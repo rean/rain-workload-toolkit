@@ -1,0 +1,44 @@
+{
+	"cloudstone-001": {
+		"generator": "radlab.rain.workload.olio.OlioGenerator",
+        "track": "radlab.rain.DefaultScenarioTrack",
+        "resourcePath": "resources/",
+		"behavior": {
+			"default" : [
+				[ 0.0, 11.0, 52.0,  36.0,   0.0, 1.0,  0.0],
+				[ 0.0,  0.0, 60.0,  20.0,   0.0, 0.0, 20.0],
+				[21.0,  6.0, 41.0,  31.0,   0.0, 1.0,  0.0],
+				[72.0, 21.0,  0.0,   0.0,   0.0, 1.0,  0.0],
+				[52.0,  6.0,  0.0,  31.0,  11.0, 0.0,  0.0],
+				[ 0.0,  0.0,  0.0,   0.0, 100.0, 0.0,  0.0],
+				[ 0.0,  0.0,  0.0, 100,     0.0, 0.0,  0.0]
+			]
+		},
+		"loadProfile": [
+		{
+			"interval": 20,
+			"users": 100,
+			"mix": "default"
+		},
+		{
+			"interval": 15,
+			"users": 100,
+			"mix": "default"
+		},
+		{
+			"interval": 25,
+			"users": 100,
+			"mix": "default"
+		}
+		],
+		"target": {
+		  "hostname": "ec2-184-73-31-220.compute-1.amazonaws.com",
+		  "port": 80
+		},
+		"pLogSampling": 1.0,
+		"pOpenLoop": 0.0,
+		"meanCycleTime": 1,
+		"meanThinkTime": 5,
+		"interactive": true
+	}
+}

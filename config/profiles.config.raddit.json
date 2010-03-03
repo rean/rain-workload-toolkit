@@ -1,0 +1,39 @@
+{
+	"raddit-001": {
+		"generator": "radlab.rain.workload.raddit.RadditGenerator",
+        "track": "radlab.rain.DefaultScenarioTrack",
+        "resourcePath": "resources/",
+		"behavior": {
+			"default" : [
+				[ 0.75, 0.25 ],
+				[ 1.0,  0.0 ]
+			]
+		},
+		"loadProfile": [
+		{
+			"interval": 20,
+			"users": 5,
+			"mix": "default"
+		},
+		{
+			"interval": 20,
+			"users": 10,
+			"mix": "default"
+		},
+		{
+			"interval": 20,
+			"users": 20,
+			"mix": "default"
+		}
+		],
+		"target": {
+		  "hostname": "127.0.0.1",
+		  "port": 3000
+		},
+		"pLogSampling": 1.0,
+		"pOpenLoop": 0.0,
+		"meanCycleTime": 1,
+		"meanThinkTime": 5,
+		"interactive": true
+	}
+}

@@ -1,0 +1,34 @@
+*Rain* is a statistics-based workload generation toolkit that uses parameterized and empirical distributions to model the different classes of workload variations.
+
+h2. Features
+
+* Highly flexible and customizable workload characterization
+** Supports variations in the amount of load, the mix of operations and variations in data popularity (data hotspots)
+** Application-specific request Generators can easily use parameterized or empirical probability distributions to characterize different variations in load
+** Benchmarks configured by simple JSON configuration files
+* Modular design of the harness
+** Simple Generator API allowing easy integration of application-specific request Generators that target new systems/applications. Example request generator for the Olio Web 2.0 application used in the Cloudstone Benchmark described and evaluated in our tech report (see Related Documents below for more details)
+* Supports closed, open, and partly open loop workload generation
+** Use of the Command pattern (GoF) to implement parameterizable Operations. This design choice allows any thread to execute an Operation opening up the possibility of open loop or partly open-loop workload generation
+** Two thread pools, one containing dedicated load threads based on the maximum number of clients/users to emulate during an experiment and a (possibly smaller) shared thread pool for simulating asynchronous Operation-execution
+* Separation of request generation from request execution 
+** This design choice allows Rain to produce traces that can be consumed by a suitable third-party high performance load-delivery client e.g., httperf, if desired or feasible
+* Multi-track load generation
+** Generate a workload that targets multiple applications/tenants in a shared cluster in a single experiment. This feature is specifically to enable evaluating resource allocation strategies for multi-application/multi-tenant scenarios
+
+h2. Benchmarking with Rain
+
+h3. Requirements
+
+* A "workload server" with "Ant":http://ant.apache.org/.
+
+h3. Instructions
+
+# SSH into the “workload server”.
+# Checkout Rain: @git clone git://github.com/yungsters/rain-workload-toolkit.git@
+# Change into the Rain directory: @cd rain-workload-toolkit@
+# Compile the source code into @rain.jar@: @ant package@
+# Bundle the workload you want to use into a JAR.
+#* To compile the Olio package, use @ant package-olio@ to create @workloads/olio.jar@.
+#* You will have to modify the ant build file for any custom workoads.
+# Run the benchmark using: @java -Xmx1g -Xms256m -cp "rain.jar:<path to workload JAR>" radlab.rain.Benchmark <path to Rain JSON configuration file>@

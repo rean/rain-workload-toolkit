@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
+              To include a user specific buildfile here, simply create one in the same
+              directory with the processing instruction <?eclipse.ant.import?>
+              as the first entry and export the buildfile again. -->
+<project basedir="." default="build" name="rain">
+    <property environment="env"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.6"/>
+    <property name="source" value="1.6"/>
+    <path id="rain.classpath">
+        <pathelement location="bin"/>
+        <pathelement location="thirdparty/httpcomponents-client-4.0.1/lib/apache-mime4j-0.6.jar"/>
+        <pathelement location="thirdparty/httpcomponents-client-4.0.1/lib/commons-codec-1.3.jar"/>
+        <pathelement location="thirdparty/httpcomponents-client-4.0.1/lib/commons-logging-1.1.1.jar"/>
+        <pathelement location="thirdparty/httpcomponents-client-4.0.1/lib/httpclient-4.0.1.jar"/>
+        <pathelement location="thirdparty/httpcomponents-client-4.0.1/lib/httpcore-4.0.1.jar"/>
+        <pathelement location="thirdparty/httpcomponents-client-4.0.1/lib/httpmime-4.0.1.jar"/>
+        <pathelement location="thirdparty/json-20090211.jar"/>
+    </path>
+    <target name="init">
+        <mkdir dir="bin"/>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="src">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete dir="bin"/>
+    </target>
+    <target depends="clean" name="cleanall"/>
+    <target depends="build-subprojects,build-project" name="build"/>
+    <target name="build-subprojects"/>
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+            <src path="src"/>
+            <classpath refid="rain.classpath"/>
+        </javac>
+    </target>
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
+    <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
+        <copy todir="${ant.library.dir}">
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </copy>
+        <unzip dest="${ant.library.dir}">
+            <patternset includes="jdtCompilerAdapter.jar"/>
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </unzip>
+    </target>
+    <target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
+        <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
+        <antcall target="build"/>
+    </target>
+    <target depends="build" name="Benchmark">
+        <java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
+            <classpath refid="rain.classpath"/>
+        	<jvmarg value="-Xmx1g" />
+        	<jvmarg value="-Xms256m" />
+        	<jvmarg value="-XX:+DisableExplicitGC"/>
+        	<arg file="rain.single_user.config.json"/>
+        </java>
+    </target>
+    <target depends="build" name="Benchmark-null">
+        <java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
+            <classpath refid="rain.classpath"/>
+                <jvmarg value="-Xmx1g" />
+                <jvmarg value="-Xms256m" />
+                <jvmarg value="-XX:+DisableExplicitGC"/>
+                <arg file="rain.config.test.json"/>
+        </java>
+    </target>
+    <target depends="build" name="package">
+        <jar destfile="rain.jar" filesetmanifest="mergewithoutmain">
+            <manifest>
+                <attribute name="Main-Class" value="radlab.rain.Benchmark"/>
+            </manifest>
+            <fileset dir="bin" excludes="radlab/rain/workload/** radlab/rain/test/**"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.0.1/lib/apache-mime4j-0.6.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.0.1/lib/commons-codec-1.3.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.0.1/lib/commons-logging-1.1.1.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.0.1/lib/httpclient-4.0.1.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.0.1/lib/httpcore-4.0.1.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.0.1/lib/httpmime-4.0.1.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/json-20090211.jar"/>
+        </jar>
+    </target>
+    <target depends="build" name="package-olio">
+        <mkdir dir="workloads"/>
+        <jar destfile="workloads/olio.jar" filesetmanifest="mergewithoutmain">
+            <fileset dir="bin" includes="radlab/rain/workload/olio/**"/>
+        </jar>
+    </target>
+    <target depends="build" name="package-cloudstoneNull">
+        <mkdir dir="workloads"/>
+        <jar destfile="workloads/cloudstoneNull.jar" filesetmanifest="mergewithoutmain">
+            <fileset dir="bin" includes="radlab/rain/workload/cloudstoneNull/**"/>
+        </jar>
+    </target>
+    <target depends="build" name="package-raddit">
+        <mkdir dir="workloads"/>
+        <jar destfile="workloads/raddit.jar" filesetmanifest="mergewithoutmain">
+            <fileset dir="bin" includes="radlab/rain/workload/raddit/**"/>
+        </jar>
+    </target>
+    <target depends="build" name="package-sample">
+        <mkdir dir="workloads"/>
+        <jar destfile="workloads/sample.jar" filesetmanifest="mergewithoutmain">
+            <fileset dir="bin" includes="radlab/rain/workload/sample/**"/>
+        </jar>
+    </target>
+    <target depends="build" name="package-scads">
+        <mkdir dir="workloads"/>
+        <jar destfile="workloads/scads.jar" filesetmanifest="mergewithoutmain">
+            <fileset dir="bin" includes="radlab/rain/workload/scads/**"/>
+        </jar>
+    </target>
+    <target depends="build" name="Benchmark-memprof">
+      <java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
+	<classpath refid="rain.classpath"/>
+	<jvmarg value="-Xmx1g" />
+	<jvmarg value="-Xms256m" />
+	<jvmarg value="-XX:+DisableExplicitGC"/>
+	<jvmarg value="-agentlib:hprof=heap=sites,file=mem.log,depth=6" />
+	<arg file="rain.config.test.json"/>
+      </java>
+    </target>  
+    <target name="OlioOperationsTest">
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes" printsummary="withOutAndErr">
+            <formatter type="xml"/>
+            <test name="radlab.rain.test.OlioOperationsTest" todir="${junit.output.dir}"/>
+            <classpath refid="rain.classpath"/>
+        </junit>
+    </target>
+    <target name="OlioOperationsTest.testEventDetailOperation">
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes" printsummary="withOutAndErr">
+            <formatter type="xml"/>
+            <test name="radlab.rain.test.OlioOperationsTest" todir="${junit.output.dir}"/>
+            <classpath refid="rain.classpath"/>
+        </junit>
+    </target>
+    <target name="HttpTransportTest">
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes" printsummary="withOutAndErr">
+            <formatter type="xml"/>
+            <test name="radlab.rain.test.HttpTransportTest" todir="${junit.output.dir}"/>
+            <classpath refid="rain.classpath"/>
+        </junit>
+    </target>
+    <target name="junitreport">
+        <junitreport todir="${junit.output.dir}">
+            <fileset dir="${junit.output.dir}">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report format="frames" todir="${junit.output.dir}"/>
+        </junitreport>
+    </target>
+</project>
