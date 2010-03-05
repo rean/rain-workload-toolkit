@@ -30,6 +30,6 @@ h3. Instructions
 # Compile the source code into @rain.jar@: @ant package@
 # Bundle the workload you want to use into a JAR.
 #* To compile the Olio package, use @ant package-olio@ to create @workloads/olio.jar@.
-#* You will have to modify the ant build file for any custom workoads.
-# Modify configuration files to describe a run (see "Anatomy of a Configuration File:http://wiki.github.com/yungsters/rain-workload-toolkit/anatomy-of-a-configuration-file for descriptions of configuration parameters and the *'config'* directory in the source tree for examples)
+#* You will have to modify the ant build file for any custom workloads.
+# Modify configuration files to describe a run (see "Anatomy of a Configuration File":http://wiki.github.com/yungsters/rain-workload-toolkit/anatomy-of-a-configuration-file).
 # Run the benchmark using: @java -Xmx1g -Xms256m -cp "rain.jar:<path to workload JAR>" radlab.rain.Benchmark <path to Rain JSON configuration file>@
