@@ -25,8 +25,7 @@ public class MapReduceGenerator extends Generator {
 
 	@Override
 	public long getThinkTime() {
-		// TODO Auto-generated method stub
-		return 0;
+		return sampleInterJobArrivalTime();
 	}
 
 	@Override
@@ -38,7 +37,32 @@ public class MapReduceGenerator extends Generator {
 	@Override
 	public Operation nextRequest(int lastOperation) {
 		// TODO Auto-generated method stub
+		/*
+		 * sample all the various pieces of data.
+		 * create new operation that takes in those parameters.
+		 */
 		return null;
+	}
+	
+	private long sampleInterJobArrivalTime() {
+		// TODO Fill me in.
+		return 0;
+	}
+	
+	private void sampleJobData() {
+		// TODO Figure out return type.
+		// TODO Fill me in.
+		// Break into multiple methods for each data piece.
+	}
+	
+	
+	private void sample(/*generic data structure*/) {
+		
+	}
+	
+	private String sampleJobName() {
+		// TODO Fill me in.
+		return "";
 	}
 
 }
