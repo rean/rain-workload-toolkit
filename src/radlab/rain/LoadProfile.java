@@ -31,32 +31,51 @@
 
 package radlab.rain;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class LoadProfile 
 {
-	private long _interval      	= 0;
-	private int _numberOfUsers  	= 0;
-	private String _mixName     	= "";
-	private long _transitionTime	= 0;
-	private long _timeStarted		= -1; // LoadManagerThreads need to update this every time they advance the "clock"
-	
-	public LoadProfile( long interval, int users, String mix )
+	public static String CFG_LOAD_PROFILE_INTERVAL_KEY        = "interval";
+	public static String CFG_LOAD_PROFILE_TRANSITION_TIME_KEY = "transitionTime";
+	public static String CFG_LOAD_PROFILE_USERS_KEY           = "users";
+	public static String CFG_LOAD_PROFILE_MIX_KEY             = "mix";
+
+	private long   _interval;
+	private long   _transitionTime;
+	private int    _numberOfUsers;
+	private String _mixName;
+
+	private long _timeStarted = -1; // LoadManagerThreads need to update this every time they advance the "clock"
+
+	public LoadProfile( JSONObject profileObj ) throws JSONException
 	{
-		this._interval = interval;
-		this._numberOfUsers = users;
-		this._mixName = mix;
-		this._transitionTime = 0;
+		this._interval = profileObj.getLong( CFG_LOAD_PROFILE_INTERVAL_KEY );
+		this._numberOfUsers = profileObj.getInt( CFG_LOAD_PROFILE_USERS_KEY );
+		this._mixName = profileObj.getString( CFG_LOAD_PROFILE_MIX_KEY );
+
+		if ( profileObj.has( CFG_LOAD_PROFILE_TRANSITION_TIME_KEY ) )
+		{
+			this._transitionTime = profileObj.getLong( CFG_LOAD_PROFILE_TRANSITION_TIME_KEY );
+		}
+	}
+
+	public LoadProfile( long interval, int numberOfUsers, String mixName ) throws JSONException
+	{
+		this(interval, numberOfUsers, mixName, 0);
 	}
 	
-	public LoadProfile( long interval, int users, String mix, long transitionTime )
+	public LoadProfile( long interval, int numberOfUsers, String mixName, long transitionTime ) throws JSONException
 	{
-		this._interval = interval;
-		this._numberOfUsers = users;
-		this._mixName = mix;
-		this._transitionTime = transitionTime;	
+		JSONObject profileObj = new JSONObject();
+		profileObj.append( CFG_LOAD_PROFILE_INTERVAL_KEY, interval );
+		profileObj.append( CFG_LOAD_PROFILE_TRANSITION_TIME_KEY, transitionTime );
+		profileObj.append( CFG_LOAD_PROFILE_USERS_KEY, numberOfUsers );
+		profileObj.append( CFG_LOAD_PROFILE_MIX_KEY, mixName );
 	}
 		
 	// Converts to milliseconds
-	public long getInterval() { return (this._interval * 1000); }
+	public long getInterval() { return ( this._interval * 1000 ); }
 	public void setInterval( long val ) { this._interval = val; }
 	
 	public int getNumberOfUsers() { return this._numberOfUsers; }
@@ -65,7 +84,7 @@ public class LoadProfile
 	public String getMixName() { return this._mixName; }
 	public void setMixName( String val ) { this._mixName = val; }
 	
-	public long getTransitionTime() { return (this._transitionTime * 1000); }
+	public long getTransitionTime() { return ( this._transitionTime * 1000 ); }
 	public void setTransitionTime( long val ) { this._transitionTime = val; }
 	
 	public long getTimeStarted() { return this._timeStarted; }

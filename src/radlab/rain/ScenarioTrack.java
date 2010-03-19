@@ -59,12 +59,8 @@ public abstract class ScenarioTrack
 	public static String CFG_TARGET_HOSTNAME_KEY                = "hostname";
 	public static String CFG_TARGET_PORT_KEY                    = "port";
 	public static String CFG_GENERATOR_KEY                      = "generator";
+	public static String CFG_LOAD_PROFILE_CLASS_KEY             = "loadProfileClass";
 	public static String CFG_LOAD_PROFILE_KEY                   = "loadProfile";
-	// Load profile keys: interval, users, mix
-	public static String CFG_LOAD_PROFILE_INTERVAL_KEY          = "interval";
-	public static String CFG_LOAD_PROFILE_USERS_KEY             = "users";
-	public static String CFG_LOAD_PROFILE_MIX_KEY               = "mix";
-	public static String CFG_LOAD_PROFILE_TRANSITION_TIME_KEY   = "transitionTime";
 	// Load behavioral hints
 	public static String CFG_BEHAVIOR_KEY                       = "behavior";
 	public static String CFG_RESOURCE_PATH                      = "resourcePath";
@@ -85,6 +81,7 @@ public abstract class ScenarioTrack
 	protected Hashtable<String,MixMatrix> _mixMap               = new Hashtable<String,MixMatrix>();
 	protected String _scoreboardClassName                       = "radlab.rain.Scoreboard";
 	protected String _generatorClassName                        = "";
+	protected String _loadProfileClassName                      = "";
 	protected boolean _interactive                              = true;
 	private IScoreboard _scoreboard                             = null;
 	protected double _openLoopProbability                       = 0.0;
@@ -207,23 +204,13 @@ public abstract class ScenarioTrack
 		this._generator.setMeanThinkTime( (long) (this._meanThinkTime * 1000) );
 		// 7) Interactive?
 		this._interactive = config.getBoolean( ScenarioTrack.CFG_INTERACTIVE_KEY );
-		// 8) Load Profile Array
+		// 8) Concrete Load Profile and Load Profile Array
+		this._loadProfileClassName = config.getString( ScenarioTrack.CFG_LOAD_PROFILE_CLASS_KEY );
 		JSONArray loadSchedule = config.getJSONArray( ScenarioTrack.CFG_LOAD_PROFILE_KEY );
 		for ( int i = 0; i < loadSchedule.length(); i++ )
 		{
 			JSONObject profileObj = loadSchedule.getJSONObject( i );
-			// Pull out fields to create an LoadProfile
-			// Load profile keys: interval, users, mix, optional transitionTime
-			LoadProfile profile = null;
-			
-			if ( !profileObj.has( ScenarioTrack.CFG_LOAD_PROFILE_TRANSITION_TIME_KEY ) )
-			{
-				profile = new LoadProfile( profileObj.getLong( ScenarioTrack.CFG_LOAD_PROFILE_INTERVAL_KEY ), profileObj.getInt( ScenarioTrack.CFG_LOAD_PROFILE_USERS_KEY ), profileObj.getString( ScenarioTrack.CFG_LOAD_PROFILE_MIX_KEY ) );
-			}
-			else
-			{
-				profile = new LoadProfile( profileObj.getLong( ScenarioTrack.CFG_LOAD_PROFILE_INTERVAL_KEY ), profileObj.getInt( ScenarioTrack.CFG_LOAD_PROFILE_USERS_KEY ), profileObj.getString( ScenarioTrack.CFG_LOAD_PROFILE_MIX_KEY ), profileObj.getLong( ScenarioTrack.CFG_LOAD_PROFILE_TRANSITION_TIME_KEY ) );
-			}
+			LoadProfile profile = this.createLoadProfile( this._generatorClassName, profileObj );
 			
 			this._loadSchedule.add( profile );
 		}
@@ -280,6 +267,16 @@ public abstract class ScenarioTrack
 		Constructor<Generator> generatorCtor = generatorClass.getConstructor( new Class[]{ ScenarioTrack.class } );
 		generator = (Generator) generatorCtor.newInstance( new Object[] { this } );
 		return generator;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public LoadProfile createLoadProfile( String name, JSONObject profileObj ) throws Exception
+	{
+		LoadProfile loadProfile = null;
+		Class<LoadProfile> loadProfileClass = (Class<LoadProfile>) Class.forName( name );
+		Constructor<LoadProfile> loadProfileCtor = loadProfileClass.getConstructor( new Class[]{ JSONObject.class } );
+		loadProfile = (LoadProfile) loadProfileCtor.newInstance( new Object[] { profileObj } );
+		return loadProfile;
 	}
 	
 	@SuppressWarnings("unchecked")

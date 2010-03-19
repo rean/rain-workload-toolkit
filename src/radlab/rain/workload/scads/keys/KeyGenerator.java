@@ -31,11 +31,39 @@
 
 package radlab.rain.workload.scads.keys;
 
-public abstract class KeyGenerator {
-	
+import org.json.JSONObject;
+
+/**
+ * Any class that extends the KeyGenerator abstract class may be used to
+ * generate integral keys based on a distribution.
+ */
+public abstract class KeyGenerator
+{
+	/** The name of this generator. */
+	protected String name;
+
+	/**
+	 * Generates an integral key, usually based on a distribution represented
+	 * by this key generator. Subsequent invocations of this method may not
+	 * return the same value.
+	 * 
+	 * @return  An integral key.
+	 */
 	public abstract int generateKey();
-	
-	
-	
-	
+
+	/**
+	 * Returns the name of this generator.
+	 * 
+	 * @return  The name of this generator.
+	 */
+	public String getName()
+	{
+		return this.name;
+	}
+
+	public static KeyGenerator createKeyGenerator(String keyGeneratorName,
+			JSONObject keyGeneratorConfig) {
+		// TODO: Implement me.
+		return null;
+	}
 }

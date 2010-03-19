@@ -40,9 +40,9 @@ import radlab.rain.*;
  */
 public abstract class ScadsOperation extends Operation 
 {
+	/** The key used in this SCADs operation. */
 	protected int key;
-	
-	
+
 	/**
 	 * Returns the SampleGenerator that created this operation.
 	 * 
@@ -52,24 +52,23 @@ public abstract class ScadsOperation extends Operation
 	{
 		return (ScadsGenerator) this._generator;
 	}
-	
+
 	public ScadsOperation( boolean interactive, IScoreboard scoreboard )
 	{
 		super( interactive, scoreboard );
 	}
-	
+
 	@Override
 	public void prepare(Generator generator) 
 	{
 		this._generator = generator;
-		this.key = ((ScadsGenerator)generator).getKeyGenerator().generateKey();
+		this.key = getGenerator().getKeyGenerator().generateKey();
 	}
-	
-	
+
 	@Override
 	public void cleanup()
 	{
 		
 	}
-	
+
 }

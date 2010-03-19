@@ -31,11 +31,7 @@
 
 package radlab.rain.workload.scads;
 
-public class ScadsTransport {
-
-	
-	
-	
-	
-	
+public class ScadsTransport
+{
+	// TODO: Implement me.
 }

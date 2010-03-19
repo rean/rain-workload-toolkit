@@ -31,54 +31,48 @@
 
 package radlab.rain.workload.scads;
 
+import org.json.JSONObject;
+
 import radlab.rain.Generator;
 
 import radlab.rain.workload.scads.keys.*;
-import radlab.rain.LoadProfile;
 import radlab.rain.Operation;
 import radlab.rain.ScenarioTrack;
 
 /**
- * The CloudstoneGenerator class generates operations for a single user thread
- * by producing the next operation to execute given the last operation. The
- * next operation is decided through the use of a load mix matrix.<br />
- * <br />
- * This class also provides accessors to many static parameters such as the
- * HTTP client, and it generates other potentially dynamic values such as the
- * think/cycle times. 
+ * The ScadsGenerator class generates SCADs operations according to the given
+ * load mix matrix and behavior intervals/transitions.
  */
 public class ScadsGenerator extends Generator
 {
-	
 	// Operation indices used in the mix matrix.
 	public static final int GETOPERATION = 0;
-	public static final int SETOPERATION = 1;
+	public static final int PUTOPERATION = 1;
 	public static final int GETSETOPERATION = 2;
-	
+
 	private java.util.Random _randomNumberGenerator;
+
 	private KeyGenerator _keyGenerator;
-	
+	private JSONObject _keyGeneratorConfig;
+
 	/**
-	 * Initialize a <code>SampleGenerator</code> given a <code>ScenarioTrack</code>.
+	 * Initialize a <code>ScadsGenerator</code> given a <code>ScenarioTrack</code>.
 	 * 
 	 * @param track     The track configuration with which to run this generator.
 	 */
 	public ScadsGenerator( ScenarioTrack track )
 	{
 		super( track );
-		
-		// TODO: Fill me in.
 	}
-	
+
 	/**
 	 * Initialize this generator.
 	 */
 	public void initialize()
 	{
 		this._randomNumberGenerator = new java.util.Random();
-		this._keyGenerator = new UniformKeyGenerator(1, 1000);
 	}
-	
+
 	/**
 	 * Returns the next <code>Operation</code> given the <code>lastOperation</code>
 	 * according to the current mix matrix.
@@ -87,7 +81,17 @@ public class ScadsGenerator extends Generator
 	 */
 	public Operation nextRequest( int lastOperation )
 	{
-		LoadProfile currentLoad = this.getTrack().getCurrentLoadProfile();
+		ScadsLoadProfile currentLoad = (ScadsLoadProfile) this.getTrack().getCurrentLoadProfile();
+		
+		JSONObject keyGeneratorConfig = currentLoad.getKeyGeneratorConfig();
+		if ( !keyGeneratorConfig.equals( this._keyGeneratorConfig ) )
+		{
+			this._keyGeneratorConfig = keyGeneratorConfig;
+			
+			String keyGeneratorName = currentLoad.getKeyGeneratorName();
+			this._keyGenerator = KeyGenerator.createKeyGenerator( keyGeneratorName, this._keyGeneratorConfig );
+		}
+		
 		int nextOperation = -1;
 		
 		if( lastOperation == -1 )
@@ -112,7 +116,7 @@ public class ScadsGenerator extends Generator
 		}
 		return getOperation( nextOperation );
 	}
-	
+
 	/**
 	 * Returns the current think time. The think time is duration between
 	 * receiving the response of an operation and the execution of its
@@ -122,7 +126,7 @@ public class ScadsGenerator extends Generator
 	{
 		return 0;
 	}
-	
+
 	/**
 	 * Returns the current cycle time. The cycle time is duration between
 	 * the execution of an operation and the execution of its succeeding
@@ -132,7 +136,7 @@ public class ScadsGenerator extends Generator
 	{
 		return 0;
 	}
-	
+
 	/**
 	 * Disposes of unnecessary objects at the conclusion of a benchmark run.
 	 */
@@ -140,7 +144,7 @@ public class ScadsGenerator extends Generator
 	{
 		// TODO: Fill me in.
 	}
-	
+
 	/**
 	 * Creates a newly instantiated, prepared operation.
 	 * 
@@ -152,12 +156,12 @@ public class ScadsGenerator extends Generator
 		switch( opIndex )
 		{
 			case GETOPERATION: return this.createGetOperation();
-			case SETOPERATION: return this.createSetOperation();
+			case PUTOPERATION: return this.createSetOperation();
 			case GETSETOPERATION: return this.createGetSetOperation();
 			default:         return null;
 		}
 	}
-	
+
 	/**
 	 * Factory method.
 	 * 
@@ -169,29 +173,25 @@ public class ScadsGenerator extends Generator
 		op.prepare( this );
 		return op;
 	}
-	
+
 	/**
 	 * Factory method.
 	 * 
 	 * @return  A prepared Operation2.
 	 */
-	public SetOperation createSetOperation()
+	public PutOperation createSetOperation()
 	{
-		SetOperation op = new SetOperation( this.getTrack().getInteractive(), this.getScoreboard() );
+		PutOperation op = new PutOperation( this.getTrack().getInteractive(), this.getScoreboard() );
 		op.prepare( this );
 		return op;
 	}
-	
+
 	public GetSetOperation createGetSetOperation()
 	{
 		GetSetOperation op = new GetSetOperation( this.getTrack().getInteractive(), this.getScoreboard() );
 		op.prepare( this );
 		return op;
 	}
-
-	//public void set_keyGenerator(KeyGenerator _keyGenerator) {
-	//	this._keyGenerator = _keyGenerator;
-	//}
 
 	public KeyGenerator getKeyGenerator() {
 		return _keyGenerator;

@@ -36,6 +36,7 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.util.Set;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -80,7 +81,14 @@ public class OlioOperationsTest
 		testScenario.setDuration( 600 );
 		testScenario.setRampDown( 10 );
 		track = new DefaultScenarioTrack( testScenario );
-		track.initialize( generatorClassName, hostname, port );
+		try
+		{
+			track.initialize( generatorClassName, hostname, port );
+		}
+		catch ( JSONException e )
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	@Before
