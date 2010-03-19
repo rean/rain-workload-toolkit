@@ -1,0 +1,69 @@
+{
+	"scads-001": {
+		"generator": "radlab.rain.workload.scads.ScadsGenerator",
+		"track": "radlab.rain.DefaultScenarioTrack",
+		"loadProfileClass": "radlab.rain.workload.scads.ScadsLoadProfile",
+		"resourcePath": "resources/",
+		"behavior": {
+			"mix100" : [
+				[ 1, 0, 0 ],
+				[ 1, 0, 0 ],
+				[ 1, 0, 0 ]
+			],
+			"mix99" : [
+				[ 0.99, 0.01, 0 ],
+				[ 0.99, 0.01, 0 ],
+				[ 0.99, 0.01, 0 ]
+			],
+			"mix98" : [
+				[ 0.98, 0.02, 0 ],
+				[ 0.98, 0.02, 0 ],
+				[ 0.98, 0.02, 0 ]
+			],
+			"mix97" : [
+				[ 0.97, 0.03, 0 ],
+				[ 0.97, 0.03, 0 ],
+				[ 0.97, 0.03, 0 ]
+			],
+			"mix96" : [
+				[ 0.96, 0.04, 0 ],
+				[ 0.96, 0.04, 0 ],
+				[ 0.96, 0.04, 0 ]
+			]
+		},
+		"loadProfile": [
+		{
+			"interval": 20,
+			"users": 100,
+			"mix": "default",
+			"keyGenerator": "radlab.rain.workload.scads.keys.UniformKeyGenerator",
+			"keyGeneratorConfig": {
+				"minKey": 1,
+				"maxKey": 1000
+			}
+		},
+		"loadProfile": [
+		{
+			"interval": 20,
+			"users": 100,
+			"mix": "default",
+			"keyGenerator": "radlab.rain.workload.scads.keys.ZipfKeyGenerator",
+			"keyGeneratorConfig": {
+				"minKey": 1,
+				"maxKey": 1000,
+				"a": 1.001,
+				"r": 3.456
+			}
+		}
+		],
+		"target": {
+		  "hostname": "ec2-184-73-31-220.compute-1.amazonaws.com",
+		  "port": 80
+		},
+		"pLogSampling": 1.0,
+		"pOpenLoop": 0.0,
+		"meanCycleTime": 10,
+		"meanThinkTime": 10,
+		"interactive": true
+	}
+}

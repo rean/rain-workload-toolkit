@@ -1,0 +1,8 @@
+{
+    "profiles": "config/profiles.config.scads.json",
+    "timing": {
+        "rampUp": 10,
+        "duration": 60,
+        "rampDown": 10
+    }
+}
