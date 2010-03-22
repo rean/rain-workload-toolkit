@@ -33,6 +33,9 @@ package radlab.rain.workload.scads.keys;
 
 import java.util.Random;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * The UniformKeyGenerator randomly generates integral keys in a range.
  */
@@ -47,6 +50,12 @@ public class UniformKeyGenerator extends KeyGenerator
 
 	/** Upper bound of the key(s) generated. */
 	protected int maxKey;
+
+	public UniformKeyGenerator( JSONObject configObj ) throws JSONException
+	{
+		this( configObj.getInt( MIN_KEY_CONFIG_KEY ),
+			  configObj.getInt( MAX_KEY_CONFIG_KEY ) );
+	}
 
 	public UniformKeyGenerator( int minKey, int maxKey )
 	{

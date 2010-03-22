@@ -33,6 +33,9 @@ package radlab.rain.workload.scads.keys;
 
 import java.util.Random;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class ZipfKeyGenerator extends KeyGenerator
 {
 	protected String name = "Zipf";
@@ -50,6 +53,14 @@ public class ZipfKeyGenerator extends KeyGenerator
 
 	/** Random number used to shuffle keys around. */
 	protected double r;
+
+	public ZipfKeyGenerator( JSONObject configObj ) throws JSONException
+	{
+		this( configObj.getDouble( A_CONFIG_KEY ),
+			  configObj.getDouble( R_CONFIG_KEY ),
+			  configObj.getInt( MIN_KEY_CONFIG_KEY ),
+			  configObj.getInt( MAX_KEY_CONFIG_KEY ) );
+	}
 
 	public ZipfKeyGenerator( double a, double r, int minKey, int maxKey )
 	{

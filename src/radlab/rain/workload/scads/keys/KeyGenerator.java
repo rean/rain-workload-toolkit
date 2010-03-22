@@ -31,6 +31,8 @@
 
 package radlab.rain.workload.scads.keys;
 
+import java.lang.reflect.Constructor;
+
 import org.json.JSONObject;
 
 /**
@@ -39,6 +41,11 @@ import org.json.JSONObject;
  */
 public abstract class KeyGenerator
 {
+	protected static final String MIN_KEY_CONFIG_KEY = "minKey";
+	protected static final String MAX_KEY_CONFIG_KEY = "maxKey";
+	protected static final String A_CONFIG_KEY = "a";
+	protected static final String R_CONFIG_KEY = "r";
+
 	/** The name of this generator. */
 	protected String name;
 
@@ -61,9 +68,14 @@ public abstract class KeyGenerator
 		return this.name;
 	}
 
-	public static KeyGenerator createKeyGenerator(String keyGeneratorName,
-			JSONObject keyGeneratorConfig) {
-		// TODO: Implement me.
-		return null;
+	@SuppressWarnings("unchecked")
+	public static KeyGenerator createKeyGenerator( String name, JSONObject keyGeneratorConfig ) throws Exception
+	{
+		KeyGenerator keyGenerator = null;
+		Class<KeyGenerator> keyGeneratorClass = (Class<KeyGenerator>) Class.forName( name );
+		Constructor<KeyGenerator> keyGeneratorCtor = keyGeneratorClass.getConstructor( new Class[]{ JSONObject.class } );
+		keyGenerator = (KeyGenerator) keyGeneratorCtor.newInstance( new Object[] { keyGeneratorConfig } );
+		return keyGenerator;
 	}
+
 }

@@ -35,18 +35,17 @@
 		{
 			"interval": 20,
 			"users": 100,
-			"mix": "default",
+			"mix": "mix100",
 			"keyGenerator": "radlab.rain.workload.scads.keys.UniformKeyGenerator",
 			"keyGeneratorConfig": {
 				"minKey": 1,
 				"maxKey": 1000
 			}
 		},
-		"loadProfile": [
 		{
 			"interval": 20,
 			"users": 100,
-			"mix": "default",
+			"mix": "mix99",
 			"keyGenerator": "radlab.rain.workload.scads.keys.ZipfKeyGenerator",
 			"keyGeneratorConfig": {
 				"minKey": 1,

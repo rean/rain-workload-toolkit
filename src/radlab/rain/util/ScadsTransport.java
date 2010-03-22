@@ -31,9 +31,7 @@
 
 package radlab.rain.util;
 
-public class ScadsTransport {
-
-	//Todo: fill me out
-	
-	
+public class ScadsTransport
+{
+	// TODO: Implement me.
 }

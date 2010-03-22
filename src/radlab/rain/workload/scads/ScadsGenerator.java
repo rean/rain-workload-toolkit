@@ -31,11 +31,10 @@
 
 package radlab.rain.workload.scads;
 
-import org.json.JSONObject;
-
 import radlab.rain.Generator;
 
 import radlab.rain.workload.scads.keys.*;
+import radlab.rain.LoadProfile;
 import radlab.rain.Operation;
 import radlab.rain.ScenarioTrack;
 
@@ -53,7 +52,7 @@ public class ScadsGenerator extends Generator
 	private java.util.Random _randomNumberGenerator;
 
 	private KeyGenerator _keyGenerator;
-	private JSONObject _keyGeneratorConfig;
+//	private JSONObject _keyGeneratorConfig;
 
 	/**
 	 * Initialize a <code>ScadsGenerator</code> given a <code>ScenarioTrack</code>.
@@ -81,19 +80,10 @@ public class ScadsGenerator extends Generator
 	 */
 	public Operation nextRequest( int lastOperation )
 	{
-		ScadsLoadProfile currentLoad = (ScadsLoadProfile) this.getTrack().getCurrentLoadProfile();
-		
-		JSONObject keyGeneratorConfig = currentLoad.getKeyGeneratorConfig();
-		if ( !keyGeneratorConfig.equals( this._keyGeneratorConfig ) )
-		{
-			this._keyGeneratorConfig = keyGeneratorConfig;
-			
-			String keyGeneratorName = currentLoad.getKeyGeneratorName();
-			this._keyGenerator = KeyGenerator.createKeyGenerator( keyGeneratorName, this._keyGeneratorConfig );
-		}
-		
+		LoadProfile currentLoad = this.getTrack().getCurrentLoadProfile();
+
 		int nextOperation = -1;
-		
+
 		if( lastOperation == -1 )
 		{
 			nextOperation = 0;
@@ -103,7 +93,7 @@ public class ScadsGenerator extends Generator
 			// Get the selection matrix
 			double[][] selectionMix = this.getTrack().getMixMatrix(currentLoad.getMixName()).getSelectionMix();
 			double rand = this._randomNumberGenerator.nextDouble();
-			
+
 			int j;
 			for ( j = 0; j < selectionMix.length; j++ )
 			{

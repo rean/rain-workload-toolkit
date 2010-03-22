@@ -210,7 +210,7 @@ public abstract class ScenarioTrack
 		for ( int i = 0; i < loadSchedule.length(); i++ )
 		{
 			JSONObject profileObj = loadSchedule.getJSONObject( i );
-			LoadProfile profile = this.createLoadProfile( this._generatorClassName, profileObj );
+			LoadProfile profile = this.createLoadProfile( this._loadProfileClassName, profileObj );
 			
 			this._loadSchedule.add( profile );
 		}
