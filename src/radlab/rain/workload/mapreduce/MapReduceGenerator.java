@@ -25,7 +25,8 @@ public class MapReduceGenerator extends Generator {
 
 	@Override
 	public long getThinkTime() {
-		return sampleInterJobArrivalTime();
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	@Override
@@ -38,31 +39,39 @@ public class MapReduceGenerator extends Generator {
 	public Operation nextRequest(int lastOperation) {
 		// TODO Auto-generated method stub
 		/*
-		 * sample all the various pieces of data.
-		 * create new operation that takes in those parameters.
+		 * lastOperation could be line number of file we are on?
+		 * This is not necessary, our line reader will keep track of that.
 		 */
-		return null;
+		
+		String request = "mapreduce " + getNumReducers() + " " + getInputPath() +
+				" " + getOutputPath() + " " + getSIRatio() + " " + getOSRatio();
+		
+		return new MapReduceOperation(request, true, getScoreboard());
 	}
-	
-	private long sampleInterJobArrivalTime() {
-		// TODO Fill me in.
+
+	public int getNumReducers() {
+		// TODO Auto-generated method stub
 		return 0;
 	}
-	
-	private void sampleJobData() {
-		// TODO Figure out return type.
-		// TODO Fill me in.
-		// Break into multiple methods for each data piece.
+
+	public String getInputPath() {
+		// TODO Auto-generated method stub
+		return null;
 	}
-	
-	
-	private void sample(/*generic data structure*/) {
-		
+
+	public String getOutputPath() {
+		// TODO Auto-generated method stub
+		return null;
 	}
-	
-	private String sampleJobName() {
-		// TODO Fill me in.
-		return "";
+
+	public double getSIRatio() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public double getOSRatio() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }

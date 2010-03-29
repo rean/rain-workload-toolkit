@@ -6,9 +6,11 @@ import radlab.rain.Operation;
 
 public class MapReduceOperation extends Operation {
 
-	public MapReduceOperation(boolean interactive, IScoreboard scoreboard) {
+	private String _request;
+
+	public MapReduceOperation(String request, boolean interactive, IScoreboard scoreboard) {
 		super(interactive, scoreboard);
-		// TODO Auto-generated constructor stub
+		_request = request;
 	}
 
 	@Override
@@ -20,13 +22,12 @@ public class MapReduceOperation extends Operation {
 	@Override
 	public void execute() throws Throwable {
 		// TODO Auto-generated method stub
-
+		System.out.println(_request);
 	}
 
 	@Override
 	public void prepare(Generator generator) {
-		// TODO Auto-generated method stub
-
+		this._generator = generator;
 	}
 
 }
