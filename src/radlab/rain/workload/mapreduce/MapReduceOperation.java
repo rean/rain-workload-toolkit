@@ -22,7 +22,8 @@ public class MapReduceOperation extends Operation {
 	@Override
 	public void execute() throws Throwable {
 		// TODO Auto-generated method stub
-		System.out.println(_request);
+		System.out.println( _request );
+		this.setFailed( false );
 	}
 
 	@Override

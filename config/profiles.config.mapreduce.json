@@ -1,5 +1,5 @@
 {
-	"raddit-001": {
+	"mapreduce-001": {
 		"generator": "radlab.rain.workload.mapreduce.MapReduceGenerator",
         "track": "radlab.rain.DefaultScenarioTrack",
 		"behavior": {
