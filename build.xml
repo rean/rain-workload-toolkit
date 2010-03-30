@@ -118,6 +118,12 @@
             <fileset dir="bin" includes="radlab/rain/workload/scads/**"/>
         </jar>
     </target>
+    <target depends="build" name="package-mapreduce">
+        <mkdir dir="workloads"/>
+        <jar destfile="workloads/mapreduce.jar" filesetmanifest="mergewithoutmain">
+            <fileset dir="bin" includes="radlab/rain/workload/mapreduce/**"/>
+        </jar>
+    </target>
     <target depends="build" name="Benchmark-memprof">
       <java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
 	<classpath refid="rain.classpath"/>
