@@ -47,15 +47,20 @@ public class MapReduceGenerator extends Generator {
 		 * lastOperation could be line number of file we are on?
 		 * This is not necessary, our line reader will keep track of that.
 		 */
-		String request;
+		String request = null;
 		try {
 		request = "mapreduce " + getNumReducers() + " " + getInputPath() +
 				" " + getOutputPath() + " " + getSIRatio() + " " + getOSRatio();
+		} catch (IOException e) {
 		} finally {
-			inputPaths.close();
-			outputPaths.close();
-			siRatios.close();
-			osRatios.close();
+			try {
+				if (inputPaths != null) inputPaths.close();
+				if (outputPaths != null) outputPaths.close();
+				if (siRatios != null) siRatios.close();
+				if (osRatios != null) osRatios.close();
+			} catch (IOException e) {
+				
+			}
 		}
 		return new MapReduceOperation(request, true, getScoreboard());
 	}
