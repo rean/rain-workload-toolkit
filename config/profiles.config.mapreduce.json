@@ -1,0 +1,37 @@
+{
+	"raddit-001": {
+		"generator": "radlab.rain.workload.mapreduce.MapReduceGenerator",
+        "track": "radlab.rain.DefaultScenarioTrack",
+		"behavior": {
+			"default" : [
+				[ 1.0 ]
+			]
+		},
+		"loadProfile": [
+		{
+			"interval": 20,
+			"users": 5,
+			"mix": "default"
+		},
+		{
+			"interval": 20,
+			"users": 10,
+			"mix": "default"
+		},
+		{
+			"interval": 20,
+			"users": 20,
+			"mix": "default"
+		}
+		],
+		"target": {
+		  "hostname": "127.0.0.1",
+		  "port": 3000
+		},
+		"pLogSampling": 1.0,
+		"pOpenLoop": 0.0,
+		"meanCycleTime": 1,
+		"meanThinkTime": 5,
+		"interactive": true
+	}
+}
