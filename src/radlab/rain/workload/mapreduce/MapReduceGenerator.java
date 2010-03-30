@@ -1,10 +1,15 @@
 package radlab.rain.workload.mapreduce;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+
 import radlab.rain.Generator;
 import radlab.rain.Operation;
 import radlab.rain.ScenarioTrack;
 
 public class MapReduceGenerator extends Generator {
+	
+	private BufferedReader inputPaths, outputPaths, siRatios, osRatios;
 
 	public MapReduceGenerator(ScenarioTrack track) {
 		super(track);
@@ -42,36 +47,43 @@ public class MapReduceGenerator extends Generator {
 		 * lastOperation could be line number of file we are on?
 		 * This is not necessary, our line reader will keep track of that.
 		 */
-		
-		String request = "mapreduce " + getNumReducers() + " " + getInputPath() +
+		String request;
+		try {
+		request = "mapreduce " + getNumReducers() + " " + getInputPath() +
 				" " + getOutputPath() + " " + getSIRatio() + " " + getOSRatio();
-		
+		} finally {
+			inputPaths.close();
+			outputPaths.close();
+			siRatios.close();
+			osRatios.close();
+		}
 		return new MapReduceOperation(request, true, getScoreboard());
 	}
 
 	public int getNumReducers() {
 		// TODO Auto-generated method stub
+		// This value is calculated
 		return 0;
 	}
 
-	public String getInputPath() {
+	public String getInputPath() throws IOException {
 		// TODO Auto-generated method stub
-		return null;
+		return inputPaths.readLine();
 	}
 
-	public String getOutputPath() {
+	public String getOutputPath() throws IOException {
 		// TODO Auto-generated method stub
-		return null;
+		return outputPaths.readLine();
 	}
 
-	public double getSIRatio() {
+	public double getSIRatio() throws IOException {
 		// TODO Auto-generated method stub
-		return 0;
+		return Double.parseDouble(siRatios.readLine());
 	}
 
-	public double getOSRatio() {
+	public double getOSRatio() throws IOException {
 		// TODO Auto-generated method stub
-		return 0;
+		return Double.parseDouble(osRatios.readLine());
 	}
 
 }
