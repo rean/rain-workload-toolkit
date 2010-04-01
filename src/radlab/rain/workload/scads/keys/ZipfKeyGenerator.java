@@ -43,10 +43,10 @@ public class ZipfKeyGenerator extends KeyGenerator
 	protected Random random = new Random();
 
 	/** Lower bound of the key(s) generated. */
-	protected int minKey;
+	protected int lowerBound;
 
 	/** Upper bound of the key(s) generated. */
-	protected int maxKey;
+	protected int upperBound;
 
 	/** Shape of the Zipf distribution; larger value implies taller peaks. */
 	protected double a;
@@ -70,8 +70,9 @@ public class ZipfKeyGenerator extends KeyGenerator
 
 		this.a = a;
 		this.r = r;
-		this.minKey = minKey;
-		this.maxKey = maxKey;
+		this.lowerBound = minKey;
+		// maxKey is inclusive, upperBound is exclusive.
+		this.upperBound = maxKey + 1;
 	}
 
 	public int generateKey()
@@ -79,8 +80,8 @@ public class ZipfKeyGenerator extends KeyGenerator
 		int k = -1;
 		do {
 			k = sampleZipf();
-		} while ( k > maxKey );
-		return Math.abs( (Double.valueOf( ( k + 1 ) * r ) ).hashCode() ) % ( maxKey - minKey ) + minKey;
+		} while ( k > upperBound );
+		return Math.abs( (Double.valueOf( ( k + 1 ) * r ) ).hashCode() ) % ( upperBound - lowerBound ) + lowerBound;
 	}
 
 	private int sampleZipf()
