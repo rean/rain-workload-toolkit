@@ -54,7 +54,7 @@ public abstract class ScenarioTrack
 	public static String CFG_MEAN_THINK_TIME_KEY                = "meanThinkTime";
 	public static String CFG_INTERACTIVE_KEY                    = "interactive";
 	public static String CFG_TARGETS_KEY                        = "target";
-	public static String CFG_SCOREBOARD_SNAPSHOT_INTERVAL		= "metricSnapshotInterval";
+	public static String CFG_SCOREBOARD_SNAPSHOT_INTERVAL       = "metricSnapshotInterval";
 	// Targets keys: hostname, port
 	public static String CFG_TARGET_HOSTNAME_KEY                = "hostname";
 	public static String CFG_TARGET_PORT_KEY                    = "port";
@@ -64,12 +64,13 @@ public abstract class ScenarioTrack
 	// Load behavioral hints
 	public static String CFG_BEHAVIOR_KEY                       = "behavior";
 	public static String CFG_RESOURCE_PATH                      = "resourcePath";
-	public static String CFG_OBJECT_POOL_MAX_SIZE				= "objectPoolMaxSize";
-	public static String CFG_MEAN_RESPONSE_TIME_SAMPLE_INTERVAL	= "meanResponseTimeSamplingInterval";
+	public static String CFG_OBJECT_POOL_MAX_SIZE               = "objectPoolMaxSize";
+	public static String CFG_MEAN_RESPONSE_TIME_SAMPLE_INTERVAL = "meanResponseTimeSamplingInterval";
 	
 	// Defaults
-	public static long DEFAULT_OBJECT_POOL_MAX_SIZE				= 50000;
+	public static long DEFAULT_OBJECT_POOL_MAX_SIZE             = 50000;
 	public static long DEFAULT_MEAN_RESPONSE_TIME_SAMPLE_INTERVAL = 500;
+	public static String DEFAULT_LOAD_PROFILE_CLASS             = "radlab.rain.DefaultScenarioTrack";
 	
 	protected Scenario _parentScenario                          = null;
 	protected Generator _generator                              = null;
@@ -89,9 +90,9 @@ public abstract class ScenarioTrack
 	protected double _meanCycleTime                             = 0.0; // non-stop request generation
 	protected double _meanThinkTime                             = 0.0; // non-stop request generation
 	protected double _logSamplingProbability                    = 1.0; // Log every executed request seen by the Scoreboard
-	protected double _metricSnapshotInterval					= 60.0; // (seconds)
-	protected ObjectPool _objPool 								= null;
-	protected long _meanResponseTimeSamplingInterval			= DEFAULT_MEAN_RESPONSE_TIME_SAMPLE_INTERVAL;
+	protected double _metricSnapshotInterval                    = 60.0; // (seconds)
+	protected ObjectPool _objPool                               = null;
+	protected long _meanResponseTimeSamplingInterval            = DEFAULT_MEAN_RESPONSE_TIME_SAMPLE_INTERVAL;
 	
 	/**
 	 * Create a new scenario track that will be benchmarked as part of the
@@ -205,7 +206,14 @@ public abstract class ScenarioTrack
 		// 7) Interactive?
 		this._interactive = config.getBoolean( ScenarioTrack.CFG_INTERACTIVE_KEY );
 		// 8) Concrete Load Profile and Load Profile Array
-		this._loadProfileClassName = config.getString( ScenarioTrack.CFG_LOAD_PROFILE_CLASS_KEY );
+		if ( config.has( ScenarioTrack.CFG_LOAD_PROFILE_CLASS_KEY ) )
+		{
+			this._loadProfileClassName = config.getString( ScenarioTrack.CFG_LOAD_PROFILE_CLASS_KEY );
+		}
+		else
+		{
+			this._loadProfileClassName = ScenarioTrack.DEFAULT_LOAD_PROFILE_CLASS;
+		}
 		JSONArray loadSchedule = config.getJSONArray( ScenarioTrack.CFG_LOAD_PROFILE_KEY );
 		for ( int i = 0; i < loadSchedule.length(); i++ )
 		{
@@ -251,7 +259,10 @@ public abstract class ScenarioTrack
 		{
 			this._objPool = new ObjectPool( config.getLong( ScenarioTrack.CFG_OBJECT_POOL_MAX_SIZE ) );
 		}
-		else this._objPool = new ObjectPool( ScenarioTrack.DEFAULT_OBJECT_POOL_MAX_SIZE );
+		else
+		{
+			this._objPool = new ObjectPool( ScenarioTrack.DEFAULT_OBJECT_POOL_MAX_SIZE );
+		}
 		this._objPool.setTrackName( this._name );
 		// 12 Configure the response time sampler
 		if( config.has( ScenarioTrack.CFG_MEAN_RESPONSE_TIME_SAMPLE_INTERVAL ) )
