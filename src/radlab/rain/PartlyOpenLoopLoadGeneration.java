@@ -105,7 +105,7 @@ public class PartlyOpenLoopLoadGeneration extends LoadGenerationStrategy
 		{
 			this.sleepUntil( this._timeStarted );
 			
-			int lastOperationIndex = NO_OPERATION_INDEX;	
+			int lastOperationIndex = NO_OPERATION_INDEX;
 			while ( System.currentTimeMillis() <= this._timeToQuit )
 			{
 				if ( !this.isActive() )
@@ -314,13 +314,29 @@ public class PartlyOpenLoopLoadGeneration extends LoadGenerationStrategy
 	/**
 	 * Checks whether this thread should be active or not based on the number
 	 * of active users specified by the current load profile and this thread's
-	 * ID number.
+	 * ID number. During ramp up, all threads are active; during ramp down, no
+	 * threads are active.<br />
+	 * <br />
+	 * Assumes that this method is invoked between timeStarted and timetoQuit.
 	 * 
 	 * @return      True if this thread should be active; otherwise false.
 	 */
 	protected boolean isActive()
 	{
-		LoadProfile currentLoad = this._generator.getTrack().getCurrentLoadProfile();
-		return ( this._id <= currentLoad.getNumberOfUsers() );
+		long now = System.currentTimeMillis();
+		
+		if ( now < this._startSteadyState )
+		{
+			return true;
+		}
+		else if ( now > this._endSteadyState )
+		{
+			return false;
+		}
+		else
+		{
+			LoadProfile loadProfile = this._generator.getTrack().getCurrentLoadProfile();
+			return ( this._id <= loadProfile.getNumberOfUsers() );
+		}
 	}
 }

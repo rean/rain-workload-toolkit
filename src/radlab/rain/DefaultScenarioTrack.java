@@ -127,9 +127,10 @@ public class DefaultScenarioTrack extends ScenarioTrack
 		{
 			/*
 			 * If we make it here, that means the current time is before the
-			 * current load profile interval. This should not happen.
+			 * current load profile interval. This should only happen during
+			 * ramp up when we use the first load profile as the "ramp up"
+			 * profile.
 			 */
-			System.out.println( this + " Info: Transition sampling indicates an invalid profile. Using current load profile." );
 			return currentProfile;
 		}
 	}	
@@ -248,9 +249,22 @@ public class DefaultScenarioTrack extends ScenarioTrack
 		public void run()
 		{
 			long now = System.currentTimeMillis();
+			long rampUp = this._track.getRampUp() * 1000;
 			
+			// Prepare the first load profile before ramp up so that we at
+			// lease have a load profile to use during the ramp up.
 			this._track._currentLoadProfile = this._track._loadSchedule.get( loadScheduleIndex );
-			this._track._currentLoadProfile.setTimeStarted( now );
+			this._track._currentLoadProfile.setTimeStarted( now + rampUp );
+			System.out.println( this + " ramping up for " + rampUp + "ms." );
+			
+			try {
+				Thread.sleep( rampUp );
+			} catch (InterruptedException e1) {
+				System.out.println( this + " interrupted during ramp up... exiting." );
+				this._done = true;
+				return;
+			}
+			
 			System.out.println( this + " current time: " + now  + " " + this._track._currentLoadProfile.toString() );
 			
 			while( !this.getDone() )
