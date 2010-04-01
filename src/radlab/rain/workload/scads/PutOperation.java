@@ -48,7 +48,7 @@ public class PutOperation extends ScadsOperation
 	@Override
 	public void execute() 
 	{
-		// TODO: Make a request.
+		this._scads.putKey(this.key);
 		this.trace( "PUT " + this.key );
 
 		this.setFailed( false );

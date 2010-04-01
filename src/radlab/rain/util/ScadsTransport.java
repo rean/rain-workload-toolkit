@@ -31,7 +31,23 @@
 
 package radlab.rain.util;
 
+/**
+ * The ScadsTransport class is used to issue various Scads requests.
+ */
 public class ScadsTransport
 {
-	// TODO: Implement me.
+	public void getKey(int key) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void putKey(int key) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void getSetKey(int key) {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -33,6 +33,7 @@ package radlab.rain.workload.scads;
 
 import radlab.rain.Generator;
 
+import radlab.rain.util.ScadsTransport;
 import radlab.rain.workload.scads.keys.*;
 import radlab.rain.LoadProfile;
 import radlab.rain.Operation;
@@ -50,9 +51,20 @@ public class ScadsGenerator extends Generator
 	public static final int GETSETOPERATION = 2;
 
 	private java.util.Random _randomNumberGenerator;
+	private ScadsTransport _scads;
 
 	private KeyGenerator _keyGenerator;
 //	private JSONObject _keyGeneratorConfig;
+
+	/**
+	 * Returns the Scads transport.
+	 * 
+	 * @return          A Scads transport.
+	 */
+	public ScadsTransport getScadsTransport()
+	{
+		return this._scads;
+	}
 
 	/**
 	 * Initialize a <code>ScadsGenerator</code> given a <code>ScenarioTrack</code>.
@@ -62,6 +74,8 @@ public class ScadsGenerator extends Generator
 	public ScadsGenerator( ScenarioTrack track )
 	{
 		super( track );
+
+		this._scads = new ScadsTransport();
 	}
 
 	/**

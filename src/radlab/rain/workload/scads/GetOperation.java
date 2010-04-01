@@ -46,7 +46,7 @@ public class GetOperation extends ScadsOperation
 	@Override
 	public void execute() 
 	{
-		// TODO: Make a request.
+		this._scads.getKey(this.key);
 		this.trace( "GET " + this.key );
 
 		this.setFailed( false );

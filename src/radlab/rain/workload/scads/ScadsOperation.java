@@ -34,6 +34,7 @@ package radlab.rain.workload.scads;
 import org.json.JSONObject;
 
 import radlab.rain.*;
+import radlab.rain.util.ScadsTransport;
 import radlab.rain.workload.scads.keys.KeyGenerator;
 
 
@@ -43,6 +44,10 @@ import radlab.rain.workload.scads.keys.KeyGenerator;
  */
 public abstract class ScadsOperation extends Operation 
 {
+
+	// These references will be set by the Generator.
+	protected ScadsTransport _scads;
+
 	/** The key used in this SCADs operation. */
 	protected int key;
 
@@ -65,6 +70,7 @@ public abstract class ScadsOperation extends Operation
 	public void prepare(Generator generator) 
 	{
 		this._generator = generator;
+		this._scads = ((ScadsGenerator) generator).getScadsTransport();
 
 		ScadsLoadProfile currentLoad = (ScadsLoadProfile) generator.getTrack().getCurrentLoadProfile(); 
 

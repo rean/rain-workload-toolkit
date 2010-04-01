@@ -48,7 +48,7 @@ public class GetSetOperation extends ScadsOperation
 	@Override
 	public void execute() 
 	{
-		// TODO: Make a request.
+		this._scads.getSetKey(this.key);
 		this.trace( "GETSET " + this.key );
 
 		this.setFailed( false );
