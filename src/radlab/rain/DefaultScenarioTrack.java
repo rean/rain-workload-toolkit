@@ -33,6 +33,8 @@ package radlab.rain;
 
 import java.util.Random;
 
+import org.json.JSONException;
+
 /**
  * The DefaultScenarioTrack class is a generic implementation of the abstract
  * <code>ScenarioTrack</code> class that supports load profiles that specify
@@ -139,8 +141,9 @@ public class DefaultScenarioTrack extends ScenarioTrack
 	 * @param generatorClassName    The class name of the generator to use.
 	 * @param hostname              Hostname of the target.
 	 * @param port                  Port of the target.
+	 * @throws JSONException 
 	 */
-	public void initialize( String generatorClassName, String hostname, int port )
+	public void initialize( String generatorClassName, String hostname, int port ) throws JSONException
 	{
 		// 1) Open-Loop Probability
 		this._openLoopProbability = 0.0;

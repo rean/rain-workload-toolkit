@@ -33,16 +33,39 @@ package radlab.rain.workload.scads.keys;
 
 import java.util.Random;
 
-public class UniformKeyGenerator extends KeyGenerator {
-	int minKey;
-	int maxKey;
-	static Random rand = new Random();
-	public UniformKeyGenerator(int minKey, int maxKey) {
+import org.json.JSONException;
+import org.json.JSONObject;
+
+/**
+ * The UniformKeyGenerator randomly generates integral keys in a range.
+ */
+public class UniformKeyGenerator extends KeyGenerator
+{
+	protected String name = "Uniform";
+
+	protected Random random = new Random();
+
+	/** Lower bound of the key(s) generated. */
+	protected int minKey;
+
+	/** Upper bound of the key(s) generated. */
+	protected int maxKey;
+
+	public UniformKeyGenerator( JSONObject configObj ) throws JSONException
+	{
+		this( configObj.getInt( MIN_KEY_CONFIG_KEY ),
+			  configObj.getInt( MAX_KEY_CONFIG_KEY ) );
+	}
+
+	public UniformKeyGenerator( int minKey, int maxKey )
+	{
 		this.minKey = minKey;
 		this.maxKey = maxKey;
 	}
 	
-	public int generateKey() {
-		return rand.nextInt(maxKey-minKey) + minKey;
+	@Override
+	public int generateKey()
+	{
+		return random.nextInt( maxKey - minKey ) + minKey;
 	}
 }

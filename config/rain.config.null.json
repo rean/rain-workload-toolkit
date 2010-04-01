@@ -1,5 +1,5 @@
 {
-    "profiles": "config/profiles.config.test.json",
+    "profiles": "config/profiles.config.null.json",
     "timing": {
         "rampUp": 10,
         "duration": 300,

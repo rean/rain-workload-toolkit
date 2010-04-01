@@ -41,13 +41,14 @@ public class GetSetOperation extends ScadsOperation
 	public GetSetOperation( boolean interactive, IScoreboard scoreboard ) 
 	{
 		super( interactive, scoreboard );
-		this._operationName = "Operation 1";
+		this._operationName = "GetSetOperation";
 		this._operationIndex = ScadsGenerator.GETSETOPERATION;
 	}
-	
+
 	@Override
 	public void execute() 
 	{
+		// TODO: Make a request.
 		this.trace( "GETSET " + this.key );
 
 		this.setFailed( false );

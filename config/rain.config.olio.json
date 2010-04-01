@@ -1,5 +1,5 @@
 {
-    "profiles": "config/profiles.config.sample.json",
+    "profiles": "config/profiles.config.olio.json",
     "timing": {
         "rampUp": 10,
         "duration": 60,

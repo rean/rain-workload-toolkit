@@ -33,41 +33,66 @@ package radlab.rain.workload.scads.keys;
 
 import java.util.Random;
 
-public class ZipfKeyGenerator extends KeyGenerator {
-	int minKey;
-	int maxKey;
-	double a; 
-	double r;
-	static Random rand = new Random();
+import org.json.JSONException;
+import org.json.JSONObject;
 
-	public ZipfKeyGenerator(int minKey, int maxKey) {
-		this.minKey = minKey;
-		this.maxKey = maxKey;
-		
+public class ZipfKeyGenerator extends KeyGenerator
+{
+	protected String name = "Zipf";
+
+	protected Random random = new Random();
+
+	/** Lower bound of the key(s) generated. */
+	protected int minKey;
+
+	/** Upper bound of the key(s) generated. */
+	protected int maxKey;
+
+	/** Shape of the Zipf distribution; larger value implies taller peaks. */
+	protected double a;
+
+	/** Random number used to shuffle keys around. */
+	protected double r;
+
+	public ZipfKeyGenerator( JSONObject configObj ) throws JSONException
+	{
+		this( configObj.getDouble( A_CONFIG_KEY ),
+			  configObj.getDouble( R_CONFIG_KEY ),
+			  configObj.getInt( MIN_KEY_CONFIG_KEY ),
+			  configObj.getInt( MAX_KEY_CONFIG_KEY ) );
 	}
 
-	//double a = 1.001;
-	//double r = 3.456;
-	//static Random rand = new Random();
-	
-	public int generateKey() {
+	public ZipfKeyGenerator( double a, double r, int minKey, int maxKey )
+	{
+		if ( a <= 1 ) {
+			throw new RuntimeException( "Zipf distribution requires a > 1: a = " + a );
+		}
+
+		this.a = a;
+		this.r = r;
+		this.minKey = minKey;
+		this.maxKey = maxKey;
+	}
+
+	public int generateKey()
+	{
 		int k = -1;
 		do {
 			k = sampleZipf();
-		} while (k > maxKey);
-		return Math.abs( (Double.valueOf((k+1)*r)).hashCode() ) % (maxKey-minKey) + minKey;
+		} while ( k > maxKey );
+		return Math.abs( (Double.valueOf( ( k + 1 ) * r ) ).hashCode() ) % ( maxKey - minKey ) + minKey;
 	}
-	
-	private int sampleZipf() {
-		double b = Math.pow(2, a-1);
+
+	private int sampleZipf()
+	{
+		double b = Math.pow( 2, a - 1 );
 		double u, v, x, t = 0.0;
 		do {
-			u = rand.nextDouble();
-			v = rand.nextDouble();
-			x = Math.floor( Math.pow(u,-1.0/(a-1.0)));
-			t = Math.pow(1.0+1.0/x, a-1.0);
-		} while ( v*x*(t-1.0)/(b-1.0) > t/b );
-		//System.out.println(x);
+			u = random.nextDouble();
+			v = random.nextDouble();
+			x = Math.floor( Math.pow( u, -1.0 / ( a - 1.0 ) ) );
+			t = Math.pow( 1.0 + 1.0 / x, a - 1.0 );
+		} while ( v * x * ( t - 1.0 ) / ( b - 1.0 ) > t / b );
 		return (int) x;
 	}
 }

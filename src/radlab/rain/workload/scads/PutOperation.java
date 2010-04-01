@@ -34,25 +34,23 @@ package radlab.rain.workload.scads;
 import radlab.rain.IScoreboard;
 
 /**
- * The Operation1 operation is a sample operation.
+ * Executes a SCADs put operation.
  */
-public class SetOperation extends ScadsOperation 
+public class PutOperation extends ScadsOperation 
 {
-	public SetOperation( boolean interactive, IScoreboard scoreboard ) 
+	public PutOperation( boolean interactive, IScoreboard scoreboard ) 
 	{
 		super( interactive, scoreboard );
-		this._operationName = "Operation 2";
-		this._operationIndex = ScadsGenerator.SETOPERATION;
+		this._operationName = "PutOperation";
+		this._operationIndex = ScadsGenerator.PUTOPERATION;
 	}
-	
+
 	@Override
 	public void execute() 
 	{
 		// TODO: Make a request.
-		this.trace( "SET " + this.key );
-			
-			// TODO: Fill me in.
-			
+		this.trace( "PUT " + this.key );
+
 		this.setFailed( false );
 	}
 	

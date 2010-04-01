@@ -31,7 +31,10 @@
 
 package radlab.rain.workload.scads;
 
+import org.json.JSONObject;
+
 import radlab.rain.*;
+import radlab.rain.workload.scads.keys.KeyGenerator;
 
 
 /**
@@ -40,9 +43,9 @@ import radlab.rain.*;
  */
 public abstract class ScadsOperation extends Operation 
 {
+	/** The key used in this SCADs operation. */
 	protected int key;
-	
-	
+
 	/**
 	 * Returns the SampleGenerator that created this operation.
 	 * 
@@ -52,24 +55,40 @@ public abstract class ScadsOperation extends Operation
 	{
 		return (ScadsGenerator) this._generator;
 	}
-	
+
 	public ScadsOperation( boolean interactive, IScoreboard scoreboard )
 	{
 		super( interactive, scoreboard );
 	}
-	
+
 	@Override
 	public void prepare(Generator generator) 
 	{
 		this._generator = generator;
-		this.key = ((ScadsGenerator)generator).getKeyGenerator().generateKey();
+
+		ScadsLoadProfile currentLoad = (ScadsLoadProfile) generator.getTrack().getCurrentLoadProfile(); 
+
+		// Create the key generator...
+		JSONObject keyGeneratorConfig = currentLoad.getKeyGeneratorConfig();
+		String keyGeneratorName = currentLoad.getKeyGeneratorName();
+		KeyGenerator keyGenerator = null;
+		try {
+			keyGenerator = KeyGenerator.createKeyGenerator( keyGeneratorName, keyGeneratorConfig );
+		} catch (Exception e) {
+			// Error creating key generator!
+			e.printStackTrace();
+		}
+
+		// ...so that we can generate a key.
+		this.key = keyGenerator.generateKey();
+
+		// TODO: Move key generator out into the generator (share it).
 	}
-	
-	
+
 	@Override
 	public void cleanup()
 	{
 		
 	}
-	
+
 }
