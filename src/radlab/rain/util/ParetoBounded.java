@@ -33,32 +33,27 @@ package radlab.rain.util;
 
 import java.util.Random;
 
-public class Pareto 
+public class ParetoBounded 
 {
 	private double _alpha = 0.0;
-	private double _beta = 0.0;
+	private double _lowerBound = 0.0;
+	private double _upperBound = 0.0;
 	private Random _random = new Random();
 	
-	public Pareto( double alpha, double beta )
+	public ParetoBounded( double alpha, double L, double H )
 	{
 		this._alpha = alpha;
-		this._beta = beta;
+		this._lowerBound = L;
+		this._upperBound = H;
 	}
-	
-	// Courtesy: http://www.sitmo.com/eq/521 - Generating Pareto distributed random number
-	// This seems incorrect since the numbers generated can be less than the minimum (beta)
-	public double nextDouble_Old()
-	{
-		double rndValU = this._random.nextDouble();
-		double next = this._beta/( -1 * ( Math.pow( Math.log( rndValU ), 1/this._alpha ) ) );
-		return next;
-	}
-	
+
 	// Courtesy: http://en.wikipedia.org/wiki/Pareto_distribution
 	public double nextDouble()
 	{
 		double rndValU = this._random.nextDouble();
-		double next = this._beta/( Math.pow( rndValU, 1/this._alpha ) );
+		double numerator = (rndValU * Math.pow( this._upperBound,this._alpha )) - (rndValU * Math.pow( this._lowerBound,this._alpha )) - Math.pow( this._upperBound, this._alpha );  
+		double denominator = Math.pow( this._upperBound,this._alpha ) * Math.pow( this._lowerBound,this._alpha );
+		double next = Math.pow( (-1 * (numerator/denominator)), -1.0/this._alpha );
 		return next;
 	}
 	
@@ -69,7 +64,7 @@ public class Pareto
 		double max = Double.MIN_VALUE;
 		
 		int iterations = 1000;
-		Pareto dist = new Pareto( 1, 1000 );
+		ParetoBounded dist = new ParetoBounded( 0.1, 1, 2000 );
 		for( int i = 0; i < iterations; i ++ )
 		{
 			double val = dist.nextDouble();
@@ -85,4 +80,5 @@ public class Pareto
 		System.out.println( "Min: " + min );
 		System.out.println( "Max: " + max );
 	}
+
 }
