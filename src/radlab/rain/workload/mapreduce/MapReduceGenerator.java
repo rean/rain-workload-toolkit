@@ -1,6 +1,8 @@
 package radlab.rain.workload.mapreduce;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 
 import radlab.rain.Generator;
@@ -9,11 +11,16 @@ import radlab.rain.ScenarioTrack;
 
 public class MapReduceGenerator extends Generator {
 	
-	private BufferedReader inputPaths, outputPaths, siRatios, osRatios;
+	private BufferedReader traceFile;
 
 	public MapReduceGenerator(ScenarioTrack track) {
 		super(track);
-		// TODO Auto-generated constructor stub
+		String path = ((MapReduceScenarioTrack)track).getTraceFilePath();
+		try {
+			traceFile = new BufferedReader(new FileReader(path));
+		} catch (FileNotFoundException e) {
+			// TODO Deal with bad path 
+		}
 	}
 
 	@Override
@@ -49,18 +56,11 @@ public class MapReduceGenerator extends Generator {
 		 */
 		String request = null;
 		try {
-		request = "mapreduce " + getNumReducers() + " " + getInputPath() +
-				" " + getOutputPath() + " " + getSIRatio() + " " + getOSRatio();
+		request = "mapreduce " + traceFile.readLine();
 		} catch (IOException e) {
+			// TODO Deal with error.
 		} finally {
-			try {
-				if (inputPaths != null) inputPaths.close();
-				if (outputPaths != null) outputPaths.close();
-				if (siRatios != null) siRatios.close();
-				if (osRatios != null) osRatios.close();
-			} catch (IOException e) {
-				
-			}
+			
 		}
 		return new MapReduceOperation(request, true, getScoreboard());
 	}
@@ -73,22 +73,22 @@ public class MapReduceGenerator extends Generator {
 
 	public String getInputPath() throws IOException {
 		// TODO Auto-generated method stub
-		return inputPaths.readLine();
+		return "";
 	}
 
 	public String getOutputPath() throws IOException {
 		// TODO Auto-generated method stub
-		return outputPaths.readLine();
+		return "";
 	}
 
 	public double getSIRatio() throws IOException {
 		// TODO Auto-generated method stub
-		return Double.parseDouble(siRatios.readLine());
+		return 0.0;
 	}
 
 	public double getOSRatio() throws IOException {
 		// TODO Auto-generated method stub
-		return Double.parseDouble(osRatios.readLine());
+		return 0.0;
 	}
 
 }

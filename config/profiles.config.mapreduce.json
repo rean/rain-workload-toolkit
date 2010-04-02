@@ -1,7 +1,8 @@
 {
 	"mapreduce-001": {
 		"generator": "radlab.rain.workload.mapreduce.MapReduceGenerator",
-        "track": "radlab.rain.DefaultScenarioTrack",
+        "track": "radlab.rain.MapReduceScenarioTrack",
+        "traceFile": "workloads/day-0.tsv",
 		"behavior": {
 			"default" : [
 				[ 1.0 ]
