@@ -55,7 +55,7 @@ public class Zipf
 		do {
 			k = this.sampleZipf();
 		} while (k > this._upperBound);
-		System.out.println(k);
+		//System.out.println(k);
 		return Math.abs( (Double.valueOf((k+1)*this._r)).hashCode() ) % (this._upperBound-this._lowerBound) + this._lowerBound;		
 	}
 	
