@@ -12,6 +12,20 @@ import radlab.rain.ScenarioTrack;
 public class MapReduceGenerator extends Generator {
 	
 	private BufferedReader traceFile;
+	private long nextThinkTime;
+	private long maxInputSize;
+	
+	/*
+	 * Other inputs from code.
+	 * We can gather this stuff from track configuration json.
+	 * int clusterSizeRaw,
+	 * int clusterSizeWorkload,
+	 * int inputPartitionSize,
+	 * int inputPartitionCount, 
+	 * String scriptDirPath,
+	 * String hdfsInputDir,
+	 * long totalDataPerReduce
+	 */
 
 	public MapReduceGenerator(ScenarioTrack track) {
 		super(track);
@@ -38,13 +52,35 @@ public class MapReduceGenerator extends Generator {
 	@Override
 	public long getThinkTime() {
 		// TODO Auto-generated method stub
-		return 0;
+		return nextThinkTime;
 	}
 
 	@Override
 	public void initialize() {
 		// TODO Auto-generated method stub
-
+		// Read whole input file to determine max input size.
+		// Close and reopen file to get back to the beginning
+		// Is this the best way to get back to the beginning?
+		
+		String line;
+		long inputSize;
+		
+		try {
+			while((line = traceFile.readLine()) != null) {
+				inputSize = Long.parseLong(line.split("\t")[4]);
+				if (inputSize > maxInputSize)
+					maxInputSize = inputSize;
+			}
+			
+			traceFile.close();
+			
+			String path = ((MapReduceScenarioTrack)getTrack()).getTraceFilePath();
+			traceFile = new BufferedReader(new FileReader(path));
+		} catch (IOException E) {
+			// TODO Deal with exception
+		}
+		
+		// TODO Write data to HDFS
 	}
 
 	@Override
@@ -54,15 +90,43 @@ public class MapReduceGenerator extends Generator {
 		 * lastOperation could be line number of file we are on?
 		 * This is not necessary, our line reader will keep track of that.
 		 */
-		String request = null;
+		String line = null;
+		String request[] = null;
+		String jobName;
+		long inputSize;
+		long shuffleSize;
+		long outputSize;
+		String command = "";
 		try {
-		request = "mapreduce " + traceFile.readLine();
+			line = traceFile.readLine();
+			if (line == null) {
+				// TODO Reached end of input
+			} else {
+				request = line.split("\t");
+			}
 		} catch (IOException e) {
 			// TODO Deal with error.
-		} finally {
-			
 		}
-		return new MapReduceOperation(request, true, getScoreboard());
+		
+		jobName = request[0];
+		inputSize = Long.parseLong(request[1]);
+		shuffleSize = Long.parseLong(request[2]);
+		outputSize = Long.parseLong(request[3]);
+		nextThinkTime = Long.parseLong(request[4]);
+		
+		/* 
+		 * Scaling from other code:
+		 * 		input   = input   * clusterSizeWorkload / clusterSizeRaw;
+		 *      shuffle = shuffle * clusterSizeWorkload / clusterSizeRaw;
+		 *      output  = output  * clusterSizeWorkload / clusterSizeRaw; 
+		 */
+		
+		// Copied the following. No idea what constants mean.
+		if (inputSize   < 67108864) inputSize   = 67108864;
+		if (shuffleSize < 1024    ) shuffleSize = 1024    ;
+		if (outputSize  < 1024    ) outputSize  = 1024    ;
+		
+		return new MapReduceOperation(command, true, getScoreboard());
 	}
 
 	public int getNumReducers() {
