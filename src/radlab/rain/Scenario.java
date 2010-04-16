@@ -184,6 +184,7 @@ public class Scenario
 		catch( Exception e )
 		{
 			System.out.println( "[SCENARIO] ERROR initializing tracks. Reason: " + e.toString() );
+			e.printStackTrace();
 			System.exit( 1 );
 		}
 	}

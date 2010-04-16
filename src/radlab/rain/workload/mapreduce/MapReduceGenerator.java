@@ -26,18 +26,12 @@ public class MapReduceGenerator extends Generator {
 	private int inputPartitionCount; 
 	private String scriptDirPath;
 	private String hdfsInputDir;
-	private long totalDataPerReduce;
+	private long totalDataPerReduce = 100; // Dummy value.
 	 
 
 	public MapReduceGenerator(ScenarioTrack track) {
 		super(track);
 		counter = 0;
-		String path = ((MapReduceScenarioTrack)track).getTraceFilePath();
-		try {
-			traceFile = new BufferedReader(new FileReader(path));
-		} catch (FileNotFoundException e) {
-			// TODO Deal with bad path 
-		}
 	}
 
 	@Override
@@ -68,6 +62,13 @@ public class MapReduceGenerator extends Generator {
 		String line;
 		long inputSize;
 		
+		String path = ((MapReduceScenarioTrack)getTrack()).getTraceFilePath();
+		try {
+			traceFile = new BufferedReader(new FileReader(path));
+		} catch (FileNotFoundException e) {
+			// TODO Deal with bad path 
+		}
+		
 		try {
 			while((line = traceFile.readLine()) != null) {
 				inputSize = Long.parseLong(line.split("\t")[4]);
@@ -77,7 +78,6 @@ public class MapReduceGenerator extends Generator {
 			
 			traceFile.close();
 			
-			String path = ((MapReduceScenarioTrack)getTrack()).getTraceFilePath();
 			traceFile = new BufferedReader(new FileReader(path));
 		} catch (IOException E) {
 			// TODO Deal with exception
