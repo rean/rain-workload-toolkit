@@ -14,21 +14,24 @@ public class MapReduceGenerator extends Generator {
 	private BufferedReader traceFile;
 	private long nextThinkTime;
 	private long maxInputSize;
+	private int counter;
 	
 	/*
 	 * Other inputs from code.
 	 * We can gather this stuff from track configuration json.
-	 * int clusterSizeRaw,
-	 * int clusterSizeWorkload,
-	 * int inputPartitionSize,
-	 * int inputPartitionCount, 
-	 * String scriptDirPath,
-	 * String hdfsInputDir,
-	 * long totalDataPerReduce
 	 */
+	private int clusterSizeRaw;
+	private int clusterSizeWorkload;
+	private int inputPartitionSize;
+	private int inputPartitionCount; 
+	private String scriptDirPath;
+	private String hdfsInputDir;
+	private long totalDataPerReduce;
+	 
 
 	public MapReduceGenerator(ScenarioTrack track) {
 		super(track);
+		counter = 0;
 		String path = ((MapReduceScenarioTrack)track).getTraceFilePath();
 		try {
 			traceFile = new BufferedReader(new FileReader(path));
@@ -126,6 +129,33 @@ public class MapReduceGenerator extends Generator {
 		if (shuffleSize < 1024    ) shuffleSize = 1024    ;
 		if (outputSize  < 1024    ) outputSize  = 1024    ;
 		
+		// This is where some stuff from Yanpei's code goes.
+		// I haven't copied it yet because I don't understand it.
+		// It deals with an ArrayList inputPartitionSample and sets up
+		// the inputPath.
+		
+		String inputPath = "";
+		
+		String outputPath = "workGenOut-job" + counter;
+				
+		double SIRatio = ((double) shuffleSize) / ((double) inputSize);
+		double OSRatio = ((double) outputSize) / ((double) shuffleSize);
+		
+		long numReduces = -1;
+
+		if (totalDataPerReduce > 0) {
+			numReduces = Math.round((shuffleSize + outputSize) / ((double) totalDataPerReduce));
+			if (numReduces < 1) numReduces = 1;
+			
+			command = "bin/hadoop jar WorkGen.jar org.apache.hadoop.examples.WorkGen -conf conf/workGenKeyValue_conf.xsl " +
+			          "-r " + numReduces + " " + inputPath + " " + outputPath + " " + SIRatio + " " + OSRatio +
+			          " >> output/job-" + counter + ".txt 2>> output/job-" + counter + ".txt\n";
+		} else {
+			command = "bin/hadoop jar WorkGen.jar org.apache.hadoop.examples.WorkGen -conf conf/workGenKeyValue_conf.xsl " +
+			          inputPath + " " + outputPath + " " + SIRatio + " " + OSRatio +
+			          " >> output/job-" + counter + ".txt 2>> output/job-" + counter + ".txt\n";
+		}
+		counter ++;
 		return new MapReduceOperation(command, true, getScoreboard());
 	}
 

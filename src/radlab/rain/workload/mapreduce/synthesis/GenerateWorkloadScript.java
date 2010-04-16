@@ -154,6 +154,10 @@ public class GenerateWorkloadScript {
 		if (shuffle < 1024    ) shuffle = 1024    ;
 		if (output  < 1024    ) output  = 1024    ;
 
+		/*
+		 * Aaron: I don't know what this does. I haven't copied it to the
+		 * Rain implementation.
+		 */
 		ArrayList<Integer> inputPartitionSamples = new ArrayList<Integer>();
 		long inputCopy = input; 
 		java.util.Random rng = new java.util.Random();
