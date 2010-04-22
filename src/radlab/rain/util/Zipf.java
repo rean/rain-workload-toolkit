@@ -33,43 +33,62 @@ package radlab.rain.util;
 
 import java.util.Random;
 
-public class Pareto 
+public class Zipf 
 {
-	private double _alpha = 0.0;
-	private double _beta = 0.0;
+	double _lowerBound = 0.0;
+	double _upperBound = 0.0;
+	double _a = 0.0;
+	double _r = 0.0;
 	private Random _random = new Random();
 	
-	public Pareto( double alpha, double beta )
+	public Zipf( double a, double r, double L, double H )
 	{
-		this._alpha = alpha;
-		this._beta = beta;
+		this._a = a;
+		this._r = r;
+		this._lowerBound = L;
+		this._upperBound = H + 1;
 	}
 	
-	// Courtesy: http://www.sitmo.com/eq/521 - Generating Pareto distributed random number
-	// This seems incorrect since the numbers generated can be less than the minimum (beta)
-	public double nextDouble_Old()
-	{
-		double rndValU = this._random.nextDouble();
-		double next = this._beta/( -1 * ( Math.pow( Math.log( rndValU ), 1/this._alpha ) ) );
-		return next;
-	}
-	
-	// Courtesy: http://en.wikipedia.org/wiki/Pareto_distribution
 	public double nextDouble()
 	{
-		double rndValU = this._random.nextDouble();
-		double next = this._beta/( Math.pow( rndValU, 1/this._alpha ) );
-		return next;
+		double k = -1;
+		do {
+			k = this.sampleZipf();
+		} while (k > this._upperBound);
+		//System.out.println(k);
+		return Math.abs( (Double.valueOf((k+1)*this._r)).hashCode() ) % (this._upperBound-this._lowerBound) + this._lowerBound;		
 	}
 	
+	// Courtesy: http://osdir.com/ml/lib.gsl.general/2008-05/msg00057.html
+	// and http://cg.scs.carleton.ca/~luc/chapter_ten.pdf
+	private double sampleZipf() 
+	{
+		double b = Math.pow(2, this._a-1);
+		double u, v, x, t = 0.0;
+		do 
+		{
+			u = this._random.nextDouble();
+			v = this._random.nextDouble();
+			x = Math.floor( Math.pow(u,-1.0/(this._a-1.0)));
+			t = Math.pow(1.0+1.0/x, this._a-1.0);
+		} while ( v*x*(t-1.0)/(b-1.0) > t/b );
+		return x;
+	}
+	
+	/**
+	 * @param args
+	 */
 	public static void main(String[] args) 
 	{
 		double total = 0.0;
 		double min = Double.MAX_VALUE;
 		double max = Double.MIN_VALUE;
 		
+		//double a = 1.001;
+		//double r = 3.456;
+		
 		int iterations = 1000;
-		Pareto dist = new Pareto( 1, 1000 );
+		Zipf dist = new Zipf( 1.001, 3.456, 1, 2000 );
 		for( int i = 0; i < iterations; i ++ )
 		{
 			double val = dist.nextDouble();
@@ -85,4 +104,5 @@ public class Pareto
 		System.out.println( "Min: " + min );
 		System.out.println( "Max: " + max );
 	}
+
 }

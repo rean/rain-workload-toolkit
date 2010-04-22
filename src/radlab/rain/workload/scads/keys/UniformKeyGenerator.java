@@ -45,11 +45,11 @@ public class UniformKeyGenerator extends KeyGenerator
 
 	protected Random random = new Random();
 
-	/** Lower bound of the key(s) generated. */
-	protected int minKey;
+	/** Lower bound of the key(s) generated, inclusive. */
+	protected int lowerBound;
 
-	/** Upper bound of the key(s) generated. */
-	protected int maxKey;
+	/** Upper bound of the key(s) generated, exclusive. */
+	protected int upperBound;
 
 	public UniformKeyGenerator( JSONObject configObj ) throws JSONException
 	{
@@ -59,13 +59,14 @@ public class UniformKeyGenerator extends KeyGenerator
 
 	public UniformKeyGenerator( int minKey, int maxKey )
 	{
-		this.minKey = minKey;
-		this.maxKey = maxKey;
+		this.lowerBound = minKey;
+		// maxKey is inclusive, upperBound is exclusive.
+		this.upperBound = maxKey + 1;
 	}
 	
 	@Override
 	public int generateKey()
 	{
-		return random.nextInt( maxKey - minKey ) + minKey;
+		return random.nextInt( upperBound - lowerBound ) + lowerBound;
 	}
 }

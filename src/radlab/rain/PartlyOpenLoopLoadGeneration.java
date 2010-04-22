@@ -105,7 +105,7 @@ public class PartlyOpenLoopLoadGeneration extends LoadGenerationStrategy
 		{
 			this.sleepUntil( this._timeStarted );
 			
-			int lastOperationIndex = NO_OPERATION_INDEX;	
+			int lastOperationIndex = NO_OPERATION_INDEX;
 			while ( System.currentTimeMillis() <= this._timeToQuit )
 			{
 				if ( !this.isActive() )
@@ -320,7 +320,7 @@ public class PartlyOpenLoopLoadGeneration extends LoadGenerationStrategy
 	 */
 	protected boolean isActive()
 	{
-		LoadProfile currentLoad = this._generator.getTrack().getCurrentLoadProfile();
-		return ( this._id <= currentLoad.getNumberOfUsers() );
+		LoadProfile loadProfile = this._generator.getTrack().getCurrentLoadProfile();
+		return ( this._id <= loadProfile.getNumberOfUsers() );
 	}
 }
