@@ -51,23 +51,26 @@ public class MapReduceGenerator extends Generator {
 		// TODO Auto-generated method stub
 		return nextThinkTime;
 	}
-
-	@Override
-	public void initialize() {
-		// TODO Auto-generated method stub
-		// Read whole input file to determine max input size.
-		// Close and reopen file to get back to the beginning
-		// Is this the best way to get back to the beginning?
-		
-		String line;
-		long inputSize;
-		
+	
+	private void openConfigFile() {
 		String path = ((MapReduceScenarioTrack)getTrack()).getTraceFilePath();
 		try {
 			traceFile = new BufferedReader(new FileReader(path));
 		} catch (FileNotFoundException e) {
 			// TODO Deal with bad path 
 		}
+	}
+
+	@Override
+	public void initialize() {
+		// TODO Auto-generated method stub
+		// Read whole input file to determine max input size.
+		// Close and reopen file to get back to the beginning
+		
+		String line;
+		long inputSize;
+		
+		openConfigFile();
 		
 		try {
 			while((line = traceFile.readLine()) != null) {
@@ -78,7 +81,7 @@ public class MapReduceGenerator extends Generator {
 			
 			traceFile.close();
 			
-			traceFile = new BufferedReader(new FileReader(path));
+			openConfigFile();
 		} catch (IOException E) {
 			// TODO Deal with exception
 		}
@@ -91,7 +94,7 @@ public class MapReduceGenerator extends Generator {
 		// TODO Auto-generated method stub
 		/*
 		 * lastOperation could be line number of file we are on?
-		 * This is not necessary, our line reader will keep track of that.
+		 * This is not necessary, our file reader will keep track of that.
 		 */
 		String line = null;
 		String request[] = null;

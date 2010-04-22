@@ -12,17 +12,7 @@
 		"loadProfile": [
 		{
 			"interval": 20,
-			"users": 5,
-			"mix": "default"
-		},
-		{
-			"interval": 20,
-			"users": 10,
-			"mix": "default"
-		},
-		{
-			"interval": 20,
-			"users": 20,
+			"users": 1,
 			"mix": "default"
 		}
 		],

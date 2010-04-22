@@ -81,13 +81,14 @@ public class GenerateWorkloadScript {
 				      ArrayList<ArrayList<String>> inputSizes  ,
 				      ArrayList<ArrayList<String>> shuffleSizes,
 				      ArrayList<ArrayList<String>> outputSizes ,
-				      int clusterSizeRaw,
-				      int clusterSizeWorkload,
-				      int inputPartitionSize,
-				      int inputPartitionCount, 
-				      String scriptDirPath,
-				      String hdfsInputDir,
-				      long totalDataPerReduce) throws Exception {
+				      int clusterSizeRaw, // Our cluster size
+				      int clusterSizeWorkload, // Cluster used to generate data
+				      int inputPartitionSize, // Size of chunks
+				      int inputPartitionCount, // Number of chunks
+				      String scriptDirPath, // Output script file directory. Not needed in Rain.
+				      String hdfsInputDir, // Where the data is?
+				      long totalDataPerReduce // Highest amount of data output?
+				      ) throws Exception {
 
 
 	// ArrayList<ArrayList<String>> toReturn = new ArrayList<ArrayList<String>>();
