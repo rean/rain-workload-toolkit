@@ -11,6 +11,7 @@ public class MapReduceOperation extends Operation {
 	public MapReduceOperation(String request, boolean interactive, IScoreboard scoreboard) {
 		super(interactive, scoreboard);
 		_request = request;
+		_operationName = "MR Job";
 	}
 
 	@Override

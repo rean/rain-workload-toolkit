@@ -24,7 +24,6 @@ public class MapReduceGenerator extends Generator {
 	private int clusterSizeWorkload;
 	private int inputPartitionSize;
 	private int inputPartitionCount; 
-	private String scriptDirPath;
 	private String hdfsInputDir;
 	private long totalDataPerReduce = 100; // Dummy value.
 	 
