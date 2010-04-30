@@ -20,11 +20,11 @@ public class MapReduceGenerator extends Generator {
 	 * Other inputs from code.
 	 * We can gather this stuff from track configuration json.
 	 */
-	private int clusterSizeRaw;
-	private int clusterSizeWorkload;
-	private int inputPartitionSize;
-	private int inputPartitionCount; 
-	private String hdfsInputDir;
+	//private int clusterSizeRaw;
+	//private int clusterSizeWorkload;
+	//private int inputPartitionSize;
+	//private int inputPartitionCount; 
+	//private String hdfsInputDir;
 	private long totalDataPerReduce = 100; // Dummy value.
 	 
 

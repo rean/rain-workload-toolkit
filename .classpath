@@ -11,5 +11,10 @@
 	<classpathentry kind="lib" path="thirdparty/httpcomponents-client-4.0.1/lib/httpmime-4.0.1.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="thirdparty/json-20090211.jar"/>
+	<classpathentry kind="lib" path="thirdparty/hadoop-0.20.2/hadoop-0.20.2-ant.jar"/>
+	<classpathentry kind="lib" path="thirdparty/hadoop-0.20.2/hadoop-0.20.2-core.jar"/>
+	<classpathentry kind="lib" path="thirdparty/hadoop-0.20.2/hadoop-0.20.2-examples.jar"/>
+	<classpathentry kind="lib" path="thirdparty/hadoop-0.20.2/hadoop-0.20.2-test.jar"/>
+	<classpathentry kind="lib" path="thirdparty/hadoop-0.20.2/hadoop-0.20.2-tools.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
