@@ -93,7 +93,10 @@ public class HttpTransport
 	
 	/** HTTP client configuration: Time to wait between data packets. */
 	private int _socketIdleTimeout = 10000;
-	
+
+	/* URL where we end it if we're redirected at any point. */
+	private String _finalUrl = "";
+		
 	/**
 	 * Returns the HTTP client used to execute requests.
 	 * 
@@ -112,6 +115,15 @@ public class HttpTransport
 	public StringBuilder getResponseBuffer()
 	{
 		return this._responseBuffer;
+	}
+	
+	/**
+	 * Returns the final URL where we end up after issuing a request.
+	 * @return Our final location after a redirect
+	 */
+	public String getFinalUrl()
+	{
+		return this._finalUrl;
 	}
 	
 	/**
@@ -496,6 +508,9 @@ public class HttpTransport
 		// Update the HTTP client configuration.
 		this.configureHttpClient();
 		
+		// By default we'll end up at the URI being requested (unless a redirect occurs)
+		this._finalUrl = httpRequest.getURI().toString();
+		
 		// Execute the HTTP request and get the response entity.
 		HttpResponse response = this._httpClient.execute( httpRequest );
 		HttpEntity entity = response.getEntity();
@@ -530,6 +545,8 @@ public class HttpTransport
 					{
 						// TODO: Is it safe to assume all redirects are GET requests?
 						httpRequest = new HttpGet( locationHeaders[0].getValue() );
+						// Save the redirect URL
+						this._finalUrl = locationHeaders[0].getValue();
 						
 						response = this._httpClient.execute( httpRequest );
 						entity = response.getEntity();
