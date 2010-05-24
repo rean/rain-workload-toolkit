@@ -32,6 +32,7 @@
 package radlab.rain.util;
 
 import java.io.IOException;
+import java.util.Hashtable;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
@@ -49,6 +50,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.params.HttpClientParams;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -154,6 +156,16 @@ public class HttpTransport
 	public Header[] getHeaders()
 	{
 		return this._headers;
+	}
+	
+	public Hashtable<String,String> getHeaderMap()
+	{
+		Hashtable<String,String> headerMap = new Hashtable<String,String>(); 
+		for( Header h : this._headers )
+		{
+			headerMap.put( h.getName(), h.getValue() );	
+		}
+		return headerMap;
 	}
 	
 	/**
@@ -342,7 +354,10 @@ public class HttpTransport
 	private void configureHttpClient()
 	{
 		HttpParams params = this._httpClient.getParams();
-		
+		// Don't let the apache http client follow redirects automatically. We'll do it manually.
+		// This is necessary for web application frameworks like Spring web-flow
+		// that rely on redirects for moving through the web UI.
+		HttpClientParams.setRedirecting( params, false );
 		HttpConnectionParams.setConnectionTimeout( params, this._connectTimeout );
 		HttpConnectionParams.setSoTimeout( params, this._socketIdleTimeout );
 	}
@@ -513,6 +528,7 @@ public class HttpTransport
 		
 		// Execute the HTTP request and get the response entity.
 		HttpResponse response = this._httpClient.execute( httpRequest );
+				
 		HttpEntity entity = response.getEntity();
 		
 		// Save the status code and headers.

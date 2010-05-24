@@ -304,7 +304,9 @@ public class Scoreboard implements Runnable, IScoreboard
 				{
 					try
 					{
-						errorLogger.write( "[" + generatedBy + "] " + result.getOperation().getFailureReason().toString() );
+						Throwable failureReason = result.getOperation().getFailureReason();
+						if( failureReason != null )
+							errorLogger.write( "[" + generatedBy + "] " + failureReason.toString() );
 					}
 					catch( IOException ioe )
 					{

@@ -70,7 +70,7 @@ public abstract class ScenarioTrack
 	// Defaults
 	public static long DEFAULT_OBJECT_POOL_MAX_SIZE             = 50000;
 	public static long DEFAULT_MEAN_RESPONSE_TIME_SAMPLE_INTERVAL = 500;
-	public static String DEFAULT_LOAD_PROFILE_CLASS             = "radlab.rain.DefaultScenarioTrack";
+	public static String DEFAULT_LOAD_PROFILE_CLASS             = "radlab.rain.LoadProfile";
 	
 	protected Scenario _parentScenario                          = null;
 	protected Generator _generator                              = null;
