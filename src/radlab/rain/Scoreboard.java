@@ -75,6 +75,7 @@ public class Scoreboard implements Runnable, IScoreboard
 	private long _metricSnapshotInterval			= (1 * 60 * 1000); // Every minute
 	/* Response time sampling interval */
 	private long _meanResponseTimeSamplingInterval 	= 500;
+	private static String NEWLINE 					= System.getProperty("line.separator");
 	
 	/* Time markers. */
 	private long _startTime 			= 0;
@@ -306,7 +307,7 @@ public class Scoreboard implements Runnable, IScoreboard
 					{
 						Throwable failureReason = result.getOperation().getFailureReason();
 						if( failureReason != null )
-							errorLogger.write( "[" + generatedBy + "] " + failureReason.toString() );
+							errorLogger.write( "[" + generatedBy + "] " + failureReason.toString() + Scoreboard.NEWLINE );
 					}
 					catch( IOException ioe )
 					{
@@ -337,7 +338,7 @@ public class Scoreboard implements Runnable, IScoreboard
 						if ( trace != null && trace.length() > 0 )
 						{
 							// Don't flush on every write, it kills the load performance
-							logger.write( trace.toString() );
+							logger.write( trace.toString() + Scoreboard.NEWLINE );
 							// Dumping objects we persisted to disk
 							result.getOperation().disposeOfTrace();
 						}
@@ -437,8 +438,14 @@ public class Scoreboard implements Runnable, IScoreboard
 		{
 			try
 			{
-				out.println( this + "| operation | proportion | successes | failures | avg response | min response | max response | 90th (s) | 99th (s) |" );
-				out.println( this + "|           |            |           |          | time (s)     | time (s)     | time (s)     |          |          |" );
+				// Make this thing "prettier", using fixed width columns
+				String outputFormatSpec = "|%20s|%10s|%10s|%10s|%12s|%12s|%12s|%10s|%10s|";
+				
+				out.println( this + String.format( outputFormatSpec, "operation", "proportion", "successes", "failures", "avg response", "min response", "max response", "90th (s)", "99th (s)" ) );
+				out.println( this + String.format( outputFormatSpec, "", "", "", "", "time (s)", "time (s)", "time(s)", "", "" ) );
+				//out.println( this + "| operation | proportion | successes | failures | avg response | min response | max response | 90th (s) | 99th (s) |" );
+				//out.println( this + "|           |            |           |          | time (s)     | time (s)     | time (s)     |          |          |" );
+				
 				// Show operation proportions, response time: avg, max, min, stdev (op1 = x%, op2 = y%...)
 				Enumeration<String> keys = this._operationMap.keys();
 				while ( keys.hasMoreElements() )
@@ -446,19 +453,30 @@ public class Scoreboard implements Runnable, IScoreboard
 					String opName = keys.nextElement();
 					OperationSummary summary = this._operationMap.get( opName );
 					
-					// Print out the operation summary.
-					out.println( this + " " +
-							opName + " " +
-							this._formatter.format( ( ( (double) ( summary.succeeded + summary.failed ) / (double) totalOperations ) * 100 ) ) + "% " +
-							summary.succeeded + " " +
-							summary.failed + " " +
-							this._formatter.format( summary.getAverageResponseTime() / 1000.0 ) + " " +
-							this._formatter.format( summary.minResponseTime / 1000.0 ) + " " +
-							this._formatter.format( summary.maxResponseTime / 1000.0 ) + " " +
-							this._formatter.format( summary.getNthPercentileResponseTime( 90 ) / 1000.0 ) + " " +
-							this._formatter.format( summary.getNthPercentileResponseTime( 99 ) / 1000.0 ) + " [Percentile estimates using " +
-							summary.getSamplesCollected() + " samples collected out of " + summary.getSamplesSeen() + "]" );
+					// If there were no successes, then the min and max response times would not have been set
+					// so make them to 0
+					if( summary.minResponseTime == Long.MAX_VALUE )
+						summary.minResponseTime = 0;
 					
+					if( summary.maxResponseTime == Long.MIN_VALUE )
+						summary.maxResponseTime = 0;
+					
+					// Print out the operation summary.
+					out.println( this + String.format( outputFormatSpec, 
+							opName, 
+							this._formatter.format( ( ( (double) ( summary.succeeded + summary.failed ) / (double) totalOperations ) * 100 ) ) + "% ",
+							summary.succeeded,
+							summary.failed,
+							this._formatter.format( summary.getAverageResponseTime() / 1000.0 ),
+							this._formatter.format( summary.minResponseTime / 1000.0 ),
+							this._formatter.format( summary.maxResponseTime / 1000.0 ),
+							this._formatter.format( summary.getNthPercentileResponseTime( 90 ) / 1000.0 ),
+							this._formatter.format( summary.getNthPercentileResponseTime( 99 ) / 1000.0 )
+							) 
+							+ " [Percentile estimates using " +
+							summary.getSamplesCollected() + " samples collected out of " + summary.getSamplesSeen() + "]"
+						);
+										
 					if( purgePercentileData )
 						summary.resetSamples();
 				}

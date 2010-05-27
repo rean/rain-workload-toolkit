@@ -139,7 +139,16 @@ public class MixMatrix
 	
 	public static void main( String[] args )
 	{
-		MixMatrix m = new MixMatrix();
+		double [][] mix = { { 1, 50, 0, 49,  0, 0, 0, 0 }, 
+			     			{ 1,  0, 0, 99,  0, 0, 0, 0 }, 
+			     			{ 1, 50, 0, 49,  0, 0,  0, 0 }, 
+			     			{ 0,  5, 5, 10, 80, 0, 0, 0 }, 
+			     			{ 0,  5, 5, 20, 0, 70, 0, 0 },
+			     			{ 0,  0, 5, 35, 0, 0, 60, 0 },
+			     			{ 0,  0, 10, 30, 0, 0, 0, 60 },
+			     			{ 0,  0, 10, 80, 0, 0, 10, 0 }  };
+		
+		MixMatrix m = new MixMatrix( mix );
 		m.printMix();
 		m.printSelectionMix();
 	}

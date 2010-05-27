@@ -84,7 +84,9 @@ public class HttpTransport
 	/** HTTP headers of the last HTTP request executed. */
 	private Header[] _headers;
 	
-	/** HTTP client configuration: whether to handle redirects or not. */
+	/** HTTP Transport configuration: whether to handle redirects or not. 
+	 	If HttpTransport is handling redirects then the underlying Apache HTTP client is not.
+	 */
 	private boolean _followRedirects = true;
 	
 	/** HTTP client configuration: maximum number of redirects to follow. */
@@ -357,8 +359,13 @@ public class HttpTransport
 		
 		// Specify whether the Apache htto client should follow redirects automatically.
 		// For frameworks like Spring WebFlow we DO NOT want the Apache client to
-		// automatically follow redirects
-		HttpClientParams.setRedirecting( params, false );
+		// automatically follow redirects, rather we want HttpTransport to manually follow
+		// redirects.
+		// If HttpTransport isn't following, then let Apache Http client do it
+		if( this._followRedirects )
+			HttpClientParams.setRedirecting( params, false );
+		else HttpClientParams.setRedirecting( params, true ); 
+		
 		HttpConnectionParams.setConnectionTimeout( params, this._connectTimeout );
 		HttpConnectionParams.setSoTimeout( params, this._socketIdleTimeout );
 	}

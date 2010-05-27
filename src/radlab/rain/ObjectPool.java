@@ -101,17 +101,40 @@ public class ObjectPool
 		out.println( "[OBJECTPOOL " + this._trackName + "] Start time                       : " + this._timeStarted );
 		out.println( "[OBJECTPOOL " + this._trackName + "] Total rent requests              : " + this._totalRentRequests );
 		out.println( "[OBJECTPOOL " + this._trackName + "] Request rate                     : " + this._formatter.format( ( (double)this._totalRentRequests/(double)(this._timeShutdown - this._timeStarted) ) * 1000 ) );
-		out.println( "[OBJECTPOOL " + this._trackName + "] Hits                             : " + this._hits + "(" + this._formatter.format( ( (double)this._hits/(double)this._totalRentRequests ) * 100 ) + "%)" );
-		out.println( "[OBJECTPOOL " + this._trackName + "] Misses                           : " + this._misses + "(" + this._formatter.format( ( (double)this._misses/(double)this._totalRentRequests ) * 100 ) + "%)" );
-		out.println( "[OBJECTPOOL " + this._trackName + "] Average rentQ time (ms)          : " + this._formatter.format((double)this._totalRentQTime/(double)this._totalRentRequests) );
-		out.println( "[OBJECTPOOL " + this._trackName + "] Average rent service time (ms)   : " + this._formatter.format((double)this._totalRentServiceTime/(double)this._totalRentRequests) );
-		
+		if( this._hits != 0 )
+			out.println( "[OBJECTPOOL " + this._trackName + "] Hits                             : " + this._hits + "(" + this._formatter.format( ( (double)this._hits/(double)this._totalRentRequests ) * 100 ) + "%)" );
+		else 
+			out.println( "[OBJECTPOOL " + this._trackName + "] Hits                             : " + this._hits + "(0%)" );
+		if( this._misses != 0 )
+			out.println( "[OBJECTPOOL " + this._trackName + "] Misses                           : " + this._misses + "(" + this._formatter.format( ( (double)this._misses/(double)this._totalRentRequests ) * 100 ) + "%)" );
+		else
+			out.println( "[OBJECTPOOL " + this._trackName + "] Misses                           : " + this._misses + "(0%)" );
+		if( this._totalRentRequests != 0 )
+		{	
+			out.println( "[OBJECTPOOL " + this._trackName + "] Average rentQ time (ms)          : " + this._formatter.format((double)this._totalRentQTime/(double)this._totalRentRequests) );
+			out.println( "[OBJECTPOOL " + this._trackName + "] Average rent service time (ms)   : " + this._formatter.format((double)this._totalRentServiceTime/(double)this._totalRentRequests) );
+		}
+		else
+		{
+			out.println( "[OBJECTPOOL " + this._trackName + "] Average rentQ time (ms)          : 0" );
+			out.println( "[OBJECTPOOL " + this._trackName + "] Average rent service time (ms)   : 0" );		
+		}	
+			
 		out.println( "[OBJECTPOOL " + this._trackName + "] Total return requests            : " + this._totalReturnRequests );
 		out.println( "[OBJECTPOOL " + this._trackName + "] Total successful returns         : " + this._totalSuccessfulReturns );
 		out.println( "[OBJECTPOOL " + this._trackName + "] Total overflow discards          : " + this._totalOverflowDiscards );
 		out.println( "[OBJECTPOOL " + this._trackName + "] Total cleanup discards           : " + this._totalCleanupDiscards );
-		out.println( "[OBJECTPOOL " + this._trackName + "] Average returnQ time (ms)        : " + this._formatter.format( (double)this._totalReturnQTime/(double)(this._totalSuccessfulReturns+this._totalOverflowDiscards) ) );
-		out.println( "[OBJECTPOOL " + this._trackName + "] Average return service time (ms) : " + this._formatter.format( (double)this._totalReturnServiceTime/(double)(this._totalSuccessfulReturns+this._totalOverflowDiscards) ) );		
+		
+		if( (this._totalSuccessfulReturns+this._totalOverflowDiscards) > 0 )
+		{
+			out.println( "[OBJECTPOOL " + this._trackName + "] Average returnQ time (ms)        : " + this._formatter.format( (double)this._totalReturnQTime/(double)(this._totalSuccessfulReturns+this._totalOverflowDiscards) ) );
+			out.println( "[OBJECTPOOL " + this._trackName + "] Average return service time (ms) : " + this._formatter.format( (double)this._totalReturnServiceTime/(double)(this._totalSuccessfulReturns+this._totalOverflowDiscards) ) );
+		}
+		else
+		{
+			out.println( "[OBJECTPOOL " + this._trackName + "] Average returnQ time (ms)        : 0" );
+			out.println( "[OBJECTPOOL " + this._trackName + "] Average return service time (ms) : 0" );
+		}
 	}
 	
 	public Operation rentObject( String tag )
