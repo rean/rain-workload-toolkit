@@ -165,12 +165,17 @@ public class PartlyOpenLoopLoadGeneration extends LoadGenerationStrategy
 	{
 		this._asynchOperations++;
 		
-		long wakeUpTime = System.currentTimeMillis() + this._generator.getCycleTime();
+		long cycleTime = this._generator.getCycleTime();
+		long now = System.currentTimeMillis();
+		long wakeUpTime = now + cycleTime;
 		
 		operation.setAsync( true );
 		this.doOperation( operation );
 		
 		this.sleepUntil( wakeUpTime );
+		
+		// Save the cycle time - if we're in the steady state
+		this._generator.getScoreboard().dropOffWaitTime( now, operation._operationName, cycleTime );
 	}
 	
 	/**
@@ -188,7 +193,12 @@ public class PartlyOpenLoopLoadGeneration extends LoadGenerationStrategy
 		operation.setAsync( false );
 		this.doOperation( operation );
 		
-		this.sleepUntil( System.currentTimeMillis() + this._generator.getThinkTime() );
+		long thinkTime = this._generator.getThinkTime();
+		long now = System.currentTimeMillis();
+		this.sleepUntil( now +  thinkTime );
+		
+		// Save the think time
+		this._generator.getScoreboard().dropOffWaitTime( now, operation._operationName, thinkTime );
 	}
 	
 	/**

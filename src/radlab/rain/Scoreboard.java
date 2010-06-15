@@ -109,8 +109,14 @@ public class Scoreboard implements Runnable, IScoreboard
 	/** Lock for access to _dropOffQ */
 	private Object _dropOffQLock = new Object();
 	
+	/** Lock for access to waitTime table */
+	private Object _waitTimeDropOffLock = new Object();
+	
 	/** A mapping of each operation with its summary. */
 	private Hashtable<String,OperationSummary> _operationMap = new Hashtable<String,OperationSummary>();
+	
+	/** A mapping of each operation with its wait/cycle time. */
+	private Hashtable<String,WaitTimeSummary> _waitTimeMap = new Hashtable<String,WaitTimeSummary>();
 	
 	private Thread _workerThread = null;
 	private ScenarioTrack _owner = null;
@@ -211,12 +217,19 @@ public class Scoreboard implements Runnable, IScoreboard
 	
 	public void reset()
 	{
+		// Clear the operation map		
 		this._operationMap.clear();
 		synchronized( this._dropOffQLock )
 		{
 			this._dropOffQ.clear();
 		}
 		this._processingQ.clear();
+		
+		// Clear the wait/cycle time map
+		synchronized( this._waitTimeDropOffLock )
+		{
+			this._waitTimeMap.clear();
+		}
 		
 		this._totalActionsSuccessful = 0;
 		this._totalDropoffs = 0;
@@ -227,6 +240,33 @@ public class Scoreboard implements Runnable, IScoreboard
 		this._totalOpsSuccessful = 0;
 		this._totalOpsSync = 0;
 		this._maxDropOffWaitTime = 0;
+	}
+	
+	public void dropOffWaitTime( long time, String opName, long waitTime )
+	{
+		if( this._done )
+			return;
+		
+		if( !this.isSteadyState( time ) )
+			return;
+		
+		synchronized( this._waitTimeDropOffLock )
+		{
+			WaitTimeSummary waitTimeSummary = this._waitTimeMap.get( opName );
+			if( waitTimeSummary == null )
+			{
+				waitTimeSummary = new WaitTimeSummary( new PoissonSamplingStrategy( this._meanResponseTimeSamplingInterval ) );
+				this._waitTimeMap.put( opName, waitTimeSummary );
+			}
+			
+			waitTimeSummary.count++;
+			waitTimeSummary.totalWaitTime += waitTime;
+			if( waitTime < waitTimeSummary.minWaitTime )
+				waitTimeSummary.minWaitTime = waitTime;
+			if( waitTime > waitTimeSummary.maxWaitTime )
+				waitTimeSummary.maxWaitTime = waitTime;
+			waitTimeSummary.acceptSample( waitTime );
+		}
 	}
 	
 	public void dropOff( OperationExecution result )
@@ -271,19 +311,23 @@ public class Scoreboard implements Runnable, IScoreboard
 		}
 		
 		// Set the trace label accordingly.
-		if ( this.isCompletedDuringSteadyState( result ) )
-		{
-			result.setTraceLabel( Scoreboard.STEADY_STATE_TRACE_LABEL );
-		}
-		else if ( this.isInitiatedDuringSteadyState( result ) )
-		{
-			result.setTraceLabel( Scoreboard.LATE_LABEL );
-		}
-		else if ( this.isInitiatedDuringRampUp( result ) )
+		if ( this.isRampUp( result.getTimeStarted() ) ) // Initiated during ramp up
 		{
 			result.setTraceLabel( Scoreboard.RAMP_UP_LABEL );
 		}
-		else if ( this.isInitiatedDuringRampDown( result ) )
+		else if ( this.isSteadyState( result.getTimeFinished() ) ) // Finished in steady state
+		{
+			result.setTraceLabel( Scoreboard.STEADY_STATE_TRACE_LABEL );
+		}
+		else if ( this.isSteadyState( result.getTimeStarted() ) ) // Initiated in steady state BUT did not complete until after steady state
+		{
+			result.setTraceLabel( Scoreboard.LATE_LABEL );
+		}
+		/*else if ( this.isRampUp( result.getTimeStarted() ) ) // Initiated during ramp up
+		{
+			result.setTraceLabel( Scoreboard.RAMP_UP_LABEL );
+		}*/
+		else if ( this.isRampDown( result.getTimeStarted() ) ) // Initiated during ramp down
 		{
 			result.setTraceLabel( Scoreboard.RAMP_DOWN_LABEL );
 		}
@@ -361,6 +405,22 @@ public class Scoreboard implements Runnable, IScoreboard
 			this._owner.getObjectPool().returnObject( result.getOperation() );
 	}
 	
+	public boolean isSteadyState( long time )
+	{
+		return ( time >= this._startTime && time <= this._endTime );
+	}
+	
+	public boolean isRampUp( long time )
+	{
+		return ( time < this._startTime );
+	}
+	
+	public boolean isRampDown( long time )
+	{
+		return ( time > this._endTime );
+	}
+	
+	/*
 	public boolean isCompletedDuringSteadyState( OperationExecution e )
 	{
 		long finishTime = e.getTimeFinished();
@@ -384,6 +444,7 @@ public class Scoreboard implements Runnable, IScoreboard
 		long startTime = e.getTimeStarted();
 		return ( startTime > this._endTime );
 	}
+	*/
 	
 	public void printStatistics( PrintStream out )
 	{
@@ -427,7 +488,65 @@ public class Scoreboard implements Runnable, IScoreboard
 		out.println( this + " Sync Ops                           : " + this._totalOpsSync + " " + this._formatter.format( ( ( (double) this._totalOpsSync / (double) totalOperations) * 100) ) + "%" );
 		out.println( this + " Mean response time sample interval : " + this._meanResponseTimeSamplingInterval + " (using Poisson sampling)");
 		
-		this.printOperationStatistics( out, true );	
+		this.printOperationStatistics( out, true );
+		out.println( "" );
+		this.printWaitTimeStatistics( out, true );
+	}
+	
+	private void printWaitTimeStatistics( PrintStream out, boolean purgePercentileData )
+	{
+		synchronized( this._operationMap )
+		{
+			try
+			{
+				// Make this thing "prettier", using fixed width columns
+				String outputFormatSpec = "|%20s|%12s|%12s|%12s|%10s|%10s|%20s|";
+				
+				out.println( this + String.format( outputFormatSpec, "operation", "avg wait", "min wait", "max wait", "90th (s)", "99th (s)", "pctile" ) );
+				out.println( this + String.format( outputFormatSpec, "", "time (s)", "time (s)", "time (s)", "", "", "samples" ) );
+				//out.println( this + "| operation | proportion | successes | failures | avg response | min response | max response | 90th (s) | 99th (s) | pctile  |" );
+				//out.println( this + "|           |            |           |          | time (s)     | time (s)     | time (s)     |          |          | samples |" );
+				
+				// Show operation proportions, response time: avg, max, min, stdev (op1 = x%, op2 = y%...)
+				Enumeration<String> keys = this._operationMap.keys();
+				while ( keys.hasMoreElements() )
+				{
+					String opName = keys.nextElement();
+					WaitTimeSummary summary = this._waitTimeMap.get( opName );
+					
+					// If there were no values, then the min and max wait times would not have been set
+					// so make them to 0
+					if( summary.minWaitTime == Long.MAX_VALUE )
+						summary.minWaitTime = 0;
+					
+					if( summary.maxWaitTime == Long.MIN_VALUE )
+						summary.maxWaitTime = 0;
+					
+					// Print out the operation summary.
+					out.println( this + String.format( outputFormatSpec, 
+							opName, 
+							//this._formatter.format( ( ( (double) ( summary.succeeded + summary.failed ) / (double) totalOperations ) * 100 ) ) + "% ",
+							//summary.succeeded,
+							//summary.failed,
+							this._formatter.format( summary.getAverageWaitTime() / 1000.0 ),
+							this._formatter.format( summary.minWaitTime / 1000.0 ),
+							this._formatter.format( summary.maxWaitTime / 1000.0 ),
+							this._formatter.format( summary.getNthPercentileResponseTime( 90 ) / 1000.0 ),
+							this._formatter.format( summary.getNthPercentileResponseTime( 99 ) / 1000.0 ),
+							summary.getSamplesCollected() + "/" + summary.getSamplesSeen()
+							) 
+						);
+										
+					if( purgePercentileData )
+						summary.resetSamples();
+				}
+			}
+			catch( Exception e )
+			{
+				System.out.println( this + " Error printing think/cycle time summary. Reason: " + e.toString() );
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	private void printOperationStatistics( PrintStream out, boolean purgePercentileData )
@@ -439,12 +558,12 @@ public class Scoreboard implements Runnable, IScoreboard
 			try
 			{
 				// Make this thing "prettier", using fixed width columns
-				String outputFormatSpec = "|%20s|%10s|%10s|%10s|%12s|%12s|%12s|%10s|%10s|";
+				String outputFormatSpec = "|%20s|%10s|%10s|%10s|%12s|%12s|%12s|%10s|%10s|%10s|";
 				
-				out.println( this + String.format( outputFormatSpec, "operation", "proportion", "successes", "failures", "avg response", "min response", "max response", "90th (s)", "99th (s)" ) );
-				out.println( this + String.format( outputFormatSpec, "", "", "", "", "time (s)", "time (s)", "time(s)", "", "" ) );
-				//out.println( this + "| operation | proportion | successes | failures | avg response | min response | max response | 90th (s) | 99th (s) |" );
-				//out.println( this + "|           |            |           |          | time (s)     | time (s)     | time (s)     |          |          |" );
+				out.println( this + String.format( outputFormatSpec, "operation", "proportion", "successes", "failures", "avg response", "min response", "max response", "90th (s)", "99th (s)", "pctile" ) );
+				out.println( this + String.format( outputFormatSpec, "", "", "", "", "time (s)", "time (s)", "time(s)", "", "", "samples" ) );
+				//out.println( this + "| operation | proportion | successes | failures | avg response | min response | max response | 90th (s) | 99th (s) | pctile  |" );
+				//out.println( this + "|           |            |           |          | time (s)     | time (s)     | time (s)     |          |          | samples |" );
 				
 				// Show operation proportions, response time: avg, max, min, stdev (op1 = x%, op2 = y%...)
 				Enumeration<String> keys = this._operationMap.keys();
@@ -471,10 +590,9 @@ public class Scoreboard implements Runnable, IScoreboard
 							this._formatter.format( summary.minResponseTime / 1000.0 ),
 							this._formatter.format( summary.maxResponseTime / 1000.0 ),
 							this._formatter.format( summary.getNthPercentileResponseTime( 90 ) / 1000.0 ),
-							this._formatter.format( summary.getNthPercentileResponseTime( 99 ) / 1000.0 )
+							this._formatter.format( summary.getNthPercentileResponseTime( 99 ) / 1000.0 ),
+							summary.getSamplesCollected() + "/" + summary.getSamplesSeen()
 							) 
-							+ " [Percentile estimates using " +
-							summary.getSamplesCollected() + " samples collected out of " + summary.getSamplesSeen() + "]"
 						);
 										
 					if( purgePercentileData )
@@ -620,66 +738,64 @@ public class Scoreboard implements Runnable, IScoreboard
 	private void processSteadyStateResult( OperationExecution result )
 	{
 		String opName = result._operationName;
-		//synchronized( this._operationMap )
-		//{	
-			OperationSummary summary = this._operationMap.get( opName );
 			
-			if ( summary == null )
-			{
-				summary = new OperationSummary( new PoissonSamplingStrategy( this._meanResponseTimeSamplingInterval ) );
-				this._operationMap.put( opName, summary );
-			}
+		OperationSummary summary = this._operationMap.get( opName );
 		
+		if ( summary == null )
+		{
+			summary = new OperationSummary( new PoissonSamplingStrategy( this._meanResponseTimeSamplingInterval ) );
+			this._operationMap.put( opName, summary );
+		}
+	
+		if ( result.isAsynchronous() )
+		{
+			this._totalOpsAsync++;
+		}
+		else
+		{
+			this._totalOpsSync++;
+		}
+		
+		if ( result.isFailed() )
+		{
+			summary.failed++;
+			this._totalOpsFailed++;
+		}
+		else
+		{
+			this._totalOpsSuccessful++;
+			this._totalActionsSuccessful += result.getActionsPerformed();
+			
+			summary.succeeded++;
+			summary.totalActions += result.getActionsPerformed();
 			if ( result.isAsynchronous() )
 			{
-				this._totalOpsAsync++;
+				summary.totalAsyncInvocations++;
 			}
 			else
 			{
-				this._totalOpsSync++;
+				summary.totalSyncInvocations++;
 			}
 			
-			if ( result.isFailed() )
+			// If interactive, look at the total response time.
+			if ( result.isInteractive() )
 			{
-				summary.failed++;
-				this._totalOpsFailed++;
-			}
-			else
-			{
-				this._totalOpsSuccessful++;
-				this._totalActionsSuccessful += result.getActionsPerformed();
-				
-				summary.succeeded++;
-				summary.totalActions += result.getActionsPerformed();
-				if ( result.isAsynchronous() )
+				long responseTime = result.getExecutionTime();
+				// Save the response time
+				summary.acceptSample( responseTime );
+				// summary.responseTimes.add( responseTime );
+				// Update the total response time
+				summary.totalResponseTime += responseTime;
+				if ( responseTime > summary.maxResponseTime )
 				{
-					summary.totalAsyncInvocations++;
+					summary.maxResponseTime = responseTime;
 				}
-				else
+				if ( responseTime < summary.minResponseTime )
 				{
-					summary.totalSyncInvocations++;
+					summary.minResponseTime = responseTime;
 				}
-				
-				// If interactive, look at the total response time.
-				if ( result.isInteractive() )
-				{
-					long responseTime = result.getExecutionTime();
-					// Save the response time
-					summary.acceptSample( responseTime );
-					// summary.responseTimes.add( responseTime );
-					// Update the total response time
-					summary.totalResponseTime += responseTime;
-					if ( responseTime > summary.maxResponseTime )
-					{
-						summary.maxResponseTime = responseTime;
-					}
-					if ( responseTime < summary.minResponseTime )
-					{
-						summary.minResponseTime = responseTime;
-					}
-				}	
-			}
-		//}
+			}	
+		}
 	}
 	
 	public String toString()

@@ -61,6 +61,7 @@ public abstract class ScenarioTrack
 	public static String CFG_GENERATOR_KEY                      = "generator";
 	public static String CFG_LOAD_PROFILE_CLASS_KEY             = "loadProfileClass";
 	public static String CFG_LOAD_PROFILE_KEY                   = "loadProfile";
+	public static String CFG_LOAD_SCHEDULE_CREATOR_KEY			= "loadScheduleCreator";
 	// Load behavioral hints
 	public static String CFG_BEHAVIOR_KEY                       = "behavior";
 	public static String CFG_RESOURCE_PATH                      = "resourcePath";
@@ -214,14 +215,31 @@ public abstract class ScenarioTrack
 		{
 			this._loadProfileClassName = ScenarioTrack.DEFAULT_LOAD_PROFILE_CLASS;
 		}
-		JSONArray loadSchedule = config.getJSONArray( ScenarioTrack.CFG_LOAD_PROFILE_KEY );
-		for ( int i = 0; i < loadSchedule.length(); i++ )
+		// Look for a load schedule OR a class that creates it, we prefer the class
+		if( config.has( ScenarioTrack.CFG_LOAD_SCHEDULE_CREATOR_KEY ) )
 		{
-			JSONObject profileObj = loadSchedule.getJSONObject( i );
-			LoadProfile profile = this.createLoadProfile( this._loadProfileClassName, profileObj );
-			
-			this._loadSchedule.add( profile );
+			// Create the load schedule creator
+			String loadSchedulerClass = config.getString( ScenarioTrack.CFG_LOAD_SCHEDULE_CREATOR_KEY );
+			LoadScheduleCreator loadScheduler = this.createLoadScheduleCreator( loadSchedulerClass );
+			if( loadScheduler != null )
+				this._loadSchedule = loadScheduler.createSchedule();
+			else throw new Exception( "Error creating load scheduler class: " +  loadSchedulerClass );
 		}
+		else
+		{
+			JSONArray loadSchedule = config.getJSONArray( ScenarioTrack.CFG_LOAD_PROFILE_KEY );
+			for ( int i = 0; i < loadSchedule.length(); i++ )
+			{
+				JSONObject profileObj = loadSchedule.getJSONObject( i );
+				LoadProfile profile = this.createLoadProfile( this._loadProfileClassName, profileObj );
+				
+				this._loadSchedule.add( profile );
+			}
+		}
+		
+		if( this._loadSchedule.size() == 0 )
+			throw new Exception( "Error: empty load schedule. Nothing to do." );
+		
 		// 9) Load Mix Matrices/Behavior Directives
 		JSONObject behavior = config.getJSONObject( ScenarioTrack.CFG_BEHAVIOR_KEY );
 		Iterator<String> keyIt = behavior.keys();
@@ -270,6 +288,16 @@ public abstract class ScenarioTrack
 	}
 	
 	// Factory methods
+	@SuppressWarnings("unchecked")
+	public LoadScheduleCreator createLoadScheduleCreator( String name ) throws Exception
+	{
+		LoadScheduleCreator creator = null;
+		Class<LoadScheduleCreator> creatorClass = (Class<LoadScheduleCreator>) Class.forName( name );
+		Constructor<LoadScheduleCreator> creatorCtor = creatorClass.getConstructor( new Class[]{} );
+		creator = (LoadScheduleCreator) creatorCtor.newInstance( (Object[]) null );
+		return creator;
+	}
+	
 	@SuppressWarnings("unchecked")
 	public Generator createWorkloadGenerator( String name ) throws Exception
 	{

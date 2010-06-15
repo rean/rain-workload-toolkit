@@ -1,0 +1,31 @@
+{
+    "swf-booking-faces-001": {
+        "generator": "radlab.rain.workload.booking.BookingGenerator",
+        "track": "radlab.rain.DefaultScenarioTrack",
+        "resourcePath": "resources/",
+        "behavior": {
+            "default": [
+            [1.0, 50.0,  0.0, 49.0,  0.0,  0.0,  0.0,  0.0],
+            [1.0,  0.0,  0.0, 99.0,  0.0,  0.0,  0.0,  0.0],
+            [1.0, 50.0,  0.0, 49.0,  0.0,  0.0,  0.0,  0.0],
+            [0.0,  5.0,  5.0, 10.0, 80.0,  0.0,  0.0,  0.0],
+            [0.0,  5.0,  5.0, 20.0,  0.0, 70.0,  0.0,  0.0],
+            [0.0,  0.0,  5.0, 35.0,  0.0,  0.0, 60.0,  0.0],
+            [0.0,  0.0, 10.0, 30.0,  0.0,  0.0,  0.0, 60.0],
+            [0.0,  0.0, 10.0, 80.0,  0.0,  0.0, 10.0,  0.0]
+            ]
+        },
+        "loadScheduleCreator" : "radlab.rain.workload.booking.BookingAppLoadSpikeScheduleCreator",
+        "target": {
+            "hostname": "localhost",
+            "port": 8080
+        },
+        "pLogSampling": 1.0,
+        "pOpenLoop": 0.0,
+        "meanCycleTime": 0,
+        "meanThinkTime": 5,
+        "interactive": true,
+        "objectPoolMaxSize": 500,
+        "meanResponseTimeSamplingInterval": 10
+    }
+}

@@ -60,18 +60,17 @@ public class LoadProfile
 		}
 	}
 
-	public LoadProfile( long interval, int numberOfUsers, String mixName ) throws JSONException
+	public LoadProfile( long interval, int numberOfUsers, String mixName )
 	{
 		this(interval, numberOfUsers, mixName, 0);
 	}
 	
-	public LoadProfile( long interval, int numberOfUsers, String mixName, long transitionTime ) throws JSONException
+	public LoadProfile( long interval, int numberOfUsers, String mixName, long transitionTime )
 	{
-		JSONObject profileObj = new JSONObject();
-		profileObj.append( CFG_LOAD_PROFILE_INTERVAL_KEY, interval );
-		profileObj.append( CFG_LOAD_PROFILE_TRANSITION_TIME_KEY, transitionTime );
-		profileObj.append( CFG_LOAD_PROFILE_USERS_KEY, numberOfUsers );
-		profileObj.append( CFG_LOAD_PROFILE_MIX_KEY, mixName );
+		this._interval = interval;
+		this._numberOfUsers = numberOfUsers;
+		this._mixName = mixName;
+		this._transitionTime = transitionTime;
 	}
 		
 	// Converts to milliseconds

@@ -38,6 +38,7 @@ import radlab.rain.LoadProfile;
 import radlab.rain.Operation;
 import radlab.rain.ScenarioTrack;
 import radlab.rain.ObjectPool;
+import radlab.rain.util.NegativeExponential;
 
 public class CloudstoneNullGenerator extends Generator 
 {
@@ -65,6 +66,9 @@ public class CloudstoneNullGenerator extends Generator
 	public static final int PERSON_DETAIL	= 4;
 	public static final int ADD_PERSON		= 5;
 	public static final int ADD_EVENT		= 6;
+
+	private NegativeExponential _thinkTimeGenerator  = null;
+	private NegativeExponential _cycleTimeGenerator = null;
 	
 	public CloudstoneNullGenerator(ScenarioTrack trk) 
 	{
@@ -72,6 +76,11 @@ public class CloudstoneNullGenerator extends Generator
 		
 		// Initalize random utility generators and HttpTransport instances
 		this._rng = new java.util.Random();
+		// Initialize the cycle time and think time generators. If you want non-stop
+		// activity, then set mean cycle time, and mean think times to 0 and the
+		// number generators should just *always* return 0 for the think/cycle time
+		this._cycleTimeGenerator = new NegativeExponential( trk.getMeanCycleTime()*1000 );
+		this._thinkTimeGenerator = new NegativeExponential( trk.getMeanThinkTime()*1000 );
 	}
 
 	@Override
@@ -83,13 +92,19 @@ public class CloudstoneNullGenerator extends Generator
 	@Override
 	public long getCycleTime() 
 	{
-		return 0;
+		long nextCycleTime = (long) this._cycleTimeGenerator.nextDouble(); 
+		// Truncate at 5 times the mean (arbitrary truncation)
+		return Math.min( nextCycleTime, (5*this._cycleTime) );
+		//return 0;
 	}
 
 	@Override
 	public long getThinkTime() 
 	{
-		return 0;
+		long nextThinkTime = (long) this._thinkTimeGenerator.nextDouble(); 
+		// Truncate at 5 times the mean (arbitrary truncation)
+		return Math.min( nextThinkTime, (5*this._thinkTime) );
+		// return 0;
 	}
 
 	@Override

@@ -103,7 +103,7 @@ public abstract class Operation implements Runnable
 	public void setActionsPerformed( long val ){ this._actionsPerformed = val; }
 	public long getGeneratorThreadID() { return this._generatorThreadID; }
 	public void setGeneratorThreadID( long val ) { this._generatorThreadID = val; }
-	
+		
 	public void trace( String request )
 	{
 		if( this._trace == null )

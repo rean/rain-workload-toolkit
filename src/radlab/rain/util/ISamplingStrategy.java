@@ -29,58 +29,15 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package radlab.rain;
+package radlab.rain.util;
 
-//import radlab.rain.util.PoissonSamplingStrategy;
-import radlab.rain.util.ISamplingStrategy;
-
-public class OperationSummary 
+public interface ISamplingStrategy 
 {
-	public long succeeded 					= 0;
-	public long failed 						= 0;
-	public long totalActions				= 0;
-	public long totalResponseTime 			= 0;
-	public long totalAsyncInvocations		= 0;
-	public long totalSyncInvocations		= 0;
-	public long minResponseTime				= Long.MAX_VALUE;
-	public long maxResponseTime				= Long.MIN_VALUE;
-	// Sample the response times so that we can give a "reasonable" 
-	// estimate of the 90th and 99th percentiles.	
-	private ISamplingStrategy responseTimeSampler; 
-	
-	public OperationSummary( ISamplingStrategy strategy )
-	{
-		this.responseTimeSampler = strategy;
-	}
-	
-	public long getNthPercentileResponseTime( int pct )
-	{
-		return this.responseTimeSampler.getNthPercentile( pct );
-	}
-	
-	public boolean acceptSample( long respTime )
-	{
-		return this.responseTimeSampler.accept( respTime );
-	}
-	
-	public void resetSamples()
-	{
-		this.responseTimeSampler.reset();
-	}
-	
-	public int getSamplesSeen()
-	{
-		return this.responseTimeSampler.getSamplesSeen();
-	}
-	
-	public int getSamplesCollected()
-	{
-		return this.responseTimeSampler.getSamplesCollected();
-	}
-	public double getAverageResponseTime()
-	{
-		if( this.succeeded == 0 )
-			return 0.0;
-		else return (double) this.totalResponseTime/(double)this.succeeded;
-	}
+	double getMeanSamplingInterval();
+	void setMeanSamplingInterval( double val );
+	void reset();
+	int getSamplesSeen();
+	int getSamplesCollected();
+	boolean accept( long observation );
+	long getNthPercentile( int pct );
 }

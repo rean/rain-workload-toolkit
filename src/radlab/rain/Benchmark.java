@@ -140,7 +140,12 @@ public class Benchmark
 		{
 			track.getScoreboard().stop();
 			track.getScoreboard().printStatistics( System.out );
+			// Collect scoreboard results
+			// Collect object pool results
+			track.getObjectPool().shutdown();
 		}
+		
+		// Write out scoreboard results
 				
 		// Shutdown the shared threadpool.
 		pool.shutdown();

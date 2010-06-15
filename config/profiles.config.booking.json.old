@@ -1,0 +1,56 @@
+{
+    "swf-booking-faces-001": {
+        "generator": "radlab.rain.workload.booking.BookingGenerator",
+        "track": "radlab.rain.DefaultScenarioTrack",
+        "resourcePath": "resources/",
+        "behavior": {
+            "default": [
+            [1.0, 50.0,  0.0, 49.0,  0.0,  0.0,  0.0,  0.0],
+            [1.0,  0.0,  0.0, 99.0,  0.0,  0.0,  0.0,  0.0],
+            [1.0,  0.0, 41.0, 31.0,  0.0,  1.0,  0.0,  0.0],
+            [1.0,  5.0,  0.0,  0.0, 85.0,  1.0,  0.0,  0.0],
+            [0.0, 15.0,  0.0, 15.0,  0.0, 70.0,  0.0,  0.0],
+            [0.0,  0.0,  5.0, 35.0,  0.0,  0.0, 60.0,  0.0],
+            [0.0,  0.0, 10.0, 30.0,  0.0,  0.0,  0.0, 60.0],
+            [0.0,  0.0,  5.0, 85.0,  0.0,  0.0, 10.0,  0.0]
+            ]
+        },
+        "loadProfile": [
+        {
+            "interval": 10,
+            "users": 2,
+            "mix": "default",
+            "transitionTime": 5
+        },
+        {
+            "interval": 20,
+            "users": 4,
+            "mix": "default",
+            "transitionTime": 5
+        },
+        {
+            "interval": 20,
+            "users": 6,
+            "mix": "default",
+            "transitionTime": 5
+        },
+        {
+            "interval": 10,
+            "users": 2,
+            "mix": "default",
+            "transitionTime": 5
+        }
+        ],
+        "target": {
+            "hostname": "localhost",
+            "port": 8080
+        },
+        "pLogSampling": 0.1,
+        "pOpenLoop": 0.0,
+        "meanCycleTime": 0,
+        "meanThinkTime": 5,
+        "interactive": true,
+        "objectPoolMaxSize": 500,
+        "meanResponseTimeSamplingInterval": 1000
+    }
+}

@@ -34,7 +34,7 @@ package radlab.rain.util;
 import java.util.Collections;
 import java.util.LinkedList;
 
-public class PoissonSamplingStrategy 
+public class PoissonSamplingStrategy implements ISamplingStrategy
 {
 	public static long getNthPercentile( int pct, LinkedList<Long> samples )
 	{
@@ -60,6 +60,16 @@ public class PoissonSamplingStrategy
 		this.reset();
 	}
 
+	public double getMeanSamplingInterval()
+	{
+		return this._meanSamplingInterval;
+	}
+	
+	public void setMeanSamplingInterval( double val )
+	{
+		this._meanSamplingInterval = val;
+	}
+	
 	public void reset() 
 	{
 		this._currentSample = 0;

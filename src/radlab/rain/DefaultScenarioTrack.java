@@ -218,7 +218,7 @@ public class DefaultScenarioTrack extends ScenarioTrack
 		catch( InterruptedException ie )
 		{}
 		
-		this._objPool.shutdown();
+		//this._objPool.shutdown();
 	}
 	
 	/**

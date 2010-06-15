@@ -31,56 +31,53 @@
 
 package radlab.rain;
 
-//import radlab.rain.util.PoissonSamplingStrategy;
 import radlab.rain.util.ISamplingStrategy;
 
-public class OperationSummary 
+public class WaitTimeSummary 
 {
-	public long succeeded 					= 0;
-	public long failed 						= 0;
-	public long totalActions				= 0;
-	public long totalResponseTime 			= 0;
-	public long totalAsyncInvocations		= 0;
-	public long totalSyncInvocations		= 0;
-	public long minResponseTime				= Long.MAX_VALUE;
-	public long maxResponseTime				= Long.MIN_VALUE;
+	public long count					= 0;
+	public long totalWaitTime			= 0;
+	public long minWaitTime				= Long.MAX_VALUE;
+	public long maxWaitTime				= Long.MIN_VALUE;
+	
 	// Sample the response times so that we can give a "reasonable" 
 	// estimate of the 90th and 99th percentiles.	
-	private ISamplingStrategy responseTimeSampler; 
+	private ISamplingStrategy waitTimeSampler;
 	
-	public OperationSummary( ISamplingStrategy strategy )
+	public WaitTimeSummary( ISamplingStrategy strategy )
 	{
-		this.responseTimeSampler = strategy;
+		this.waitTimeSampler = strategy;
 	}
 	
 	public long getNthPercentileResponseTime( int pct )
 	{
-		return this.responseTimeSampler.getNthPercentile( pct );
+		return this.waitTimeSampler.getNthPercentile( pct );
 	}
 	
 	public boolean acceptSample( long respTime )
 	{
-		return this.responseTimeSampler.accept( respTime );
+		return this.waitTimeSampler.accept( respTime );
 	}
 	
 	public void resetSamples()
 	{
-		this.responseTimeSampler.reset();
+		this.waitTimeSampler.reset();
 	}
 	
 	public int getSamplesSeen()
 	{
-		return this.responseTimeSampler.getSamplesSeen();
+		return this.waitTimeSampler.getSamplesSeen();
 	}
 	
 	public int getSamplesCollected()
 	{
-		return this.responseTimeSampler.getSamplesCollected();
+		return this.waitTimeSampler.getSamplesCollected();
 	}
-	public double getAverageResponseTime()
+	
+	public double getAverageWaitTime()
 	{
-		if( this.succeeded == 0 )
+		if( this.count == 0 )
 			return 0.0;
-		else return (double) this.totalResponseTime/(double)this.succeeded;
+		else return (double) this.totalWaitTime/(double)this.count;
 	}
 }
