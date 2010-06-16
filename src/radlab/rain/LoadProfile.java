@@ -41,10 +41,10 @@ public class LoadProfile
 	public static String CFG_LOAD_PROFILE_USERS_KEY           = "users";
 	public static String CFG_LOAD_PROFILE_MIX_KEY             = "mix";
 
-	private long   _interval;
-	private long   _transitionTime;
-	private int    _numberOfUsers;
-	private String _mixName;
+	protected long   _interval;
+	protected long   _transitionTime;
+	protected int    _numberOfUsers;
+	protected String _mixName;
 
 	private long _timeStarted = -1; // LoadManagerThreads need to update this every time they advance the "clock"
 

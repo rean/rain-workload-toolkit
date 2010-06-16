@@ -2,7 +2,7 @@
     "profiles": "config/profiles.config.booking.spike.json",
     "timing": {
         "rampUp": 30,
-        "duration": 2900,
+        "duration": 1180,
         "rampDown": 30
     }
 }

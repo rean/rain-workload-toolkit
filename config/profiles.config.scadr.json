@@ -1,0 +1,22 @@
+{
+    "scadr-001": {
+        "generator": "radlab.rain.workload.scadr.ScadrGenerator",
+        "track": "radlab.rain.DefaultScenarioTrack",
+        "resourcePath": "resources/",
+        "behavior": {
+            
+        },
+        "loadScheduleCreator" : "radlab.rain.workload.scadr.ScadrLoadScheduleCreator",
+        "target": {
+            "hostname": "scadr.knowsql.org",
+            "port": 80
+        },
+        "pLogSampling": 1.0,
+        "pOpenLoop": 0.0,
+        "meanCycleTime": 0,
+        "meanThinkTime": 5,
+        "interactive": true,
+        "objectPoolMaxSize": 500,
+        "meanResponseTimeSamplingInterval": 10
+    }
+}

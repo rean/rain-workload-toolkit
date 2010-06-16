@@ -15,7 +15,6 @@
             [0.0,  0.0, 10.0, 80.0,  0.0,  0.0, 10.0,  0.0]
             ]
         },
-        "loadScheduleCreator" : "radlab.rain.workload.booking.BookingAppLoadScheduleCreator",
         "loadProfile": [
         {
             "interval": 10,
