@@ -36,7 +36,10 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import org.json.*;
+//import org.json.*;
+import org.json.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
 
 /**
  * The ScenarioTrack abstract class represents a single workload among
@@ -59,6 +62,7 @@ public abstract class ScenarioTrack
 	public static String CFG_TARGET_HOSTNAME_KEY                = "hostname";
 	public static String CFG_TARGET_PORT_KEY                    = "port";
 	public static String CFG_GENERATOR_KEY                      = "generator";
+	public static String CFG_GENERATOR_PARAMS_KEY				= "generatorParameters";
 	public static String CFG_LOAD_PROFILE_CLASS_KEY             = "loadProfileClass";
 	public static String CFG_LOAD_PROFILE_KEY                   = "loadProfile";
 	public static String CFG_LOAD_SCHEDULE_CREATOR_KEY			= "loadScheduleCreator";
@@ -83,6 +87,7 @@ public abstract class ScenarioTrack
 	protected Hashtable<String,MixMatrix> _mixMap               = new Hashtable<String,MixMatrix>();
 	protected String _scoreboardClassName                       = "radlab.rain.Scoreboard";
 	protected String _generatorClassName                        = "";
+	protected JSONObject _generatorParams						= null;
 	protected String _loadProfileClassName                      = "";
 	protected boolean _interactive                              = true;
 	private IScoreboard _scoreboard                             = null;
@@ -112,6 +117,7 @@ public abstract class ScenarioTrack
 	// public abstract LoadProfile getNextLoadProfile();
 	
 	public String getGeneratorClassName() { return this._generatorClassName; }
+	public JSONObject getGeneratorParams() { return this._generatorParams; }
 	public String getName() { return this._name; }
 	public void setName( String val ) { this._name = val; }
 	public long getRampUp() { return this._parentScenario.getRampUp(); }
@@ -190,8 +196,11 @@ public abstract class ScenarioTrack
 		// 1) Open-Loop Probability
 		this._openLoopProbability = config.getDouble( ScenarioTrack.CFG_OPEN_LOOP_PROBABILITY_KEY );
 		// 2) Concrete Generator
-		this._generatorClassName = config.getString( ScenarioTrack.CFG_GENERATOR_KEY ); 
-		this._generator = this.createWorkloadGenerator( this._generatorClassName );
+		this._generatorClassName = config.getString( ScenarioTrack.CFG_GENERATOR_KEY );
+		this._generatorParams = null;
+		if( config.has( ScenarioTrack.CFG_GENERATOR_PARAMS_KEY ) )
+			this._generatorParams = config.getJSONObject( ScenarioTrack.CFG_GENERATOR_PARAMS_KEY );
+		this._generator = this.createWorkloadGenerator( this._generatorClassName, this._generatorParams );
 		// 3) Target Information
 		JSONObject target = config.getJSONObject( ScenarioTrack.CFG_TARGETS_KEY );
 		this._targetHostname = target.getString( ScenarioTrack.CFG_TARGET_HOSTNAME_KEY );
@@ -299,12 +308,14 @@ public abstract class ScenarioTrack
 	}
 	
 	@SuppressWarnings("unchecked")
-	public Generator createWorkloadGenerator( String name ) throws Exception
+	public Generator createWorkloadGenerator( String name, JSONObject config ) throws Exception
 	{
 		Generator generator = null;
 		Class<Generator> generatorClass = (Class<Generator>) Class.forName( name );
 		Constructor<Generator> generatorCtor = generatorClass.getConstructor( new Class[]{ ScenarioTrack.class } );
 		generator = (Generator) generatorCtor.newInstance( new Object[] { this } );
+		if( config != null )
+			generator.configure( config );
 		return generator;
 	}
 	

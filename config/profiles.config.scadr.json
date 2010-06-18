@@ -1,6 +1,10 @@
 {
     "scadr-001": {
         "generator": "radlab.rain.workload.scadr.ScadrGenerator",
+        "generatorParameters": {
+        	"paramOne": "foo",
+        	"paramTwo": 100
+        },
         "track": "radlab.rain.DefaultScenarioTrack",
         "resourcePath": "resources/",
         "behavior": {

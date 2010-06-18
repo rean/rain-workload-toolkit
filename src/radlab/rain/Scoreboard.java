@@ -91,6 +91,7 @@ public class Scoreboard implements Runnable, IScoreboard
 	private long _totalOpsAsync          = 0;
 	private long _totalOpsSync           = 0;
 	private long _totalOpsInitiated      = 0;
+	private long _totalOpsLate			 = 0;
 	
 	/* Log (trace) sampling probability */
 	private double _logSamplingProbability = 1.0;
@@ -240,6 +241,7 @@ public class Scoreboard implements Runnable, IScoreboard
 		this._totalOpsSuccessful = 0;
 		this._totalOpsSync = 0;
 		this._maxDropOffWaitTime = 0;
+		this._totalOpsLate = 0;
 	}
 	
 	public void dropOffWaitTime( long time, String opName, long waitTime )
@@ -315,7 +317,7 @@ public class Scoreboard implements Runnable, IScoreboard
 		{
 			result.setTraceLabel( Scoreboard.RAMP_UP_LABEL );
 		}
-		else if ( this.isSteadyState( result.getTimeFinished() ) ) // Finished in steady state
+		if ( this.isSteadyState( result.getTimeFinished() ) ) // Finished in steady state
 		{
 			result.setTraceLabel( Scoreboard.STEADY_STATE_TRACE_LABEL );
 		}
@@ -351,7 +353,15 @@ public class Scoreboard implements Runnable, IScoreboard
 					{
 						Throwable failureReason = result.getOperation().getFailureReason();
 						if( failureReason != null )
+						{
 							errorLogger.write( "[" + generatedBy + "] " + failureReason.toString() + Scoreboard.NEWLINE );
+							if( RainConfig.getInstance()._verboseErrors )
+							{
+								// If we're doing verbose error reporting then dump the stack trace
+								for( StackTraceElement frame : failureReason.getStackTrace() )
+									errorLogger.write( "[" + generatedBy + "] " + frame.toString() + Scoreboard.NEWLINE );
+							}
+						}
 					}
 					catch( IOException ioe )
 					{
@@ -484,6 +494,8 @@ public class Scoreboard implements Runnable, IScoreboard
 		out.println( this + " Effective load (requests/sec)      : " + this._formatter.format( effectiveLoadRequests ) );
 		out.println( this + " Operations initiated               : " + this._totalOpsInitiated );
 		out.println( this + " Operations completed               : " + this._totalOpsSuccessful );
+		out.println( this + " Operations late                    : " + this._totalOpsLate );
+		out.println( this + " Operations failed                  : " + this._totalOpsFailed );
 		out.println( this + " Async Ops                          : " + this._totalOpsAsync + " " + this._formatter.format( ( ( (double) this._totalOpsAsync / (double) totalOperations) * 100) ) + "%" );
 		out.println( this + " Sync Ops                           : " + this._totalOpsSync + " " + this._formatter.format( ( ( (double) this._totalOpsSync / (double) totalOperations) * 100) ) + "%" );
 		out.println( this + " Mean response time sample interval : " + this._meanResponseTimeSamplingInterval + " (using Poisson sampling)");
@@ -709,6 +721,7 @@ public class Scoreboard implements Runnable, IScoreboard
 					else if ( traceLabel.equals( Scoreboard.LATE_LABEL ) )
 					{
 						this._totalOpsInitiated++;
+						this._totalOpsLate++;
 					}
 				}
 			}

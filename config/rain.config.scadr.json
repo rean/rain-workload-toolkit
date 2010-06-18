@@ -4,5 +4,6 @@
         "rampUp": 15,
         "duration": 50,
         "rampDown": 15
-    }
+    },
+    "verboseErrors" : false
 }

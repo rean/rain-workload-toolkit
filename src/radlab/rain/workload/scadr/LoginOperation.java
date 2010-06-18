@@ -1,9 +1,12 @@
 package radlab.rain.workload.scadr;
 
 import radlab.rain.IScoreboard;
+import java.util.Random;
 
 public class LoginOperation extends ScadrOperation {
 
+	private Random _random = new Random();
+	
 	public LoginOperation(boolean interactive, IScoreboard scoreboard) {
 		super(interactive, scoreboard);
 		this._operationName = "Login";
@@ -15,7 +18,10 @@ public class LoginOperation extends ScadrOperation {
 	public void execute() throws Throwable
 	{
 		this.trace( this._operationName );
-		Thread.sleep( 25 );
+		double rndVal = this._random.nextDouble();
+		if( rndVal <= 0.2 )
+			throw new Exception( "Just testing..." );
+		else Thread.sleep( 25 );
 		this.setFailed( false );
 	}
 }

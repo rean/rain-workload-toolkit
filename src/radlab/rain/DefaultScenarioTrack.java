@@ -152,7 +152,8 @@ public class DefaultScenarioTrack extends ScenarioTrack
 		this._generatorClassName = generatorClassName;
 		try
 		{
-			this._generator = this.createWorkloadGenerator( this._generatorClassName );
+			// Create generator with no parameters by passing null
+			this._generator = this.createWorkloadGenerator( this._generatorClassName, null );
 		}
 		catch ( Exception e )
 		{

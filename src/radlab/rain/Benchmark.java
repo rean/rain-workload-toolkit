@@ -97,7 +97,7 @@ public class Benchmark
 			// Create enough threads for maximum users needed by the scenario.
 			for( int i = 0; i < track.getMaxUsers(); i++ )
 			{
-				Generator generator = track.createWorkloadGenerator( track.getGeneratorClassName() );
+				Generator generator = track.createWorkloadGenerator( track.getGeneratorClassName(), track.getGeneratorParams() );
 				generator.setScoreboard( scoreboard );
 				generator.setMeanCycleTime( (long)(track.getMeanCycleTime() * 1000) );
 				generator.setMeanThinkTime( (long)(track.getMeanThinkTime() * 1000) );

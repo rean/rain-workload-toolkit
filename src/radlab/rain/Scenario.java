@@ -54,6 +54,7 @@ public class Scenario
 	public static String CFG_DURATION_KEY    = "duration";
 	public static String CFG_RAMP_DOWN_KEY   = "rampDown";
 	public static String CFG_TRACK_CLASS_KEY = "track";
+	public static String CFG_VERBOSE_ERRORS_KEY	= "verboseErrors";
 	
 	/** Ramp up time in seconds. */
 	private long _rampUp;
@@ -131,6 +132,13 @@ public class Scenario
 			setRampUp( timing.getLong( Scenario.CFG_RAMP_UP_KEY ) );
 			setDuration( timing.getLong( Scenario.CFG_DURATION_KEY ) );
 			setRampDown( timing.getLong( Scenario.CFG_RAMP_DOWN_KEY ) );
+			
+			// Set up Rain configuration params (if they've been provided)
+			if( jsonConfig.has( Scenario.CFG_VERBOSE_ERRORS_KEY ) )
+			{
+				boolean val = jsonConfig.getBoolean( Scenario.CFG_VERBOSE_ERRORS_KEY );
+				RainConfig.getInstance()._verboseErrors = val;
+			}
 			
 			String filename = jsonConfig.getString( CFG_PROFILES_KEY );
 			String fileContents = ConfigUtil.readFileAsString( filename );

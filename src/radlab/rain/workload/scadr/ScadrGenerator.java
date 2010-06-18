@@ -6,12 +6,17 @@ import radlab.rain.Operation;
 import radlab.rain.ScenarioTrack;
 import radlab.rain.util.HttpTransport;
 import radlab.rain.util.NegativeExponential;
+import org.json.JSONObject;
+import org.json.JSONException;
 
 import java.util.Random;
 
 @SuppressWarnings("unused")
 public class ScadrGenerator extends Generator {
 
+	public static final String CFG_PARAM_1_KEY = "paramOne";
+	public static final String CFG_PARAM_2_KEY = "paramTwo";
+	
 	// Operation indices - each operation has a unique index 
 	public static final int LOGIN		 		= 0;
 	public static final int CREATE_SUBSCRIPTION = 1;
@@ -63,6 +68,13 @@ public class ScadrGenerator extends Generator {
 		this._http = new HttpTransport();
 	}
 
+	@Override
+	public void configure( JSONObject config ) throws JSONException
+	{
+		String paramOne = config.getString( ScadrGenerator.CFG_PARAM_1_KEY );
+		long paramTwo = config.getLong( ScadrGenerator.CFG_PARAM_2_KEY );
+	}
+	
 	/* Pass in index of the last operation */
 	
 	@Override

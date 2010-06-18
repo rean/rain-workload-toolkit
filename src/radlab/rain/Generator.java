@@ -31,6 +31,9 @@
 
 package radlab.rain;
 
+import org.json.JSONObject;
+import org.json.JSONException;
+
 /**
  * The Generator abstract class provides a default constructor, required
  * properties, and specifies the methods that must be implemented in order
@@ -82,4 +85,7 @@ public abstract class Generator
 	
 	public abstract void initialize();
 	public abstract void dispose();
+	// Method for configuring the driver prior to its initialization
+	public void configure( JSONObject config ) throws JSONException
+	{}
 }
