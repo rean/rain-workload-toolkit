@@ -9,6 +9,7 @@
 	<classpathentry kind="lib" path="thirdparty/httpcomponents-client-4.0.1/lib/httpclient-4.0.1.jar"/>
 	<classpathentry kind="lib" path="thirdparty/httpcomponents-client-4.0.1/lib/httpcore-4.0.1.jar"/>
 	<classpathentry kind="lib" path="thirdparty/httpcomponents-client-4.0.1/lib/httpmime-4.0.1.jar"/>
+	<classpathentry kind="lib" path="thirdparty/colt.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="thirdparty/json-20090211.jar"/>
 	<classpathentry kind="output" path="bin"/>
