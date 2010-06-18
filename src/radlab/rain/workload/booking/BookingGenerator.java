@@ -178,7 +178,8 @@ public class BookingGenerator extends Generator
 	 */
 	public Operation nextRequest( int lastOperation )
 	{
-		LoadProfile currentLoad = this.getTrack().getCurrentLoadProfile();
+//		LoadProfile currentLoad = this.getTrack().getCurrentLoadProfile();
+		BookingLoadProfile currentLoad = (BookingLoadProfile)this.getTrack().getCurrentLoadProfile();
 		int nextOperation = -1;
 		
 		if( lastOperation == -1 )
@@ -201,7 +202,7 @@ public class BookingGenerator extends Generator
 			}
 			nextOperation = j;
 		}
-		return getOperation( nextOperation );
+		return getOperation( nextOperation, currentLoad );
 	}
 	
 	/**
@@ -298,14 +299,14 @@ public class BookingGenerator extends Generator
 	 * @param opIndex   The type of operation to instantiate.
 	 * @return          A prepared operation.
 	 */
-	public Operation getOperation( int opIndex )
+	public Operation getOperation( int opIndex, BookingLoadProfile loadProfile )
 	{
 		switch( opIndex )
 		{
 			case HOME_PAGE:				return this.createHomePageOperation();
 			case LOGIN:     			return this.createLoginOperation();
 			case LOGOUT:    			return this.createLogoutOperation();
-			case SEARCH_HOTEL:    		return this.createSearchHotelOperation();
+			case SEARCH_HOTEL:    		return this.createSearchHotelOperation(loadProfile);
 			case SEARCH_HOTEL_RESULTS:	return this.createSearchHotelResultsOperation();
 			case VIEW_HOTEL:			return this.createViewHotelOperation();
 			case BOOK_HOTEL:			return this.createBookHotelOperation();
@@ -355,9 +356,10 @@ public class BookingGenerator extends Generator
 	 * 
 	 * @return  A prepared SearchHotelOperation.
 	 */
-	public SearchHotelOperation createSearchHotelOperation()
+	public SearchHotelOperation createSearchHotelOperation(BookingLoadProfile loadProfile)
 	{
-		SearchHotelOperation op = new SearchHotelOperation( this.getTrack().getInteractive(), this.getScoreboard() );
+		Hotel hotel = loadProfile.nextHotel();
+		SearchHotelOperation op = new SearchHotelOperation( this.getTrack().getInteractive(), this.getScoreboard(), hotel );
 		op.prepare( this );
 		return op;
 	}

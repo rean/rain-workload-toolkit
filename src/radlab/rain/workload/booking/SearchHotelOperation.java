@@ -19,6 +19,7 @@ import org.apache.http.message.BasicNameValuePair;
 //import org.apache.http.params.HttpParams;
 
 import radlab.rain.IScoreboard;
+import radlab.rain.hotspots.IObjectGenerator;
 
 /**
  * The Search Hotel operation allows the user to enter a search query
@@ -28,12 +29,15 @@ import radlab.rain.IScoreboard;
  */
 public class SearchHotelOperation extends BookingOperation 
 {
-	public SearchHotelOperation( boolean interactive, IScoreboard scoreboard ) 
+	private Hotel hotel;
+	
+	public SearchHotelOperation( boolean interactive, IScoreboard scoreboard, Hotel hotel ) 
 	{
 		super( interactive, scoreboard );
 		this._operationName = "Search Hotel";
 		this._operationIndex = BookingGenerator.SEARCH_HOTEL;
 		this._mustBeSync = true;
+		this.hotel = hotel;
 	}
 	
 	@Override
@@ -68,10 +72,12 @@ public class SearchHotelOperation extends BookingOperation
 		String pageSize = new Integer(pageSizeArray[randomPageSizeIndex]).toString();
 
 		// Select a random hotel search string.
-        String hotelSearchArray[] = {"", "W Hotel", "Marriott", "Hilton", "Doubletree", "Ritz", "Super 8", "No Tell Motel", "Conrad", "InterContinental", "Westin", "Mar", "Foo"};
-        boolean expectHotelFoundArray[] = {true, true, true, true, true, true, true, false, true, true, true, true, false };
-		int randomHotelIndex = this._randomNumberGenerator.nextInt(hotelSearchArray.length);
-		String hotelSearchString = hotelSearchArray[randomHotelIndex];
+//        String hotelSearchArray[] = {"", "W Hotel", "Marriott", "Hilton", "Doubletree", "Ritz", "Super 8", "No Tell Motel", "Conrad", "InterContinental", "Westin", "Mar", "Foo"};
+//        boolean expectHotelFoundArray[] = {true, true, true, true, true, true, true, false, true, true, true, true, false };
+//		int randomHotelIndex = this._randomNumberGenerator.nextInt(hotelSearchArray.length);
+//		String hotelSearchString = hotelSearchArray[randomHotelIndex];
+		
+		String hotelSearchString = hotel.getName();
 		
 		// Create a POST request
 		HttpPost searchHotelPost = new HttpPost( searchPostUrl );
@@ -146,7 +152,8 @@ public class SearchHotelOperation extends BookingOperation
         // TODO: Determine if this is an expected result and act accordingly.
 		String noHotelsFoundMessage = "No Hotels Found";
     	if ( response.indexOf( noHotelsFoundMessage ) > 0 ) {
-            if (expectHotelFoundArray[randomHotelIndex] == false) {
+            // bodikp: if (expectHotelFoundArray[randomHotelIndex] == false) {
+            if (hotel.expectedFound() == false) {
         		this.debugTrace( "Search for \"" + hotelSearchString + "\" found no hotels as expected." );
     			this.setFailed( false );
           	    return;
