@@ -18,6 +18,7 @@
         <pathelement location="thirdparty/httpcomponents-client-4.0.1/lib/httpcore-4.0.1.jar"/>
         <pathelement location="thirdparty/httpcomponents-client-4.0.1/lib/httpmime-4.0.1.jar"/>
         <pathelement location="thirdparty/json-20090211.jar"/>
+    	<pathelement location="thirdparty/colt.jar"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>
@@ -86,6 +87,7 @@
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.0.1/lib/httpcore-4.0.1.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.0.1/lib/httpmime-4.0.1.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/json-20090211.jar"/>
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/colt.jar"/>
         </jar>
     </target>
     <target depends="build" name="package-olio">
