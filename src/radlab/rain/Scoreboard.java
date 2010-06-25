@@ -92,6 +92,7 @@ public class Scoreboard implements Runnable, IScoreboard
 	private long _totalOpsSync           = 0;
 	private long _totalOpsInitiated      = 0;
 	private long _totalOpsLate			 = 0;
+	private long _totalOpResponseTime	 = 0;
 	
 	/* Log (trace) sampling probability */
 	private double _logSamplingProbability = 1.0;
@@ -494,6 +495,8 @@ public class Scoreboard implements Runnable, IScoreboard
 		out.println( this + " Effective load (requests/sec)      : " + this._formatter.format( effectiveLoadRequests ) );
 		out.println( this + " Operations initiated               : " + this._totalOpsInitiated );
 		out.println( this + " Operations successfully completed  : " + this._totalOpsSuccessful );
+		// Avg response time per operation
+		out.println( this + " Average operation response time (s): " + this._formatter.format( ( (double)this._totalOpResponseTime/(double)this._totalOpsSuccessful)/1000.0 ) );
 		out.println( this + " Operations late                    : " + this._totalOpsLate );
 		out.println( this + " Operations failed                  : " + this._totalOpsFailed );
 		out.println( this + " Async Ops                          : " + this._totalOpsAsync + " " + this._formatter.format( ( ( (double) this._totalOpsAsync / (double) totalOperations) * 100) ) + "%" );
@@ -564,6 +567,9 @@ public class Scoreboard implements Runnable, IScoreboard
 	private void printOperationStatistics( PrintStream out, boolean purgePercentileData )
 	{
 		long totalOperations = this._totalOpsSuccessful + this._totalOpsFailed;
+		double totalAvgResponseTime = 0.0;
+		double totalResponseTime = 0.0;
+		long totalSuccesses = 0;
 		
 		synchronized( this._operationMap )
 		{
@@ -584,6 +590,9 @@ public class Scoreboard implements Runnable, IScoreboard
 					String opName = keys.nextElement();
 					OperationSummary summary = this._operationMap.get( opName );
 					
+					totalAvgResponseTime += summary.getAverageResponseTime();
+					totalResponseTime += summary.totalResponseTime;
+					totalSuccesses += summary.succeeded;
 					// If there were no successes, then the min and max response times would not have been set
 					// so make them to 0
 					if( summary.minResponseTime == Long.MAX_VALUE )
@@ -610,6 +619,13 @@ public class Scoreboard implements Runnable, IScoreboard
 					if( purgePercentileData )
 						summary.resetSamples();
 				}
+				
+				/*if( this._operationMap.size() > 0 )
+				{
+					out.println( "" );
+					//out.println( this + " average response time (agg)        : " + this._formatter.format( ( totalAvgResponseTime/this._operationMap.size())/1000.0 ) );
+					out.println( this + " average response time (s)          : " + this._formatter.format( ( totalResponseTime/totalSuccesses)/1000.0 ) );
+				}*/
 			}
 			catch( Exception e )
 			{
@@ -799,6 +815,7 @@ public class Scoreboard implements Runnable, IScoreboard
 				// summary.responseTimes.add( responseTime );
 				// Update the total response time
 				summary.totalResponseTime += responseTime;
+				this._totalOpResponseTime += responseTime;
 				if ( responseTime > summary.maxResponseTime )
 				{
 					summary.maxResponseTime = responseTime;
