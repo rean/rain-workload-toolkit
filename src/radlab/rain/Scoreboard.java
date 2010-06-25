@@ -493,7 +493,7 @@ public class Scoreboard implements Runnable, IScoreboard
 		out.println( this + " Effective load (ops/sec)           : " + this._formatter.format( effectiveLoadOps ) );
 		out.println( this + " Effective load (requests/sec)      : " + this._formatter.format( effectiveLoadRequests ) );
 		out.println( this + " Operations initiated               : " + this._totalOpsInitiated );
-		out.println( this + " Operations completed               : " + this._totalOpsSuccessful );
+		out.println( this + " Operations successfully completed  : " + this._totalOpsSuccessful );
 		out.println( this + " Operations late                    : " + this._totalOpsLate );
 		out.println( this + " Operations failed                  : " + this._totalOpsFailed );
 		out.println( this + " Async Ops                          : " + this._totalOpsAsync + " " + this._formatter.format( ( ( (double) this._totalOpsAsync / (double) totalOperations) * 100) ) + "%" );
