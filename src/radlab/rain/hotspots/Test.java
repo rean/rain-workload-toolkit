@@ -2,7 +2,7 @@ package radlab.rain.hotspots;
 
 import java.util.ArrayList;
 
-import radlab.rain.workload.booking.Hotel;
+import radlab.rain.workload.bookingHotspots.Hotel;
 
 public class Test {
 
