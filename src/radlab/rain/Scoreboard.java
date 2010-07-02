@@ -815,7 +815,7 @@ public class Scoreboard implements Runnable, IScoreboard
 		String opName = result._operationName;
 		// By default we don't save per-interval metrics
 		LoadProfile activeProfile = result._generatedDuring;
-		if( activeProfile != null )
+		if( activeProfile != null && (activeProfile._name != null && activeProfile._name.length() > 0 ) )
 		{
 			String intervalName = activeProfile._name;
 			Scorecard intervalScorecard = this._intervalScorecards.get( intervalName );
