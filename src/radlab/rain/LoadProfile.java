@@ -40,11 +40,16 @@ public class LoadProfile
 	public static String CFG_LOAD_PROFILE_TRANSITION_TIME_KEY = "transitionTime";
 	public static String CFG_LOAD_PROFILE_USERS_KEY           = "users";
 	public static String CFG_LOAD_PROFILE_MIX_KEY             = "mix";
-
+	public static String CFG_LOAD_PROFILE_NAME_KEY			  = "name";
+	
+	// Allow LoadProfile intervals to have names (no getter/setter)
+	public String _name = "";
+	
 	protected long   _interval;
 	protected long   _transitionTime;
 	protected int    _numberOfUsers;
-	protected String _mixName;
+	protected String _mixName = "";
+	protected long _activeCount = 0; // How often has this interval become active, the load scheduler updates this
 
 	private long _timeStarted = -1; // LoadManagerThreads need to update this every time they advance the "clock"
 
@@ -54,10 +59,13 @@ public class LoadProfile
 		this._numberOfUsers = profileObj.getInt( CFG_LOAD_PROFILE_USERS_KEY );
 		this._mixName = profileObj.getString( CFG_LOAD_PROFILE_MIX_KEY );
 
+		// Load the transition time (if specified)
 		if ( profileObj.has( CFG_LOAD_PROFILE_TRANSITION_TIME_KEY ) )
-		{
 			this._transitionTime = profileObj.getLong( CFG_LOAD_PROFILE_TRANSITION_TIME_KEY );
-		}
+		
+		// Load the interval name (if specified)
+		if( profileObj.has( CFG_LOAD_PROFILE_NAME_KEY) )
+			this._name = profileObj.getString( CFG_LOAD_PROFILE_NAME_KEY );
 	}
 
 	public LoadProfile( long interval, int numberOfUsers, String mixName )
@@ -72,7 +80,16 @@ public class LoadProfile
 		this._mixName = mixName;
 		this._transitionTime = transitionTime;
 	}
-		
+	
+	public LoadProfile( long interval, int numberOfUsers, String mixName, long transitionTime, String name )
+	{
+		this._interval = interval;
+		this._numberOfUsers = numberOfUsers;
+		this._mixName = mixName;
+		this._transitionTime = transitionTime;
+		this._name = name; 
+	}
+	
 	// Converts to milliseconds
 	public long getInterval() { return ( this._interval * 1000 ); }
 	public void setInterval( long val ) { this._interval = val; }

@@ -256,6 +256,7 @@ public class DefaultScenarioTrack extends ScenarioTrack
 			// lease have a load profile to use during the ramp up.
 			this._track._currentLoadProfile = this._track._loadSchedule.get( loadScheduleIndex );
 			this._track._currentLoadProfile.setTimeStarted( now + rampUp );
+			this._track._currentLoadProfile._activeCount++;
 			System.out.println( this + " ramping up for " + rampUp + "ms." );
 			
 			try {
@@ -290,6 +291,7 @@ public class DefaultScenarioTrack extends ScenarioTrack
 						now = System.currentTimeMillis();
 						
 						this._track._currentLoadProfile = this._track._loadSchedule.get( loadScheduleIndex );
+						this._track._currentLoadProfile._activeCount++;
 						this._track._currentLoadProfile.setTimeStarted( now );
 						
 						System.out.println( this + " current time: " + now + " " + this._track._currentLoadProfile.toString() );

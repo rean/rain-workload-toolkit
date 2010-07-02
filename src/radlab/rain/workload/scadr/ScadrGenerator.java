@@ -83,6 +83,7 @@ public class ScadrGenerator extends Generator {
 		// Get the current load profile if we need to look inside of it to decide
 		// what to do next
 		ScadrLoadProfile currentLoad = (ScadrLoadProfile) this.getTrack().getCurrentLoadProfile();
+		this._latestLoadProfile = currentLoad;
 		
 		// Pick a random number between 0 and 3
 		int nextOpIndex = Math.abs( this._rand.nextInt() ) % 4;

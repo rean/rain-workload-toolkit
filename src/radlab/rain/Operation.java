@@ -45,8 +45,12 @@ public abstract class Operation implements Runnable
 	// Describes the operation
 	protected int _operationIndex       = -1;
 	protected String _operationName     = "";
+	// Describes who generated the operation and when (during what interval)
+	protected String _generatedBy       			= "";
+	//protected String _generatedDuring				= "";
+	// LoadProfile in effect when this operation was generated/initialized
+	protected LoadProfile _generatedDuringProfile 	= null;
 	
-	private String _generatedBy         = "";
 	private long _generatorThreadID     = -1;
 	private boolean _interactive        = true;
 	private long _timeQueued            = 0;
@@ -95,6 +99,8 @@ public abstract class Operation implements Runnable
 	public void setAsync( boolean val ){ this._async = val; }
 	public String getGeneratedBy() { return this._generatedBy; }
 	public void setGeneratedBy( String val ){ this._generatedBy = val; }
+	//public String getGeneratedDuring() { return this._generatedDuring; }
+	//public void setGeneratedDuring( String val ){ this._generatedDuring = val; }
 	public boolean isFailed() {return this._failed; }
 	public void setFailed( boolean val ){ this._failed = val; }
 	public Throwable getFailureReason(){ return this._failureReason; }

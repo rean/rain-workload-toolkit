@@ -23,6 +23,11 @@ public class ScadrLoadProfile extends LoadProfile {
 		super(interval, numberOfUsers, mixName, transitionTime);
 	}
 
+	public ScadrLoadProfile(long interval, int numberOfUsers, String mixName,
+			long transitionTime, String name) {
+		super(interval, numberOfUsers, mixName, transitionTime, name);
+	}
+	
 	// Override toString to control how a load profile is printed during a run
 	public String toString()
 	{

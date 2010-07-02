@@ -71,7 +71,7 @@
                 <jvmarg value="-Xmx1g" />
                 <jvmarg value="-Xms256m" />
                 <jvmarg value="-XX:+DisableExplicitGC"/>
-                <arg file="rain.config.test.json"/>
+                <arg file="config/rain.config.null.json"/>
         </java>
     </target>
     <target depends="build" name="package">
@@ -127,7 +127,7 @@
 	<jvmarg value="-Xms256m" />
 	<jvmarg value="-XX:+DisableExplicitGC"/>
 	<jvmarg value="-agentlib:hprof=heap=sites,file=mem.log,depth=6" />
-	<arg file="rain.config.test.json"/>
+	<arg file="config/rain.config.null.json"/>
       </java>
     </target>  
     <target name="OlioOperationsTest">

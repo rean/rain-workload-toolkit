@@ -57,5 +57,6 @@ public class RainConfig
 	}
 	
 	private RainConfig()
-	{}
+	{
+	}
 }

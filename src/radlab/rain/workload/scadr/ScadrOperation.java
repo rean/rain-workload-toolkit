@@ -1,6 +1,7 @@
 package radlab.rain.workload.scadr;
 
 import radlab.rain.Generator;
+import radlab.rain.LoadProfile;
 import radlab.rain.IScoreboard;
 import radlab.rain.Operation;
 import radlab.rain.util.HttpTransport;
@@ -34,7 +35,10 @@ public class ScadrOperation extends Operation {
 		ScadrGenerator scadrGenerator = (ScadrGenerator) generator;
 		
 		this._http = scadrGenerator.getHttpTransport();
-
+		LoadProfile currentLoadProfile = scadrGenerator.getLatestLoadProfile();
+		if( currentLoadProfile != null )
+			this._generatedDuringProfile = currentLoadProfile;
+			//this._generatedDuring = currentLoadProfile._name;
 	}
 
 }

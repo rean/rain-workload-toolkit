@@ -19,12 +19,12 @@ public class ScadrLoadScheduleCreator extends LoadScheduleCreator {
 		// Use subclass load profile here and set all the extra special things
 		// then pack it in a generic container that uses the base class, the
 		// ScadrGenerator can cast it to the more specific ScadrLoadProfile
-		ScadrLoadProfile i1 = new ScadrLoadProfile( 30, 400,  "default" );
-		ScadrLoadProfile i2 = new ScadrLoadProfile( 60, 1000, "default" ); 
-		ScadrLoadProfile i3 = new ScadrLoadProfile( 40, 1200, "default" );
-		ScadrLoadProfile i4 = new ScadrLoadProfile( 40, 900,  "default" );
-		ScadrLoadProfile i5 = new ScadrLoadProfile( 40, 500,  "default" );
-		ScadrLoadProfile i6 = new ScadrLoadProfile( 40, 200,  "default" );
+		ScadrLoadProfile i1 = new ScadrLoadProfile( 40, 400,  "default", 0, "00000" );
+		ScadrLoadProfile i2 = new ScadrLoadProfile( 40, 1000, "default", 0, "00001" ); 
+		ScadrLoadProfile i3 = new ScadrLoadProfile( 40, 1200, "default", 0, "00002" );
+		ScadrLoadProfile i4 = new ScadrLoadProfile( 40, 900,  "default", 0, "00003" );
+		ScadrLoadProfile i5 = new ScadrLoadProfile( 40, 500,  "default", 0, "00004" );
+		ScadrLoadProfile i6 = new ScadrLoadProfile( 40, 200,  "default", 0, "00005" );
 		
 		//ScadrLoadProfile debug = new ScadrLoadProfile( 30, 1,  "default" );
 		

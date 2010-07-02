@@ -56,6 +56,8 @@ public abstract class Generator
 	
 	/** A reference to the scoreboard to drop results off at. */
 	protected IScoreboard _scoreboard = null;
+	/** A reference to the latest load profile used */
+	protected LoadProfile _latestLoadProfile = null;
 	
 	public String getName() { return this._name; }
 	public void setName( String val ) { this._name = val; }
@@ -64,6 +66,9 @@ public abstract class Generator
 	
 	public void setScoreboard( IScoreboard scoreboard ) { this._scoreboard = scoreboard; }
 	public IScoreboard getScoreboard() { return this._scoreboard; }
+	
+	public void setLatestLoadProfile( LoadProfile val ) { this._latestLoadProfile = val; }
+	public LoadProfile getLatestLoadProfile() { return this._latestLoadProfile; }
 	
 	/**
 	 * Creates a new Generator.

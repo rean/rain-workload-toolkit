@@ -242,6 +242,10 @@ public abstract class ScenarioTrack
 				JSONObject profileObj = loadSchedule.getJSONObject( i );
 				LoadProfile profile = this.createLoadProfile( this._loadProfileClassName, profileObj );
 				
+				// If the profile does NOT have a name, set one using "i" formatted as "00000N"
+				if( profile._name == null || profile._name.length() == 0 )
+					profile._name = new java.text.DecimalFormat("00000").format( i );
+				
 				this._loadSchedule.add( profile );
 			}
 		}

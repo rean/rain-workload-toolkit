@@ -45,6 +45,10 @@ public class OperationExecution implements Comparable<OperationExecution>
 	private long _timeStarted = 0;
 	private long _timeFinished = 0;
 	public String _operationName;
+	public LoadProfile _generatedDuring = null;
+	public long _actionsPerformed = 1;
+	public boolean _async = false;
+	public boolean _failed = true;
 	public Operation getOperation() { return this._owner; }
 	
 	public String getTraceLabel() { return this._traceLabel; }
@@ -62,6 +66,10 @@ public class OperationExecution implements Comparable<OperationExecution>
 		this._timeStarted = operation.getTimeStarted();
 		this._timeFinished = operation.getTimeFinished();
 		this._operationName = operation._operationName;
+		this._async = operation.getAsync();
+		this._failed = operation._failed;
+		// Pull out any info on when this operation was created
+		this._generatedDuring = operation._generatedDuringProfile;
 	}
 	
 	/* Delegate to get the execution statistics */
@@ -70,12 +78,12 @@ public class OperationExecution implements Comparable<OperationExecution>
 	public long getTimeStarted()  { return this._timeStarted; }
 	public long getTimeFinished() { return this._timeFinished; }
 	
-	public long getActionsPerformed() { return (this._owner != null) ? this._owner.getActionsPerformed() : 0; }
+	public long getActionsPerformed() { return this._actionsPerformed; }
 	
-	public long getDelayTime() { return (this._owner != null) ? this.getDelayTime() : 0; }
+	//public long getDelayTime() { return (this._owner != null) ? this.getDelayTime() : 0; }
 	
-	public boolean isAsynchronous() { return (this._owner != null) ? this._owner.getAsync() : false; }
-	public boolean isFailed()       { return (this._owner != null) ? this._owner.isFailed() : true; }
+	public boolean isAsynchronous() { return this._async; }
+	public boolean isFailed()       { return this._failed; }
 	public boolean isInteractive() { return this._interactive; }
 	
 	//public long getWaitTime()      { return this.getTimeStarted()  - this.getTimeQueued(); }
