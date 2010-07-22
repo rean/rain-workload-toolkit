@@ -71,7 +71,7 @@ public abstract class ScenarioTrack
 	public static String CFG_RESOURCE_PATH                      = "resourcePath";
 	public static String CFG_OBJECT_POOL_MAX_SIZE               = "objectPoolMaxSize";
 	public static String CFG_MEAN_RESPONSE_TIME_SAMPLE_INTERVAL = "meanResponseTimeSamplingInterval";
-	
+		
 	// Defaults
 	public static long DEFAULT_OBJECT_POOL_MAX_SIZE             = 50000;
 	public static long DEFAULT_MEAN_RESPONSE_TIME_SAMPLE_INTERVAL = 500;
