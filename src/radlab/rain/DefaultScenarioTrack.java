@@ -32,8 +32,8 @@
 package radlab.rain;
 
 import java.util.Random;
-
 import org.json.JSONException;
+import java.util.LinkedList;
 
 /**
  * The DefaultScenarioTrack class is a generic implementation of the abstract
@@ -78,11 +78,15 @@ public class DefaultScenarioTrack extends ScenarioTrack
 	 */
 	public LoadProfile getCurrentLoadProfile() 
 	{
-		int currentLoadScheduleIndex = this._loadManager.loadScheduleIndex;
+		/*int currentLoadScheduleIndex = this._loadManager.loadScheduleIndex;
 		int nextLoadScheduleIndex = ( currentLoadScheduleIndex + 1 ) % this._loadSchedule.size();
 		
 		LoadProfile currentProfile = this._loadSchedule.get( currentLoadScheduleIndex );
-		LoadProfile nextProfile = this._loadSchedule.get( nextLoadScheduleIndex );
+		LoadProfile nextProfile = this._loadSchedule.get( nextLoadScheduleIndex );*/
+		
+		// Leave it up to the load manager thread to determine the current and next load profiles
+		LoadProfile currentProfile = this._loadManager.getCurrentLoadProfile();
+		LoadProfile nextProfile = this._loadManager.getNextLoadProfile();
 		
 		// Calculate when the current interval ends and when the transition ends.
 		long intervalEndTime = currentProfile.getTimeStarted() + currentProfile.getInterval();
@@ -134,6 +138,50 @@ public class DefaultScenarioTrack extends ScenarioTrack
 			return currentProfile;
 		}
 	}	
+	
+	public void submitDynamicLoadProfile( LoadProfile profile )
+	{
+		this._loadManager.submitDynamicLoadProfile( profile );
+	}
+	
+	/**
+	 * Checks whether a load profile is valid within a ScenarioTrack, e.g.,
+	 * that the number of users is > 0, the mix name exists in the mixmap for the track,
+	 * the behavioral hints are recognized by the track, etc.
+	 * 
+	 * @param profile	The load profile to be validated
+	 * @return in	0 if the profile is considered valid, non-zero otherwise
+	 */
+	public int validateLoadProfile( LoadProfile profile )
+	{
+		// By default, all we we're interested in is whether:
+		// 1) the number of users is > 0
+		// 2) the mix name is in the mix map
+		//boolean valid = true;
+		int retVal = ScenarioTrack.VALID_LOAD_PROFILE; 
+		
+		if( profile._numberOfUsers <= 0 )
+		{
+			System.out.println( this + " Invalid load profile. Number of users <= 0. Profile details: " + profile.toString() );
+			retVal = ScenarioTrack.ERROR_INVALID_LOAD_PROFILE_BAD_NUM_USERS;
+		}
+		
+		if( profile._mixName.length() > 0 && !this._mixMap.containsKey( profile._mixName ) )
+		{
+			System.out.println( this + " Invalid load profile. mixname not in track's mixmap. Profile details: " + profile.toString() );
+			retVal = ScenarioTrack.ERROR_INVALID_LOAD_PROFILE_BAD_MIX_NAME;
+		}
+		
+		// Do capping of number of users, don't fail validation though
+		int maxUsersForTrack = this.getMaxUsers();
+		if( profile._numberOfUsers > maxUsersForTrack )
+		{
+			System.out.println( this + " LoadProfile validation capping number of users to " + maxUsersForTrack + "." );
+			profile._numberOfUsers = maxUsersForTrack;
+		}
+		
+		return retVal;
+	}
 	
 	/**
 	 * Initializes a ScenarioTrack with reasonable defaults. This is mainly used
@@ -233,11 +281,16 @@ public class DefaultScenarioTrack extends ScenarioTrack
 		/** The track for which this thread is responsible. */
 		private ScenarioTrack _track = null;
 		
+		private LoadProfile _currentProfile = null;
+		
 		/** If true, this thread will stop advancing the load profile. */
 		private boolean _done = false;
 		
 		/** The current load profile index. */
 		int loadScheduleIndex = 0;
+		
+		/** Allow external agents to augment the current load schedule by providing dynamic load profiles */
+		LinkedList<LoadProfile> _dynamicLoadProfiles = new LinkedList<LoadProfile>();
 		
 		public boolean getDone() { return this._done; }
 		public void setDone( boolean val ) { this._done = val; }
@@ -247,6 +300,28 @@ public class DefaultScenarioTrack extends ScenarioTrack
 			this._track = track;
 		}
 		
+		public LoadProfile getCurrentLoadProfile()
+		{
+			// Pull the current load profile from a local variable stash
+			//return this._track._loadSchedule.get( this.loadScheduleIndex );
+			return this._currentProfile;
+		}
+		
+		public LoadProfile getNextLoadProfile()
+		{
+			// Compute the next load profile from what should be the current load schedule index
+			int nextLoadScheduleIndex = (this.loadScheduleIndex + 1) % this._track._loadSchedule.size();
+			return this._track._loadSchedule.get( nextLoadScheduleIndex );
+		}
+		
+		public void submitDynamicLoadProfile( LoadProfile profile )
+		{
+			synchronized( this._dynamicLoadProfiles )
+			{
+				this._dynamicLoadProfiles.add( profile );
+			}
+		}
+		
 		public void run()
 		{
 			long now = System.currentTimeMillis();
@@ -254,7 +329,8 @@ public class DefaultScenarioTrack extends ScenarioTrack
 			
 			// Prepare the first load profile before ramp up so that we at
 			// lease have a load profile to use during the ramp up.
-			this._track._currentLoadProfile = this._track._loadSchedule.get( loadScheduleIndex );
+			this._currentProfile = this._track._loadSchedule.get( loadScheduleIndex );
+			this._track._currentLoadProfile = this._currentProfile;
 			this._track._currentLoadProfile.setTimeStarted( now + rampUp );
 			this._track._currentLoadProfile._activeCount++;
 			System.out.println( this + " ramping up for " + rampUp + "ms." );
@@ -276,31 +352,62 @@ public class DefaultScenarioTrack extends ScenarioTrack
 					// Sleep until the next load/behavior change.
 					Thread.sleep( this._track._currentLoadProfile.getInterval() + this._track._currentLoadProfile.getTransitionTime() );
 					
-					loadScheduleIndex = ( loadScheduleIndex + 1 ) % this._track._loadSchedule.size();
-					// If we reach index 0, we cycled; log it.
-					if ( loadScheduleIndex == 0 )
+					// If time reading is even then push on a dynamic load profile. 
+					// Simple integration testing
+					/*if( now % 2 == 0 )
 					{
-						System.out.println( this + " cycling." );
-					}
+						LoadProfile dlp = new LoadProfile( 30, 500,  "default", 0, "dlp" );
+						this._dynamicLoadProfiles.push( dlp );
+					}*/
 					
-					// Update the track's reference of the current load profile.
-					if ( loadScheduleIndex < this._track._loadSchedule.size() )
+					// Decide what to do next, either load the next profile in the schedule OR
+					// load a dynamic load profile if one exists
+					// Check for a dynamic load profile
+					if( this._dynamicLoadProfiles.size() > 0 )
 					{
-						System.out.println( this + " advancing load schedule" );
+						// Try to acquire a lock on the list
+						System.out.println( this + " Dynamic load profile found! Attempting to load..." );
+						// Grab lock before pop - only this thread pops, all other threads push, so after we see that the list is non-empty
+						// its size can only increase, so pop should not fail
+						LoadProfile dynProfile = null;
+						synchronized( this._dynamicLoadProfiles )
+						{
+							dynProfile = this._dynamicLoadProfiles.pop();
+						}
 						
-						now = System.currentTimeMillis();
-						
-						this._track._currentLoadProfile = this._track._loadSchedule.get( loadScheduleIndex );
-						this._track._currentLoadProfile._activeCount++;
-						this._track._currentLoadProfile.setTimeStarted( now );
-						
-						System.out.println( this + " current time: " + now + " " + this._track._currentLoadProfile.toString() );
-					}
-					else 
+						// Just in case, make sure that we acutally got a "real"/valid load profile
+						if( dynProfile != null && this._track.validateLoadProfile( dynProfile ) == ScenarioTrack.VALID_LOAD_PROFILE )
+						{
+							System.out.println( this + " Dynamic load profile passed validation..." );
+							now = System.currentTimeMillis();
+							// Store this dynProfile as the current
+							this._currentProfile = dynProfile;
+							// Update the track
+							this._track._currentLoadProfile = this._currentProfile;
+							this._track._currentLoadProfile._activeCount++;
+							this._track._currentLoadProfile.setTimeStarted( now );
+							System.out.println( this + " Dynamic load profile activated! Profile: " + dynProfile.toString() );
+						}
+						else
+						{
+							System.out.println( this + " Dynamic load profile failed validation. Advancing load schedule the usual way." );
+							// Advance the schedule the old-fashioned way and if that returns false, then we're done
+							if( !this.advanceSchedule() )
+							{
+								System.out.println( this + " end of load schedule... exiting." );
+								this._done = true;
+							}
+						}// End-else loadprofile failed track validation
+					}// End loading the next load profile from the dynamic profile list
+					else// If not dynamic load profiles available do things the regular way
 					{
-						System.out.println( this + " end of load schedule... exiting." );
-						this._done = true;
-					}
+						// Advance the schedule and if that returns false, then we're done
+						if( !this.advanceSchedule() )
+						{
+							System.out.println( this + " end of load schedule... exiting." );
+							this._done = true;
+						}
+					}// End-selecting next load profile the regular way
 				}
 				catch( InterruptedException ie )
 				{
@@ -314,6 +421,45 @@ public class DefaultScenarioTrack extends ScenarioTrack
 				}
 			}
 			System.out.println( this + " finished!" );
+		}
+		
+		/**
+		 * Default way to advance the load schedule
+		 * @return	true if schedule advanced or false if at the end of the schedule
+		 */
+		public boolean advanceSchedule()
+		{
+			long now = 0;
+			
+			loadScheduleIndex = ( loadScheduleIndex + 1 ) % this._track._loadSchedule.size();
+			// If we reach index 0, we cycled; log it.
+			if ( loadScheduleIndex == 0 )
+			{
+				System.out.println( this + " cycling." );
+			}
+			
+			// Update the track's reference of the current load profile.
+			if ( loadScheduleIndex < this._track._loadSchedule.size() )
+			{
+				System.out.println( this + " advancing load schedule" );
+				
+				now = System.currentTimeMillis();
+				
+				// Save the current loadprofile locally as well as in the track
+				this._currentProfile = this._track._loadSchedule.get( loadScheduleIndex );
+				this._track._currentLoadProfile = this._currentProfile;
+				this._track._currentLoadProfile._activeCount++;
+				this._track._currentLoadProfile.setTimeStarted( now );
+				
+				System.out.println( this + " current time: " + now + " " + this._track._currentLoadProfile.toString() );
+				return true;
+			}
+			else 
+			{
+				//System.out.println( this + " end of load schedule... exiting." );
+				//this._done = true;
+				return false;
+			}
 		}
 		
 		public String toString()

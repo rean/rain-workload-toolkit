@@ -31,14 +31,21 @@
 
 package radlab.rain;
 
+import radlab.rain.communication.RainPipe;
+
 // Singleton configuration class
 public class RainConfig 
 {
 	// What can we configure?
 	public boolean _verboseErrors = true;
-		
-	public static Object configLock = new Object();
-	public static volatile RainConfig config = null;
+	// Communication server params
+	public int _pipePort = RainPipe.DEFAULT_PORT;
+	public int _pipeThreads = RainPipe.DEFAULT_NUM_THREADS;
+	// Should we wait for a start message before we start the run, default is no
+	public boolean _waitForStartSignal = false;
+	
+	private static Object configLock = new Object();
+	private static volatile RainConfig config = null;
 	
 	public static RainConfig getInstance()
 	{

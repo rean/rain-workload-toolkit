@@ -39,6 +39,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.json.*;
 
+import radlab.rain.communication.RainPipe;
 import radlab.rain.util.ConfigUtil;
 
 /**
@@ -47,14 +48,31 @@ import radlab.rain.util.ConfigUtil;
  */
 public class Benchmark
 {
+	public static Benchmark BenchmarkInstance = null;
+	public static Scenario BenchmarkScenario = null;
+	
 	/** Name of the main benchmark thread. */
 	public String threadName = "Benchmark-thread";
-	
 	/**
 	 * Amount of time (in milliseconds) to wait before threads start issuing
 	 * requests. This allows all of the threads to start synchronously.
 	 */
 	public long timeToStart = 5000;
+	
+	public boolean waitingForStartSignal = false;
+	
+	public static Benchmark getBenchmarkInstance()
+	{
+		if( BenchmarkInstance == null )
+			BenchmarkInstance = new Benchmark();
+		
+		return BenchmarkInstance;
+	}
+	
+	public static Scenario getBenchmarkScenario()
+	{
+		return BenchmarkScenario;
+	}
 	
 	/**
 	 * Initializes the benchmark as specified by the provided scenario. This
@@ -81,7 +99,7 @@ public class Benchmark
 		long startSteadyState = start + (scenario.getRampUp() * 1000);
 		long endSteadyState   = startSteadyState + (scenario.getDuration() * 1000);
 		
-		for ( ScenarioTrack track : scenario.getTracks() )
+		for ( ScenarioTrack track : scenario.getTracks().values() )
 		{
 			// Start the scoreboard. It needs to know the timings because we only
 			// want to retain metrics generated during the steady state interval.
@@ -94,8 +112,16 @@ public class Benchmark
 			}
 			track.setScoreboard(scoreboard);
 			
+			// Let track register to receive messages from the Pipe
+			
+			// Need some configuration parameters to indidcate:
+			// 1) whether to wait here for controller to contact us
+			// 2) whether to forge ahead
+						
+			long maxUsers = track.getMaxUsers();
+			System.out.println( "[BENCHMARK] Creating " + maxUsers + " threads for track." );
 			// Create enough threads for maximum users needed by the scenario.
-			for( int i = 0; i < track.getMaxUsers(); i++ )
+			for( int i = 0; i < maxUsers; i++ )
 			{
 				Generator generator = track.createWorkloadGenerator( track.getGeneratorClassName(), track.getGeneratorParams() );
 				generator.setScoreboard( scoreboard );
@@ -136,7 +162,7 @@ public class Benchmark
 		threads.clear();
 		
 		// Shutdown the scoreboards and tally up the results.
-		for ( ScenarioTrack track : scenario.getTracks() )
+		for ( ScenarioTrack track : scenario.getTracks().values() )
 		{
 			track.getScoreboard().stop();
 			track.getScoreboard().printStatistics( System.out );
@@ -145,8 +171,6 @@ public class Benchmark
 			track.getObjectPool().shutdown();
 		}
 		
-		// Write out scoreboard results
-				
 		// Shutdown the shared threadpool.
 		pool.shutdown();
 		try
@@ -162,6 +186,11 @@ public class Benchmark
 		{
 			System.out.println( "[BENCHMARK] INTERRUPTED while waiting for shared threadpool to shutdown!" );
 		}
+		
+		// Close down the pipe
+		System.out.println( "[BENCHMARK] Shutting down the communication pipe!" );
+		RainPipe.getInstance().stop();
+				
 		System.out.println( "[BENCHMARK] finished!" );
 	}
 	
@@ -193,11 +222,32 @@ public class Benchmark
 			System.out.println( "ERROR parsing configuration file " + filename + " as JSON. Reason: " + e.toString() );
 			System.exit( 1 );
 		}
-		
+	
+		// Create a scenario from the json config
 		Scenario scenario = new Scenario( jsonConfig );
-		scenario.start();
+		// Set the global Scenario instance for the Driver
+		Benchmark.BenchmarkScenario = scenario;
+		Benchmark benchmark = Benchmark.getBenchmarkInstance();
+		benchmark.waitingForStartSignal = RainConfig.getInstance()._waitForStartSignal;
 		
-		Benchmark benchmark = new Benchmark();
+		// Now that the Benchmark and Scenario singletons are set up
+		RainPipe pipe = RainPipe.getInstance();
+		System.out.println( "[BENCHMARK] Starting communication pipe! Using port: " + pipe.getPort() + " and running: " + pipe.getNumThreads() + " communication threads." );
+		pipe.start();
+		
+		if( benchmark.waitingForStartSignal )
+			System.out.println( "[BENCHMARK] Waiting for start signal..." );
+		
+		while( benchmark.waitingForStartSignal )
+		{
+			System.out.println( "[BENCHMARK] Sleeping for 1sec..." );
+			Thread.sleep( 1000 );
+			System.out.println( "[BENCHMARK] Checking for wakeup" );
+		}
+		
+		System.out.println( "[BENCHMARK] Starting..." );
+		
+		scenario.start();
 		benchmark.start( scenario );
 		
 		scenario.end();

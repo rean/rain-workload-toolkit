@@ -33,12 +33,15 @@ package radlab.rain;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+//import java.util.Hashtable;
+import java.util.TreeMap;
 import java.util.Iterator;
-import java.util.LinkedList;
+//import java.util.LinkedList;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import radlab.rain.communication.RainPipe;
 import radlab.rain.util.ConfigUtil;
 
 /**
@@ -48,13 +51,16 @@ import radlab.rain.util.ConfigUtil;
  */
 public class Scenario 
 {
-	public static String CFG_PROFILES_KEY    = "profiles";
-	public static String CFG_TIMING_KEY      = "timing";
-	public static String CFG_RAMP_UP_KEY     = "rampUp";
-	public static String CFG_DURATION_KEY    = "duration";
-	public static String CFG_RAMP_DOWN_KEY   = "rampDown";
-	public static String CFG_TRACK_CLASS_KEY = "track";
-	public static String CFG_VERBOSE_ERRORS_KEY	= "verboseErrors";
+	public static String CFG_PROFILES_KEY    		= "profiles";
+	public static String CFG_TIMING_KEY      		= "timing";
+	public static String CFG_RAMP_UP_KEY     		= "rampUp";
+	public static String CFG_DURATION_KEY    		= "duration";
+	public static String CFG_RAMP_DOWN_KEY   		= "rampDown";
+	public static String CFG_TRACK_CLASS_KEY 		= "track";
+	public static String CFG_VERBOSE_ERRORS_KEY		= "verboseErrors";
+	public static String CFG_PIPE_PORT				= "pipePort";
+	public static String CFG_PIPE_THREADS			= "pipeThreads";
+	public static String CFG_WAIT_FOR_START_SIGNAL	= "waitForStartSignal";
 	
 	/** Ramp up time in seconds. */
 	private long _rampUp;
@@ -66,7 +72,9 @@ public class Scenario
 	private long _rampDown;
 	
 	/** The instantiated tracks specified by the JSON configuration. */
-	private LinkedList<ScenarioTrack> _tracks = new LinkedList<ScenarioTrack>();
+	// Use Hashtable instead of flat list
+	//private LinkedList<ScenarioTrack> _tracks = new LinkedList<ScenarioTrack>();
+	private TreeMap<String,ScenarioTrack> _tracks = new TreeMap<String,ScenarioTrack>();
 	
 	public long getRampUp() { return this._rampUp; }
 	public void setRampUp( long val ) { this._rampUp = val; }
@@ -77,7 +85,7 @@ public class Scenario
 	public long getDuration() { return this._duration; }
 	public void setDuration( long val ) { this._duration = val; }
 	
-	public LinkedList<ScenarioTrack> getTracks() { return this._tracks; }
+	public TreeMap<String,ScenarioTrack> getTracks() { return this._tracks; }
 	
 	/** Create a new and uninitialized <code>Scenario</code>. */
 	public Scenario()
@@ -99,7 +107,7 @@ public class Scenario
 	 */
 	public void start()
 	{
-		for ( ScenarioTrack track : this._tracks )
+		for ( ScenarioTrack track : this._tracks.values() )
 		{
 			track.start();
 		}
@@ -110,7 +118,7 @@ public class Scenario
 	 */
 	public void end()
 	{
-		for ( ScenarioTrack track : this._tracks )
+		for ( ScenarioTrack track : this._tracks.values() )
 		{
 			track.end();
 		}
@@ -138,6 +146,25 @@ public class Scenario
 			{
 				boolean val = jsonConfig.getBoolean( Scenario.CFG_VERBOSE_ERRORS_KEY );
 				RainConfig.getInstance()._verboseErrors = val;
+			}
+			// Figure out whether we're using communication pipes
+			
+			// Figure out whether we're waiting for a start signal from an external controller
+			if( jsonConfig.has( Scenario.CFG_PIPE_PORT ) )
+			{
+				RainConfig.getInstance()._pipePort = jsonConfig.getInt( Scenario.CFG_PIPE_PORT );
+				RainPipe.getInstance().setPort( RainConfig.getInstance()._pipePort );
+			}
+			
+			if( jsonConfig.has( Scenario.CFG_PIPE_THREADS ) )
+			{
+				RainConfig.getInstance()._pipeThreads = jsonConfig.getInt( Scenario.CFG_PIPE_THREADS );
+				RainPipe.getInstance().setNumThreads( RainConfig.getInstance()._pipeThreads );
+			}
+			
+			if( jsonConfig.has( Scenario.CFG_WAIT_FOR_START_SIGNAL ) )
+			{
+				RainConfig.getInstance()._waitForStartSignal = jsonConfig.getBoolean( Scenario.CFG_WAIT_FOR_START_SIGNAL );
 			}
 			
 			String filename = jsonConfig.getString( CFG_PROFILES_KEY );
@@ -181,7 +208,7 @@ public class Scenario
 				track.setName( trackName );
 				track.initialize( trackConfig );
 				
-				this._tracks.add( track );
+				this._tracks.put( track._name, track );
 			}
 		}
 		catch ( JSONException e )

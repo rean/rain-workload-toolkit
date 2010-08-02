@@ -43,7 +43,7 @@ import org.json.JSONException;
 
 /**
  * The ScenarioTrack abstract class represents a single workload among
- * potentially many that are simultaneously benchmarked under a single\
+ * potentially many that are simultaneously run under a single
  * Scenario.<br />
  * <br />
  * The ScenarioTrack is responsible for reading in the configuration of a
@@ -51,6 +51,12 @@ import org.json.JSONException;
  */
 public abstract class ScenarioTrack 
 {
+	public static final int VALID_LOAD_PROFILE								= 0;
+	public static final int ERROR_INVALID_LOAD_PROFILE_BAD_NUM_USERS 		= 1777;
+	public static final int ERROR_INVALID_LOAD_PROFILE_BAD_MIX_NAME 		= 1778;
+	public static final int ERROR_INVALID_LOAD_PROFILE_BAD_BEHAVIOR_HINT 	= 1779;
+	public static final int ERROR_TRACK_NOT_FOUND							= 1780;
+	
 	public static String CFG_OPEN_LOOP_PROBABILITY_KEY          = "pOpenLoop";
 	public static String CFG_LOG_SAMPLING_PROBABILITY_KEY       = "pLogSampling";
 	public static String CFG_MEAN_CYCLE_TIME_KEY                = "meanCycleTime";
@@ -71,7 +77,8 @@ public abstract class ScenarioTrack
 	public static String CFG_RESOURCE_PATH                      = "resourcePath";
 	public static String CFG_OBJECT_POOL_MAX_SIZE               = "objectPoolMaxSize";
 	public static String CFG_MEAN_RESPONSE_TIME_SAMPLE_INTERVAL = "meanResponseTimeSamplingInterval";
-		
+	public static String CFG_MAX_USERS							= "maxUsers";
+	
 	// Defaults
 	public static long DEFAULT_OBJECT_POOL_MAX_SIZE             = 50000;
 	public static long DEFAULT_MEAN_RESPONSE_TIME_SAMPLE_INTERVAL = 500;
@@ -99,6 +106,7 @@ public abstract class ScenarioTrack
 	protected double _metricSnapshotInterval                    = 60.0; // (seconds)
 	protected ObjectPool _objPool                               = null;
 	protected long _meanResponseTimeSamplingInterval            = DEFAULT_MEAN_RESPONSE_TIME_SAMPLE_INTERVAL;
+	protected int _maxUsersFromConfig							= 0;
 	
 	/**
 	 * Create a new scenario track that will be benchmarked as part of the
@@ -114,6 +122,8 @@ public abstract class ScenarioTrack
 	public abstract void start();
 	public abstract void end();
 	public abstract LoadProfile getCurrentLoadProfile();
+	public abstract int validateLoadProfile( LoadProfile profile );
+	public abstract void submitDynamicLoadProfile( LoadProfile profile );
 	// public abstract LoadProfile getNextLoadProfile();
 	
 	public String getGeneratorClassName() { return this._generatorClassName; }
@@ -130,17 +140,22 @@ public abstract class ScenarioTrack
 	
 	public int getMaxUsers() 
 	{ 
-		int maxUsers = 0;
+		// Search the load profiles to figure out the maximum 
+		int maxUsersFromProfile = 0;
 		
 		Iterator<LoadProfile> it = this._loadSchedule.iterator();
 		while( it.hasNext() )
 		{
 			LoadProfile current = it.next(); 
-			if( current.getNumberOfUsers() > maxUsers )
-				maxUsers = current.getNumberOfUsers();
+			if( current.getNumberOfUsers() > maxUsersFromProfile )
+				maxUsersFromProfile = current.getNumberOfUsers();
 		}
 		
-		return maxUsers; 
+		// In the end return the max of what's in the schedule and what was
+		// put in the explicit maxUsers config setting. If the config setting
+		// is larger that what's in the profile, then this allows the for a dynamic
+		// load profile to create a spike of that magnitude.
+		return Math.max( maxUsersFromProfile, this._maxUsersFromConfig ); 
 	}
 	
 	public MixMatrix getMixMatrix( String name )
@@ -298,6 +313,9 @@ public abstract class ScenarioTrack
 		// 12 Configure the response time sampler
 		if( config.has( ScenarioTrack.CFG_MEAN_RESPONSE_TIME_SAMPLE_INTERVAL ) )
 			this._meanResponseTimeSamplingInterval = config.getLong( ScenarioTrack.CFG_MEAN_RESPONSE_TIME_SAMPLE_INTERVAL );
+		// 13 Configure the maxUsers if specified
+		if( config.has( ScenarioTrack.CFG_MAX_USERS ) )
+			this._maxUsersFromConfig = config.getInt( ScenarioTrack.CFG_MAX_USERS );
 	}
 	
 	// Factory methods
