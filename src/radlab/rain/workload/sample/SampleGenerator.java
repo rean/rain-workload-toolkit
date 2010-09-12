@@ -35,6 +35,7 @@ import radlab.rain.Generator;
 import radlab.rain.LoadProfile;
 import radlab.rain.Operation;
 import radlab.rain.ScenarioTrack;
+import radlab.rain.util.HttpTransport;
 
 /**
  * The SampleGenerator class generates operations for a single user thread
@@ -49,7 +50,7 @@ public class SampleGenerator extends Generator
 	public static final int OPERATION2 = 1;
 	
 	private java.util.Random _randomNumberGenerator;
-	
+	private HttpTransport _http;
 	/**
 	 * Initialize a <code>SampleGenerator</code> given a <code>ScenarioTrack</code>.
 	 * 
@@ -68,6 +69,7 @@ public class SampleGenerator extends Generator
 	public void initialize()
 	{
 		this._randomNumberGenerator = new java.util.Random();
+		this._http = new HttpTransport();
 	}
 	
 	/**
@@ -131,6 +133,17 @@ public class SampleGenerator extends Generator
 	{
 		// TODO: Fill me in.
 	}
+	
+	/**
+	 * Returns the pre-existing HTTP transport.
+	 * 
+	 * @return          An HTTP transport.
+	 */
+	public HttpTransport getHttpTransport()
+	{
+		return this._http;
+	}
+	
 	
 	/**
 	 * Creates a newly instantiated, prepared operation.

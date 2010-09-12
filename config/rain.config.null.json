@@ -4,6 +4,5 @@
         "rampUp": 10,
         "duration": 300,
         "rampDown": 10
-    },
-    "waitForStartSignal" : true
+    }
 }

@@ -19,7 +19,7 @@ import org.apache.http.message.BasicNameValuePair;
 //import org.apache.http.params.HttpParams;
 
 import radlab.rain.IScoreboard;
-import radlab.rain.hotspots.IObjectGenerator;
+//import radlab.rain.hotspots.IObjectGenerator;
 
 /**
  * The Search Hotel operation allows the user to enter a search query

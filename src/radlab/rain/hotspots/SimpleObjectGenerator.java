@@ -23,6 +23,7 @@ public class SimpleObjectGenerator<O> implements IObjectGenerator<O> {
 		return(objects.size());
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<O> objects() {
 		return(new ArrayList(objects));
 	}

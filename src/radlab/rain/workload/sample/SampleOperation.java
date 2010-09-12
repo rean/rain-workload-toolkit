@@ -34,6 +34,8 @@ package radlab.rain.workload.sample;
 import radlab.rain.Generator;
 import radlab.rain.IScoreboard;
 import radlab.rain.Operation;
+import radlab.rain.util.HttpTransport;
+import radlab.rain.workload.raddit.RadditGenerator;
 
 /**
  * The SampleOperation class contains common static methods for use by the
@@ -41,6 +43,8 @@ import radlab.rain.Operation;
  */
 public abstract class SampleOperation extends Operation 
 {
+	// These references will be set by the Generator.
+	protected HttpTransport _http;
 	
 	/**
 	 * Returns the SampleGenerator that created this operation.
@@ -61,6 +65,10 @@ public abstract class SampleOperation extends Operation
 	public void prepare(Generator generator) 
 	{
 		this._generator = generator;
+		SampleGenerator sampleGenerator = (SampleGenerator) generator;
+		
+		this._http = sampleGenerator.getHttpTransport();
+	
 	}
 	
 	@Override

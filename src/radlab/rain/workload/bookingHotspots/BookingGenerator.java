@@ -1,7 +1,7 @@
 package radlab.rain.workload.bookingHotspots;
 
 import radlab.rain.Generator;
-import radlab.rain.LoadProfile;
+//import radlab.rain.LoadProfile;
 import radlab.rain.Operation;
 import radlab.rain.ScenarioTrack;
 import radlab.rain.util.HttpTransport;

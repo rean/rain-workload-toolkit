@@ -12,5 +12,9 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="thirdparty/json-20090211.jar"/>
 	<classpathentry kind="lib" path="thirdparty/colt-1.2.0/colt.jar"/>
+	<classpathentry kind="lib" path="thirdparty/hadoop-0.20.2/hadoop-0.20.2-core.jar" sourcepath="thirdparty/hadoop-0.20.2/src/core"/>
+	<classpathentry kind="lib" path="thirdparty/hadoop-0.20.2/hadoop-0.20.2-tools.jar"/>
+	<classpathentry kind="lib" path="thirdparty/hadoop-0.20.2/lib/commons-cli-1.2.jar"/>
+	<classpathentry kind="lib" path="thirdparty/hadoop-0.20.2/hadoop-0.20.2-examples.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
