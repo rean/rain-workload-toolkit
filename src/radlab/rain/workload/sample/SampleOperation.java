@@ -35,7 +35,6 @@ import radlab.rain.Generator;
 import radlab.rain.IScoreboard;
 import radlab.rain.Operation;
 import radlab.rain.util.HttpTransport;
-import radlab.rain.workload.raddit.RadditGenerator;
 
 /**
  * The SampleOperation class contains common static methods for use by the
