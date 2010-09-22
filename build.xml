@@ -74,6 +74,15 @@
                 <arg file="config/rain.config.null.json"/>
         </java>
     </target>
+	<target depends="build" name="Benchmark-httptest">
+		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
+	    	<classpath refid="rain.classpath"/>
+	    	<jvmarg value="-Xmx1g" />
+	    	<jvmarg value="-Xms256m" />
+	    	<jvmarg value="-XX:+DisableExplicitGC"/>
+	        <arg file="config/rain.config.ac.json"/>
+	    </java>
+	</target>
     <target depends="build" name="package">
         <jar destfile="rain.jar" filesetmanifest="mergewithoutmain">
             <manifest>
@@ -114,6 +123,12 @@
             <fileset dir="bin" includes="radlab/rain/workload/sample/**"/>
         </jar>
     </target>
+	<target depends="build" name="package-httptest">
+		<mkdir dir="workloads"/>
+	    <jar destfile="workloads/httptest.jar" filesetmanifest="mergewithoutmain">
+	    	<fileset dir="bin" includes="radlab/rain/workload/httptest/**"/>
+	    </jar>
+	</target>
     <target depends="build" name="package-scads">
         <mkdir dir="workloads"/>
         <jar destfile="workloads/scads.jar" filesetmanifest="mergewithoutmain">
