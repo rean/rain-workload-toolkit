@@ -1,0 +1,10 @@
+{
+    "profiles": "config/profiles.config.ac.json",
+    "profilesCreatorClass": "radlab.rain.SampleProfileCreator",
+    "profilesCreatorClassParams": {},
+    "timing": {
+        "rampUp": 10,
+        "duration": 900,
+        "rampDown": 10
+    }
+}

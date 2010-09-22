@@ -36,7 +36,6 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-//import org.json.*;
 import org.json.JSONObject;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -57,12 +56,13 @@ public abstract class ScenarioTrack
 	public static final int ERROR_INVALID_LOAD_PROFILE_BAD_BEHAVIOR_HINT 	= 1779;
 	public static final int ERROR_TRACK_NOT_FOUND							= 1780;
 	
+	public static String CFG_TRACK_CLASS_KEY 					= "track";
 	public static String CFG_OPEN_LOOP_PROBABILITY_KEY          = "pOpenLoop";
 	public static String CFG_LOG_SAMPLING_PROBABILITY_KEY       = "pLogSampling";
 	public static String CFG_MEAN_CYCLE_TIME_KEY                = "meanCycleTime";
 	public static String CFG_MEAN_THINK_TIME_KEY                = "meanThinkTime";
 	public static String CFG_INTERACTIVE_KEY                    = "interactive";
-	public static String CFG_TARGETS_KEY                        = "target";
+	public static String CFG_TARGET_KEY	                        = "target";
 	public static String CFG_SCOREBOARD_SNAPSHOT_INTERVAL       = "metricSnapshotInterval";
 	// Targets keys: hostname, port
 	public static String CFG_TARGET_HOSTNAME_KEY                = "hostname";
@@ -217,7 +217,7 @@ public abstract class ScenarioTrack
 			this._generatorParams = config.getJSONObject( ScenarioTrack.CFG_GENERATOR_PARAMS_KEY );
 		this._generator = this.createWorkloadGenerator( this._generatorClassName, this._generatorParams );
 		// 3) Target Information
-		JSONObject target = config.getJSONObject( ScenarioTrack.CFG_TARGETS_KEY );
+		JSONObject target = config.getJSONObject( ScenarioTrack.CFG_TARGET_KEY );
 		this._targetHostname = target.getString( ScenarioTrack.CFG_TARGET_HOSTNAME_KEY );
 		this._targetPort = target.getInt( ScenarioTrack.CFG_TARGET_PORT_KEY );
 		// 4) Log Sampling Probability

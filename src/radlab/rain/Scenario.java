@@ -51,16 +51,17 @@ import radlab.rain.util.ConfigUtil;
  */
 public class Scenario 
 {
-	public static String CFG_PROFILES_KEY    		= "profiles";
-	public static String CFG_TIMING_KEY      		= "timing";
-	public static String CFG_RAMP_UP_KEY     		= "rampUp";
-	public static String CFG_DURATION_KEY    		= "duration";
-	public static String CFG_RAMP_DOWN_KEY   		= "rampDown";
-	public static String CFG_TRACK_CLASS_KEY 		= "track";
-	public static String CFG_VERBOSE_ERRORS_KEY		= "verboseErrors";
-	public static String CFG_PIPE_PORT				= "pipePort";
-	public static String CFG_PIPE_THREADS			= "pipeThreads";
-	public static String CFG_WAIT_FOR_START_SIGNAL	= "waitForStartSignal";
+	public static String CFG_PROFILES_KEY    					= "profiles";
+	public static String CFG_PROFILES_CREATOR_CLASS_KEY			= "profilesCreatorClass";
+	public static String CFG_PROFILES_CREATOR_CLASS_PARAMS_KEY 	= "profilesCreatorClassParams";
+	public static String CFG_TIMING_KEY      					= "timing";
+	public static String CFG_RAMP_UP_KEY     					= "rampUp";
+	public static String CFG_DURATION_KEY    					= "duration";
+	public static String CFG_RAMP_DOWN_KEY   					= "rampDown";
+	public static String CFG_VERBOSE_ERRORS_KEY					= "verboseErrors";
+	public static String CFG_PIPE_PORT							= "pipePort";
+	public static String CFG_PIPE_THREADS						= "pipeThreads";
+	public static String CFG_WAIT_FOR_START_SIGNAL				= "waitForStartSignal";
 	
 	/** Ramp up time in seconds. */
 	private long _rampUp;
@@ -97,7 +98,7 @@ public class Scenario
 	 * 
 	 * @param jsonConfig    The JSON object containing load specifications.
 	 */
-	public Scenario( JSONObject jsonConfig )
+	public Scenario( JSONObject jsonConfig ) throws Exception
 	{
 		this.loadProfile( jsonConfig );
 	}
@@ -131,7 +132,7 @@ public class Scenario
 	 * 
 	 * @param jsonConfig    The JSON object containing load specifications.
 	 */
-	public void loadProfile( JSONObject jsonConfig )
+	public void loadProfile( JSONObject jsonConfig ) throws Exception
 	{
 		JSONObject tracksConfig = null;
 		try
@@ -167,10 +168,27 @@ public class Scenario
 				RainConfig.getInstance()._waitForStartSignal = jsonConfig.getBoolean( Scenario.CFG_WAIT_FOR_START_SIGNAL );
 			}
 			
-			String filename = jsonConfig.getString( CFG_PROFILES_KEY );
-			String fileContents = ConfigUtil.readFileAsString( filename );
-			
-			tracksConfig = new JSONObject( fileContents );
+			// Look for the profiles key OR the name of a class that generates the
+			// profiles.
+			if( jsonConfig.has( CFG_PROFILES_CREATOR_CLASS_KEY ) )
+			{
+				// Programmatic generation class takes precedence
+				// Create profile creator class by reflection
+				String profileCreatorClass = jsonConfig.getString( CFG_PROFILES_CREATOR_CLASS_KEY);
+				ProfileCreator creator = this.createLoadProfileCreator( profileCreatorClass );
+				JSONObject params = null;
+				// Look for profile creator params - if we find some then pass them
+				if( jsonConfig.has( CFG_PROFILES_CREATOR_CLASS_PARAMS_KEY ) )
+					params = (JSONObject) jsonConfig.get( CFG_PROFILES_CREATOR_CLASS_PARAMS_KEY );
+				
+				tracksConfig = creator.createProfile( params );
+			}
+			else // Otherwise there MUST be a profiles key in the config file
+			{
+				String filename = jsonConfig.getString( CFG_PROFILES_KEY );
+				String fileContents = ConfigUtil.readFileAsString( filename );
+				tracksConfig = new JSONObject( fileContents );
+			}
 		}
 		catch ( JSONException e )
 		{
@@ -184,6 +202,16 @@ public class Scenario
 		}
 		
 		this.loadTracks( tracksConfig );
+	}
+	
+	@SuppressWarnings("unchecked")
+	public ProfileCreator createLoadProfileCreator( String name ) throws Exception
+	{
+		ProfileCreator creator = null;
+		Class<ProfileCreator> creatorClass = (Class<ProfileCreator>) Class.forName( name );
+		Constructor<ProfileCreator> creatorCtor = creatorClass.getConstructor( new Class[]{} );
+		creator = (ProfileCreator) creatorCtor.newInstance( (Object[]) null );
+		return creator;
 	}
 	
 	/**
@@ -203,7 +231,7 @@ public class Scenario
 				String trackName = i.next();
 				JSONObject trackConfig = jsonConfig.getJSONObject( trackName );
 				
-				String trackClassName = trackConfig.getString( Scenario.CFG_TRACK_CLASS_KEY );
+				String trackClassName = trackConfig.getString( ScenarioTrack.CFG_TRACK_CLASS_KEY );
 				ScenarioTrack track = this.createTrack( trackClassName, trackName );
 				track.setName( trackName );
 				track.initialize( trackConfig );
@@ -213,7 +241,7 @@ public class Scenario
 		}
 		catch ( JSONException e )
 		{
-			System.out.println( "[SCENARIO] ERROR parsing tracks in JSON configuration file. Reason: " + e.toString() );
+			System.out.println( "[SCENARIO] ERROR parsing tracks in JSON configuration file/object. Reason: " + e.toString() );
 			System.exit( 1 );
 		}
 		catch( Exception e )
