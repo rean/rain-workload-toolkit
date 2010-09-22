@@ -1,10 +1,12 @@
 {
-    "profiles": "config/profiles.config.ac.json",
-    "profilesCreatorClass": "radlab.rain.SampleProfileCreator",
-    "profilesCreatorClassParams": {},
+    "profilesCreatorClass": "radlab.rain.workload.httptest.HttpTestProfileCreator",
+    "profilesCreatorClassParams": {
+    	"baseHostIpPrefix": "127.0.0.",
+    	"numHostTargets": 2
+    },
     "timing": {
         "rampUp": 10,
-        "duration": 900,
+        "duration": 60,
         "rampDown": 10
     }
 }

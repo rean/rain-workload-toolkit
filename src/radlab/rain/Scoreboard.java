@@ -530,7 +530,10 @@ public class Scoreboard implements Runnable, IScoreboard
 		out.println( this + " Offered load (ops/sec)             : " + this._formatter.format( offeredLoadOps ) );
 		out.println( this + " Effective load (ops/sec)           : " + this._formatter.format( effectiveLoadOps ) );
 		// Still a rough estimate, need to compute the bounds on this estimate
-		//out.println( this + " Little's Law Verification (ops/sec): " + this._formatter.format( averageNumberOfUsers / averageOpResponseTime ) );
+		if( totalUsers > 0 )
+			out.println( this + " Little's Law Estimate (ops/sec)    : " + this._formatter.format( averageNumberOfUsers / averageOpResponseTime ) );
+		else
+			out.println( this + " Little's Law Estimate (ops/sec)    : not computed" );
 		out.println( this + " Effective load (requests/sec)      : " + this._formatter.format( effectiveLoadRequests ) );
 		out.println( this + " Operations initiated               : " + this.finalCard._totalOpsInitiated );
 		out.println( this + " Operations successfully completed  : " + this.finalCard._totalOpsSuccessful );
