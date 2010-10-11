@@ -124,7 +124,7 @@ class HttpTestStepRunner:
             # write the json data out to the config file
             # invoke the run manager passing the location of the config file
             # collect the results and write them out to the results_dir
-            print "[HttpTestStepRunner] Writing output: {0}"\
+            print "[HttpTestStepRunner] Writing config file: {0}"\
                 .format( run_config_filename )
             config_file = open( run_config_filename, 'w' )
             config_file.write( json_data )
