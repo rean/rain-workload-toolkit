@@ -102,7 +102,9 @@ public class Scorecard
 		out.println( this + " Operations initiated               : " + this._totalOpsInitiated );
 		out.println( this + " Operations successfully completed  : " + this._totalOpsSuccessful );
 		// Avg response time per operation
-		out.println( this + " Average operation response time (s): " + this._formatter.format( ( (double)this._totalOpResponseTime/(double)this._totalOpsSuccessful)/1000.0 ) );
+		if( this._totalOpsSuccessful > 0 )
+			out.println( this + " Average operation response time (s): " + this._formatter.format( ( (double)this._totalOpResponseTime/(double)this._totalOpsSuccessful)/1000.0 ) );
+		else out.println( this + " Average operation response time (s): 0.0000" );
 		out.println( this + " Operations late                    : " + this._totalOpsLate );
 		out.println( this + " Operations failed                  : " + this._totalOpsFailed );
 		out.println( this + " Async Ops                          : " + this._totalOpsAsync + " " + this._formatter.format( ( ( (double) this._totalOpsAsync / (double) totalOperations) * 100) ) + "%" );

@@ -31,9 +31,12 @@
 
 package radlab.rain.workload.httptest;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import radlab.rain.Generator;
-//import radlab.rain.LoadProfile;
 import radlab.rain.LoadProfile;
+import radlab.rain.ObjectPool;
 import radlab.rain.Operation;
 import radlab.rain.ScenarioTrack;
 import radlab.rain.util.HttpTransport;
@@ -45,14 +48,18 @@ import radlab.rain.util.HttpTransport;
  */
 public class HttpTestGenerator extends Generator
 {
+	public static String CFG_USE_POOLING_KEY = "usePooling";
+	public static String CFG_MAX_POOL_SIZE_KEY = "maxPoolSize";
 	
 	// Operation indices used in the mix matrix.
 	public static final int PING_HOMEPAGE = 0;
 	
 	//private java.util.Random _randomNumberGenerator;
 	private HttpTransport _http;
-
+	private boolean _usePooling = false;
+	
 	public String _baseUrl;
+	
 	
 	/**
 	 * Initialize a <code>SampleGenerator</code> given a <code>ScenarioTrack</code>.
@@ -73,6 +80,13 @@ public class HttpTestGenerator extends Generator
 		//this._randomNumberGenerator = new java.util.Random();
 		this._http = new HttpTransport();
 	}
+	
+	@Override
+    public void configure( JSONObject config ) throws JSONException
+    {
+		if( config.has(CFG_USE_POOLING_KEY) )
+			this._usePooling = config.getBoolean( CFG_USE_POOLING_KEY );
+    }
 	
 	/**
 	 * Returns the next <code>Operation</code> given the <code>lastOperation</code>
@@ -176,7 +190,17 @@ public class HttpTestGenerator extends Generator
 	 */
 	public PingHomePageOperation createPingHomePageOperation()
 	{
-		PingHomePageOperation op = new PingHomePageOperation( this.getTrack().getInteractive(), this.getScoreboard() );
+		PingHomePageOperation op = null;
+		
+		if( this._usePooling )
+		{
+			ObjectPool pool = this.getTrack().getObjectPool();
+			op = (PingHomePageOperation) pool.rentObject( PingHomePageOperation.NAME );	
+		}
+		
+		if( op == null )
+			op = new PingHomePageOperation( this.getTrack().getInteractive(), this.getScoreboard() );
+		
 		op.prepare( this );
 		return op;
 	}	

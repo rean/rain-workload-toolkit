@@ -516,7 +516,11 @@ public class Scoreboard implements Runnable, IScoreboard
 			card.printStatistics( out );
 		}
 		
-		double averageOpResponseTime = ((double)this.finalCard._totalOpResponseTime/(double)this.finalCard._totalOpsSuccessful)/1000.0;
+		double averageOpResponseTime = 0.0;
+		
+		if( this.finalCard._totalOpsSuccessful > 0 )
+			averageOpResponseTime = ((double)this.finalCard._totalOpResponseTime/(double)this.finalCard._totalOpsSuccessful)/1000.0;
+		
 		double averageNumberOfUsers = 0.0;
 		if( totalIntervalActivations != 0 )
 			averageNumberOfUsers = (double) totalUsers/ (double) totalIntervalActivations;
@@ -530,10 +534,10 @@ public class Scoreboard implements Runnable, IScoreboard
 		out.println( this + " Offered load (ops/sec)             : " + this._formatter.format( offeredLoadOps ) );
 		out.println( this + " Effective load (ops/sec)           : " + this._formatter.format( effectiveLoadOps ) );
 		// Still a rough estimate, need to compute the bounds on this estimate
-		if( totalUsers > 0 )
+		if( averageOpResponseTime > 0.0 )
 			out.println( this + " Little's Law Estimate (ops/sec)    : " + this._formatter.format( averageNumberOfUsers / averageOpResponseTime ) );
 		else
-			out.println( this + " Little's Law Estimate (ops/sec)    : not computed" );
+			out.println( this + " Little's Law Estimate (ops/sec)    : 0" );
 		out.println( this + " Effective load (requests/sec)      : " + this._formatter.format( effectiveLoadRequests ) );
 		out.println( this + " Operations initiated               : " + this.finalCard._totalOpsInitiated );
 		out.println( this + " Operations successfully completed  : " + this.finalCard._totalOpsSuccessful );

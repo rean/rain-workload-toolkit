@@ -43,20 +43,20 @@ import org.json.JSONObject;
  */
 public class HttpTestProfileCreator extends ProfileCreator
 {
-	public static String CFG_BASE_HOST_IP_PREFIX_KEY 	= "baseHostIpPrefix";
-	public static String CFG_NUM_HOST_TARGETS_KEY		= "numHostTargets";
+	public static String CFG_BASE_HOST_IP_KEY 		= "baseHostIp";
+	public static String CFG_NUM_HOST_TARGETS_KEY	= "numHostTargets";
 	
 	public JSONObject createProfile( JSONObject params ) throws JSONException
 	{
-		String baseHostIPPrefix = "127.0.0.";
+		String baseHostIP = "127.0.0.1";
 		int numHostTargets = 1;
 		
 		// See whether the input is non-null and has parameters for the base host ip prefix and/or
 		// the number of ip targets
 		if( params != null )
 		{
-			if( params.has( CFG_BASE_HOST_IP_PREFIX_KEY ) )
-				baseHostIPPrefix = params.getString( CFG_BASE_HOST_IP_PREFIX_KEY );
+			if( params.has( CFG_BASE_HOST_IP_KEY ) )
+				baseHostIP = params.getString( CFG_BASE_HOST_IP_KEY );
 			
 			if( params.has( CFG_NUM_HOST_TARGETS_KEY) )
 				numHostTargets = params.getInt( CFG_NUM_HOST_TARGETS_KEY );
@@ -68,7 +68,12 @@ public class HttpTestProfileCreator extends ProfileCreator
 		// Create a track config with "numHostTargets" tracks
 		for( int i = 0; i < numHostTargets; i++ )
 		{
-			String trackName = "track-00" + i;
+			String trackName = "";
+			
+			if( i < 10 )
+				trackName = "track-000" + i;
+			else trackName = "track-00" + i;
+			
 			JSONObject trackDetails = new JSONObject();
 			// Fill in details
 			trackDetails.put( ScenarioTrack.CFG_GENERATOR_KEY, "radlab.rain.workload.httptest.HttpTestGenerator" ); 
@@ -120,7 +125,24 @@ public class HttpTestProfileCreator extends ProfileCreator
 			trackDetails.put( ScenarioTrack.CFG_LOAD_SCHEDULE_CREATOR_KEY, "radlab.rain.workload.httptest.HttpTestScheduleCreator" );
 						
 			JSONObject targetDetails = new JSONObject();
-			targetDetails.put( ScenarioTrack.CFG_TARGET_HOSTNAME_KEY, baseHostIPPrefix + (i+1) );
+			// Get base IP, split on . get last octet convert to int then add i
+			String[] ipAddressParts = baseHostIP.split( "\\." );
+			if( ipAddressParts.length != 4 )
+				throw new JSONException( "Expected numerical IPv4 address format: N.N.N.N" );
+			
+			int lastOctet = Integer.parseInt( ipAddressParts[3] );
+			StringBuffer targetIPAddress = new StringBuffer();
+			targetIPAddress.append( ipAddressParts[0] );
+			targetIPAddress.append( "." );
+			targetIPAddress.append( ipAddressParts[1] );
+			targetIPAddress.append( "." );
+			targetIPAddress.append( ipAddressParts[2] );
+			targetIPAddress.append( "." );
+			targetIPAddress.append( (lastOctet+i) );
+			
+			System.out.println( "Target IP: " + targetIPAddress.toString() );
+			
+			targetDetails.put( ScenarioTrack.CFG_TARGET_HOSTNAME_KEY, targetIPAddress.toString() );
 			targetDetails.put( ScenarioTrack.CFG_TARGET_PORT_KEY, 8080 );
 			
 			trackDetails.put( ScenarioTrack.CFG_TARGET_KEY, targetDetails );

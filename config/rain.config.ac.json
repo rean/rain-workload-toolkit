@@ -1,8 +1,8 @@
 {
     "profilesCreatorClass": "radlab.rain.workload.httptest.HttpTestProfileCreator",
     "profilesCreatorClassParams": {
-    	"baseHostIpPrefix": "127.0.0.",
-    	"numHostTargets": 2
+    	"baseHostIp": "127.0.0.1",
+    	"numHostTargets": 5
     },
     "timing": {
         "rampUp": 10,
