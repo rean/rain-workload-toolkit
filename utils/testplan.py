@@ -70,8 +70,8 @@ class HttpTestStepRunner:
 
         e.g.,:
         1) run servers on ip addressed 11.0.0.1 - 11.0.0.200
-        2) with a step size of 10 run experiments on 11.0.0.1 - 20
-           11.0.0.21 - 40, ... 10.0.0.191 - 200
+        2) with a step size of 10 run experiments on 11.0.0.1 - 10
+           11.0.0.1 - 20, ... 11.0.0.1 - 200
         '''
 
         # Some pre-reqs:
@@ -84,22 +84,23 @@ class HttpTestStepRunner:
         for i in range(num_tests):
             # with one Rain launch we can load an entire block of ip's
             # using the track feature
-            ip_address_parts = start_ip.split( "." )
+            #ip_address_parts = start_ip.split( "." )
             #print len(ip_address_parts)
             # throw exception if we don't find a numeric ip v4 address
-            if len(ip_address_parts) != 4:
-                raise Exception( "Expected a numeric IPv4 address"\
-                                     + " (format N.N.N.N)" )
-            lastOctet = int( ip_address_parts[3] )
-            base_ip = "{0}.{1}.{2}.{3}".format( ip_address_parts[0],\
-                                    ip_address_parts[1],\
-                                    ip_address_parts[2],\
-                                    str(lastOctet+(num_apps_to_load*i)))
+            #if len(ip_address_parts) != 4:
+            #    raise Exception( "Expected a numeric IPv4 address"\
+            #                         + " (format N.N.N.N)" )
+            #lastOctet = int( ip_address_parts[3] )
+            #base_ip = "{0}.{1}.{2}.{3}".format( ip_address_parts[0],\
+            #                        ip_address_parts[1],\
+            #                        ip_address_parts[2],\
+            #                        str(lastOctet+(num_apps_to_load*i)))
 
             # Create config objects to write out as files
+            base_ip = start_ip
             config = HttpTestConfig()
             config.baseHostIp = base_ip
-            config.numHostTargets = num_apps_to_load
+            config.numHostTargets = (i+1)*num_apps_to_load
             config.duration = run_duration_secs
             
             json_data = \
@@ -123,6 +124,8 @@ class HttpTestStepRunner:
             # write the json data out to the config file
             # invoke the run manager passing the location of the config file
             # collect the results and write them out to the results_dir
+            print "[HttpTestStepRunner] Writing output: {0}"\
+                .format( run_config_filename )
             config_file = open( run_config_filename, 'w' )
             config_file.write( json_data )
             config_file.flush()

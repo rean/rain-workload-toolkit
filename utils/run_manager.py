@@ -224,33 +224,11 @@ class RunManager():
         print( "[Run manager] rain pid: %d" % rain_pid )
         
         # Sit and wait until Rain exits then parse the output
-        retcode = rain_process.poll()
-        if retcode == None:
-            print( "[Run manager] Rain running..." )
-        else: 
-            print( "[Run manager] Rain process failed to start. Retcode: {0}"\
-                       .format(retcode) )
-            sys.exit(2)
-
-        interrupted = False
-        check_interval = 30
-
-        while retcode == None:
-            #try:
-            print "[Run Manager] sleeping for {0} secs".format(check_interval)
-            time.sleep(check_interval)
-            print "[Run manager] woken...checking on driver process..."
-            retcode = rain_process.poll()
-            if retcode == None:
-                print "[Run manager] Rain process still running..."
-            else:
-                print "[Run manager] Rain process exited. Retcode: {0}"\
-                    .format(retcode)
-
         # Return the raw output, clients can parse it themselves 
         # or use the RainOutputParser to make sense
         # of it
-        output = rain_process.stdout.read()
+        #output = rain_process.stdout.read()
+        output, err = rain_process.communicate()
         return output
 
 '''
