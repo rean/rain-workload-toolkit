@@ -343,6 +343,9 @@ public class DefaultScenarioTrack extends ScenarioTrack
 				return;
 			}
 			
+			System.out.println( this + " Ramp up finished!" );
+			System.out.flush();
+			
 			System.out.println( this + " current time: " + now  + " " + this._track._currentLoadProfile.toString() );
 			
 			while( !this.getDone() )
