@@ -89,9 +89,9 @@ public class PredictableAppOperation extends Operation
 		StringBuilder url = new StringBuilder();
 		url.append( this.getGenerator()._baseUrl );
 		url.append( "/task1/spring/worker/busy/" );
-		url.append( this._workDone );
-		url.append( "/" );
 		url.append( "1" ); // total num iterations?
+		url.append( "/" );
+		url.append( this._workDone );
 		url.append( "/" );
 		url.append( this._busyPct );
 		url.append( "/" );
