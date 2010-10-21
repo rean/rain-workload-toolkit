@@ -32,13 +32,17 @@
 package radlab.rain.workload.httptest;
 
 import java.util.LinkedList;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import radlab.rain.LoadProfile;
 import radlab.rain.LoadScheduleCreator;
 
 public class HttpTestScheduleCreator extends LoadScheduleCreator 
 {
-	@Override
-	public LinkedList<LoadProfile> createSchedule() 
+	//@Override
+	public LinkedList<LoadProfile> createSchedule( JSONObject params ) throws JSONException  
 	{
 		LinkedList<LoadProfile> loadSchedule = new LinkedList<LoadProfile>();
 		

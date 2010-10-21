@@ -158,7 +158,7 @@ def usage():
                .format(sys.argv[0]) )
     print( "defaults: {0} --startip 127.0.0.1 --numapps 10"\
            " --maxapps 100 --resultsdir ./results --duration 60"\
-           "--configdir ./config".format(sys.argv[0]) )
+           " --configdir ./config".format(sys.argv[0]) )
 
 def main(argv):
     start_ip = "127.0.0.1"
@@ -185,7 +185,7 @@ def main(argv):
         elif opt == "--startip":
             start_ip = arg
         elif opt == "--numapps":
-            num_apts_to_load = int(arg)
+            num_apps_to_load = int(arg)
         elif opt == "--maxapps":
             apps_powered_on = int(arg)
         elif opt == "--resultsdir":

@@ -31,52 +31,95 @@
 
 package radlab.rain.workload.httptest;
 
+import java.io.IOException;
+
+import org.apache.http.HttpStatus;
+
 import radlab.rain.Generator;
 import radlab.rain.IScoreboard;
 import radlab.rain.LoadProfile;
 import radlab.rain.Operation;
 import radlab.rain.util.HttpTransport;
 
-/**
- * The HttpTestOperation class contains common static methods for use by the
- * operations that inherit from this abstract class.
- */
-public abstract class HttpTestOperation extends Operation 
+public class PredictableAppOperation extends Operation 
 {
+	public static String NAME_PREFIX = "PredicatableOp_";
+	
+	// Parameters we need 
+	public int _workDone;
+	public int _busyPct;
+	public String _memorySize;
+	
 	// These references will be set by the Generator.
 	protected HttpTransport _http;
+	
+	public PredictableAppOperation(boolean interactive, IScoreboard scoreboard) 
+	{
+		super(interactive, scoreboard);
+		// Set the operation index, but don't set the name until execution time
+		this._operationIndex = PredictableAppGenerator.PREDICTABLE_OP;
+	}
+
+	public void setName( String val )
+	{
+		this._operationName = val;
+	}
 	
 	/**
 	 * Returns the Generator that created this operation.
 	 * 
 	 * @return      The Generator that created this operation.
 	 */
-	public HttpTestGenerator getGenerator()
+	public PredictableAppGenerator getGenerator()
 	{
-		return (HttpTestGenerator) this._generator;
+		return (PredictableAppGenerator) this._generator;
 	}
 	
-	public HttpTestOperation( boolean interactive, IScoreboard scoreboard )
+	@Override
+	public void cleanup() 
 	{
-		super( interactive, scoreboard );
+		// TODO Auto-generated method stub
+
 	}
-	
+
+	@Override
+	public void execute() throws Throwable 
+	{
+		Thread.sleep( this._workDone );
+		StringBuilder url = new StringBuilder();
+		url.append( this.getGenerator()._baseUrl );
+		url.append( "/task1/spring/worker/busy/" );
+		url.append( this._workDone );
+		url.append( "/" );
+		url.append( "1" ); // total num iterations?
+		url.append( "/" );
+		url.append( this._busyPct );
+		url.append( "/" );
+		url.append( this._memorySize );
+		
+		//System.out.println( this + " " + url.toString() );
+		StringBuilder response = this._http.fetchUrl( url.toString() );
+		
+		this.trace( url.toString() );
+		if( response.length() == 0 || this._http.getStatusCode() != HttpStatus.SC_OK )
+		{
+			String errorMessage = "Home page GET ERROR - Received an empty response or non 200 http status code.";
+			throw new IOException (errorMessage);
+		}
+		
+		this.setFailed( false );
+	}
+
 	@Override
 	public void prepare(Generator generator) 
 	{
 		this._generator = generator;
-		HttpTestGenerator httpTestGenerator = (HttpTestGenerator) generator;
+		PredictableAppGenerator predictableGenerator = (PredictableAppGenerator) generator;
 		
 		LoadProfile currentLoadProfile = generator.getLatestLoadProfile();
 		if( currentLoadProfile != null )
 			this._generatedDuringProfile = currentLoadProfile;
 		
-		this._http = httpTestGenerator.getHttpTransport();
-	}
-	
-	@Override
-	public void cleanup()
-	{
-		
+		this._http = predictableGenerator.getHttpTransport();
 	}
 }

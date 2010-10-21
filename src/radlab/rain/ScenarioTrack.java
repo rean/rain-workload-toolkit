@@ -72,6 +72,7 @@ public abstract class ScenarioTrack
 	public static String CFG_LOAD_PROFILE_CLASS_KEY             = "loadProfileClass";
 	public static String CFG_LOAD_PROFILE_KEY                   = "loadProfile";
 	public static String CFG_LOAD_SCHEDULE_CREATOR_KEY			= "loadScheduleCreator";
+	public static String CFG_LOAD_SCHEDULE_CREATOR_PARAMS_KEY	= "loadScheduleCreatorParameters";
 	// Load behavioral hints
 	public static String CFG_BEHAVIOR_KEY                       = "behavior";
 	public static String CFG_RESOURCE_PATH                      = "resourcePath";
@@ -245,8 +246,13 @@ public abstract class ScenarioTrack
 			// Create the load schedule creator
 			String loadSchedulerClass = config.getString( ScenarioTrack.CFG_LOAD_SCHEDULE_CREATOR_KEY );
 			LoadScheduleCreator loadScheduler = this.createLoadScheduleCreator( loadSchedulerClass );
+			JSONObject loadSchedulerParams = new JSONObject();
+			// Look for load scheduler parameters if any exist
+			if( config.has( CFG_LOAD_SCHEDULE_CREATOR_PARAMS_KEY) )
+				loadSchedulerParams = config.getJSONObject( CFG_LOAD_SCHEDULE_CREATOR_PARAMS_KEY );
+			
 			if( loadScheduler != null )
-				this._loadSchedule = loadScheduler.createSchedule();
+				this._loadSchedule = loadScheduler.createSchedule( loadSchedulerParams );
 			else throw new Exception( "Error creating load scheduler class: " +  loadSchedulerClass );
 		}
 		else

@@ -2,6 +2,9 @@ package radlab.rain.workload.scadr;
 
 import java.util.LinkedList;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import radlab.rain.LoadProfile;
 import radlab.rain.LoadScheduleCreator;
 
@@ -12,7 +15,8 @@ public class ScadrLoadScheduleCreator extends LoadScheduleCreator {
 	}
 
 	@Override
-	public LinkedList<LoadProfile> createSchedule() {
+	public LinkedList<LoadProfile> createSchedule( JSONObject params ) throws JSONException 
+	{
 		
 		LinkedList<LoadProfile> loadSchedule = new LinkedList<LoadProfile>();
 		

@@ -35,9 +35,14 @@ class TrackSummary:
         self.operations_failed = 0
         self.average_op_response_time_sec = 0
         self.average_users = 0
-        self.op_response_time_targets_met = True
-    
-    def validate( self, pct_overhead_ops=5.0, pct_failed_ops=5.0 ):
+        #self.op_response_time_targets_met = True
+        self.op_response_times = {}
+        # Specifiy validation thresholds
+        self.pct_overhead_ops_threshold=5.0
+        self.pct_failed_ops_threshold=5.0
+        self.op_response_time_thresholds = {}
+
+    def validate( self ):
         result = TrackValidation(self.name)
         # check overheads
         
@@ -47,7 +52,7 @@ class TrackSummary:
                       self.effective_load_ops_per_sec)/\
                      self.littles_estimate_ops_per_sec)*100.0
 
-            if result.pct_overhead_ops <= pct_overhead_ops:
+            if result.pct_overhead_ops <= self.pct_overhead_ops_threshold:
                 result.pct_overhead_ops_acceptable = True
         else:
             result.pct_overhead_ops_acceptable = False
@@ -56,8 +61,16 @@ class TrackSummary:
         result.pct_ops_failed = \
             (float(self.operations_failed)/float(total_ops))*100.0
         
-        if result.pct_ops_failed <= pct_failed_ops:
+        if result.pct_ops_failed <= self.pct_failed_ops_threshold:
             result.pct_failed_ops_acceptable = True
+
+        # For each of the op_response_time thresholds
+        # see if they've been met
+        for k,v in self.op_response_time_thresholds.items():
+            if self.op_response_times.has_key( k ):
+                observed = self.op_response_times[k]
+                if observed[0] > v[0] or observed[1] > v[1]:
+                    result.op_response_time_targets_met = False
 
         return result
 
@@ -121,6 +134,7 @@ class RainOutputParser:
             #print track
             # sub-pattern of the end of a result line from rain
             # <metric><space*>:<space+><decimal value>
+            number_pattern = '([-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?)'
             result_line_tail_pattern = \
                 '\s*:\s+([-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?)'
             track_final_results_pattern = \
@@ -150,6 +164,20 @@ class RainOutputParser:
             track_avg_users_pattern = \
                 re.compile( '\[SCOREBOARD TRACK: ' + track + '\] ' \
                       'Average number of users' + result_line_tail_pattern )
+
+            # Patterns for operations - doesn't group like we'd like
+            # but matches the right lines
+            track_operation_pattern = \
+                re.compile( '\[SCOREBOARD TRACK: ' + track + '\]' \
+                       '\|(.+)\|'\
+                       '\s*(' + number_pattern + ')%\s*\|'\
+                       '\s*(' + number_pattern + ')\s*\|'\
+                       '\s*(' + number_pattern + ')\s*\|'\
+                       '\s*(' + number_pattern + ')\s*\|'\
+                       '\s*(' + number_pattern + ')\s*\|'\
+                       '\s*(' + number_pattern + ')\s*\|'\
+                       '\s*(' + number_pattern + ')\s*\|'\
+                       '\s*(' + number_pattern + ')\s*\|')
 
             # Create a new track summary instance to fill in
             summary = TrackSummary(track)
@@ -185,8 +213,30 @@ class RainOutputParser:
                     float( track_avg_users_pattern.search\
                              ( output, final_results_section_start ).group(1) )
                 
+                # find all the operations and print out the 90th and 99th
+                # percentiles
+                for opMatch in track_operation_pattern.\
+                    finditer( output, final_results_section_start ):
+                
+                    #print opMatch
+                    #print opMatch.group(0)
+                    # Split group(0) on |
+                    opCounters = opMatch.group(0).split( "|" )
+                    #for s in opCounters:
+                    #    print s
+                    #print opCounters[1].strip(), opCounters[8], opCounters[9]
+                    # Store the op name with a tuple (90th pct,99th pct)
+                    summary.op_response_times[opCounters[1].strip()]=\
+                        (float(opCounters[8].strip()), \
+                             float(opCounters[9].strip()))
+                #else:
+                #   print "no operation match" 
+
                 # save the summary to the list we have so far
+                #print summary.name, summary.op_response_times
                 track_results.append(summary)
+
+                
         
         # return the list of track results we found
         return track_results
@@ -238,9 +288,14 @@ java -Xms256m -Xmx1g -XX:+DisableExplicitGC -cp .:rain.jar:workloads/httptest.ja
 
 def run2():
     try:
-        results_file = open( "./rain.out", 'r' )
+        #results_file = open( "./rain.out", 'r' )
+        results_file = open( "./rain.predictable.out", 'r' )
         results = results_file.read()
         track_results = RainOutputParser.parse_output( results )
+        for result in track_results:
+            # Set some 90th and 99th pctile thresholds
+            result.op_response_time_thresholds['PingHome']=(0.001,0.005)
+            
         RainOutputParser.print_results( track_results )
     #except:
     #    print "something broke"
@@ -258,4 +313,4 @@ def run3():
     #return track_results 
 
 if __name__=='__main__':
-      run3()
+      run2()

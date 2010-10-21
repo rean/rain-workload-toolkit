@@ -179,7 +179,7 @@ public class Scenario
 				JSONObject params = null;
 				// Look for profile creator params - if we find some then pass them
 				if( jsonConfig.has( CFG_PROFILES_CREATOR_CLASS_PARAMS_KEY ) )
-					params = (JSONObject) jsonConfig.get( CFG_PROFILES_CREATOR_CLASS_PARAMS_KEY );
+					params = jsonConfig.getJSONObject( CFG_PROFILES_CREATOR_CLASS_PARAMS_KEY );
 				
 				tracksConfig = creator.createProfile( params );
 			}

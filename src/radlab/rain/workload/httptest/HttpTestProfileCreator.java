@@ -125,6 +125,7 @@ public class HttpTestProfileCreator extends ProfileCreator
 			trackDetails.put( ScenarioTrack.CFG_LOAD_SCHEDULE_CREATOR_KEY, "radlab.rain.workload.httptest.HttpTestScheduleCreator" );
 						
 			JSONObject targetDetails = new JSONObject();
+			
 			// Get base IP, split on . get last octet convert to int then add i
 			String[] ipAddressParts = baseHostIP.split( "\\." );
 			if( ipAddressParts.length != 4 )

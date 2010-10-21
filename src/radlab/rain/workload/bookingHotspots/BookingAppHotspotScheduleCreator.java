@@ -2,6 +2,10 @@ package radlab.rain.workload.bookingHotspots;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import radlab.rain.LoadProfile;
 import radlab.rain.LoadScheduleCreator;
 import radlab.rain.hotspots.IObjectGenerator;
@@ -12,7 +16,7 @@ public class BookingAppHotspotScheduleCreator extends LoadScheduleCreator
 {
 
 	@Override
-	public LinkedList<LoadProfile> createSchedule() 
+	public LinkedList<LoadProfile> createSchedule( JSONObject params ) throws JSONException 
 	{
 		// create hotel objects
         String hotelSearchArray[] = {"", "W Hotel", "Marriott", "Hilton", "Doubletree", "Ritz", "Super 8", "No Tell Motel", "Conrad", "InterContinental", "Westin", "Mar", "Foo"};

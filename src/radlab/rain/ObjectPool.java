@@ -140,7 +140,7 @@ public class ObjectPool
 	public Operation rentObject( String tag )
 	{
 		Operation obj = null;
-		this._totalRentRequests++;
+		//this._totalRentRequests++;
 		
 		if( this._totalRentRequests == 1 )
 		{
@@ -152,7 +152,7 @@ public class ObjectPool
 		synchronized( this._pool )
 		{
 			long qEnd = System.currentTimeMillis();
-						
+			this._totalRentRequests++;			
 			LinkedList<Operation> objs = this._pool.get( tag );
 			if( objs == null || objs.size() == 0 )
 			{
@@ -171,28 +171,44 @@ public class ObjectPool
 	
 	public void returnObject( Operation op )
 	{
-		this._totalReturnRequests++;
+		boolean cleanupSuccess = true;
+		
+		// Do object cleanup before grabbing object pool lock and just note
+		// whether the cleanup was unsuccessful. This way, lengthy cleanup operations
+		// don't happen while holding the lock, which would back up the object pool and
+		// slow down serving object rent requests from other threads.
 		try
 		{
-			op.cleanup(); // Reset object
+			op.cleanup();
 		}
 		catch( Throwable t )
 		{
-			// Don't pool an object that didn't cleanup properly
-			this._totalCleanupDiscards++;
-			op = null;
-			return;
+			cleanupSuccess = false;
 		}
 		
 		// If no one is asking for objects then the pool is probably inactive.
 		// We don't just want to hold onto objects that won't be re-used/recycled
 		if( this._totalRentRequests == 0 )
+		{
+			op = null;
 			return;
+		}
 		
 		long qStart = System.currentTimeMillis();
 		synchronized( this._pool )
 		{
 			long qEnd = System.currentTimeMillis();
+			
+			this._totalReturnRequests++;
+			
+			if( !cleanupSuccess )
+			{
+				// Don't pool an object that didn't cleanup properly
+				this._totalCleanupDiscards++;
+				op = null;
+				return;
+			}
+						
 			LinkedList<Operation> objs = this._pool.get( op._operationName );
 			if( objs == null )
 			{
