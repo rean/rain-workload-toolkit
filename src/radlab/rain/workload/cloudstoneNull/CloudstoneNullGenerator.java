@@ -78,11 +78,6 @@ public class CloudstoneNullGenerator extends Generator
 		
 		// Initalize random utility generators and HttpTransport instances
 		this._rng = new java.util.Random();
-		// Initialize the cycle time and think time generators. If you want non-stop
-		// activity, then set mean cycle time, and mean think times to 0 and the
-		// number generators should just *always* return 0 for the think/cycle time
-		this._cycleTimeGenerator = new NegativeExponential( trk.getMeanCycleTime()*1000 );
-		this._thinkTimeGenerator = new NegativeExponential( trk.getMeanThinkTime()*1000 );
 	}
 
 	@Override
@@ -113,6 +108,11 @@ public class CloudstoneNullGenerator extends Generator
 	public void initialize() 
 	{
 		this._logger = Logger.getLogger( this._name );
+		// Initialize the cycle time and think time generators. If you want non-stop
+		// activity, then set mean cycle time, and mean think times to 0 and the
+		// number generators should just *always* return 0 for the think/cycle time
+		this._cycleTimeGenerator = new NegativeExponential( this._cycleTime );
+		this._thinkTimeGenerator = new NegativeExponential( this._thinkTime );
 	}
 
 	@Override

@@ -516,10 +516,15 @@ public class Scoreboard implements Runnable, IScoreboard
 			card.printStatistics( out );
 		}
 		
-		double averageOpResponseTime = 0.0;
+		double averageOpResponseTimeSecs = 0.0;
 		
 		if( this.finalCard._totalOpsSuccessful > 0 )
-			averageOpResponseTime = ((double)this.finalCard._totalOpResponseTime/(double)this.finalCard._totalOpsSuccessful)/1000.0;
+			averageOpResponseTimeSecs = ((double)this.finalCard._totalOpResponseTime/(double)this.finalCard._totalOpsSuccessful)/1000.0;
+		
+		ScenarioTrack track = this.getScenarioTrack();
+		// Rough averaging of the additional time spent in the system due to think times/cycle times.
+		// Look at the proportion of time we would have waited based on think times and the proportion of times we would have waited based on cycle times
+		double thinkTimeDeltaSecs = ( (1 - track._openLoopProbability) * track.getMeanThinkTime() ) + ( track._openLoopProbability * track.getMeanCycleTime() );
 		
 		double averageNumberOfUsers = 0.0;
 		if( totalIntervalActivations != 0 )
@@ -534,15 +539,15 @@ public class Scoreboard implements Runnable, IScoreboard
 		out.println( this + " Offered load (ops/sec)             : " + this._formatter.format( offeredLoadOps ) );
 		out.println( this + " Effective load (ops/sec)           : " + this._formatter.format( effectiveLoadOps ) );
 		// Still a rough estimate, need to compute the bounds on this estimate
-		if( averageOpResponseTime > 0.0 )
-			out.println( this + " Little's Law Estimate (ops/sec)    : " + this._formatter.format( averageNumberOfUsers / averageOpResponseTime ) );
+		if( averageOpResponseTimeSecs > 0.0 )
+			out.println( this + " Little's Law Estimate (ops/sec)    : " + this._formatter.format( averageNumberOfUsers / (averageOpResponseTimeSecs + thinkTimeDeltaSecs) ) );
 		else
 			out.println( this + " Little's Law Estimate (ops/sec)    : 0" );
 		out.println( this + " Effective load (requests/sec)      : " + this._formatter.format( effectiveLoadRequests ) );
 		out.println( this + " Operations initiated               : " + this.finalCard._totalOpsInitiated );
 		out.println( this + " Operations successfully completed  : " + this.finalCard._totalOpsSuccessful );
 		// Avg response time per operation
-		out.println( this + " Average operation response time (s): " + this._formatter.format( averageOpResponseTime ) );
+		out.println( this + " Average operation response time (s): " + this._formatter.format( averageOpResponseTimeSecs ) );
 		out.println( this + " Operations late                    : " + this.finalCard._totalOpsLate );
 		out.println( this + " Operations failed                  : " + this.finalCard._totalOpsFailed );
 		out.println( this + " Async Ops                          : " + this.finalCard._totalOpsAsync + " " + this._formatter.format( ( ( (double) this.finalCard._totalOpsAsync / (double) totalOperations) * 100) ) + "%" );
