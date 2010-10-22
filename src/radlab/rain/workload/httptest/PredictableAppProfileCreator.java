@@ -64,7 +64,7 @@ public class PredictableAppProfileCreator extends ProfileCreator
 	private int _numHostTargets = 1;
 	private float _popularHostFraction = 0.1f; // 10% of them
 	private float _popularHostLoadFraction = 0.1f; // 10% of the traffic goes to the popular hosts
-	private int _meanThinkTime = 0;
+	private double _meanThinkTime = 0.0;
 	private int _userPopulation = this._numHostTargets;
 	
 	public PredictableAppProfileCreator() 
@@ -87,7 +87,7 @@ public class PredictableAppProfileCreator extends ProfileCreator
 			this._popularHostLoadFraction = (float) params.getDouble( CFG_POPULAR_HOST_LOAD_FRACTION_KEY );
 		
 		if( params.has( CFG_MEAN_THINK_TIME_KEY ) )
-			this._meanThinkTime = params.getInt( CFG_MEAN_THINK_TIME_KEY );
+			this._meanThinkTime = params.getDouble( CFG_MEAN_THINK_TIME_KEY );
 		
 		if( params.has( CFG_NUM_HOST_TARGETS_KEY ) )
 			this._numHostTargets = params.getInt( CFG_NUM_HOST_TARGETS_KEY );
@@ -204,7 +204,7 @@ public class PredictableAppProfileCreator extends ProfileCreator
 		return trackConfig;
 	}
 	
-	private JSONObject createTrack( String host, int port, int meanThinkTime, int minUsers, JSONObject generatorParameters ) throws JSONException
+	private JSONObject createTrack( String host, int port, double meanThinkTime, int minUsers, JSONObject generatorParameters ) throws JSONException
 	{
 		JSONObject trackDetails = new JSONObject();
 		// Fill in details

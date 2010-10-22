@@ -312,7 +312,7 @@ def main(argv):
         elif opt == "--users":
             user_population = int(arg)
         elif opt == "--thinktime":
-            mean_think_time = int(arg)
+            mean_think_time = float(arg)
         elif opt == "--opwork":
             opwork = []
             for work in arg.split( "," ):

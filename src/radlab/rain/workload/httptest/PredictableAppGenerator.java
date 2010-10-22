@@ -91,9 +91,6 @@ public class PredictableAppGenerator extends Generator
 	{
 		super(track);
 		this._baseUrl 	= "http://" + this._loadTrack.getTargetHostName() + ":" + this._loadTrack.getTargetHostPort();
-		
-		this._thinkTime = (long) track.getMeanThinkTime();
-		this._thinkTimeGenerator = new NegativeExponential( this._thinkTime );
 	}
 
 	/**
@@ -103,6 +100,7 @@ public class PredictableAppGenerator extends Generator
 	public void initialize()
 	{
 		this._http = new HttpTransport();
+		this._thinkTimeGenerator = new NegativeExponential( this._thinkTime );
 	}
 
 	/*
@@ -257,6 +255,9 @@ public class PredictableAppGenerator extends Generator
 	@Override
 	public long getThinkTime() 
 	{
+		if( this._thinkTimeGenerator == null )
+			return 0;
+		
 		long nextThinkTime = (long) this._thinkTimeGenerator.nextDouble(); 
 		// Truncate at 5 times the mean (arbitrary truncation)
 		return Math.min( nextThinkTime, (5*this._thinkTime) );
