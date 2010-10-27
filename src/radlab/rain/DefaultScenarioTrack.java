@@ -34,6 +34,9 @@ package radlab.rain;
 import java.util.Random;
 import org.json.JSONException;
 import java.util.LinkedList;
+import java.util.Calendar;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 /**
  * The DefaultScenarioTrack class is a generic implementation of the abstract
@@ -289,6 +292,10 @@ public class DefaultScenarioTrack extends ScenarioTrack
 		/** The current load profile index. */
 		int loadScheduleIndex = 0;
 		
+		/** Date formatter */
+		private DateFormat formatter = null;
+		private Calendar cal = null;
+		
 		/** Allow external agents to augment the current load schedule by providing dynamic load profiles */
 		LinkedList<LoadProfile> _dynamicLoadProfiles = new LinkedList<LoadProfile>();
 		
@@ -335,6 +342,9 @@ public class DefaultScenarioTrack extends ScenarioTrack
 			this._track._currentLoadProfile._activeCount++;
 			System.out.println( this + " ramping up for " + rampUp + "ms." );
 			
+			this.formatter = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss.SSS");
+			this.cal = Calendar.getInstance();
+			
 			try {
 				Thread.sleep( rampUp );
 			} catch (InterruptedException e1) {
@@ -346,7 +356,8 @@ public class DefaultScenarioTrack extends ScenarioTrack
 			System.out.println( this + " Ramp up finished!" );
 			System.out.flush();
 			
-			System.out.println( this + " current time: " + now  + " " + this._track._currentLoadProfile.toString() );
+			cal.setTimeInMillis(now);
+			System.out.println( this + " current time: " + formatter.format(cal.getTime()) + " " + this._track._currentLoadProfile.toString() );
 			
 			while( !this.getDone() )
 			{
@@ -454,7 +465,8 @@ public class DefaultScenarioTrack extends ScenarioTrack
 				this._track._currentLoadProfile._activeCount++;
 				this._track._currentLoadProfile.setTimeStarted( now );
 				
-				System.out.println( this + " current time: " + now + " " + this._track._currentLoadProfile.toString() );
+				cal.setTimeInMillis(now);
+				System.out.println( this + " current time: " + formatter.format(cal.getTime()) + " " + this._track._currentLoadProfile.toString() );
 				return true;
 			}
 			else 
