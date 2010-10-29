@@ -357,7 +357,7 @@ public class DefaultScenarioTrack extends ScenarioTrack
 			System.out.flush();
 			
 			cal.setTimeInMillis(now);
-			System.out.println( this + " current time: " + formatter.format(cal.getTime()) + " " + this._track._currentLoadProfile.toString() );
+			System.out.println( this + " current time: " + formatter.format(cal.getTime()) + " (" +  now + ") " + this._track._currentLoadProfile.toString() );
 			
 			while( !this.getDone() )
 			{
@@ -466,7 +466,7 @@ public class DefaultScenarioTrack extends ScenarioTrack
 				this._track._currentLoadProfile.setTimeStarted( now );
 				
 				cal.setTimeInMillis(now);
-				System.out.println( this + " current time: " + formatter.format(cal.getTime()) + " " + this._track._currentLoadProfile.toString() );
+				System.out.println( this + " current time: " + formatter.format(cal.getTime()) + " (" +  now + ") " + this._track._currentLoadProfile.toString() );
 				return true;
 			}
 			else 
