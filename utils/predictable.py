@@ -270,7 +270,7 @@ def usage():
            " --sockettimeout 1000 --connectiontimeout 1000"\
            " --thinktime 5 --opwork 50,100,200"\
            " --opmix 30,30,40 --opbusy 50,75,75"\
-           " --memsize 'small','med','large' --memmix 10,20,70"\
+           " --memsize '2','4','8' --memmix 10,20,70"\
            .format(sys.argv[0]) )
 
 
