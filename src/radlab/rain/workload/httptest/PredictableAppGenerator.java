@@ -60,6 +60,10 @@ public class PredictableAppGenerator extends Generator
 	public static String CFG_MEMORY_SIZES_KEY		= "memorySizes";
 	public static String CFG_MEMORY_MIX_KEY			= "memoryMix";
 	
+	// Allow setting of connection and socket timeouts
+	public static String CFG_CONNECTION_TIMEOUT	= "connectionTimeoutMsecs";
+	public static String CFG_SOCKET_TIMEOUT		= "socketTimeoutMsecs";
+	
 	// Operation indices used in the mix matrix.
 	public static final int PREDICTABLE_OP = 0;
 		
@@ -70,6 +74,8 @@ public class PredictableAppGenerator extends Generator
 	private boolean _debug = false;
 	private Random _random = new Random();
 	private NegativeExponential _thinkTimeGenerator  = null;
+	private int _connectionTimeoutMsecs = 1000;
+	private int _socketTimeoutMsecs = 1000;
 	
 	/* Example (all the operation* arrays MUST be the same size.  
 	   The memory* arrays must be the same size: 
@@ -112,6 +118,20 @@ public class PredictableAppGenerator extends Generator
 		if( config.has(CFG_USE_POOLING_KEY) )
 			this._usePooling = config.getBoolean( CFG_USE_POOLING_KEY );
 		
+		// Check whether we're setting connection timeouts of using our defaults
+		if( config.has(CFG_CONNECTION_TIMEOUT) )
+			this._connectionTimeoutMsecs = config.getInt(CFG_CONNECTION_TIMEOUT);
+		
+		this._http.setConnectTimeout( this._connectionTimeoutMsecs );
+		//System.out.println( "Setting connection timeout (msecs): " + this._http.getConnectTimeout() );
+		
+		// Check whether we're setting socket (idle) timeouts or using our defaults
+		if( config.has(CFG_SOCKET_TIMEOUT) )
+			this._socketTimeoutMsecs = config.getInt(CFG_SOCKET_TIMEOUT);
+		
+		this._http.setSocketIdleTimeout( this._socketTimeoutMsecs );
+		//System.out.println( "Setting socket timeout (msecs): " + this._http.getSocketIdleTimeout() );
+			
 		/* Example (all the operation* arrays MUST be the same size.  
 		   The memory* arrays must be the same size: 
 		 operationWorkDone (ms): [50, 100, 200]

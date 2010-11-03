@@ -7,23 +7,28 @@ import simplejson as json
 import getopt
 from run_manager import RunManager, RainOutputParser
 
-'''Example config
+'''Example config (updated to include usersPerPopularHost and 
+usersPerLessPopularHost. Removing userPopulation and popularHostLoadFraction
+since these are no longer needed if we're specifying the users per
+popular and less popular host)
 {
     "profilesCreatorClass": "radlab.rain.workload.httptest.PredictableAppProfileCreator",
     "profilesCreatorClassParams": {
          "baseHostIp": "127.0.0.1",
          "hostPort": 80,
          "popularHostFraction": 0.2,
-         "popularHostLoadFraction": 0.5,
          "numHostTargets": 10,
-         "userPopulation": 100,
          "meanThinkTime": 5,
+         "usersPerPopularHost": 10,
+         "usersPerLessPopularHost":1,
          "generatorParameters": {
              "operationWorkDone": [50, 100, 200],
              "operationMix": [30, 30, 40],
              "operationBusyPct" : [50, 75, 75],
              "memorySizes": ["small", "med", "large"],
-             "memoryMix": [10,20,70]
+             "memoryMix": [10,20,70],
+             "connectionTimeoutMsecs" : 1000,
+             "socketTimeoutMsecs" : 1000
              }
     },
     "timing": {
@@ -45,6 +50,8 @@ class PredictableAppGeneratorParameters:
         self.operationBusyPct = []
         self.memorySizes = []
         self.memorymix = []
+        self.connectionTimeoutMsecs = 1000
+        self.socketTimeoutMsecs = 1000
 
     def to_json( self ):
         dict = {}
@@ -53,6 +60,8 @@ class PredictableAppGeneratorParameters:
         dict['operationBusyPct'] = self.operationBusyPct
         dict['memorySizes'] = self.memorySizes
         dict['memoryMix'] = self.memoryMix
+        dict['connectionTimeoutMsecs'] = self.connectionTimeoutMsecs
+        dict['socketTimeoutMsecs'] = self.socketTimeoutMsecs
         return dict
 
 class PreditableAppTestConfig:
@@ -70,8 +79,10 @@ class PreditableAppTestConfig:
         self.numHostTargets = 10 # total number of hosts
         self.hostPort = 8080 # server port
         self.popularHostFraction = 0.2 # Fraction of popular hosts
-        self.popularHostLoadFraction = 0.5 # % aggregate traffic for popular
-        self.userPopulation = 100 # aggregate number of users to emulate
+        #self.popularHostLoadFraction = 0.5 # % aggregate traffic for popular
+        #self.userPopulation = 100 # aggregate number of users to emulate
+        self.usersPerPopularHost = 25
+        self.usersPerLessPopularHost = 5
         self.meanThinkTime = 5 # seconds
         # Timing info
         self.rampUp = 10 # seconds
@@ -88,10 +99,13 @@ class PreditableAppTestConfig:
         creatorParams['numHostTargets'] = self.numHostTargets
         creatorParams['hostPort'] = self.hostPort
         creatorParams['popularHostFraction'] = self.popularHostFraction
-        creatorParams['popularHostLoadFraction'] = self.popularHostLoadFraction
-        creatorParams['userPopulation'] = self.userPopulation
+        #creatorParams['popularHostLoadFraction'] = \
+            #self.popularHostLoadFraction
+        #creatorParams['userPopulation'] = self.userPopulation
         creatorParams['meanThinkTime'] = self.meanThinkTime
-
+        creatorParams['usersPerPopularHost'] = self.usersPerPopularHost
+        creatorParams['usersPerLessPopularHost'] = self.usersPerLessPopularHost
+        
         # add in the generator parameters to the creator parameters
         creatorParams['generatorParameters'] = \
             self.generatorParameters.to_json()
@@ -113,10 +127,12 @@ class PredictableAppTestRunner:
             os.mkdir( path )
 
     def run( self, start_ip, num_apps_to_load, apps_powered_on,\
-             host_port, popular_host_fraction, popular_host_load_fraction,\
-             user_population, operation_work_done, operation_mix, \
+             host_port, popular_host_fraction,\
+             operation_work_done, operation_mix, \
              operation_busy_pct, memory_sizes, memory_mix, \
-             mean_think_time=0,  \
+             mean_think_time, users_per_popular_host,\
+             users_per_less_popular_host,\
+             connection_timeout_msecs, socket_timeout_msecs,\
              results_dir="./results", run_duration_secs=60, \
              config_dir="./config" ):
         '''
@@ -140,8 +156,10 @@ class PredictableAppTestRunner:
             config.duration = run_duration_secs
             config.hostPort = host_port
             config.popularHostFraction = popular_host_fraction
-            config.popularHostLoadFraction = popular_host_load_fraction
-            config.userPopulation = user_population
+            config.usersPerPopularHost = users_per_popular_host
+            config.usersPerLessPopularHost = users_per_less_popular_host
+            #config.popularHostLoadFraction = popular_host_load_fraction
+            #config.userPopulation = user_population
             config.meanThinkTime = mean_think_time
             # Add in the parameters for the workload generator
             # the operation mixes etc.
@@ -151,6 +169,8 @@ class PredictableAppTestRunner:
             generatorParams.operationBusyPct = operation_busy_pct
             generatorParams.memorySizes = memory_sizes
             generatorParams.memoryMix = memory_mix
+            generatorParams.connectionTimeoutMsecs = connection_timeout_msecs
+            generatorParams.socketTimeoutMsecs = socket_timeout_msecs
             config.generatorParameters = generatorParams
             
             json_data = \
@@ -233,7 +253,10 @@ def usage():
            " [--maxapps <#apps powered on>] [--resultsdir <path>]"\
            " [--duration <seconds to run>] [--configdir <path>]"\
            " [--port <host port>] [--popularhosts <%popular hosts>]"\
-           " [--popularload <%load for popular hosts>] [--users <#users>]"\
+           " [--popularhostusers <users-per-popular-host>]"\
+           " [--lesspopularhostusers <users-per-less-popular-host]"\
+           " [--connectiontimeout <msecs to wait for http connection>]"\
+           " [--sockettimeout <msecs to wait for data/server response>]"\
            " [--thinktime <secs>] [--opwork <comma separated list>]"\
            " [--opmix <command separated list>]"\
            " [--opbusy <comma separated list>]"\
@@ -243,7 +266,9 @@ def usage():
     print( "defaults: {0} --startip 127.0.0.1 --numapps 10"\
            " --maxapps 10 --resultsdir ./results --duration 60"\
            " --configdir ./config --port 8080 --popularhosts 0.2"\
-           " --popularload 0.5 --users 100 --thinktime 5 --opwork 50,100,200"\
+           " --popularhostusers 25 --lesspopularhostusers 5"\
+           " --sockettimeout 1000 --connectiontimeout 1000"\
+           " --thinktime 5 --opwork 50,100,200"\
            " --opmix 30,30,40 --opbusy 50,75,75"\
            " --memsize 'small','med','large' --memmix 10,20,70"\
            .format(sys.argv[0]) )
@@ -259,9 +284,13 @@ def main(argv):
     
     host_port = 8080
     popular_host_fraction = 0.2
-    popular_host_load_fraction = 0.5
-    user_population = 100
+    #popular_host_load_fraction = 0.5
+    #user_population = 100
     mean_think_time = 5
+    users_per_popular_host = 25
+    users_per_less_popular_host = 5
+    connection_timeout_msecs = 1000
+    socket_timeout_msecs = 1000
 
     # generator parameters - how should these be specified at the cmd line?
     operation_work_done = [50, 100, 200]
@@ -277,11 +306,13 @@ def main(argv):
                                           "duration=", "configdir=",\
                                           "help", "port=",\
                                            "popularhosts=",\
-                                           "popularload=",\
-                                           "users=",\
                                            "thinktime=", "opwork=",\
                                            "opmix=", "opbusy=",\
-                                           "memsize=", "memmix="] )
+                                           "memsize=", "memmix=",\
+                                           "popularhostusers=",\
+                                           "lesspopularhostusers=",\
+                                           "connectiontimeout=",\
+                                           "sockettimeout="] )
     except getopt.GetoptError:
             print sys.exc_info()
             usage()
@@ -307,12 +338,16 @@ def main(argv):
             host_port = int(arg)
         elif opt == "--popularhostfraction":
             popular_host_fraction = float(arg)
-        elif opt == "--popularloadfraction":
-            popular_host_load_fraction = float(arg)
-        elif opt == "--users":
-            user_population = int(arg)
+        elif opt == "--popularhostusers":
+            users_per_popular_host = int(arg)
+        elif opt == "--lesspopularhostusers":
+            users_per_less_popular_host = int(arg)
         elif opt == "--thinktime":
             mean_think_time = float(arg)
+        elif opt == "--connectiontimeout":
+            connection_timeout_msecs = int(arg)
+        elif opt == "--sockettimeout":
+            socket_timeout_msecs = int(arg)
         elif opt == "--opwork":
             opwork = []
             for work in arg.split( "," ):
@@ -342,10 +377,14 @@ def main(argv):
     # launch run
     test_runner = PredictableAppTestRunner()
     test_runner.run( start_ip, num_apps_to_load, apps_powered_on,\
-             host_port, popular_host_fraction, popular_host_load_fraction,\
-             user_population, operation_work_done, operation_mix, \
+             host_port, popular_host_fraction,\
+             operation_work_done, operation_mix, \
              operation_busy_pct, memory_sizes, memory_mix, \
-             mean_think_time, results_dir, run_duration, \
+             mean_think_time, \
+             users_per_popular_host,\
+             users_per_less_popular_host,\
+             connection_timeout_msecs, socket_timeout_msecs,\
+             results_dir, run_duration, \
              config_dir )
 
 if __name__=='__main__':
