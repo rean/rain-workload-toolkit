@@ -120,7 +120,7 @@ class RainOutputParser:
                 "failed",\
                 "%failed",\
                 "passed",\
-                "note")
+                "(note)")
     RESULTS_DATA = "{0:<20} {1:10.4f} {2:10.4f} {3:10.4f} {4:10.4f} {5:10.4f}"\
                    "{6:10.4f} {7:10} {8:10} {9:10.4f} {10:<5s} ({11})"
 
