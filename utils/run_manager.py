@@ -41,6 +41,7 @@ class TrackSummary:
         self.pct_overhead_ops_threshold=5.0
         self.pct_failed_ops_threshold=5.0
         self.op_response_time_thresholds = {}
+        self.validation_note = "n/a"
 
     def validate( self ):
         result = TrackValidation(self.name)
@@ -56,6 +57,8 @@ class TrackSummary:
                 result.pct_overhead_ops_acceptable = True
         else:
             result.pct_overhead_ops_acceptable = False
+            self.validation_note = "little's law overhead > {0}%"\
+                .format(self.pct_overhead_ops_threshold)
 
         total_ops = self.operations_successful + self.operations_failed
         result.pct_ops_failed = \
@@ -63,6 +66,9 @@ class TrackSummary:
         
         if result.pct_ops_failed <= self.pct_failed_ops_threshold:
             result.pct_failed_ops_acceptable = True
+        else:
+            self.validation_note = "pct ops failed > {0}%"\
+                .format(self.pct_failed_ops_threshold)
 
         # For each of the op_response_time thresholds
         # see if they've been met
@@ -71,7 +77,7 @@ class TrackSummary:
                 observed = self.op_response_times[k]
                 if observed[0] > v[0] or observed[1] > v[1]:
                     result.op_response_time_targets_met = False
-
+                    self.validation_note = "response time target(s) not met"
         return result
 
     def __repr__(self):
@@ -94,14 +100,15 @@ class TrackSummary:
             self.operations_successful, \
             self.operations_failed, \
             validation.pct_ops_failed, \
-            str(validation.is_acceptable()) )
+            str(validation.is_acceptable()),\
+            self.validation_note )
 
 class RainOutputParser:
     '''
     Class for parsing the output from Rain. Returns a list of track summaries
     '''
     RESULTS_HEADER = "{0:<20} {1:<10s} {2:<10s} {3:<10s} {4:<10s} {5:<10s} "\
-                "{6:<10s} {7:<10s} {8:<10s} {9:<10s} {10:<5s}".format(\
+                "{6:<10s} {7:<10s} {8:<10s} {9:<10s} {10:<5s} {11}".format(\
                 "track",\
                 "eff-ops/s",\
                 "ltl-ops/s",\
@@ -112,9 +119,10 @@ class RainOutputParser:
                 "succeeded",\
                 "failed",\
                 "%failed",\
-                "passed" )
+                "passed",\
+                "note")
     RESULTS_DATA = "{0:<20} {1:10.4f} {2:10.4f} {3:10.4f} {4:10.4f} {5:10.4f}"\
-                   "{6:10.4f} {7:10} {8:10} {9:10.4f} {10:<5s}"
+                   "{6:10.4f} {7:10} {8:10} {9:10.4f} {10:<5s} ({11})"
 
 
     @staticmethod
