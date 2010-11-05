@@ -1,6 +1,9 @@
 {
     "swf-booking-faces-001": {
         "generator": "radlab.rain.workload.booking.BookingGenerator",
+        "generatorParameters":{
+        	"rngSeed": 67510
+        },
         "track": "radlab.rain.DefaultScenarioTrack",
         "resourcePath": "resources/",
         "behavior": {

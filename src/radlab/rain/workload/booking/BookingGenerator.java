@@ -16,7 +16,9 @@ import radlab.rain.util.HttpTransport;
  */
 public class BookingGenerator extends Generator
 {
-
+	public static String CFG_DEBUG_TO_TRACE_LOG_KEY = "printDebugToTraceLog";
+	public static String CFG_RNG_SEED_KEY 			= "rngSeed";
+	
 	// Operation indices used in the mix matrix.
 	public static final int HOME_PAGE = 0;
 	public static final int LOGIN = 1;
@@ -156,7 +158,6 @@ public class BookingGenerator extends Generator
 	 */
 	public void initialize()
 	{
-		this._randomNumberGenerator = new java.util.Random();
 		this._http = new HttpTransport();
 	}
 
@@ -171,9 +172,15 @@ public class BookingGenerator extends Generator
  		//     "printDebugToTraceLog": "true",
     	// },
   	
-    	printDebugToTraceLog = config.getBoolean( "printDebugToTraceLog" );
+    	if( config.has( CFG_DEBUG_TO_TRACE_LOG_KEY ) )
+    		printDebugToTraceLog = config.getBoolean( "printDebugToTraceLog" );
         //System.out.println("** printDebugToTrace is: " + printDebugToTraceLog);
 
+    	// If a seed for the random number generator is passed in then use it
+    	if( config.has( CFG_RNG_SEED_KEY ) )
+    		this._randomNumberGenerator = new java.util.Random( config.getLong( CFG_RNG_SEED_KEY ) );
+    	else this._randomNumberGenerator = new java.util.Random();
+    	
     	// JSON objects can be strings, long, etc.
     	//String paramOne = config.getString( "paramOne" );
         //long paramTwo = config.getLong( "paramTwo" );

@@ -3,6 +3,9 @@ package radlab.rain.workload.booking;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Calendar;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -104,13 +107,26 @@ public class BookHotelOperation extends BookingOperation
 		HttpPost bookingFormPost = new HttpPost( bookingFormUrl );
 		
 		// Create the POST data.
-		String checkinDate = "11-01-2010";
-		String checkoutDate = "11-02-2010";
+		// Determine check-in, check-out and card-expiry dates dynamically rather
+		// than hard coding dates
+		Calendar cal = Calendar.getInstance();
+		DateFormat formatter = new SimpleDateFormat("MM-dd-yyyy");
+		// Set the current time to today
+		cal.setTimeInMillis( System.currentTimeMillis() );
+		// Add 4 weeks to compute the check-in date
+		cal.add( Calendar.DAY_OF_MONTH, 4*7 );
+				
+		String checkinDate = formatter.format( cal.getTime() );
+		// Add 2 days to calendar for checkout
+		cal.add( Calendar.DAY_OF_MONTH, 2 );
+		String checkoutDate = formatter.format( cal.getTime() );
 		String creditCardNumber = "1111222233334444";
 		String creditCardName = "Visa";
 		String creditCardExpiryMonth = "1";
-		String creditCardExpiryYear = "2010";
-
+		// Change the expiry date to a year from now
+		cal.add( Calendar.YEAR, 1 );
+		String creditCardExpiryYear = String.valueOf( cal.get( Calendar.YEAR ) );
+				
 		List<NameValuePair> bookingFormParams = new ArrayList<NameValuePair>();
 		bookingFormParams.add( new BasicNameValuePair( "bookingForm", "bookingForm" ) );
 		bookingFormParams.add( new BasicNameValuePair( "bookingForm:checkinDate", checkinDate ) );
@@ -191,5 +207,28 @@ public class BookHotelOperation extends BookingOperation
 		
 		this.setFailed( false );
 	}
-		
+	
+	// Quick test for dynamic check-in, check-out and card expiry date
+	public static void main( String[] args )
+	{
+		Calendar cal = Calendar.getInstance();
+		DateFormat formatter = new SimpleDateFormat("MM-dd-yyyy");
+		// Set the current time to today
+		cal.setTimeInMillis( System.currentTimeMillis() );
+		// Add 4 weeks to compute the check-in date
+		cal.add( Calendar.DAY_OF_MONTH, 4*7 );
+				
+		String checkinDate = formatter.format( cal.getTime() );
+		// Add 2 days to calendar for checkout
+		cal.add( Calendar.DAY_OF_MONTH, 2 );
+		String checkoutDate = formatter.format( cal.getTime() );
+		String creditCardExpiryMonth = "1";
+		// Change the expiry date to a year from now
+		cal.add( Calendar.YEAR, 1 );
+		String creditCardExpiryYear = String.valueOf( cal.get( Calendar.YEAR ) );
+
+		System.out.println( "Check-in    : " + checkinDate );
+		System.out.println( "Check-out   : " + checkoutDate );
+		System.out.println( "Card expiry : " + creditCardExpiryMonth + "/" + creditCardExpiryYear );
+	}
 }

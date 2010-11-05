@@ -1,5 +1,5 @@
 {
-    "profiles": "config/profiles.config.scadr.json",
+    "profiles": "config/profiles.config.booking.json",
     "timing": {
         "rampUp": 15,
         "duration": 50,
