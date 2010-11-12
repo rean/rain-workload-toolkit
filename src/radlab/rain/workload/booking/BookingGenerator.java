@@ -196,6 +196,7 @@ public class BookingGenerator extends Generator
 	public Operation nextRequest( int lastOperation )
 	{
 		LoadProfile currentLoad = this.getTrack().getCurrentLoadProfile();
+		this._latestLoadProfile = currentLoad;
 		int nextOperation = -1;
 
 		if( lastOperation == -1 )

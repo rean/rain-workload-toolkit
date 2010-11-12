@@ -20,6 +20,7 @@ import org.xml.sax.InputSource;
 
 import radlab.rain.Generator;
 import radlab.rain.IScoreboard;
+import radlab.rain.LoadProfile;
 import radlab.rain.Operation;
 import radlab.rain.util.HttpTransport;
 
@@ -58,6 +59,9 @@ public abstract class BookingOperation extends Operation
 		
 		this._http = bookingGenerator.getHttpTransport();
 		this._randomNumberGenerator = bookingGenerator.getRandomNumberGenerator();
+		LoadProfile currentLoadProfile = generator.getLatestLoadProfile();
+		if( currentLoadProfile != null )
+			this._generatedDuringProfile = currentLoadProfile;
 	}
 
 	public boolean traceUser(StringBuilder response)
