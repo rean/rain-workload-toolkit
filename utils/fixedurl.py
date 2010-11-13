@@ -143,7 +143,7 @@ class FixedUrlTestRunner:
             run_output_filename = results_dir + "/" + \
                 "run_fixed_url_log" + "_nodes.txt"
             run_results_filename = results_dir + "/" + \
-                "run_fixed_url_result_" + "_nodes.txt"
+                "run_fixed_url_result" + "_nodes.txt"
             
             # write the json data out to the config file
             # invoke the run manager passing the location of the config file
