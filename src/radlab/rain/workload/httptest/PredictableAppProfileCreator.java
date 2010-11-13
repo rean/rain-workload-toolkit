@@ -35,9 +35,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import radlab.rain.ProfileCreator;
-import radlab.rain.Scenario;
+//import radlab.rain.Scenario;
 import radlab.rain.ScenarioTrack;
-import radlab.rain.util.ConfigUtil;
+//import radlab.rain.util.ConfigUtil;
 import radlab.rain.workloadtraits.WikipediaScheduleCreator;
 
 import java.io.PrintStream;
@@ -338,15 +338,15 @@ public class PredictableAppProfileCreator extends ProfileCreator
 	
 	public static void main( String[] args ) throws Exception
 	{
-		
+		/*
 		// Read in an example rain.xxx.json file and see what we get
 		String filename = "config/rain.config.ac_predictable.json";
 		String fileContents = ConfigUtil.readFileAsString( filename );
 		JSONObject jsonConfigRoot = new JSONObject( fileContents );
 		JSONObject params = jsonConfigRoot.getJSONObject( Scenario.CFG_PROFILES_CREATOR_CLASS_PARAMS_KEY );
-		
-		PredictableAppProfileCreator creator = new PredictableAppProfileCreator(); 
-		JSONObject tracks = creator.createProfile( params );
+		*/
+		//PredictableAppProfileCreator creator = new PredictableAppProfileCreator(); 
+		//JSONObject tracks = creator.createProfile( params );
 		//System.out.println( tracks.toString() );
 		
 		

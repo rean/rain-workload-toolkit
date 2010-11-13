@@ -168,7 +168,7 @@ public abstract class ScenarioTrack
 	public void setParentScenario( Scenario val  ) { this._parentScenario = val; }
 		
 	public IScoreboard getScoreboard() { return this._scoreboard; }
-	public void setScoreboard( IScoreboard val ) { this._scoreboard = val; }
+	public void setScoreboard( IScoreboard val ) { this._scoreboard = val; val.setTargetHost( this._targetHostname ); }
 	
 	public double getOpenLoopProbability() { return this._openLoopProbability; }
 	public void setOpenLoopProbability( double val ) { this._openLoopProbability = val; }

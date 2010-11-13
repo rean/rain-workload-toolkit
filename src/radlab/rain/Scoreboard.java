@@ -104,6 +104,7 @@ public class Scoreboard implements Runnable, IScoreboard
 	private double _logSamplingProbability = 1.0;
 	
 	private String _trackName = "";
+	private String _trackTargetHost = "";
 	
 	/** If true, this scoreboard will refuse any new results. */
 	private boolean _done = false;
@@ -166,6 +167,9 @@ public class Scoreboard implements Runnable, IScoreboard
 	
 	public long getMetricSnapshotInterval() { return this._metricSnapshotInterval; }
 	public void setMetricSnapshotInterval( long val ) { this._metricSnapshotInterval = val; }
+	
+	public String getTargetHost() { return this._trackTargetHost; }
+	public void setTargetHost( String val ) { this._trackTargetHost = val; }
 	
 	public void registerErrorLogHandle( String owner, FileWriter logHandle )
 	{
@@ -531,6 +535,7 @@ public class Scoreboard implements Runnable, IScoreboard
 			averageNumberOfUsers = (double) totalUsers/ (double) totalIntervalActivations;
 		
 		out.println( this + " Final results----------------------: " );
+		out.println( this + " Target host                        : " + this._trackTargetHost );
 		out.println( this + " Total drop offs                    : " + this._totalDropoffs );
 		out.println( this + " Average drop off Q time (ms)       : " + this._formatter.format( (double) this._totalDropOffWaitTime / (double) this._totalDropoffs ) );
 		out.println( this + " Max drop off Q time (ms)           : " + this._maxDropOffWaitTime );

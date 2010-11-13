@@ -145,5 +145,7 @@ public interface IScoreboard
 	
 	long getMeanResponseTimeSamplingInterval();
 	void setMeanResponseTimeSamplingInterval( long val );
-	
+
+	String getTargetHost();
+	void setTargetHost( String val );
 }
