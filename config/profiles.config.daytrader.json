@@ -1,0 +1,69 @@
+{
+	"daytrader-001": {
+		"generator": "radlab.rain.workload.daytrader.DayTraderGenerator",
+        "track": "radlab.rain.DefaultScenarioTrack",
+        "resourcePath": "resources/",
+		"behavior": {
+			"default" : [
+					[0, 100,   0,   0,   0,   0,   0], 
+					[0,   0, 100,   0,   0,   0,   0],
+					[0,   0,   5,  60,  10,  15,  10],
+					[0,   0,  10,   5,  35,  40,  10],
+					[0,   0,  25,  45,   5,  20,   5],
+					[0,   0,  40,  30,   5,  20,   5],
+					[0,   0,  25,  20,  10,  40,   5]
+			]
+		},
+		"loadProfile": [
+		{
+			"interval": 30,
+			"users": 20,
+			"mix": "default"
+		},
+		{
+			"interval": 15,
+			"users": 40,
+			"mix": "default"
+		},
+		{
+			"interval": 45,
+			"users": 100,
+			"mix": "default"
+		},
+		{
+			"interval": 40,
+			"users": 150,
+			"mix": "default"
+		},
+		{
+			"interval": 60,
+			"users": 200,
+			"mix": "default"
+		},
+		{
+			"interval": 40,
+			"users": 150,
+			"mix": "default"
+		},
+		{
+			"interval": 45,
+			"users": 100,
+			"mix": "default"
+		},
+		{
+			"interval": 35,
+			"users": 40,
+			"mix": "default"
+		}
+		],
+		"target": {
+		  "hostname": "localhost",
+		  "port": 8080
+		},
+		"pLogSampling": 1.0,
+		"pOpenLoop": 0.0,
+		"meanCycleTime": 1,
+		"meanThinkTime": 5,
+		"interactive": true
+	}
+}

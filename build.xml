@@ -135,6 +135,18 @@
             <fileset dir="bin" includes="radlab/rain/workload/scads/**"/>
         </jar>
     </target>
+	<target depends="build" name="package-daytrader">
+		<mkdir dir="workloads"/>
+	    <jar destfile="workloads/daytrader.jar" filesetmanifest="mergewithoutmain">
+	    	<fileset dir="bin" includes="radlab/rain/workload/daytrader/**"/>
+	    </jar>
+	</target>
+	<target depends="build" name="package-rubis">
+		<mkdir dir="workloads"/>
+	    <jar destfile="workloads/rubis.jar" filesetmanifest="mergewithoutmain">
+	    	<fileset dir="bin" includes="radlab/rain/workload/rubis/**"/>
+	    </jar>
+	</target>	
     <target depends="build" name="Benchmark-memprof">
       <java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
 	<classpath refid="rain.classpath"/>
