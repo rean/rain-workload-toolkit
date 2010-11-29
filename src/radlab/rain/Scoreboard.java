@@ -509,19 +509,52 @@ public class Scoreboard implements Runnable, IScoreboard
 		 * - async % vs. sync %
 		 */ 
 		
-		long totalUsers = 0;
-		long totalIntervalActivations = 0;
+		double totalUsers = 0.0;
+		double totalIntervalActivations = 0.0;
 		out.println( this + " Interval results-------------------: " );
 		// Print out per-interval stats?
 		for( Scorecard card : this._intervalScorecards.values() )
 		{
+			// Let's look at the load schedule to find the profile that
+			// matches the current score card
+			for( LoadProfile profile : this._owner._loadSchedule )
+			{
+				if( !card._name.equals( profile._name ) )
+					continue;
+								
+				// If the profile started after the end of a run then
+				// decrease the activation count accordingly
+				if( profile.getTimeStarted() > this._endTime )
+				{
+					// Decrease activation count
+					double intervalSpillOver = (this._endTime - profile.getTimeStarted())/( (profile._interval*1000) + (profile._transitionTime*1000) );
+					System.out.println( this + " Need to decrease activation count for: " + profile._name + " spillover: " + intervalSpillOver );
+					card._activeCount -= intervalSpillOver;
+					continue;
+				}
+				// Look at the diff between the last activation
+				// and the end of steady state
+				long intervalEndTime = profile.getTimeStarted() + (profile._interval*1000) + (profile._transitionTime*1000);
+				
+				// Did the end of the run interrupt this interval
+				double diff = intervalEndTime - this._endTime;
+				if( diff > 0 )
+				{
+					double delta = (diff/(double)(profile._interval*1000));
+					System.out.println( this + " " + card._name + " shortchanged (msecs): " + this._formatter.format( diff ) );
+					System.out.println( this + " " + card._name + " shortchanged (delta): " + this._formatter.format( delta ) );
+					// Interval truncated so revise activation count downwards
+					card._activeCount -= delta;
+				}
+			}
+			
 			totalUsers += card._numberOfUsers * card._activeCount;
 			totalIntervalActivations += card._activeCount;
 			card.printStatistics( out );
 		}
 		
 		double averageOpResponseTimeSecs = 0.0;
-		
+				
 		if( this.finalCard._totalOpsSuccessful > 0 )
 			averageOpResponseTimeSecs = ((double)this.finalCard._totalOpResponseTime/(double)this.finalCard._totalOpsSuccessful)/1000.0;
 		
@@ -532,20 +565,25 @@ public class Scoreboard implements Runnable, IScoreboard
 		
 		double averageNumberOfUsers = 0.0;
 		if( totalIntervalActivations != 0 )
-			averageNumberOfUsers = (double) totalUsers/ (double) totalIntervalActivations;
-		
+			averageNumberOfUsers = totalUsers/totalIntervalActivations;
+				
 		out.println( this + " Final results----------------------: " );
 		out.println( this + " Target host                        : " + this._trackTargetHost );
 		out.println( this + " Total drop offs                    : " + this._totalDropoffs );
 		out.println( this + " Average drop off Q time (ms)       : " + this._formatter.format( (double) this._totalDropOffWaitTime / (double) this._totalDropoffs ) );
 		out.println( this + " Max drop off Q time (ms)           : " + this._maxDropOffWaitTime );
-		out.println( this + " Total interval activations         : " + totalIntervalActivations );
+		out.println( this + " Total interval activations         : " + this._formatter.format( totalIntervalActivations ) );
 		out.println( this + " Average number of users            : " + this._formatter.format( averageNumberOfUsers ) );
 		out.println( this + " Offered load (ops/sec)             : " + this._formatter.format( offeredLoadOps ) );
 		out.println( this + " Effective load (ops/sec)           : " + this._formatter.format( effectiveLoadOps ) );
 		// Still a rough estimate, need to compute the bounds on this estimate
 		if( averageOpResponseTimeSecs > 0.0 )
-			out.println( this + " Little's Law Estimate (ops/sec)    : " + this._formatter.format( averageNumberOfUsers / (averageOpResponseTimeSecs + thinkTimeDeltaSecs) ) );
+		{
+			double littlesEstimate = averageNumberOfUsers / (averageOpResponseTimeSecs + thinkTimeDeltaSecs);
+			double littlesDelta = Math.abs( (effectiveLoadOps - littlesEstimate)/ littlesEstimate ) * 100;
+			out.println( this + " Little's Law Estimate (ops/sec)    : " + this._formatter.format( littlesEstimate ) );
+			out.println( this + " Variation from Little's Law (%)    : " + this._formatter.format( littlesDelta ) );
+		}
 		else
 			out.println( this + " Little's Law Estimate (ops/sec)    : 0" );
 		out.println( this + " Effective load (requests/sec)      : " + this._formatter.format( effectiveLoadRequests ) );
@@ -853,10 +891,6 @@ public class Scoreboard implements Runnable, IScoreboard
 				intervalScorecard._operationMap.put( opName, intervalSummary );
 			}
 			
-			if ( result.isAsynchronous() )
-				intervalScorecard._totalOpsAsync++;
-			else intervalScorecard._totalOpsSync++;
-			
 			if ( result.isFailed() )
 			{
 				intervalSummary.failed++;
@@ -864,27 +898,45 @@ public class Scoreboard implements Runnable, IScoreboard
 			}
 			else // Result was successful
 			{
-				intervalScorecard._totalOpsSuccessful++;
-				intervalScorecard._totalActionsSuccessful += result.getActionsPerformed();
-				intervalSummary.succeeded++;
-				intervalSummary.totalActions += result.getActionsPerformed();
-				
-				if ( result.isAsynchronous() )
-					intervalSummary.totalAsyncInvocations++;
-				else intervalSummary.totalSyncInvocations++;
-				
-				// If interactive, look at the total response time.
-				if ( result.isInteractive() )
+				// Intervals passed in seconds, convert to msecs
+				long intervalMsecs = result._generatedDuring._interval * 1000;
+				long intervalEndTime = result._profileStartTime + intervalMsecs;
+				if( result.getTimeFinished() <= intervalEndTime )
 				{
-					long responseTime = result.getExecutionTime();
-					intervalSummary.acceptSample( responseTime );
+					// Count sync vs. async for the operations that complete
+					// within the interval only. Ignore the late operations
+					if ( result.isAsynchronous() )
+						intervalScorecard._totalOpsAsync++;
+					else intervalScorecard._totalOpsSync++;
+					//System.out.println( "Cover (msecs): " + ( intervalEndTime - result.getTimeFinished() ) );
 					
-					intervalSummary.totalResponseTime += responseTime;
-					intervalScorecard._totalOpResponseTime += responseTime;
-					if( responseTime > intervalSummary.maxResponseTime )
-						intervalSummary.maxResponseTime = responseTime;
-					if( responseTime < intervalSummary.minResponseTime )
-						intervalSummary.minResponseTime = responseTime;
+					intervalScorecard._totalOpsSuccessful++;
+					intervalScorecard._totalActionsSuccessful += result.getActionsPerformed();
+					intervalSummary.succeeded++;
+					intervalSummary.totalActions += result.getActionsPerformed();
+					
+					if ( result.isAsynchronous() )
+						intervalSummary.totalAsyncInvocations++;
+					else intervalSummary.totalSyncInvocations++;
+					
+					// If interactive, look at the total response time.
+					if ( result.isInteractive() )
+					{
+						long responseTime = result.getExecutionTime();
+						intervalSummary.acceptSample( responseTime );
+						
+						intervalSummary.totalResponseTime += responseTime;
+						intervalScorecard._totalOpResponseTime += responseTime;
+						if( responseTime > intervalSummary.maxResponseTime )
+							intervalSummary.maxResponseTime = responseTime;
+						if( responseTime < intervalSummary.minResponseTime )
+							intervalSummary.minResponseTime = responseTime;
+					}
+				}
+				else
+				{
+					// Mark the result as late for this interval
+					intervalScorecard._totalOpsLate++;
 				}
 			}
 		}

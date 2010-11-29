@@ -12,8 +12,8 @@
         },
         "loadScheduleCreator" : "radlab.rain.workload.scadr.ScadrLoadScheduleCreator",
         "target": {
-            "hostname": "scadr.knowsql.org",
-            "port": 80
+            "hostname": "localhost",
+            "port": 3000
         },
         "pLogSampling": 1.0,
         "pOpenLoop": 0.0,

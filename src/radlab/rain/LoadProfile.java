@@ -109,7 +109,9 @@ public class LoadProfile
 	public String toString()
 	{
 		StringBuffer buf = new StringBuffer();
-		buf.append( "[Duration: " + this._interval + " Users: " + this._numberOfUsers + " Mix: " + this._mixName + " Transition time: " + this._transitionTime + "]");
+		if( this._name == null || this._name.trim().length() == 0 )
+			buf.append( "[Duration: " + this._interval + " Users: " + this._numberOfUsers + " Mix: " + this._mixName + " Transition time: " + this._transitionTime + "]");
+		else buf.append( "[Duration: " + this._interval + " Users: " + this._numberOfUsers + " Mix: " + this._mixName + " Transition time: " + this._transitionTime + " Name: " + this._name + "]");
 		return buf.toString();
 	}
 }

@@ -69,7 +69,7 @@ public abstract class HttpTestOperation extends Operation
 		
 		LoadProfile currentLoadProfile = generator.getLatestLoadProfile();
 		if( currentLoadProfile != null )
-			this._generatedDuringProfile = currentLoadProfile;
+			this.setGeneratedDuringProfile( currentLoadProfile );
 		
 		this._http = httpTestGenerator.getHttpTransport();
 	}

@@ -31,8 +31,8 @@ public class Scorecard
 	public long _totalOpResponseTime	= 0;
 	
 	public double _intervalDuration		= 0;
-	public long _numberOfUsers			= 0;
-	public long _activeCount			= 0;
+	public double _numberOfUsers		= 0.0;
+	public double _activeCount			= 0.0;
 	
 	/** A mapping of each operation with its summary. */
 	public TreeMap<String,OperationSummary> _operationMap = new TreeMap<String,OperationSummary>();
@@ -94,8 +94,8 @@ public class Scorecard
 		 * - async % vs. sync %
 		 */ 
 		out.println( this + " Interval name                      : " + this._name );
-		out.println( this + " Active users                       : " + this._numberOfUsers );
-		out.println( this + " Activation count                   : " + this._activeCount );
+		out.println( this + " Active users                       : " + this._formatter.format( this._numberOfUsers ) );
+		out.println( this + " Activation count                   : " + this._formatter.format( this._activeCount ) );
 		out.println( this + " Offered load (ops/sec)             : " + this._formatter.format( offeredLoadOps/(double) this._activeCount ) );
 		out.println( this + " Effective load (ops/sec)           : " + this._formatter.format( effectiveLoadOps/(double) this._activeCount ) );
 		out.println( this + " Effective load (requests/sec)      : " + this._formatter.format( effectiveLoadRequests/(double) this._activeCount ) );

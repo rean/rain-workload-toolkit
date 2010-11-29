@@ -46,6 +46,7 @@ public class OperationExecution implements Comparable<OperationExecution>
 	private long _timeFinished = 0;
 	public String _operationName;
 	public LoadProfile _generatedDuring = null;
+	public long _profileStartTime = -1;
 	public long _actionsPerformed = 1;
 	public boolean _async = false;
 	public boolean _failed = true;
@@ -69,7 +70,8 @@ public class OperationExecution implements Comparable<OperationExecution>
 		this._async = operation.getAsync();
 		this._failed = operation._failed;
 		// Pull out any info on when this operation was created
-		this._generatedDuring = operation._generatedDuringProfile;
+		this._generatedDuring = operation.getGeneratedDuringProfile();
+		this._profileStartTime = operation.getProfileStartTime();
 	}
 	
 	/* Delegate to get the execution statistics */

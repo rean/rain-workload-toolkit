@@ -6,7 +6,7 @@
     },
     "timing": {
         "rampUp": 10,
-        "duration": 60,
+        "duration": 75,
         "rampDown": 10
     }
 }

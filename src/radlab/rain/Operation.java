@@ -47,9 +47,9 @@ public abstract class Operation implements Runnable
 	protected String _operationName     = "";
 	// Describes who generated the operation and when (during what interval)
 	protected String _generatedBy       			= "";
-	//protected String _generatedDuring				= "";
 	// LoadProfile in effect when this operation was generated/initialized
-	protected LoadProfile _generatedDuringProfile 	= null;
+	private LoadProfile _generatedDuringProfile 	= null;
+	protected long _profileStartTime		= -1;
 	
 	private long _generatorThreadID     = -1;
 	private boolean _interactive        = true;
@@ -99,8 +99,18 @@ public abstract class Operation implements Runnable
 	public void setAsync( boolean val ){ this._async = val; }
 	public String getGeneratedBy() { return this._generatedBy; }
 	public void setGeneratedBy( String val ){ this._generatedBy = val; }
-	//public String getGeneratedDuring() { return this._generatedDuring; }
-	//public void setGeneratedDuring( String val ){ this._generatedDuring = val; }
+	public LoadProfile getGeneratedDuringProfile() { return this._generatedDuringProfile; }
+	public void setGeneratedDuringProfile( LoadProfile val )
+	{ 
+		// Save the load profile
+		this._generatedDuringProfile = val; 
+		// Save the time started now since the load manager thread updates this
+		// field - we can then use timestarted+intervalduration
+		// to see whether the operation finished during the interval
+		this._profileStartTime = val.getTimeStarted(); 
+	}
+	public long getProfileStartTime(){ return this._profileStartTime; }
+	
 	public boolean isFailed() {return this._failed; }
 	public void setFailed( boolean val ){ this._failed = val; }
 	public Throwable getFailureReason(){ return this._failureReason; }
@@ -109,7 +119,7 @@ public abstract class Operation implements Runnable
 	public void setActionsPerformed( long val ){ this._actionsPerformed = val; }
 	public long getGeneratorThreadID() { return this._generatorThreadID; }
 	public void setGeneratorThreadID( long val ) { this._generatorThreadID = val; }
-		
+	
 	public void trace( String request )
 	{
 		if( this._trace == null )

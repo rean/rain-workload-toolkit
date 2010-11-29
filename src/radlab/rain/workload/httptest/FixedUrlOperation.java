@@ -63,7 +63,7 @@ public class FixedUrlOperation extends Operation
 		
 		LoadProfile currentLoadProfile = generator.getLatestLoadProfile();
 		if( currentLoadProfile != null )
-			this._generatedDuringProfile = currentLoadProfile;
+			this.setGeneratedDuringProfile( currentLoadProfile );
 		
 		this._http = specificUrlGenerator.getHttpTransport();
 	}

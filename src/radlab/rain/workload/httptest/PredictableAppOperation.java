@@ -118,7 +118,7 @@ public class PredictableAppOperation extends Operation
 		
 		LoadProfile currentLoadProfile = generator.getLatestLoadProfile();
 		if( currentLoadProfile != null )
-			this._generatedDuringProfile = currentLoadProfile;
+			this.setGeneratedDuringProfile( currentLoadProfile );
 		
 		this._http = predictableGenerator.getHttpTransport();
 	}

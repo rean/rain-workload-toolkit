@@ -49,7 +49,7 @@ public abstract class CloudstoneNullOperation extends Operation
 		this._generator = generator;
 		LoadProfile currentLoadProfile = generator.getLatestLoadProfile();
 		if( currentLoadProfile != null )
-			this._generatedDuringProfile = currentLoadProfile;
+			this.setGeneratedDuringProfile( currentLoadProfile );
 	}
 	
 	public void cleanup()

@@ -61,7 +61,7 @@ public abstract class BookingOperation extends Operation
 		this._randomNumberGenerator = bookingGenerator.getRandomNumberGenerator();
 		LoadProfile currentLoadProfile = generator.getLatestLoadProfile();
 		if( currentLoadProfile != null )
-			this._generatedDuringProfile = currentLoadProfile;
+			this.setGeneratedDuringProfile( currentLoadProfile );
 	}
 
 	public boolean traceUser(StringBuilder response)
