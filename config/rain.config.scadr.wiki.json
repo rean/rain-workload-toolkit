@@ -1,0 +1,8 @@
+{
+    "profiles": "config/profiles.config.scadr.wiki.json",
+    "timing": {
+        "rampUp": 15,
+        "duration": 420,
+        "rampDown": 15
+    }
+}

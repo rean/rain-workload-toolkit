@@ -83,6 +83,24 @@
 	        <arg file="config/rain.config.ac.json"/>
 	    </java>
 	</target>
+	<target depends="build" name="Benchmark-scadr">
+		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
+	    	<classpath refid="rain.classpath"/>
+	    	<jvmarg value="-Xmx1g" />
+	    	<jvmarg value="-Xms256m" />
+	    	<jvmarg value="-XX:+DisableExplicitGC"/>
+	        <arg file="config/rain.config.scadr.json"/>
+	    </java>
+	</target>
+	<target depends="build" name="Benchmark-scadr-wiki">
+		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
+	    	<classpath refid="rain.classpath"/>
+	    	<jvmarg value="-Xmx1g" />
+	    	<jvmarg value="-Xms256m" />
+	    	<jvmarg value="-XX:+DisableExplicitGC"/>
+	        <arg file="config/rain.config.scadr.wiki.json"/>
+	    </java>
+	</target>
     <target depends="build" name="package">
         <jar destfile="rain.jar" filesetmanifest="mergewithoutmain">
             <manifest>
@@ -135,6 +153,12 @@
             <fileset dir="bin" includes="radlab/rain/workload/scads/**"/>
         </jar>
     </target>
+	<target depends="build" name="package-scadr">
+	        <mkdir dir="workloads"/>
+	        <jar destfile="workloads/scadr.jar" filesetmanifest="mergewithoutmain">
+	            <fileset dir="bin" includes="radlab/rain/workload/scadr/**"/>
+	        </jar>
+	    </target>
 	<target depends="build" name="package-daytrader">
 		<mkdir dir="workloads"/>
 	    <jar destfile="workloads/daytrader.jar" filesetmanifest="mergewithoutmain">

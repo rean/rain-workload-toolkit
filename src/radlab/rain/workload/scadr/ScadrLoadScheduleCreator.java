@@ -7,17 +7,31 @@ import org.json.JSONObject;
 
 import radlab.rain.LoadProfile;
 import radlab.rain.LoadScheduleCreator;
+import radlab.rain.workloadtraits.WikipediaScheduleCreator;
 
-public class ScadrLoadScheduleCreator extends LoadScheduleCreator {
+public class ScadrLoadScheduleCreator extends LoadScheduleCreator 
+{
 
-	public ScadrLoadScheduleCreator() {
-		// TODO Auto-generated constructor stub
+	public ScadrLoadScheduleCreator() 
+	{
 	}
 
 	@Override
 	public LinkedList<LoadProfile> createSchedule( JSONObject params ) throws JSONException 
 	{
+		// Scale the wikipedia workload and return that
+		WikipediaScheduleCreator creator = new WikipediaScheduleCreator();
+		creator.setIncrementSize( 20 ); // 20 second increments
+		creator.setIncrementsPerInterval( 2 ); // each interval lasts (2 * 20) seconds
+		creator.setInitialWorkload( 100 ); // Use a base workload of 100 users
+	
+		// The schedule refers to a mix-matrix named "default", we can create that
+		// or go through the schedule and change it to something else
 		
+		// Would like to give a duration and have the workload stretched/compressed into that
+		return creator.createSchedule( new JSONObject() );
+				
+		/*
 		LinkedList<LoadProfile> loadSchedule = new LinkedList<LoadProfile>();
 		
 		// Use subclass load profile here and set all the extra special things
@@ -40,7 +54,7 @@ public class ScadrLoadScheduleCreator extends LoadScheduleCreator {
 		loadSchedule.add( i6 );
 		
 		//loadSchedule.add( debug );
-		return loadSchedule;
+		return loadSchedule;*/
 	}
 
 }

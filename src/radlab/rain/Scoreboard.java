@@ -579,6 +579,8 @@ public class Scoreboard implements Runnable, IScoreboard
 		// Still a rough estimate, need to compute the bounds on this estimate
 		if( averageOpResponseTimeSecs > 0.0 )
 		{
+			//double opsPerUser = averageNumberOfUsers / this.finalCard._totalOpsSuccessful;
+						
 			double littlesEstimate = averageNumberOfUsers / (averageOpResponseTimeSecs + thinkTimeDeltaSecs);
 			double littlesDelta = Math.abs( (effectiveLoadOps - littlesEstimate)/ littlesEstimate ) * 100;
 			out.println( this + " Little's Law Estimate (ops/sec)    : " + this._formatter.format( littlesEstimate ) );

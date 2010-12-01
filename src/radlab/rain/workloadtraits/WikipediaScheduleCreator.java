@@ -60,6 +60,9 @@ public class WikipediaScheduleCreator extends LoadScheduleCreator
 	public WikipediaScheduleCreator() 
 	{}
 	
+	public int getInitialWorkload() { return this._initialWorkload; }
+	public void setInitialWorkload( int val ){ this._initialWorkload = val; }
+	
 	public int getIncrementSize() { return this._incrementSize; }
 	public void setIncrementSize( int val ){ this._incrementSize = val; }
 	

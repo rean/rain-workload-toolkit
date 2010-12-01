@@ -17,38 +17,7 @@
 				[ 0.0,  0.0,  0.0,  20.0, 50.0, 30.0]
 			]
         },
-        "loadProfile": [
-        {
-            "interval": 30,
-            "users": 140,
-            "mix": "default"
-        },
-        {
-            "interval": 60,
-            "users": 200,
-            "mix": "default"
-        },
-        {
-            "interval": 40,
-            "users": 220,
-            "mix": "default"
-        },
-        {
-            "interval": 40,
-            "users": 190,
-            "mix": "default"
-        },
-        {
-            "interval": 40,
-            "users": 150,
-            "mix": "default"
-        },
-        {
-            "interval": 40,
-            "users": 120,
-            "mix": "default"
-        }
-        ],
+        "loadScheduleCreator" : "radlab.rain.workload.scadr.ScadrLoadScheduleCreator",
         "target": {
             "hostname": "localhost",
             "port": 3000

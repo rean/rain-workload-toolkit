@@ -4,9 +4,11 @@ import radlab.rain.IScoreboard;
 
 public class PostThoughtOperation extends ScadrOperation {
 
+	public static final String NAME = "PostThought";
+	
 	public PostThoughtOperation(boolean interactive, IScoreboard scoreboard) {
 		super(interactive, scoreboard);
-		this._operationName = "CreateThought";
+		this._operationName = NAME;
 		this._operationIndex = ScadrGenerator.POST_THOUGHT;
 		this._mustBeSync = true;
 	}
@@ -14,8 +16,7 @@ public class PostThoughtOperation extends ScadrOperation {
 	@Override
 	public void execute() throws Throwable
 	{
-		this.trace( this._operationName );
-		Thread.sleep( 25 );
+		this.doPostThought();
 		this.setFailed( false );
 	}
 }

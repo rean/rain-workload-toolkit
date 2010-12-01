@@ -1,15 +1,14 @@
 package radlab.rain.workload.scadr;
 
 import radlab.rain.IScoreboard;
-import java.util.Random;
 
 public class LoginOperation extends ScadrOperation {
 
-	//private Random _random = new Random();
+	public static final String NAME = "Login";
 	
 	public LoginOperation(boolean interactive, IScoreboard scoreboard) {
 		super(interactive, scoreboard);
-		this._operationName = "Login";
+		this._operationName = NAME;
 		this._operationIndex = ScadrGenerator.LOGIN;
 		this._mustBeSync = true;
 	}
@@ -17,11 +16,18 @@ public class LoginOperation extends ScadrOperation {
 	@Override
 	public void execute() throws Throwable
 	{
-		/*this.trace( this._operationName );
-		double rndVal = this._random.nextDouble();
-		if( rndVal <= 0.2 )
-			throw new Exception( "Just testing..." );
-		else Thread.sleep( 25 );
-		this.setFailed( false );*/
+		boolean result = this.doLogin();
+		if( !result )
+		{
+			// Try creating the user first and then re-try the log in
+			this.doCreateUser();
+			result = this.doLogin();
+		}
+		
+		// If we're not able to log in then throw an exception
+		if( !result )
+			throw new Exception( "Unable to log in." );
+		
+		this.setFailed( false );
 	}
 }
