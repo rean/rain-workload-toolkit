@@ -302,7 +302,7 @@ public class ScadrGenerator extends Generator
 	protected static final String[] HOMEPAGE_STATICS = 
 	{
 		"/stylesheets/base.css?1290059762",
-		"http://fonts.googleapis.com/css?family=Lobster%7CNobile"
+		//"http://fonts.googleapis.com/css?family=Lobster%7CNobile"
 	};
 
 	protected static final String[] LOGINPAGE_STATICS =
