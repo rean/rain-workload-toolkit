@@ -28,6 +28,7 @@ public class LoginOperation extends ScadrOperation {
 		if( !result )
 			throw new Exception( "Unable to log in." );
 		
+		this.getGenerator().setIsLoggedIn( true );
 		this.setFailed( false );
 	}
 }

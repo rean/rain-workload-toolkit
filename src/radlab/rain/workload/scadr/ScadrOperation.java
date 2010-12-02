@@ -393,6 +393,7 @@ public abstract class ScadrOperation extends Operation
 		// See whether we're logged in - if not try to log in
 		if( !this.getGenerator().getIsLoggedIn() )
 			result = this.doLogin();
+		else result = true;
 				
 		if( !result )
 			throw new Exception( "Error logging in. Can't post thought." );
@@ -486,6 +487,9 @@ public abstract class ScadrOperation extends Operation
 			end = System.currentTimeMillis();
 			System.out.println( "Logout (s): " + (end - start)/1000.0 );
 		}
+		
+		// Update the generator to indicate that we've logged out
+		this.getGenerator().setIsLoggedIn( false );
 	}
 	
 	public void doSubscribe( boolean createTargetUser ) throws Exception
@@ -502,7 +506,7 @@ public abstract class ScadrOperation extends Operation
 		// If we're not logged in, try to log in
 		if( !this.getGenerator().getIsLoggedIn() )
 			result = this.doLogin();
-		//else System.out.println( "Not logged in." );
+		else result = true;
 		
 		if( !result )
 			throw new Exception( "Error logging in. Can't subscribe to user." );
