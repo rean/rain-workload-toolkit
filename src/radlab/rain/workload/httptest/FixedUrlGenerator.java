@@ -36,7 +36,7 @@ public class FixedUrlGenerator extends Generator
 	public FixedUrlGenerator(ScenarioTrack track) 
 	{
 		super(track);
-		this._baseUrl 	= "http://" + this._loadTrack.getTargetHostName();
+		this._baseUrl 	= this._loadTrack.getTargetHostName();
 	}
 
 	@Override

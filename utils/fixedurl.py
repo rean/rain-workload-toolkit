@@ -204,7 +204,7 @@ def usage():
            " [--lesspopularhostusers <users-per-less-popular-host]"\
            " [--connectiontimeout <msecs to wait for http connection>]"\
            " [--sockettimeout <msecs to wait for data/server response>]"\
-           " [--hostfile <path to file>]"\
+           " [--hostlist <path to file>]"\
            .format(sys.argv[0]) )
 
     print "\n"
