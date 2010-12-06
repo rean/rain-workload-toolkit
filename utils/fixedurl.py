@@ -26,7 +26,8 @@ from run_manager import RunManager, RainOutputParser
         "rampUp": 10,
         "duration": 60,
         "rampDown": 10
-    }
+    },
+    "pipePort": 7581
 }
 '''
 
@@ -65,6 +66,7 @@ class FixedUrlTestConfig:
         self.rampUp = 10 # seconds
         self.duration = 60 # seconds
         self.rampDown = 10 # seconds
+        self.pipePort = 7851 # comm port
 
     def to_json( self ):
         dict = {}
@@ -91,6 +93,8 @@ class FixedUrlTestConfig:
         timing['rampDown'] = self.rampDown
         # Add timing info to top-level dictionary
         dict['timing'] = timing
+        # Add the comm port
+        dict['pipePort'] = self.pipePort
         return dict
 
 class FixedUrlTestRunner:
@@ -103,7 +107,7 @@ class FixedUrlTestRunner:
              users_per_less_popular_host,\
              connection_timeout_msecs, socket_timeout_msecs,\
              results_dir="./results", run_duration_secs=60, \
-             config_dir="./config" ):
+             config_dir="./config", pipe_port=7851 ):
 
         # Some pre-reqs:
         # 1) create the config_dir if it doesn't exist
@@ -121,6 +125,7 @@ class FixedUrlTestRunner:
             config.usersPerPopularHost = users_per_popular_host
             config.usersPerLessPopularHost = users_per_less_popular_host
             config.meanThinkTime = mean_think_time
+            config.pipePort = pipe_port
             # Add in the parameters for the workload generator
             # the operation mixes etc.
             generatorParams = FixedUrlGeneratorParameters()
@@ -204,7 +209,7 @@ def usage():
            " [--lesspopularhostusers <users-per-less-popular-host]"\
            " [--connectiontimeout <msecs to wait for http connection>]"\
            " [--sockettimeout <msecs to wait for data/server response>]"\
-           " [--hostlist <path to file>]"\
+           " [--hostlist <path to file>] [--pipeport <port>]"\
            .format(sys.argv[0]) )
 
     print "\n"
@@ -214,6 +219,7 @@ def usage():
            " --sockettimeout 1000 --connectiontimeout 1000"\
            " --thinktime 5 "\
            " --hostlist /home/rean/work/rain.git/hostlist.txt"\
+           " --pipeport 7851"\
            .format(sys.argv[0]) )
 
 
@@ -228,6 +234,7 @@ def main(argv):
     users_per_less_popular_host = 5
     connection_timeout_msecs = 1000
     socket_timeout_msecs = 1000
+    pipe_port = 7851
 
     # parse arguments and replace the defaults
     try:
@@ -238,7 +245,7 @@ def main(argv):
                                            "thinktime=", "popularhostusers=",\
                                            "lesspopularhostusers=",\
                                            "connectiontimeout=",\
-                                           "sockettimeout="] )
+                                           "sockettimeout=", "pipeport="] )
     except getopt.GetoptError:
             print sys.exc_info()
             usage()
@@ -268,6 +275,8 @@ def main(argv):
             socket_timeout_msecs = int(arg)
         elif opt == "--hostlist":
             hostlist_fname = arg
+        elif opt == "--pipeport":
+            pipe_port = int(arg)
     
     # launch run
     test_runner = FixedUrlTestRunner()
@@ -277,7 +286,7 @@ def main(argv):
              users_per_less_popular_host,\
              connection_timeout_msecs, socket_timeout_msecs,\
              results_dir, run_duration, \
-             config_dir )
+             config_dir, pipe_port )
 
 if __name__=='__main__':
     # Pass all the arguments we received except the name of the script
