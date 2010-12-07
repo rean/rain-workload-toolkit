@@ -64,7 +64,8 @@ class TrackSummary:
         if total_ops > 0:
             result.pct_ops_failed = \
                 (float(self.operations_failed)/float(total_ops))*100.0
-        else result.pct_ops_failed = 100
+        else: 
+            result.pct_ops_failed = 100
         
         if result.pct_ops_failed <= self.pct_failed_ops_threshold:
             result.pct_failed_ops_acceptable = True
