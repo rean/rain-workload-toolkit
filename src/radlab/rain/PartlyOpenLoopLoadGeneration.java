@@ -172,7 +172,23 @@ public class PartlyOpenLoopLoadGeneration extends LoadGenerationStrategy
 		operation.setAsync( true );
 		this.doOperation( operation );
 		
-		this.sleepUntil( wakeUpTime );
+		if( wakeUpTime > this._timeToQuit )
+		{
+			if( now < this._startSteadyState )
+			{
+				//System.out.println( "[" + this.getName() + "] In rampUp attempt to sleep past end of run! Adjusting." );
+				cycleTime = this._startSteadyState - now;
+				this.sleepUntil( this._startSteadyState );
+			}
+			else
+			{
+				//System.out.println( "[" + this.getName() + "] Attempt to sleep past end of run! Adjusting." );
+				// Revise the cycle time
+				cycleTime = this._timeToQuit - now;
+				this.sleepUntil( this._timeToQuit );
+			}
+		}
+		else this.sleepUntil( wakeUpTime );
 		
 		// Save the cycle time - if we're in the steady state
 		this._generator.getScoreboard().dropOffWaitTime( now, operation._operationName, cycleTime );
@@ -194,8 +210,28 @@ public class PartlyOpenLoopLoadGeneration extends LoadGenerationStrategy
 		this.doOperation( operation );
 		
 		long thinkTime = this._generator.getThinkTime();
+		//System.out.println( "[" + this.getName() + "] Think time: " + thinkTime );
+		
 		long now = System.currentTimeMillis();
-		this.sleepUntil( now +  thinkTime );
+		if( (now + thinkTime) > this._timeToQuit )
+		{
+			// If we're in the ramp up period then sleep until the start of
+			// steady state 
+			if( now < this._startSteadyState )
+			{
+				//System.out.println( "[" + this.getName() + "] In rampUp attempt to sleep past end of run! Adjusting." );
+				thinkTime = this._startSteadyState - now;
+				this.sleepUntil( this._startSteadyState );
+			}
+			else // we're in the steadystate or rampdown
+			{
+				//System.out.println( "[" + this.getName() + "] Attempt to sleep past end of run! Adjusting." );
+				// Revise the think time
+				thinkTime = this._timeToQuit - now;
+				this.sleepUntil( this._timeToQuit );
+			}
+		}
+		else this.sleepUntil( now +  thinkTime );
 		
 		// Save the think time
 		this._generator.getScoreboard().dropOffWaitTime( now, operation._operationName, thinkTime );

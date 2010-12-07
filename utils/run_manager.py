@@ -55,17 +55,20 @@ class TrackSummary:
 
             if result.pct_overhead_ops <= self.pct_overhead_ops_threshold:
                 result.pct_overhead_ops_acceptable = True
+            else:
+                result.pct_overhead_ops_acceptable = False
+                self.validation_note = "little's law overhead > {0}%"\
+                    .format(self.pct_overhead_ops_threshold)
         else:
-            result.pct_overhead_ops_acceptable = False
-            self.validation_note = "little's law overhead > {0}%"\
-                .format(self.pct_overhead_ops_threshold)
+            result.pct_overhead_ops_acceptable = True
 
         total_ops = self.operations_successful + self.operations_failed
         if total_ops > 0:
             result.pct_ops_failed = \
                 (float(self.operations_failed)/float(total_ops))*100.0
         else: 
-            result.pct_ops_failed = 100
+            result.pct_ops_failed = 0
+            self.validation_note = "slept through steady state"
         
         if result.pct_ops_failed <= self.pct_failed_ops_threshold:
             result.pct_failed_ops_acceptable = True
@@ -300,12 +303,23 @@ java -Xms256m -Xmx1g -XX:+DisableExplicitGC -cp .:rain.jar:workloads/httptest.ja
 def run2():
     try:
         #results_file = open( "./rain.out", 'r' )
-        results_file = open( "./rain.predictable.out", 'r' )
+        #results_file = open( "./rain.predictable.out", 'r' )
+        results_file = open( "./nonpop_run_fixed_url_log_nodes.txt", 'r' )
         results = results_file.read()
         track_results = RainOutputParser.parse_output( results )
         for result in track_results:
             # Set some 90th and 99th pctile thresholds
-            result.op_response_time_thresholds['PingHome']=(0.001,0.005)
+            result.pct_overhead_ops_threshold=10.0
+            result.pct_failed_ops_threshold=5.0
+            # Set the desired 90th and 99th percentile thresholds for
+            # the 50ms, 100ms, 200ms operations - set everything to
+            # 500 ms = 0.5s. Threshold units = seconds
+            result.op_response_time_thresholds['FixedUrl']=\
+                    (0.5,0.5)
+
+            # Set some 90th and 99th pctile thresholds
+            #result.op_response_time_thresholds['PingHome']=(0.001,0.005)
+            #result.op_response_time_thresholds['PingHome']=(0.001,0.005)
             
         RainOutputParser.print_results( track_results )
     #except:
