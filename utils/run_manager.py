@@ -279,7 +279,8 @@ class RunManager():
         sched stats
         """
         args = ["java", min_heapsize, max_heapsize, gc_policy, \
-            "-cp", classpath, "radlab.rain.Benchmark", config_file  ]
+                "-XX:-UseGCOverheadLimit", \
+                "-cp", classpath, "radlab.rain.Benchmark", config_file  ]
         
         rain_process = None
         rain_process = subprocess.Popen(args, bufsize=-1, \

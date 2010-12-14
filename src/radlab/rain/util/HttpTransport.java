@@ -42,6 +42,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
 import org.apache.http.Header;
+//import org.apache.http.HttpHost;
 import org.apache.http.HttpMessage; 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -52,10 +53,20 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.params.HttpClientParams;
 import org.apache.http.impl.client.DefaultHttpClient;
+//import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+//import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+//import org.apache.http.conn.ClientConnectionManager;
+//import org.apache.http.conn.params.ConnManagerParams;
+//import org.apache.http.conn.params.ConnPerRouteBean;
+//import org.apache.http.conn.routing.HttpRoute;
+//import org.apache.http.conn.scheme.PlainSocketFactory;
+//import org.apache.http.conn.scheme.Scheme;
+//import org.apache.http.conn.scheme.SchemeRegistry;
+//import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 
@@ -343,7 +354,30 @@ public class HttpTransport
 	 */
 	public HttpTransport()
 	{
+		/* Multi-threaded/partly-open loop operation
+		HttpParams params = new BasicHttpParams();
+		// Increase max total connection to 200
+		ConnManagerParams.setMaxTotalConnections(params, 200);
+		// Increase default max connection per route to 20
+		ConnPerRouteBean connPerRoute = new ConnPerRouteBean(20);
+		// Increase max connections for localhost:80 to 50
+		HttpHost localhost = new HttpHost("locahost", 80);
+		connPerRoute.setMaxForRoute(new HttpRoute(localhost), 50);
+		ConnManagerParams.setMaxConnectionsPerRoute(params, connPerRoute);
+
+		SchemeRegistry schemeRegistry = new SchemeRegistry();
+		schemeRegistry.register(
+		        new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+		schemeRegistry.register(
+		        new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
+
+		ClientConnectionManager cm = new ThreadSafeClientConnManager(params, schemeRegistry);
+		this._httpClient = new DefaultHttpClient(cm, params);
+		*/
+		
+		// Single-threaded (100% closed loop) operation
 		this._httpClient = new DefaultHttpClient();
+		
 	}
 	
 	/**
