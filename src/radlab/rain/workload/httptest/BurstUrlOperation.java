@@ -68,7 +68,7 @@ public class BurstUrlOperation extends Operation
 			this.trace( url );
 			if( response.length() == 0 || this._http.getStatusCode() != HttpStatus.SC_OK )
 			{
-				String errorMessage = "Url GET ERROR - Received an empty response";
+				String errorMessage = "Url GET ERROR - Received an empty/failed response";
 				throw new IOException (errorMessage);
 			}	
 		}
