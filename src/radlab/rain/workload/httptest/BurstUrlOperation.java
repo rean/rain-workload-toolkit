@@ -2,6 +2,8 @@ package radlab.rain.workload.httptest;
 
 import java.io.IOException;
 
+import org.apache.http.HttpStatus;
+
 import radlab.rain.Generator;
 import radlab.rain.IScoreboard;
 import radlab.rain.LoadProfile;
@@ -51,9 +53,9 @@ public class BurstUrlOperation extends Operation
 		StringBuilder response = this._http.fetchUrl( this.getGenerator()._baseUrl );
 		
 		this.trace( this.getGenerator()._baseUrl );
-		if( response.length() == 0 )
+		if( response.length() == 0 || this._http.getStatusCode() != HttpStatus.SC_OK )
 		{
-			String errorMessage = "Url GET ERROR - Received an empty response";
+			String errorMessage = "Url GET ERROR - Received an empty/failed response";
 			throw new IOException (errorMessage);
 		}
 		
@@ -64,7 +66,7 @@ public class BurstUrlOperation extends Operation
 			response = this._http.fetchUrl( url );
 			
 			this.trace( url );
-			if( response.length() == 0 )
+			if( response.length() == 0 || this._http.getStatusCode() != HttpStatus.SC_OK )
 			{
 				String errorMessage = "Url GET ERROR - Received an empty response";
 				throw new IOException (errorMessage);
