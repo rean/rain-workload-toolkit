@@ -40,4 +40,7 @@ public interface ISamplingStrategy
 	int getSamplesCollected();
 	boolean accept( long observation );
 	long getNthPercentile( int pct );
+	double getSampleMean();
+	double getSampleStandardDeviation();
+	double getTvalue( double populationMean );
 }

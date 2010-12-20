@@ -27,6 +27,7 @@ public class BurstUrlProfileCreator extends ProfileCreator
 	public static String CFG_POPULAR_HOST_LOAD_FRACTION_KEY = "popularHostLoadFraction";
 	public static String CFG_MEAN_THINK_TIME_KEY			= "meanThinkTime";
 	public static String CFG_USER_POPULATION_KEY			= "userPopulation";
+		
 	// Allow specification of users per popular app and users per less-popular app.
 	// If these values are specified then the userPopulation and popularHostLoadFraction
 	// parameters aren't necessary
@@ -46,7 +47,8 @@ public class BurstUrlProfileCreator extends ProfileCreator
 	private int _burstSizePerPopularHost		= 0;
 	private int _burstSizePerLessPopularHost	= 0;
 	private NumberFormat _formatter = new DecimalFormat( "#0.0000" );
-		
+	private int _responseTimeSamplingInterval = 100;
+	
 	public BurstUrlProfileCreator() 
 	{}
 
@@ -98,7 +100,10 @@ public class BurstUrlProfileCreator extends ProfileCreator
 			this._burstSizePerPopularHost = params.getInt( CFG_BURST_SIZE_PER_POPULAR_HOST );
 		if( params.has( CFG_BURST_SIZE_PER_LESS_POPULAR_HOST ) )
 			this._burstSizePerLessPopularHost = params.getInt( CFG_BURST_SIZE_PER_LESS_POPULAR_HOST );
-		
+
+		if( params.has( ScenarioTrack.CFG_MEAN_RESPONSE_TIME_SAMPLE_INTERVAL ) )
+			this._responseTimeSamplingInterval = params.getInt( ScenarioTrack.CFG_MEAN_RESPONSE_TIME_SAMPLE_INTERVAL );
+			
 		this.printConfig( System.out );
 		
 		// Determine the set of hosts to touch - could all be contiguous or randomly selected
@@ -135,17 +140,17 @@ public class BurstUrlProfileCreator extends ProfileCreator
 		this._popularHostLoadFraction = (float)(this._usersPerPopularHost*numPopularHosts)/(float)this._userPopulation;
 		
 		// Print out what we've computed
-		System.out.println( this + " total host targets              : " + this._numHostTargets );
-		System.out.println( this + " popular hosts fraction          : " + this._formatter.format( this._popularHostFraction ) );
-		System.out.println( this + " popular hosts                   : " + numPopularHosts );
-		System.out.println( this + " less popular hosts              : " + numLessPopularHosts );
-		System.out.println( this + " total user population           : " + this._userPopulation );
-		System.out.println( this + " popular host user load fraction : " + this._formatter.format( this._popularHostLoadFraction ) );
-		System.out.println( this + " users for all popular hosts     : " + this._usersPerPopularHost*numPopularHosts );
-		System.out.println( this + " users for less popular hosts    : " + this._usersPerLessPopularHost*numLessPopularHosts );
-		System.out.println( this + " users per popular host          : " + this._usersPerPopularHost );
-		System.out.println( this + " users per less-popular host     : " + this._usersPerLessPopularHost );
-		System.out.println( this + " effective user population       : " + ( (this._usersPerPopularHost*numPopularHosts)+(this._usersPerLessPopularHost*numLessPopularHosts) ) );
+		System.out.println( this + " total host targets                    : " + this._numHostTargets );
+		System.out.println( this + " popular hosts fraction                : " + this._formatter.format( this._popularHostFraction ) );
+		System.out.println( this + " popular hosts                         : " + numPopularHosts );
+		System.out.println( this + " less popular hosts                    : " + numLessPopularHosts );
+		System.out.println( this + " total user population                 : " + this._userPopulation );
+		System.out.println( this + " popular host user load fraction       : " + this._formatter.format( this._popularHostLoadFraction ) );
+		System.out.println( this + " users for all popular hosts           : " + this._usersPerPopularHost*numPopularHosts );
+		System.out.println( this + " users for less popular hosts          : " + this._usersPerLessPopularHost*numLessPopularHosts );
+		System.out.println( this + " users per popular host                : " + this._usersPerPopularHost );
+		System.out.println( this + " users per less-popular host           : " + this._usersPerLessPopularHost );
+		System.out.println( this + " effective user population             : " + ( (this._usersPerPopularHost*numPopularHosts)+(this._usersPerLessPopularHost*numLessPopularHosts) ) );
 		
 		// Change the way we compute the target's ip address
 		// Store the last ip address we received,
@@ -231,16 +236,17 @@ public class BurstUrlProfileCreator extends ProfileCreator
 		// e.g. lower values if we're doing a short run with few operations and
 		// larger values if we're doing a long run with many operations so we reduce
 		// memory overhead of storing samples
-		trackDetails.put( ScenarioTrack.CFG_MEAN_RESPONSE_TIME_SAMPLE_INTERVAL, 100 );
+		trackDetails.put( ScenarioTrack.CFG_MEAN_RESPONSE_TIME_SAMPLE_INTERVAL, this._responseTimeSamplingInterval );
 
 		return trackDetails;
 	}
 	
 	private void printConfig( PrintStream out )
 	{
-		out.println( this + " Mean think time                 : " + this._meanThinkTime );
-		out.println( this + " Burst size popular hosts        : " + this._burstSizePerPopularHost );
-		out.println( this + " Burst size less popular hosts   : " + this._burstSizePerLessPopularHost );
+		out.println( this + " Mean think time                       : " + this._meanThinkTime );
+		out.println( this + " Burst size popular hosts              : " + this._burstSizePerPopularHost );
+		out.println( this + " Burst size less popular hosts         : " + this._burstSizePerLessPopularHost );
+		out.println( this + " Mean response time Sampling interval  : " + this._responseTimeSamplingInterval );
 	}
 	
 	public String toString()
@@ -263,5 +269,4 @@ public class BurstUrlProfileCreator extends ProfileCreator
 		JSONObject tracks = creator.createProfile( params );
 		System.out.println( tracks.toString() );
 	}
-
 }

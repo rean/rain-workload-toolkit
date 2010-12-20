@@ -80,4 +80,19 @@ public class WaitTimeSummary
 			return 0.0;
 		else return (double) this.totalWaitTime/(double)this.count;
 	}
+
+	public double getSampleMean() 
+	{
+		return this.waitTimeSampler.getSampleMean();
+	}
+
+	public double getSampleStandardDeviation() 
+	{
+		return this.waitTimeSampler.getSampleStandardDeviation();
+	}
+
+	public double getTvalue( double averageWaitTime ) 
+	{
+		return this.waitTimeSampler.getTvalue( averageWaitTime );
+	}
 }

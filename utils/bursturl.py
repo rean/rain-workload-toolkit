@@ -19,6 +19,7 @@ from run_manager import RunManager, RainOutputParser
          "usersPerLessPopularHost":1,
          "burstSizePerPopularHost":5,
          "burstSizePerLessPopularHost":2,
+         "meanResponseTimeSamplingInterval":123,
          "generatorParameters": {
              "connectionTimeoutMsecs" : 1000,
              "socketTimeoutMsecs" : 1000
@@ -72,6 +73,8 @@ class BurstUrlTestConfig:
         self.duration = 60 # seconds
         self.rampDown = 10 # seconds
         self.pipePort = 7851 # comm port
+        # response time sampling info
+        self.meanResponseTimeSamplingInterval = 100
 
     def to_json( self ):
         dict = {}
@@ -87,6 +90,8 @@ class BurstUrlTestConfig:
         creatorParams['burstSizePerPopularHost'] = self.burstSizePerPopularHost
         creatorParams['burstSizePerLessPopularHost'] = \
             self.burstSizePerLessPopularHost
+        creatorParams['meanResponseTimeSamplingInterval'] = \
+            self.meanResponseTimeSamplingInterval
 
         # add in the generator parameters to the creator parameters
         creatorParams['generatorParameters'] = \
@@ -116,7 +121,8 @@ class BurstUrlTestRunner:
              connection_timeout_msecs, socket_timeout_msecs,\
              burst_size_per_popular_host, burst_size_per_less_popular_host,\
              results_dir="./results", run_duration_secs=60, \
-             config_dir="./config", pipe_port=7851 ):
+             config_dir="./config", pipe_port=7851, \
+             mean_response_time_sample_interval=100 ):
 
         # Some pre-reqs:
         # 1) create the config_dir if it doesn't exist
@@ -138,6 +144,8 @@ class BurstUrlTestRunner:
             config.burstSizePerPopularHost = burst_size_per_popular_host
             config.burstSizePerLessPopularHost = \
                 burst_size_per_less_popular_host
+            config.meanResponseTimeSamplingInterval = \
+                mean_response_time_sample_interval
             # Add in the parameters for the workload generator
             # the operation mixes etc.
             generatorParams = BurstUrlGeneratorParameters()
@@ -239,6 +247,7 @@ def usage():
            " [--connectiontimeout <msecs to wait for http connection>]"\
            " [--sockettimeout <msecs to wait for data/server response>]"\
            " [--hostlist <path to file>] [--pipeport <port>]"\
+           " [--sampleinterval <interval>]"\
            .format(sys.argv[0]) )
 
     print "\n"
@@ -249,7 +258,7 @@ def usage():
            " --sockettimeout 1000 --connectiontimeout 1000"\
            " --thinktime 5 "\
            " --hostlist /home/rean/work/rain.git/hostlist.txt"\
-           " --pipeport 7851"\
+           " --pipeport 7851 --sampleinterval 10"\
            .format(sys.argv[0]) )
 
 
@@ -267,6 +276,7 @@ def main(argv):
     pipe_port = 7851
     popular_host_burst = 5
     less_popular_host_burst = 2
+    mean_response_time_sampling_interval = 100
 
     # parse arguments and replace the defaults
     try:
@@ -279,7 +289,8 @@ def main(argv):
                                            "popularhostburst=",\
                                            "lesspopularhostburst=",\
                                            "connectiontimeout=",\
-                                           "sockettimeout=", "pipeport="] )
+                                           "sockettimeout=", "pipeport=",\
+                                           "sampleinterval="] )
     except getopt.GetoptError:
             print sys.exc_info()
             usage()
@@ -315,6 +326,8 @@ def main(argv):
             popular_host_burst = int(arg)
         elif opt == "--lesspopularhostburst":
             less_popular_host_burst = int(arg)
+        elif opt == "--sampleinterval":
+            mean_response_time_sampling_interval = int(arg)
     
     # launch run
     test_runner = BurstUrlTestRunner()
@@ -325,7 +338,7 @@ def main(argv):
              connection_timeout_msecs, socket_timeout_msecs,\
              popular_host_burst, less_popular_host_burst,\
              results_dir, run_duration, \
-             config_dir, pipe_port )
+             config_dir, pipe_port, mean_response_time_sampling_interval )
 
 if __name__=='__main__':
     # Pass all the arguments we received except the name of the script

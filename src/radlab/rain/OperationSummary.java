@@ -82,4 +82,19 @@ public class OperationSummary
 			return 0.0;
 		else return (double) this.totalResponseTime/(double)this.succeeded;
 	}
+
+	public double getSampleMean() 
+	{
+		return this.responseTimeSampler.getSampleMean();
+	}
+
+	public double getSampleStandardDeviation() 
+	{
+		return this.responseTimeSampler.getSampleStandardDeviation();
+	}
+
+	public double getTvalue( double averageResponseTime ) 
+	{
+		return this.responseTimeSampler.getTvalue( averageResponseTime );
+	}
 }

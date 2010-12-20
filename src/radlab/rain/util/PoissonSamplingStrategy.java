@@ -52,7 +52,8 @@ public class PoissonSamplingStrategy implements ISamplingStrategy
 	private int _currentSample = 0;
 	private double _meanSamplingInterval = 1.0;
 	private NegativeExponential _expRandom = null;
-
+	private long _sampleSum = 0;
+	
 	public PoissonSamplingStrategy(double meanSamplingInterval) 
 	{
 		this._meanSamplingInterval = meanSamplingInterval;
@@ -75,6 +76,7 @@ public class PoissonSamplingStrategy implements ISamplingStrategy
 		this._currentSample = 0;
 		this._nextSampleToAccept = 1;
 		this._samples.clear();
+		this._sampleSum = 0;
 	}
 
 	public int getSamplesCollected()
@@ -92,12 +94,50 @@ public class PoissonSamplingStrategy implements ISamplingStrategy
 		return PoissonSamplingStrategy.getNthPercentile( pct, this._samples );
 	}
 	
+	public double getSampleMean()
+	{
+		long samples = this.getSamplesCollected();
+		if( samples == 0 )
+			return 0.0;
+		else return (double) this._sampleSum / (double) samples;
+	}
+	
+	public double getSampleStandardDeviation()
+	{
+		long samples = this.getSamplesCollected();
+		if( samples == 0 || samples == 1 )
+			return 0.0;
+		
+		double sampleMean = this.getSampleMean();
+		
+		// Sum the deviations from the mean for all items
+		double deviationSqSum = 0.0;
+		for( Long value : this._samples )
+		{
+			// Print out value so we can debug the sd computation
+			//System.out.println( value );
+			deviationSqSum += Math.pow( (double)(value - sampleMean), 2 );
+		}
+		// Divide deviationSqSum by N-1 then return the square root
+		return Math.sqrt( deviationSqSum/(double)(samples - 1) );
+	}
+	
+	public double getTvalue( double populationMean )
+	{
+		long samples = this.getSamplesCollected();
+		if( samples == 0 || samples == 1 )
+			return 0.0;
+		
+		return ( this.getSampleMean() - populationMean ) / ( this.getSampleStandardDeviation()/Math.sqrt( this.getSamplesCollected() ) );
+	}
+	
 	public boolean accept(long value) 
 	{
 		this._currentSample++;
 
 		if (this._currentSample == this._nextSampleToAccept) 
 		{
+			this._sampleSum += value;
 			this._samples.add(value);
 			// Update the nextSampleToAccept
 			double randExp = this._expRandom.nextDouble();

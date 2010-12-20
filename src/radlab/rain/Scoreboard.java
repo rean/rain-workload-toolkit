@@ -599,7 +599,7 @@ public class Scoreboard implements Runnable, IScoreboard
 		out.println( this + " Sync Ops                           : " + this.finalCard._totalOpsSync + " " + this._formatter.format( ( ( (double) this.finalCard._totalOpsSync / (double) totalOperations) * 100) ) + "%" );
 		
 		out.println( this + " Mean response time sample interval : " + this._meanResponseTimeSamplingInterval + " (using Poisson sampling)");
-		
+				
 		this.printOperationStatistics( out, true );
 		out.println( "" );
 		this.printWaitTimeStatistics( out, true );
@@ -612,7 +612,7 @@ public class Scoreboard implements Runnable, IScoreboard
 			try
 			{
 				// Make this thing "prettier", using fixed width columns
-				String outputFormatSpec = "|%20s|%12s|%12s|%12s|%10s|%10s|%20s|";
+				String outputFormatSpec = "|%20s|%12s|%12s|%12s|%10s|%10s|%50s|";
 				
 				out.println( this + String.format( outputFormatSpec, "operation", "avg wait", "min wait", "max wait", "90th (s)", "99th (s)", "pctile" ) );
 				out.println( this + String.format( outputFormatSpec, "", "time (s)", "time (s)", "time (s)", "", "", "samples" ) );
@@ -646,7 +646,7 @@ public class Scoreboard implements Runnable, IScoreboard
 							this._formatter.format( summary.maxWaitTime / 1000.0 ),
 							this._formatter.format( summary.getNthPercentileResponseTime( 90 ) / 1000.0 ),
 							this._formatter.format( summary.getNthPercentileResponseTime( 99 ) / 1000.0 ),
-							summary.getSamplesCollected() + "/" + summary.getSamplesSeen()
+							summary.getSamplesCollected() + "/" + summary.getSamplesSeen() + " (mu: " + this._formatter.format( summary.getSampleMean()/1000.0 ) + ", sd: " + this._formatter.format( summary.getSampleStandardDeviation()/1000.0 ) + " t: " + this._formatter.format( summary.getTvalue( summary.getAverageWaitTime() ) ) + ")"
 							) 
 						);
 										
@@ -674,7 +674,7 @@ public class Scoreboard implements Runnable, IScoreboard
 			try
 			{
 				// Make this thing "prettier", using fixed width columns
-				String outputFormatSpec = "|%20s|%10s|%10s|%10s|%12s|%12s|%12s|%10s|%10s|%10s|";
+				String outputFormatSpec = "|%20s|%10s|%10s|%10s|%12s|%12s|%12s|%10s|%10s|%50s|";
 				
 				out.println( this + String.format( outputFormatSpec, "operation", "proportion", "successes", "failures", "avg response", "min response", "max response", "90th (s)", "99th (s)", "pctile" ) );
 				out.println( this + String.format( outputFormatSpec, "", "", "", "", "time (s)", "time (s)", "time(s)", "", "", "samples" ) );
@@ -711,7 +711,7 @@ public class Scoreboard implements Runnable, IScoreboard
 							this._formatter.format( summary.maxResponseTime / 1000.0 ),
 							this._formatter.format( summary.getNthPercentileResponseTime( 90 ) / 1000.0 ),
 							this._formatter.format( summary.getNthPercentileResponseTime( 99 ) / 1000.0 ),
-							summary.getSamplesCollected() + "/" + summary.getSamplesSeen()
+							summary.getSamplesCollected() + "/" + summary.getSamplesSeen() + " (mu: " + this._formatter.format( summary.getSampleMean()/1000.0 ) + ", sd: " + this._formatter.format( summary.getSampleStandardDeviation()/1000.0 ) + " t: " + this._formatter.format( summary.getTvalue( summary.getAverageResponseTime() ) ) + ")"
 							) 
 						);
 										
