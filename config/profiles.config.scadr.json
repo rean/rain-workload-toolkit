@@ -3,7 +3,9 @@
         "generator": "radlab.rain.workload.scadr.ScadrGenerator",
         "generatorParameters": {
         	"debug" : "false",
-        	"usePooling": "true"
+        	"usePooling": "true",
+        	"zookeeperConnString": "ec2-50-16-2-36.compute-1.amazonaws.com,ec2-174-129-105-138.compute-1.amazonaws.com,ec2-50-16-59-213.compute-1.amazonaws.com",
+			"zookeeperAppServerPath": "/apps/scadr/appservers"
         },
         "track": "radlab.rain.DefaultScenarioTrack",
         "resourcePath": "resources/",
@@ -18,6 +20,11 @@
 			]
         },
         "loadProfile": [
+        {
+            "interval": 600,
+            "users": 1,
+            "mix": "default"
+        },
         {
             "interval": 30,
             "users": 140,
@@ -59,6 +66,8 @@
         "meanThinkTime": 0,
         "interactive": true,
         "objectPoolMaxSize": 500,
-        "meanResponseTimeSamplingInterval": 50
+        "meanResponseTimeSamplingInterval": 50,
+        "metricSnapshots" : true,
+        "metricSnapshotInterval" : 60
     }
 }

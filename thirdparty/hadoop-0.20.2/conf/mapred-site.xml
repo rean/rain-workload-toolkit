@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+<!-- Put site-specific property overrides in this file. -->
+
+<configuration>
+  <property>
+    <name>mapred.job.tracker</name>
+    <value>localhost:9001</value>
+  </property>
+  <property>
+    <name>mapred.tasktracker.map.tasks.maximum</name>
+    <value>4</value>
+  </property>
+  <property>
+    <name>mapred.tasktracker.reduce.tasks.maximum</name>
+    <value>2</value>
+  </property>
+  <property>
+    <name>dfs.safemode.threshold.pct</name>
+    <value>0.999f</value>
+    <description>
+        Specifies the percentage of blocks that should satisfy 
+        the minimal replication requirement defined by dfs.replication.min.
+        Values less than or equal to 0 mean not to start in safe mode.
+        Values greater than 1 will make safe mode permanent.
+    </description>
+  </property>
+  <property>
+    <name>mapred.map.tasks</name>
+    <value>1</value>
+    <description>The default number of map tasks per job.  Typically set
+      to a prime several times greater than number of available hosts.
+      Ignored when mapred.job.tracker is "local".  
+    </description>
+  </property>
+  <property>
+    <name>mapred.reduce.tasks</name>
+    <value>1</value>
+    <description>The default number of reduce tasks per job.  Typically set
+      to a prime close to the number of available hosts.  Ignored when
+      mapred.job.tracker is "local".
+    </description>
+  </property>
+  <property>
+    <name>dfs.block.size</name>
+    <value>67108864</value>
+    <description>The default block size for new files. 67108864</description>
+  </property>
+  <property>
+    <name>io.file.buffer.size</name>
+    <value>4096</value>
+    <description>The size of buffer for use in sequence files.
+      The size of this buffer should probably be a multiple of hardware
+      page size (4096 on Intel x86), and it determines how much data is
+      buffered during read and write operations.</description>
+  </property>
+  <property>
+    <name>fs.inmemory.size.mb</name>
+    <value>75</value>
+    <description>The size of the in-memory filsystem instance in MB</description>
+  </property>
+  <property>
+    <name>io.sort.mb</name>
+    <value>100</value>
+    <description>The total amount of buffer memory to use while sorting 
+      files, in megabytes.  By default, gives each merge stream 1MB, which
+      should minimize seeks.</description>
+  </property>
+  <property>
+    <name>mapred.child.java.opts</name>
+    <value>-Xmx200m</value>
+    <description>Java opts for the task tracker child processes.  
+      The following symbol, if present, will be interpolated: @taskid@ is replaced 
+      by current TaskID. Any other occurrences of '@' will go unchanged.
+      For example, to enable verbose gc logging to a file named for the taskid in
+      /tmp and to set the heap maximum to be a gigabyte, pass a 'value' of:
+        -Xmx1024m -verbose:gc -Xloggc:/tmp/@taskid@.gc
+      The configuration variable mapred.child.ulimit can be used to control the
+      maximum virtual memory of the child processes. 
+    </description>
+  </property>
+  <property>
+    <name>io.sort.factor</name>
+    <value>10</value>
+    <description>The number of streams to merge at once while sorting
+      files.  This determines the number of open file handles.</description>
+  </property>
+  <property>
+    <name>mapred.reduce.parallel.copies</name>
+    <value>5</value>
+    <description>The default number of parallel transfers run by reduce
+      during the copy(shuffle) phase.
+    </description>
+  </property>
+  <property>
+    <name>mapred.map.tasks.speculative.execution</name>
+    <value>true</value>
+    <description>If true, then multiple instances of some map tasks 
+               may be executed in parallel.</description>
+  </property>
+  <property>
+    <name>mapred.reduce.tasks.speculative.execution</name>
+    <value>true</value>
+    <description>If true, then multiple instances of some reduce tasks 
+               may be executed in parallel.</description>
+  </property>
+</configuration>

@@ -31,7 +31,10 @@
 
 package radlab.rain;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -200,16 +203,38 @@ public class Benchmark
 	 */
 	public static void main( String[] args ) throws Exception
 	{
-		if ( args.length < 1 ) {
-			System.out.println( "Unspecified path to configuration file!" );
+		StringBuffer configData = new StringBuffer();
+						
+		if ( args.length < 1 ) 
+		{
+			System.out.println( "Unspecified name/path to configuration file!" );
 			System.exit( 1 );
 		}
 		
 		String filename = args[0];
 		JSONObject jsonConfig = null;
+		
 		try
 		{
-			String fileContents = ConfigUtil.readFileAsString( filename );
+			String fileContents = "";
+			// Try to load the config file as a resource first
+			InputStream in = ClassLoader.getSystemClassLoader().getResourceAsStream( filename );
+			if( in != null )
+			{
+				System.out.println( "[BENCHMARK] Reading config file from resource stream." );
+				BufferedReader reader = new BufferedReader( new InputStreamReader( in ) );
+				String line = "";
+				// Read in the entire file and append to the string buffer
+				while( ( line = reader.readLine() ) != null )
+					configData.append( line );
+				fileContents = configData.toString();
+			}
+			else
+			{
+				System.out.println( "[BENCHMARK] Reading config file from file system." );
+				fileContents = ConfigUtil.readFileAsString( filename );
+			}
+			
 			jsonConfig = new JSONObject( fileContents );
 		}
 		catch ( IOException e )

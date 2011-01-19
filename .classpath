@@ -12,10 +12,13 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="thirdparty/json-20090211.jar"/>
 	<classpathentry kind="lib" path="thirdparty/colt-1.2.0/colt.jar"/>
-	<classpathentry kind="lib" path="thirdparty/hadoop-0.20.2/hadoop-0.20.2-core.jar" sourcepath="thirdparty/hadoop-0.20.2/src/core"/>
+	<classpathentry kind="lib" path="thirdparty/hadoop-0.20.2/hadoop-0.20.2-core.jar" sourcepath="thirdparty/hadoop-0.20.2/src/"/>
 	<classpathentry kind="lib" path="thirdparty/hadoop-0.20.2/hadoop-0.20.2-tools.jar"/>
 	<classpathentry kind="lib" path="thirdparty/hadoop-0.20.2/lib/commons-cli-1.2.jar"/>
 	<classpathentry kind="lib" path="thirdparty/hadoop-0.20.2/hadoop-0.20.2-examples.jar"/>
 	<classpathentry kind="lib" path="thirdparty/hadoop-0.20.2/lib/commons-httpclient-3.0.1.jar"/>
+	<classpathentry kind="lib" path="thirdparty/zookeeper-3.3.2/zookeeper-3.3.2.jar"/>
+	<classpathentry kind="lib" path="thirdparty/zookeeper-3.3.2/lib/jline-0.9.94.jar"/>
+	<classpathentry kind="lib" path="thirdparty/zookeeper-3.3.2/lib/log4j-1.2.15.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -117,23 +117,27 @@ public class PartlyOpenLoopLoadGeneration extends LoadGenerationStrategy
 				{
 					this._lgState = LGState.Active;
 					Operation nextOperation = this._generator.nextRequest( lastOperationIndex );
-					
-					// Update last operation index.
-					lastOperationIndex = nextOperation.getOperationIndex();
-					
-					// Store the thread name/ID so we can organize the traces.
-					nextOperation.setGeneratedBy( threadName );
-					nextOperation.setGeneratorThreadID( this._id );
-					
-					// Decide whether to do things open or closed
-					double randomDouble = this._random.nextDouble();
-					if ( randomDouble <= this._openLoopProbability )
+					// This will let generators do no-ops by returning null.
+					// We might end up making sure that we count/account for the no-ops
+					if( nextOperation != null ) 
 					{
-						this.doAsyncOperation( nextOperation );
-					}
-					else
-					{
-						this.doSyncOperation( nextOperation );
+						// Update last operation index.
+						lastOperationIndex = nextOperation.getOperationIndex();
+						
+						// Store the thread name/ID so we can organize the traces.
+						nextOperation.setGeneratedBy( threadName );
+						nextOperation.setGeneratorThreadID( this._id );
+						
+						// Decide whether to do things open or closed
+						double randomDouble = this._random.nextDouble();
+						if ( randomDouble <= this._openLoopProbability )
+						{
+							this.doAsyncOperation( nextOperation );
+						}
+						else
+						{
+							this.doSyncOperation( nextOperation );
+						}
 					}
 				}
 			}	

@@ -14,10 +14,15 @@ import org.json.JSONException;
 import java.util.LinkedHashSet;
 import java.util.Random;
 
+import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.data.Stat;
+
 public class ScadrGenerator extends Generator 
 {
 	public static String CFG_USE_POOLING_KEY = "usePooling";
 	public static String CFG_DEBUG_KEY		 = "debug";
+	public static String CFG_ZOOKEEPER_CONN_STRING		= "zookeeperConnString";
+	public static String CFG_ZOOKEEPER_APP_SERVER_PATH	= "zookeeperAppServerPath";
 	
 	protected static final String[] US_CITIES = 
 	{
@@ -301,23 +306,23 @@ public class ScadrGenerator extends Generator
 	
 	protected static final String[] HOMEPAGE_STATICS = 
 	{
-		"/stylesheets/base.css?1290059762",
+		//"/stylesheets/base.css?1290059762",
 		//"http://fonts.googleapis.com/css?family=Lobster%7CNobile"
 	};
 
 	protected static final String[] LOGINPAGE_STATICS =
 	{
-		"/stylesheets/base.css?1290059762"
+		//"/stylesheets/base.css?1290059762"
 	};
 	
 	protected static final String[] CREATEUSERPAGE_STATICS =
 	{
-		"/stylesheets/base.css?1290059762"
+		//"/stylesheets/base.css?1290059762"
 	};
 
 	protected static final String[] POSTTHOUGHTPAGE_STATICS =
 	{
-		"/stylesheets/base.css?1290059762"
+		//"/stylesheets/base.css?1290059762"
 	};
 	
 	// Statics URLs
@@ -350,7 +355,11 @@ public class ScadrGenerator extends Generator
 	public static final int LOGOUT				= 3;
 	public static final int POST_THOUGHT		= 4;
 	public static final int CREATE_SUBSCRIPTION = 5;
-		
+	
+	public static final int DEFAULT_ZOOKEEPER_SESSION_TIMEOUT = 30000;
+	public static final String APP_SERVER_LIST_SEPARATOR = "\n";
+	public static final String HOSTNAME_PORT_SEPARATOR	= ":";
+	
 	private boolean _usePooling = false;
 	private boolean _debug = false;
 	
@@ -376,7 +385,14 @@ public class ScadrGenerator extends Generator
 	
 	// Application-specific variables
 	private boolean _isLoggedIn = false;
-		
+	private boolean _usingZookeeper = false;
+	private ZooKeeper _zconn = null;
+	private boolean _appServerListChanged = false;
+	private String[] _appServers = null;
+	private int _currentAppServer = 0;
+	private String _zkConnString = "";
+	private String _zkPath = "";
+	
 	public String _loginAuthToken;
 	public String _username;
 	
@@ -384,10 +400,12 @@ public class ScadrGenerator extends Generator
 	public ScadrGenerator(ScenarioTrack track) 
 	{
 		super(track);
-		
 		this._rand = new Random();
-		
-		this._baseUrl 	= "http://" + this._loadTrack.getTargetHostName() + ":" + this._loadTrack.getTargetHostPort();
+	}
+
+	private void initializeUrls( String targetHost, int port )
+	{
+		this._baseUrl 	= "http://" + targetHost + ":" + port;
 		this._homeUrl = this._baseUrl;
 		
 		this._createUserUrl = this._baseUrl + "/users/new";
@@ -405,7 +423,7 @@ public class ScadrGenerator extends Generator
 		
 		this.initializeStaticUrls();
 	}
-
+	
 	public boolean getIsLoggedIn()
 	{ return this._isLoggedIn; }
 
@@ -436,6 +454,46 @@ public class ScadrGenerator extends Generator
 		
 		if( config.has( CFG_DEBUG_KEY) )
 			this._debug = config.getBoolean( CFG_DEBUG_KEY );
+		
+		// Talk to try to talk to Zookeeper to get the list of app servers.
+		// If we can't contact Zookeeper then use the track information
+		if( config.has( CFG_ZOOKEEPER_CONN_STRING ) && config.has( CFG_ZOOKEEPER_APP_SERVER_PATH ) )
+		{
+			try 
+			{
+				this._zkConnString = config.getString( CFG_ZOOKEEPER_CONN_STRING );
+				this._zkPath = config.getString( CFG_ZOOKEEPER_APP_SERVER_PATH );
+				
+				this._zconn = new ZooKeeper( this._zkConnString, DEFAULT_ZOOKEEPER_SESSION_TIMEOUT, new ZKAppServerWatcher( this ) );
+				byte[] data = this._zconn.getData( this._zkPath, true, new Stat() );
+				String list = new String( data );
+				
+				this._appServers = list.split( APP_SERVER_LIST_SEPARATOR );
+				this._currentAppServer = 0;
+				
+				this._usingZookeeper = true;
+			} 
+			catch( Exception e ) 
+			{
+				this._usingZookeeper = false;
+			}
+		}
+		
+		if( this._usingZookeeper )
+		{
+			// Pick an app server @ random and use that as the target host
+			this._currentAppServer = this._rand.nextInt( this._appServers.length );
+			String[] appServerNamePort = this._appServers[this._currentAppServer].split( HOSTNAME_PORT_SEPARATOR );
+			this.initializeUrls( appServerNamePort[0], Integer.parseInt( appServerNamePort[1]) );
+		}
+		else 
+		{
+			String appServer = this.getTrack().getTargetHostName() + HOSTNAME_PORT_SEPARATOR + this.getTrack().getTargetHostPort();
+			this._appServers = new String[1];
+			this._appServers[0] = appServer;
+			this._currentAppServer = 0;
+			this.initializeUrls( this.getTrack().getTargetHostName(), this.getTrack().getTargetHostPort() );
+		}
 	}
 	
 	public void initializeStaticUrls()
@@ -445,7 +503,15 @@ public class ScadrGenerator extends Generator
 		this.createuserpageStatics = joinStatics( CREATEUSERPAGE_STATICS );
 		this.postthoughtpageStatics = joinStatics( POSTTHOUGHTPAGE_STATICS );
 	}
+	
+	public void setAppServerListChanged( boolean val )
+	{ 
+		if( this._debug )
+			System.out.println( this + " app server list changed." );
 		
+		this._appServerListChanged = val; 
+	}
+	
 	/* Pass in index of the last operation */
 	
 	@Override
@@ -455,7 +521,10 @@ public class ScadrGenerator extends Generator
 		// what to do next
 		LoadProfile currentLoad = this.getTrack().getCurrentLoadProfile();
 		this._latestLoadProfile = currentLoad;
-				
+		
+		//if( true )
+		//	return getOperation( 0 );
+		
 		int nextOperation = -1;
 		
 		if( lastOperation == -1 )
@@ -464,6 +533,37 @@ public class ScadrGenerator extends Generator
 		}
 		else
 		{
+			if( this._appServerListChanged )
+			{
+				// Reload list from zookeeper
+				try
+				{
+					this._zconn.getData( this._zkPath, true, new Stat() );
+					this._currentAppServer = 0; // Reset the list
+					this._appServerListChanged = false;
+				}
+				catch( Exception e )
+				{ 
+					// If we try to get the updated list and fail, keep using the
+					// old list, it's not a big deal
+				}
+			}
+			
+			if( this._appServers == null )
+			{
+				String appServer = this.getTrack().getTargetHostName() + HOSTNAME_PORT_SEPARATOR + this.getTrack().getTargetHostPort();
+				this._appServers = new String[1];
+				this._appServers[0] = appServer;
+				this._currentAppServer = 0;
+				this.initializeUrls( this.getTrack().getTargetHostName(), this.getTrack().getTargetHostPort() );
+			}
+			
+			// Pick the new target based on the current app server value
+			String nextAppServerHostPort[] = this._appServers[this._currentAppServer].split( HOSTNAME_PORT_SEPARATOR );
+			this.initializeUrls( nextAppServerHostPort[0], Integer.parseInt( nextAppServerHostPort[1] ) );
+			// Update the current app server value
+			this._currentAppServer = (this._currentAppServer + 1) % this._appServers.length;
+						
 			// Get the selection matrix
 			double[][] selectionMix = this.getTrack().getMixMatrix( currentLoad.getMixName() ).getSelectionMix();
 			double rand = this._rand.nextDouble();

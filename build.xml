@@ -19,6 +19,30 @@
         <pathelement location="thirdparty/httpcomponents-client-4.0.1/lib/httpmime-4.0.1.jar"/>
         <pathelement location="thirdparty/json-20090211.jar"/>
     	<pathelement location="thirdparty/colt-1.2.0/colt.jar"/>
+    	<pathelement location="thirdparty/zookeeper-3.3.2/zookeeper-3.3.2.jar"/>
+    	<pathelement location="thirdparty/zookeeper-3.3.2/lib/jline-0.9.94.jar"/>
+    	<pathelement location="thirdparty/zookeeper-3.3.2/lib/log4j-1.2.15.jar"/>
+    </path>
+	<path id="rain.classpath.with.mr">
+        <pathelement location="bin"/>
+        <pathelement location="thirdparty/httpcomponents-client-4.0.1/lib/apache-mime4j-0.6.jar"/>
+        <pathelement location="thirdparty/httpcomponents-client-4.0.1/lib/commons-codec-1.3.jar"/>
+        <pathelement location="thirdparty/httpcomponents-client-4.0.1/lib/commons-logging-1.1.1.jar"/>
+        <pathelement location="thirdparty/httpcomponents-client-4.0.1/lib/httpclient-4.0.1.jar"/>
+        <pathelement location="thirdparty/httpcomponents-client-4.0.1/lib/httpcore-4.0.1.jar"/>
+        <pathelement location="thirdparty/httpcomponents-client-4.0.1/lib/httpmime-4.0.1.jar"/>
+        <pathelement location="thirdparty/json-20090211.jar"/>
+    	<pathelement location="thirdparty/colt-1.2.0/colt.jar"/>
+		<!-- zookeeper stuff -->
+    	<pathelement location="thirdparty/zookeeper-3.3.2/zookeeper-3.3.2.jar"/>
+    	<pathelement location="thirdparty/zookeeper-3.3.2/lib/jline-0.9.94.jar"/>
+    	<pathelement location="thirdparty/zookeeper-3.3.2/lib/log4j-1.2.15.jar"/>
+		<!-- hadoop stuff -->
+		<pathelement location="thirdparty/hadoop-0.20.2/hadoop-0.20.2-core.jar"/>
+		<pathelement location="thirdparty/hadoop-0.20.2/hadoop-0.20.2-examples.jar"/>
+		<pathelement location="thirdparty/hadoop-0.20.2/hadoop-0.20.2-tools.jar"/>
+		<pathelement location="thirdparty/hadoop-0.20.2/lib/commons-cli-1.2.jar"/>
+		<pathelement location="thirdparty/hadoop-0.20.2/lib/commons-httpclient-3.0.1.jar"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>
@@ -40,6 +64,13 @@
         <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}" excludes="radlab/rain/workload/mapreduce/**">
             <src path="src"/>
             <classpath refid="rain.classpath"/>
+        </javac>
+    </target>
+	<target depends="init" name="build-with-mr">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+            <src path="src"/>
+            <classpath refid="rain.classpath.with.mr"/>
         </javac>
     </target>
     <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
@@ -101,6 +132,15 @@
 	        <arg file="config/rain.config.scadr.wiki.json"/>
 	    </java>
 	</target>
+	<target depends="build-with-mr" name="Benchmark-mapreduce">
+		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
+	    	<classpath refid="rain.classpath.with.mr"/>
+	    	<jvmarg value="-Xmx1g" />
+	    	<jvmarg value="-Xms256m" />
+	    	<jvmarg value="-XX:+DisableExplicitGC"/>
+	        <arg file="config/rain.config.mapreduce.json"/>
+	    </java>
+	</target>
     <target depends="build" name="package">
         <jar destfile="rain.jar" filesetmanifest="mergewithoutmain">
             <manifest>
@@ -115,9 +155,44 @@
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.0.1/lib/httpmime-4.0.1.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/json-20090211.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/colt-1.2.0/colt.jar"/>
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/zookeeper-3.3.2/zookeeper-3.3.2.jar"/>
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/zookeeper-3.3.2/lib/jline-0.9.94.jar"/>
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/zookeeper-3.3.2/lib/log4j-1.2.15.jar"/>
         </jar>
     </target>
-    <target depends="build" name="package-olio">
+	<target depends="build-with-mr" name="package-with-mr">
+        <jar destfile="rain.jar" filesetmanifest="mergewithoutmain">
+            <manifest>
+                <attribute name="Main-Class" value="radlab.rain.Benchmark"/>
+            </manifest>
+            <fileset dir="bin" excludes="radlab/rain/workload/** radlab/rain/test/**"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.0.1/lib/apache-mime4j-0.6.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.0.1/lib/commons-codec-1.3.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.0.1/lib/commons-logging-1.1.1.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.0.1/lib/httpclient-4.0.1.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.0.1/lib/httpcore-4.0.1.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.0.1/lib/httpmime-4.0.1.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/json-20090211.jar"/>
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/colt-1.2.0/colt.jar"/>
+        	<!-- zookeeper stuff -->
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/zookeeper-3.3.2/zookeeper-3.3.2.jar"/>
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/zookeeper-3.3.2/lib/jline-0.9.94.jar"/>
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/zookeeper-3.3.2/lib/log4j-1.2.15.jar"/>
+        	<!-- hadoop stuff -->
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/hadoop-0.20.2/hadoop-0.20.2-core.jar"/>
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/hadoop-0.20.2/hadoop-0.20.2-examples.jar"/>
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/hadoop-0.20.2/hadoop-0.20.2-tools.jar"/>
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/hadoop-0.20.2/lib/commons-cli-1.2.jar"/>
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/hadoop-0.20.2/lib/commons-httpclient-3.0.1.jar"/>
+        </jar>
+    </target>
+	<target depends="build-with-mr" name="package-mapreduce">
+        <mkdir dir="workloads"/>
+        <jar destfile="workloads/mapreduce.jar" filesetmanifest="mergewithoutmain">
+            <fileset dir="bin" includes="radlab/rain/workload/mapreduce/**"/>
+        </jar>
+    </target>
+	<target depends="build" name="package-olio">
         <mkdir dir="workloads"/>
         <jar destfile="workloads/olio.jar" filesetmanifest="mergewithoutmain">
             <fileset dir="bin" includes="radlab/rain/workload/olio/**"/>
@@ -157,6 +232,8 @@
 	        <mkdir dir="workloads"/>
 	        <jar destfile="workloads/scadr.jar" filesetmanifest="mergewithoutmain">
 	            <fileset dir="bin" includes="radlab/rain/workload/scadr/**"/>
+	        	<!-- Bake the configuration files into the jar -->
+	        	<fileset dir="config" includes="*scadr*.json"/>
 	        </jar>
 	    </target>
 	<target depends="build" name="package-daytrader">

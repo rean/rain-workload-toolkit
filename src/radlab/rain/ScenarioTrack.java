@@ -64,6 +64,7 @@ public abstract class ScenarioTrack
 	public static String CFG_INTERACTIVE_KEY                    = "interactive";
 	public static String CFG_TARGET_KEY	                        = "target";
 	public static String CFG_SCOREBOARD_SNAPSHOT_INTERVAL       = "metricSnapshotInterval";
+	public static String CFG_METRIC_SNAPSHOTS					= "metricSnapshots";
 	// Targets keys: hostname, port
 	public static String CFG_TARGET_HOSTNAME_KEY                = "hostname";
 	public static String CFG_TARGET_PORT_KEY                    = "port";
@@ -105,6 +106,7 @@ public abstract class ScenarioTrack
 	protected double _meanThinkTime                             = 0.0; // non-stop request generation
 	protected double _logSamplingProbability                    = 1.0; // Log every executed request seen by the Scoreboard
 	protected double _metricSnapshotInterval                    = 60.0; // (seconds)
+	protected boolean _useMetricSnapshots						= false;
 	protected ObjectPool _objPool                               = null;
 	protected long _meanResponseTimeSamplingInterval            = DEFAULT_MEAN_RESPONSE_TIME_SAMPLE_INTERVAL;
 	protected int _maxUsersFromConfig							= 0;
@@ -211,16 +213,16 @@ public abstract class ScenarioTrack
 	{
 		// 1) Open-Loop Probability
 		this._openLoopProbability = config.getDouble( ScenarioTrack.CFG_OPEN_LOOP_PROBABILITY_KEY );
+		// 3) Target Information
+		JSONObject target = config.getJSONObject( ScenarioTrack.CFG_TARGET_KEY );
+		this._targetHostname = target.getString( ScenarioTrack.CFG_TARGET_HOSTNAME_KEY );
+		this._targetPort = target.getInt( ScenarioTrack.CFG_TARGET_PORT_KEY );
 		// 2) Concrete Generator
 		this._generatorClassName = config.getString( ScenarioTrack.CFG_GENERATOR_KEY );
 		this._generatorParams = null;
 		if( config.has( ScenarioTrack.CFG_GENERATOR_PARAMS_KEY ) )
 			this._generatorParams = config.getJSONObject( ScenarioTrack.CFG_GENERATOR_PARAMS_KEY );
 		this._generator = this.createWorkloadGenerator( this._generatorClassName, this._generatorParams );
-		// 3) Target Information
-		JSONObject target = config.getJSONObject( ScenarioTrack.CFG_TARGET_KEY );
-		this._targetHostname = target.getString( ScenarioTrack.CFG_TARGET_HOSTNAME_KEY );
-		this._targetPort = target.getInt( ScenarioTrack.CFG_TARGET_PORT_KEY );
 		// 4) Log Sampling Probability
 		this._logSamplingProbability = config.getDouble( ScenarioTrack.CFG_LOG_SAMPLING_PROBABILITY_KEY );
 		// 5) Mean Cycle Time
@@ -305,6 +307,8 @@ public abstract class ScenarioTrack
 		{
 			this._metricSnapshotInterval = config.getDouble( ScenarioTrack.CFG_SCOREBOARD_SNAPSHOT_INTERVAL );
 		}
+		if( config.has( ScenarioTrack.CFG_METRIC_SNAPSHOTS ) )
+			this._useMetricSnapshots = config.getBoolean( ScenarioTrack.CFG_METRIC_SNAPSHOTS );	
 		// 11 Initialize the object pool - by default it remains empty unless one of the concrete operations
 		// uses it.
 		if( config.has( ScenarioTrack.CFG_OBJECT_POOL_MAX_SIZE ) )
@@ -370,6 +374,7 @@ public abstract class ScenarioTrack
 		// Set the log sampling probability for the scoreboard
 		scoreboard.setLogSamplingProbability( this._logSamplingProbability );
 		scoreboard.setScenarioTrack( this );
+		scoreboard.setUsingMetricSnapshots( this._useMetricSnapshots );
 		scoreboard.setMeanResponseTimeSamplingInterval( this._meanResponseTimeSamplingInterval );
 		return scoreboard;
 	}

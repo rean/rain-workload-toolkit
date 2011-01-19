@@ -1,0 +1,50 @@
+{
+    "mapreduce-001": {
+        "generator": "radlab.rain.workload.mapreduce.ReplayMapReduceGenerator",
+        "generatorParameters": {
+        	"hdfsRoot": "hdfs://localhost:9000/",
+        	"hdfsInputPath": "/user/rean/input_test",
+        	"hdfsOutputPath": "/user/rean/output",
+        	"jobTracker": "localhost:9001",
+        	"bytesInHdfsInput": 5368709120,
+        	"hdfsFileSize": 67108864,
+        	"traceSummaryFile": "resources/replay_hr_0.scrub",
+        	"debug": false,
+        	"maxMapOutput": 1073741824,
+        	"maxHdfsBytes": 1073741824
+        },
+        "track": "radlab.rain.DefaultScenarioTrack",
+        "resourcePath": "resources/",
+        "behavior": {
+        	"default" : [
+        		[0.0,  11.0, 52.0, 36.0, 0.0, 1.0, 0.0],
+        		[0.0,  0.0, 60.0, 20.0, 0.0, 0.0, 20.0],
+        		[21.0, 6.0, 41.0, 31.0, 0.0, 1.0, 0.0],
+        		[72.0, 21.0, 0.0, 0.0,  6.0, 1.0, 0.0],
+        		[52.0, 6.0,  0.0, 31.0, 11.0, 0.0, 0.0],
+        		[0.0,  0.0,  0.0, 0.0, 100.0, 0.0, 0.0],
+        		[0.0,  0.0,  0.0, 100, 0.0, 0.0, 0.0]
+        	]
+        },
+        "loadProfile": [
+        {
+            "interval": 500,
+            "users": 1,
+            "mix": "default",
+            "transitionTime": 0
+        }
+        ],
+        "target": {
+          "hostname": "localhost",
+          "port": 80
+        },
+        "pLogSampling": 0.1,
+        "pOpenLoop": 1.0,
+        "meanCycleTime": 0,
+        "meanThinkTime": 0,
+        "interactive": true,
+        "metricSnapshotInterval" : 60,
+        "objectPoolMaxSize" : 50000,
+        "meanResponseTimeSamplingInterval" : 1000
+    }   
+}

@@ -140,6 +140,9 @@ public interface IScoreboard
 	long getMetricSnapshotInterval();
 	void setMetricSnapshotInterval( long val );
 	
+	boolean getUsingMetricSnapshots();
+	void setUsingMetricSnapshots( boolean val );
+	
 	ScenarioTrack getScenarioTrack();
 	void setScenarioTrack( ScenarioTrack val );
 	

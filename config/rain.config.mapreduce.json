@@ -1,0 +1,8 @@
+{
+    "profiles": "config/profiles.config.mapreduce.json",
+    "timing": {
+        "rampUp": 0,
+        "duration": 600,
+        "rampDown": 10
+    }
+}
