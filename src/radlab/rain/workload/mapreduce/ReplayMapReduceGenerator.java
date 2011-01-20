@@ -329,8 +329,8 @@ public class ReplayMapReduceGenerator extends Generator
 					this._nextThinkTime = interArrivalGap;
 					
 					// Compute the ratios
-					shuffleInputRatio = (float) ( (double) mapOutputSize / (double) mapInputSize );
-					outputShuffleRatio = (float) ( (double) hdfsBytesWritten / (double) mapOutputSize );
+					shuffleInputRatio = (float) ( (double) mapInputSize / (double) mapOutputSize );
+					outputShuffleRatio = (float) ( (double) mapOutputSize / (double) hdfsBytesWritten );
 									
 					//System.out.println( this + " Shuffle input ratio: " + shuffleInputRatio + " output shuffle ratio: " + outputShuffleRatio );
 					
