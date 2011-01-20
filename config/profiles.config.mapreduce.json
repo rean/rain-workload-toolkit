@@ -10,8 +10,8 @@
         	"hdfsFileSize": 67108864,
         	"traceSummaryFile": "resources/replay_hr_0.scrub",
         	"debug": false,
-        	"maxMapOutput": 1073741824,
-        	"maxHdfsBytes": 1073741824
+        	"maxMapOutput": -1,
+        	"maxHdfsBytes": -1
         },
         "track": "radlab.rain.DefaultScenarioTrack",
         "resourcePath": "resources/",
