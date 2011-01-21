@@ -168,10 +168,15 @@ public class WorkGenMapReduceOperation extends MapReduceOperation
 	    public void configure(JobConf job) 
         {
             outputShuffleRatio = Float.parseFloat(job.getRaw("workGen.ratios.outputShuffleRatio"));
-            minKeySize        = job.getInt("workGen.randomwrite.min_key", 10);
+            /*minKeySize        = job.getInt("workGen.randomwrite.min_key", 10);
             keySizeRange      = job.getInt("workGen.randomwrite.max_key", 10) - minKeySize;
             minValueSize      = job.getInt("workGen.randomwrite.min_value", 90);
-            valueSizeRange    = job.getInt("workGen.randomwrite.max_value", 90) - minValueSize;
+            valueSizeRange    = job.getInt("workGen.randomwrite.max_value", 90) - minValueSize;*/
+            // Make these settings symmetric with those in the map
+            minKeySize        = job.getInt("workGen.randomwrite.min_key", 10);
+		    keySizeRange      = job.getInt("workGen.randomwrite.max_key", 1000) - minKeySize;
+		    minValueSize      = job.getInt("workGen.randomwrite.min_value", 0);
+		    valueSizeRange    = job.getInt("workGen.randomwrite.max_value", 20000) - minValueSize;
         }
     }
     
