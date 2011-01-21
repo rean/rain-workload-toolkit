@@ -9,7 +9,7 @@
         	"bytesInHdfsInput": 5368709120,
         	"hdfsFileSize": 67108864,
         	"traceSummaryFile": "resources/replay_hr_0.scrub",
-        	"debug": false,
+        	"debug": true,
         	"maxMapOutput": -1,
         	"maxHdfsBytes": -1
         },

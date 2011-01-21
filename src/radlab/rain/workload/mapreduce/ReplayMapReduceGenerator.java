@@ -229,14 +229,13 @@ public class ReplayMapReduceGenerator extends Generator
 					
 					String jobName = fields[ReplayMapReduceGenerator.JOB_NAME_COL];
 					long mapInputSize = Long.parseLong( fields[ReplayMapReduceGenerator.MAP_INPUT_BYTES_COL] );
-	
-					// In debug mode we cap the input @ 10MB
-					if( this._debug )
-					{
-						if( mapInputSize > 10 * MB )
-							mapInputSize = 10 * MB;
-					}
 					
+					if( mapInputSize > this._bytesInHdfsInput )
+					{
+						System.out.println( this + " Configuration file limits map input to: " + this._bytesInHdfsInput + " bytes, which equals all the bytes in HDFS." );
+						// Don't reduce the mapInputSize from what was originally read in, instead keep it so that we 
+						// can calculate the original shuffle/input ratio and use that on less input data
+					}
 					// Figure out how many files we need to get this amount of input bytes
 					int filesNeeded = Math.round( mapInputSize/this._hdfsFileSize );
 					if( filesNeeded == 0 )
@@ -288,15 +287,17 @@ public class ReplayMapReduceGenerator extends Generator
 			
 					if( this._debug )
 					{
-						System.out.println( line );
+						System.out.println( this + " " + line );
 						System.out.println( 
-								this + " (before adjustment) map input: " + mapInputSize + 
+								this + " " + jobName + " (before adjustment) map input: " + mapInputSize + 
 								" map output: " + mapOutputSize + " hdfs bytes: " + hdfsBytesWritten );	
 					}
 					
 					// Make sure we have non-zero values
-					if( mapInputSize < 1000 )
-						mapInputSize = 1000;
+					// If the mapInputSize is less than 1 block in hdfs,
+					// bump it up to 1 block at least.
+					if( mapInputSize < this._hdfsFileSize )
+						mapInputSize = this._hdfsFileSize;
 					
 					if( mapOutputSize < 1000 )
 						mapOutputSize = 1000;
@@ -305,14 +306,14 @@ public class ReplayMapReduceGenerator extends Generator
 						hdfsBytesWritten = 1000;
 												
 					// Check whether there's a max shuffle limit specified in the configuration file
-					if( this._maxMapOutput != UNLIMITED_SIZE )
+					if( this._maxMapOutput != UNLIMITED_SIZE && mapOutputSize > this._maxMapOutput )
 					{
 						System.out.println( this + " Configuration file limits map output to: " + this._maxMapOutput );
 						mapOutputSize = this._maxMapOutput;
 					}
 					
 					// Check whether there's a max output limit specified in the configuration file
-					if( this._maxHdfsBytes != UNLIMITED_SIZE )
+					if( this._maxHdfsBytes != UNLIMITED_SIZE && hdfsBytesWritten > this._maxHdfsBytes )
 					{
 						System.out.println( this + " Configuration file limits bytes written to HDFS to: " + this._maxHdfsBytes );
 						hdfsBytesWritten = this._maxHdfsBytes;
@@ -320,7 +321,7 @@ public class ReplayMapReduceGenerator extends Generator
 					
 					if( this._debug )
 					{
-						System.out.println( this + " (after adjustment) map input: " + mapInputSize + 
+						System.out.println( this + " " + jobName + " (after adjustment)  map input: " + mapInputSize + 
 								" map output: " + mapOutputSize + " hdfs bytes: " + hdfsBytesWritten );
 					}
 					
@@ -329,10 +330,11 @@ public class ReplayMapReduceGenerator extends Generator
 					this._nextThinkTime = interArrivalGap;
 					
 					// Compute the ratios
-					shuffleInputRatio = (float) ( (double) mapInputSize / (double) mapOutputSize );
-					outputShuffleRatio = (float) ( (double) mapOutputSize / (double) hdfsBytesWritten );
-									
-					//System.out.println( this + " Shuffle input ratio: " + shuffleInputRatio + " output shuffle ratio: " + outputShuffleRatio );
+					shuffleInputRatio = (float) ( (double) mapOutputSize / (double) mapInputSize );
+					outputShuffleRatio = (float) ( (double) hdfsBytesWritten / (double) mapOutputSize );
+					
+					if( this._debug )
+						System.out.println( this + " " + jobName + " Shuffle input ratio: " + shuffleInputRatio + " output shuffle ratio: " + outputShuffleRatio );
 					
 					// Create A MapReduce Operation
 					MapReduceOperation op = new WorkGenMapReduceOperation( true, this._scoreboard );

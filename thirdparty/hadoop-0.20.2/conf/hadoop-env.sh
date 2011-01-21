@@ -11,7 +11,8 @@ export JAVA_HOME=/usr/lib/jvm/java-6-sun/
 # Extra Java CLASSPATH elements.  Optional.
 # Add location of Rain classes/jars to Hadoop so that the classes describing
 # Map and Reduce tasks that are used by the MapReduce workload generators work.
-export HADOOP_CLASSPATH=.:/home/rean/work/rain.git/bin
+#export HADOOP_CLASSPATH=.:/home/rean/work/rain.git/bin
+export HADOOP_CLASSPATH=.:/home/rean/work/rain.git/workloads/mapreduce.jar
 
 # The maximum amount of heap to use, in MB. Default is 1000.
 # export HADOOP_HEAPSIZE=2000
