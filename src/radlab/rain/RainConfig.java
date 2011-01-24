@@ -43,6 +43,8 @@ public class RainConfig
 	public int _pipeThreads = RainPipe.DEFAULT_NUM_THREADS;
 	// Should we wait for a start message before we start the run, default is no
 	public boolean _waitForStartSignal = false;
+	// Do we have a zookeeper address?
+	public String _zooKeeper = "";
 	
 	private static Object configLock = new Object();
 	private static volatile RainConfig config = null;

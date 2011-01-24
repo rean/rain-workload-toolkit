@@ -211,6 +211,17 @@ public class Benchmark
 			System.exit( 1 );
 		}
 		
+		// If we got 2 arguments expect a zookeeper pointer as the second parameter
+		if( args.length == 2 )
+		{
+			String zkString = args[1];
+			String zkPrefix = "zk://";
+			int zkIndex = zkString.indexOf( zkPrefix );
+			if( zkIndex == -1 )
+				RainConfig.getInstance()._zooKeeper = zkString;
+			else RainConfig.getInstance()._zooKeeper = zkString.substring( zkIndex + zkPrefix.length() );
+		}
+		
 		String filename = args[0];
 		JSONObject jsonConfig = null;
 		

@@ -25,7 +25,16 @@ public class ScadrRampProfileCreator extends ProfileCreator
 			String trackName = "scadr-00" + i;
 			JSONObject trackDetails = new JSONObject();
 			// Fill in details
-			trackDetails.put( ScenarioTrack.CFG_GENERATOR_KEY, "radlab.rain.workload.scadr.ScadrGenerator" ); 
+			trackDetails.put( ScenarioTrack.CFG_GENERATOR_KEY, "radlab.rain.workload.scadr.ScadrGenerator" );
+			// Construct generator parameters
+			JSONObject generatorParams = new JSONObject();
+			
+			generatorParams.put( ScadrGenerator.CFG_ZOOKEEPER_APP_SERVER_PATH, "/demo/apps/scadr/webServerList" );
+			generatorParams.put( ScadrGenerator.CFG_USE_POOLING_KEY, true );
+			generatorParams.put( ScadrGenerator.CFG_DEBUG_KEY, true );
+			
+			trackDetails.put( ScenarioTrack.CFG_GENERATOR_PARAMS_KEY, generatorParams );
+			
 			trackDetails.put( ScenarioTrack.CFG_TRACK_CLASS_KEY, "radlab.rain.DefaultScenarioTrack" );
 			trackDetails.put( ScenarioTrack.CFG_RESOURCE_PATH, "resources/" );
 			// Add in behavior and loadProfileCreatorClass

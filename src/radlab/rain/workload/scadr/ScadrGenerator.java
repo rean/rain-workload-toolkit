@@ -4,6 +4,7 @@ import radlab.rain.Generator;
 import radlab.rain.LoadProfile;
 import radlab.rain.ObjectPool;
 import radlab.rain.Operation;
+import radlab.rain.RainConfig;
 import radlab.rain.ScenarioTrack;
 import radlab.rain.util.HttpTransport;
 import radlab.rain.util.NegativeExponential;
@@ -23,6 +24,7 @@ public class ScadrGenerator extends Generator
 	public static String CFG_DEBUG_KEY		 = "debug";
 	public static String CFG_ZOOKEEPER_CONN_STRING		= "zookeeperConnString";
 	public static String CFG_ZOOKEEPER_APP_SERVER_PATH	= "zookeeperAppServerPath";
+	public static int DEFAULT_APP_SERVER_PORT = 8080;
 	
 	protected static final String[] US_CITIES = 
 	{
@@ -457,11 +459,17 @@ public class ScadrGenerator extends Generator
 		
 		// Talk to try to talk to Zookeeper to get the list of app servers.
 		// If we can't contact Zookeeper then use the track information
-		if( config.has( CFG_ZOOKEEPER_CONN_STRING ) && config.has( CFG_ZOOKEEPER_APP_SERVER_PATH ) )
+		if( config.has( CFG_ZOOKEEPER_APP_SERVER_PATH ) )
 		{
 			try 
 			{
-				this._zkConnString = config.getString( CFG_ZOOKEEPER_CONN_STRING );
+				// Get the zookeeper parameter from the RainConfig first. If that doesn't
+				// exist then get it from the generator config parameters
+				String zkString = RainConfig.getInstance()._zooKeeper; 
+				if( zkString != null && zkString.trim().length() > 0 )
+					this._zkConnString = zkString;
+				else this._zkConnString = config.getString( CFG_ZOOKEEPER_CONN_STRING );
+				
 				this._zkPath = config.getString( CFG_ZOOKEEPER_APP_SERVER_PATH );
 				
 				this._zconn = new ZooKeeper( this._zkConnString, DEFAULT_ZOOKEEPER_SESSION_TIMEOUT, new ZKAppServerWatcher( this ) );
@@ -469,9 +477,17 @@ public class ScadrGenerator extends Generator
 				String list = new String( data );
 				
 				this._appServers = list.split( APP_SERVER_LIST_SEPARATOR );
+								
 				this._currentAppServer = 0;
 				
 				this._usingZookeeper = true;
+				/*if( this._debug )
+				{
+					System.out.println( this + " Using Zookeeper" );
+					System.out.println( this + " Zookeeper servers found: " + this._appServers.length );
+					for( String s : this._appServers )
+						System.out.println( this + "App server: " + s );
+				}*/
 			} 
 			catch( Exception e ) 
 			{
@@ -484,7 +500,11 @@ public class ScadrGenerator extends Generator
 			// Pick an app server @ random and use that as the target host
 			this._currentAppServer = this._rand.nextInt( this._appServers.length );
 			String[] appServerNamePort = this._appServers[this._currentAppServer].split( HOSTNAME_PORT_SEPARATOR );
-			this.initializeUrls( appServerNamePort[0], Integer.parseInt( appServerNamePort[1]) );
+			
+			if( appServerNamePort.length == 2 )
+				this.initializeUrls( appServerNamePort[0], Integer.parseInt( appServerNamePort[1]) );
+			else if( appServerNamePort.length == 1 )
+				this.initializeUrls( appServerNamePort[0], DEFAULT_APP_SERVER_PORT );
 		}
 		else 
 		{
@@ -560,7 +580,12 @@ public class ScadrGenerator extends Generator
 			
 			// Pick the new target based on the current app server value
 			String nextAppServerHostPort[] = this._appServers[this._currentAppServer].split( HOSTNAME_PORT_SEPARATOR );
-			this.initializeUrls( nextAppServerHostPort[0], Integer.parseInt( nextAppServerHostPort[1] ) );
+			
+			if( nextAppServerHostPort.length == 2 )
+				this.initializeUrls( nextAppServerHostPort[0], Integer.parseInt( nextAppServerHostPort[1] ) );
+			else if( nextAppServerHostPort.length == 1 )
+				this.initializeUrls( nextAppServerHostPort[0], DEFAULT_APP_SERVER_PORT );
+			
 			// Update the current app server value
 			this._currentAppServer = (this._currentAppServer + 1) % this._appServers.length;
 						

@@ -4,8 +4,8 @@
         "generatorParameters": {
         	"debug" : "false",
         	"usePooling": "true",
-        	"zookeeperConnString": "ec2-50-16-2-36.compute-1.amazonaws.com,ec2-174-129-105-138.compute-1.amazonaws.com,ec2-50-16-59-213.compute-1.amazonaws.com",
-			"zookeeperAppServerPath": "/apps/scadr/appservers"
+        	"zookeeperConnString": "ec2-50-16-2-36.compute-1.amazonaws.com,ec2-174-129-105-138.compute-1.amazonaws.com",
+			"zookeeperAppServerPath": "/demo/apps/scadr/webServerList"
         },
         "track": "radlab.rain.DefaultScenarioTrack",
         "resourcePath": "resources/",
