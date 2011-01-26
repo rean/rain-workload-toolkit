@@ -5,6 +5,7 @@ import org.json.JSONException;
 
 import radlab.rain.Generator;
 import radlab.rain.LoadProfile;
+import radlab.rain.ObjectPool;
 import radlab.rain.Operation;
 import radlab.rain.ScenarioTrack;
 import radlab.rain.util.HttpTransport;
@@ -18,6 +19,7 @@ public class BookingGenerator extends Generator
 {
 	public static String CFG_DEBUG_TO_TRACE_LOG_KEY = "printDebugToTraceLog";
 	public static String CFG_RNG_SEED_KEY 			= "rngSeed";
+	public static String CFG_USE_POOLING_KEY 		= "usePooling";
 	
 	// Operation indices used in the mix matrix.
 	public static final int HOME_PAGE = 0;
@@ -107,6 +109,7 @@ public class BookingGenerator extends Generator
 
 	private java.util.Random _randomNumberGenerator;
 	private HttpTransport _http;
+	private boolean _usePooling = false;
 
 	boolean printDebugToTraceLog = false;
 	
@@ -180,6 +183,10 @@ public class BookingGenerator extends Generator
     	if( config.has( CFG_RNG_SEED_KEY ) )
     		this._randomNumberGenerator = new java.util.Random( config.getLong( CFG_RNG_SEED_KEY ) );
     	else this._randomNumberGenerator = new java.util.Random();
+    	
+    	if( config.has(CFG_USE_POOLING_KEY) )
+			this._usePooling = config.getBoolean( CFG_USE_POOLING_KEY );
+		
     	
     	// JSON objects can be strings, long, etc.
     	//String paramOne = config.getString( "paramOne" );
@@ -361,7 +368,16 @@ public class BookingGenerator extends Generator
 	 */
 	public HomePageOperation createHomePageOperation()
 	{
-		HomePageOperation op = new HomePageOperation( this.getTrack().getInteractive(), this.getScoreboard() );
+		HomePageOperation op = null;
+		if( this._usePooling )
+		{
+			ObjectPool pool = this.getTrack().getObjectPool();
+			op = (HomePageOperation) pool.rentObject( HomePageOperation.NAME );	
+		}
+		
+		if( op == null )
+			op = new HomePageOperation( this.getTrack().getInteractive(), this.getScoreboard() );
+		
 		op.prepare( this );
 		return op;
 	}
@@ -373,7 +389,16 @@ public class BookingGenerator extends Generator
 	 */
 	public LoginOperation createLoginOperation()
 	{
-		LoginOperation op = new LoginOperation( this.getTrack().getInteractive(), this.getScoreboard() );
+		LoginOperation op = null;
+		if( this._usePooling )
+		{
+			ObjectPool pool = this.getTrack().getObjectPool();
+			op = (LoginOperation) pool.rentObject( LoginOperation.NAME );
+		}
+		
+		if( op == null )
+			op = new LoginOperation( this.getTrack().getInteractive(), this.getScoreboard() );
+		
 		op.prepare( this );
 		return op;
 	}
@@ -385,7 +410,15 @@ public class BookingGenerator extends Generator
 	 */
 	public LogoutOperation createLogoutOperation()
 	{
-		LogoutOperation op = new LogoutOperation( this.getTrack().getInteractive(), this.getScoreboard() );
+		LogoutOperation op = null;
+		if( this._usePooling )
+		{
+			ObjectPool pool = this.getTrack().getObjectPool();
+			op = (LogoutOperation) pool.rentObject( LogoutOperation.NAME );
+		}
+		if( op == null )
+			op = new LogoutOperation( this.getTrack().getInteractive(), this.getScoreboard() );
+		
 		op.prepare( this );
 		return op;
 	}
@@ -397,7 +430,15 @@ public class BookingGenerator extends Generator
 	 */
 	public SearchHotelOperation createSearchHotelOperation()
 	{
-		SearchHotelOperation op = new SearchHotelOperation( this.getTrack().getInteractive(), this.getScoreboard() );
+		SearchHotelOperation op = null;
+		if( this._usePooling )
+		{
+			ObjectPool pool = this.getTrack().getObjectPool();
+			op = (SearchHotelOperation) pool.rentObject( SearchHotelOperation.NAME );
+		}
+		if( op == null )
+			op = new SearchHotelOperation( this.getTrack().getInteractive(), this.getScoreboard() );
+		
 		op.prepare( this );
 		return op;
 	}
@@ -409,7 +450,15 @@ public class BookingGenerator extends Generator
 	 */
 	public SearchHotelResultsOperation createSearchHotelResultsOperation()
 	{
-		SearchHotelResultsOperation op = new SearchHotelResultsOperation( this.getTrack().getInteractive(), this.getScoreboard() );
+		SearchHotelResultsOperation op = null;
+		if( this._usePooling )
+		{
+			ObjectPool pool = this.getTrack().getObjectPool();
+			op = (SearchHotelResultsOperation) pool.rentObject( SearchHotelResultsOperation.NAME );
+		}
+		if( op == null )
+			op = new SearchHotelResultsOperation( this.getTrack().getInteractive(), this.getScoreboard() );
+		
 		op.prepare( this );
 		return op;
 	}
@@ -421,7 +470,15 @@ public class BookingGenerator extends Generator
 	 */
 	public ViewHotelOperation createViewHotelOperation()
 	{
-		ViewHotelOperation op = new ViewHotelOperation( this.getTrack().getInteractive(), this.getScoreboard() );
+		ViewHotelOperation op = null;
+		if( this._usePooling )
+		{
+			ObjectPool pool = this.getTrack().getObjectPool();
+			op = (ViewHotelOperation) pool.rentObject( ViewHotelOperation.NAME );
+		}
+		if( op == null )
+			op = new ViewHotelOperation( this.getTrack().getInteractive(), this.getScoreboard() );
+		
 		op.prepare( this );
 		return op;
 	}
@@ -433,7 +490,15 @@ public class BookingGenerator extends Generator
 	 */
 	public BookHotelOperation createBookHotelOperation()
 	{
-		BookHotelOperation op = new BookHotelOperation( this.getTrack().getInteractive(), this.getScoreboard() );
+		BookHotelOperation op = null;
+		if( this._usePooling )
+		{
+			ObjectPool pool = this.getTrack().getObjectPool();
+			op = (BookHotelOperation) pool.rentObject( BookHotelOperation.NAME );
+		}
+		if( op == null )
+			op = new BookHotelOperation( this.getTrack().getInteractive(), this.getScoreboard() );
+		
 		op.prepare( this );
 		return op;
 	}
@@ -445,7 +510,15 @@ public class BookingGenerator extends Generator
 	 */
 	public ConfirmHotelOperation createConfirmHotelOperation()
 	{
-		ConfirmHotelOperation op = new ConfirmHotelOperation( this.getTrack().getInteractive(), this.getScoreboard() );
+		ConfirmHotelOperation op = null;
+		if( this._usePooling )
+		{
+			ObjectPool pool = this.getTrack().getObjectPool();
+			op = (ConfirmHotelOperation) pool.rentObject( ConfirmHotelOperation.NAME );
+		}
+		if( op == null )
+			op = new ConfirmHotelOperation( this.getTrack().getInteractive(), this.getScoreboard() );
+		
 		op.prepare( this );
 		return op;
 	}
@@ -457,7 +530,15 @@ public class BookingGenerator extends Generator
 	 */
 	public CancelHotelOperation createCancelHotelOperation()
 	{
-		CancelHotelOperation op = new CancelHotelOperation( this.getTrack().getInteractive(), this.getScoreboard() );
+		CancelHotelOperation op = null;
+		if( this._usePooling )
+		{
+			ObjectPool pool = this.getTrack().getObjectPool();
+			op = (CancelHotelOperation) pool.rentObject( CancelHotelOperation.NAME );
+		}
+		if( op == null )
+			op = new CancelHotelOperation( this.getTrack().getInteractive(), this.getScoreboard() );
+		
 		op.prepare( this );
 		return op;
 	}

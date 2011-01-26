@@ -12,11 +12,12 @@ import radlab.rain.IScoreboard;
  */
 public class LoginOperation extends BookingOperation 
 {
+	public static String NAME = "Login";
 	
 	public LoginOperation( boolean interactive, IScoreboard scoreboard ) 
 	{
 		super( interactive, scoreboard );
-		this._operationName = "Login";
+		this._operationName = NAME;
 		this._operationIndex = BookingGenerator.LOGIN;
 		this._mustBeSync = true;
 	}

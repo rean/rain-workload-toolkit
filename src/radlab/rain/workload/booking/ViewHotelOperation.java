@@ -28,12 +28,13 @@ import radlab.rain.IScoreboard;
  */
 public class ViewHotelOperation extends BookingOperation 
 {
+	public static String NAME = "View Hotel";
 	private int sleepTimeBetweenViews = 1000;		// In milliseconds.
 	
 	public ViewHotelOperation( boolean interactive, IScoreboard scoreboard ) 
 	{
 		super( interactive, scoreboard );
-		this._operationName = "View Hotel";
+		this._operationName = NAME;
 		this._operationIndex = BookingGenerator.VIEW_HOTEL;
 		this._mustBeSync = true;
 	}

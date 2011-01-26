@@ -11,11 +11,12 @@ import radlab.rain.IScoreboard;
  */
 public class LogoutOperation extends BookingOperation 
 {
+	public static String NAME = "Logout";
 	
 	public LogoutOperation( boolean interactive, IScoreboard scoreboard ) 
 	{
 		super( interactive, scoreboard );
-		this._operationName = "Logout";
+		this._operationName = NAME;
 		this._operationIndex = BookingGenerator.LOGOUT;
 		this._mustBeSync = true;
 	}

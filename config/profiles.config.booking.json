@@ -2,6 +2,7 @@
     "swf-booking-faces-001": {
         "generator": "radlab.rain.workload.booking.BookingGenerator",
         "generatorParameters":{
+        	"usePooling": "true",
         	"rngSeed": 67510
         },
         "track": "radlab.rain.DefaultScenarioTrack",
@@ -48,12 +49,12 @@
             "hostname": "localhost",
             "port": 8080
         },
-        "pLogSampling": 1.0,
+        "pLogSampling": 0.0,
         "pOpenLoop": 0.0,
         "meanCycleTime": 0,
         "meanThinkTime": 5,
         "interactive": true,
-        "objectPoolMaxSize": 500,
-        "meanResponseTimeSamplingInterval": 10
+        "objectPoolMaxSize": 1000,
+        "meanResponseTimeSamplingInterval": 100
     }
 }

@@ -20,12 +20,13 @@ import radlab.rain.IScoreboard;
  */
 public class CancelHotelOperation extends BookingOperation 
 {
+	public static String NAME = "Cancel Hotel";
 	private int sleepTimeBetweenCancels = 1000;		// In milliseconds.
 
 	public CancelHotelOperation( boolean interactive, IScoreboard scoreboard ) 
 	{
 		super( interactive, scoreboard );
-		this._operationName = "Cancel Hotel";
+		this._operationName = NAME;
 		this._operationIndex = BookingGenerator.CANCEL_HOTEL;
 		this._mustBeSync = true;
 	}

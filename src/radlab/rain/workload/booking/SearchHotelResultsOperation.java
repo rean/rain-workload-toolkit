@@ -15,10 +15,12 @@ import radlab.rain.IScoreboard;
 	 */
 public class SearchHotelResultsOperation extends BookingOperation 
 {
+	public static String NAME = "Search Hotel Results"; 
+	
 	public SearchHotelResultsOperation( boolean interactive, IScoreboard scoreboard ) 
 	{
 		super( interactive, scoreboard );
-		this._operationName = "Search Hotel Results";
+		this._operationName = NAME;
 		this._operationIndex = BookingGenerator.SEARCH_HOTEL_RESULTS;
 		this._mustBeSync = true;
 	}

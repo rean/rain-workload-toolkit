@@ -51,8 +51,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import javax.sql.DataSource;
-
 /**
  * The Scoreboard class implements the IScoreboard interface. Each Scoreboard
  * is specific to a single instantiation of a track (i.e. the statistical

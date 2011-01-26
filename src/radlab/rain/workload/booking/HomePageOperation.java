@@ -10,10 +10,12 @@ import radlab.rain.IScoreboard;
  */
 public class HomePageOperation extends BookingOperation 
 {
+	public static String NAME = "Home Page"; 
+	
 	public HomePageOperation( boolean interactive, IScoreboard scoreboard ) 
 	{
 		super( interactive, scoreboard );
-		this._operationName = "Home Page";
+		this._operationName = NAME; 
 		this._operationIndex = BookingGenerator.HOME_PAGE;
 		this._mustBeSync = true;
 	}
