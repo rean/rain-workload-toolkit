@@ -299,15 +299,15 @@ public class ReplayMapReduceGenerator extends Generator
 					if( mapInputSize < this._hdfsFileSize )
 						mapInputSize = this._hdfsFileSize;
 					
-					//if( mapOutputSize < 1000 )
-					//	mapOutputSize = 1000;
-					if( mapOutputSize < this._hdfsFileSize )
-						mapOutputSize = this._hdfsFileSize;
+					if( mapOutputSize < 1000 )
+						mapOutputSize = 1000;
+					//if( mapOutputSize < this._hdfsFileSize )
+						//mapOutputSize = this._hdfsFileSize;
 					
-					//if( hdfsBytesWritten < 1000 )
-					//	hdfsBytesWritten = 1000;
-					if( hdfsBytesWritten < this._hdfsFileSize )
-						hdfsBytesWritten = this._hdfsFileSize;
+					if( hdfsBytesWritten < 1000 )
+						hdfsBytesWritten = 1000;
+					//if( hdfsBytesWritten < this._hdfsFileSize )
+					//	hdfsBytesWritten = this._hdfsFileSize;
 					
 					
 					// Check whether there's a max shuffle limit specified in the configuration file
