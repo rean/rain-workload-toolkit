@@ -70,6 +70,9 @@ public class ScadrRampScheduleCreator extends LoadScheduleCreator
 
 		LinkedList<LoadProfile> loadSchedule = new LinkedList<LoadProfile>();
 		
+		// Add a long interval with 1 thread for debugging
+		// loadSchedule.add( new LoadProfile( 300, 1, "default", 0, "debug" ) );
+				
 		for( int i = 0; i < this._relativeLoads.length; i++ )
 		{
 			long intervalLength = this._incrementSize * this._incrementsPerInterval;

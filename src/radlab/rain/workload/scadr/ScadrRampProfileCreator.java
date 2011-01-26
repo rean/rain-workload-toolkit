@@ -35,7 +35,7 @@ public class ScadrRampProfileCreator extends ProfileCreator
 			
 			trackDetails.put( ScenarioTrack.CFG_GENERATOR_PARAMS_KEY, generatorParams );
 			
-			trackDetails.put( ScenarioTrack.CFG_TRACK_CLASS_KEY, "radlab.rain.DefaultScenarioTrack" );
+			trackDetails.put( ScenarioTrack.CFG_TRACK_CLASS_KEY, "radlab.rain.workload.scadr.ScadrScenarioTrack" );
 			trackDetails.put( ScenarioTrack.CFG_RESOURCE_PATH, "resources/" );
 			// Add in behavior and loadProfileCreatorClass
 			
@@ -98,7 +98,9 @@ public class ScadrRampProfileCreator extends ProfileCreator
 			// larger values if we're doing a long run with many operations so we reduce
 			// memory overhead of storing samples
 			trackDetails.put( ScenarioTrack.CFG_MEAN_RESPONSE_TIME_SAMPLE_INTERVAL, 50 );
-			
+			trackDetails.put( ScenarioTrack.CFG_METRIC_SNAPSHOT_INTERVAL, 60 ); // Specify the metric snapshot interval in seconds
+			trackDetails.put( ScenarioTrack.CFG_METRIC_SNAPSHOTS, true );
+			trackDetails.put( ScenarioTrack.CFG_METRIC_DB, "dev-mini-demosql.cwppbyvyquau.us-east-1.rds.amazonaws.com,radlab_dev,randyAndDavelab" );
 			trackConfig.put( trackName, trackDetails );
 		}
 		

@@ -20,5 +20,6 @@
 	<classpathentry kind="lib" path="thirdparty/zookeeper-3.3.2/zookeeper-3.3.2.jar"/>
 	<classpathentry kind="lib" path="thirdparty/zookeeper-3.3.2/lib/jline-0.9.94.jar"/>
 	<classpathentry kind="lib" path="thirdparty/zookeeper-3.3.2/lib/log4j-1.2.15.jar"/>
+	<classpathentry kind="lib" path="thirdparty/mysql-connector-java-5.1.14/mysql-connector-java-5.1.14-bin.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

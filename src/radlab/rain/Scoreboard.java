@@ -46,6 +46,13 @@ import java.text.NumberFormat;
 import java.text.DecimalFormat;
 import radlab.rain.util.PoissonSamplingStrategy;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+import javax.sql.DataSource;
+
 /**
  * The Scoreboard class implements the IScoreboard interface. Each Scoreboard
  * is specific to a single instantiation of a track (i.e. the statistical
@@ -1021,7 +1028,10 @@ public class Scoreboard implements Runnable, IScoreboard
 		// Owning scoreboard
 		private Scoreboard _owner = null;
 		private boolean _done = false;
-				
+		private boolean _jdbcDriverLoaded = false;
+		// Use JDBC to talk to the db
+		private Connection _conn = null;
+		
 		public boolean getDone() { return this._done; }
 		public void setDone( boolean val ) { this._done = val; }
 		
@@ -1037,6 +1047,18 @@ public class Scoreboard implements Runnable, IScoreboard
 		
 		public void run()
 		{
+			//Speed up the metric snapshot interval for debugging db connectivity issues
+			//this._owner._metricSnapshotInterval = 10000;
+			
+			// Load the mysql driver
+			try
+			{
+				Class.forName("com.mysql.jdbc.Driver").newInstance();
+				this._jdbcDriverLoaded = true;
+			}
+			catch( Exception e )
+			{}
+			
 			long now = System.currentTimeMillis();
 			System.out.println( this._owner.toString() + " current time: " + now  + " metric snapshot thread started!" );
 			
@@ -1049,10 +1071,30 @@ public class Scoreboard implements Runnable, IScoreboard
 					Thread.sleep( this._owner._metricSnapshotInterval );
 					// Print out the latest stats
 					//this._owner.finalCard._totalOpResponseTime;
-					System.out.println( this + " " + System.currentTimeMillis() + 
-										" " + this._owner.finalCard._totalOpResponseTime + 
-										" " + this._owner.finalCard._totalOpsSuccessful + 
-										" " + this._owner.finalCard._totalActionsSuccessful );
+					long metricTime = System.currentTimeMillis();
+					System.out.println( this + " " + metricTime + 
+										" ttl response time (msecs): " + this._owner.finalCard._totalOpResponseTime + 
+										" operations successful: " + this._owner.finalCard._totalOpsSuccessful + 
+										" actions successful: " + this._owner.finalCard._totalActionsSuccessful );
+					// Push these stats to the db
+					//this._owner._owner._name
+					if( this._jdbcDriverLoaded )
+					{
+						// Try to create or reuse a connection and put data in the db
+						if( this._conn == null )
+							this._conn = DriverManager.getConnection( System.getProperty( "dashboarddb" ) );
+						
+						if( this._conn != null && !this._conn.isClosed() )
+						{
+							PreparedStatement stmnt = this._conn.prepareStatement( "insert into rainStats (timestamp,trackName,totalResponseTime,operationsSuccessful, actionsSuccessful) values (?,?,?,?,?)" );
+							stmnt.setLong( 1, metricTime );
+							stmnt.setString( 2, this._owner._owner._name );
+							stmnt.setLong( 3, this._owner.finalCard._totalOpResponseTime );
+							stmnt.setLong( 4, this._owner.finalCard._totalOpsSuccessful );
+							stmnt.setLong( 5, this._owner.finalCard._totalActionsSuccessful );
+							stmnt.execute();
+						}
+					}
 					
 					/*// Open a log file if none is open
 					if( out == null )
@@ -1069,6 +1111,13 @@ public class Scoreboard implements Runnable, IScoreboard
 				{
 					this._done = true;
 				}
+				catch( SQLException sqe )
+				{
+					System.out.println( this + " Interacting with the database failed: " + sqe.toString() );
+					sqe.printStackTrace();
+					
+					this._done = false;
+				}
 				catch( Exception e )
 				{
 					this._done = true;
@@ -1080,6 +1129,18 @@ public class Scoreboard implements Runnable, IScoreboard
 			{
 				out.flush();
 				out.close();
+			}
+						
+			try
+			{
+				if( this._conn != null )
+					this._conn.close();
+			}
+			catch( SQLException sqe )
+			{}
+			finally
+			{
+				this._conn = null;
 			}
 			
 			System.out.println( this._owner + " snapshot-writer thread finished!" );

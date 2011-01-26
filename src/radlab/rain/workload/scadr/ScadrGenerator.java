@@ -15,9 +15,6 @@ import org.json.JSONException;
 import java.util.LinkedHashSet;
 import java.util.Random;
 
-import org.apache.zookeeper.ZooKeeper;
-import org.apache.zookeeper.data.Stat;
-
 public class ScadrGenerator extends Generator 
 {
 	public static String CFG_USE_POOLING_KEY = "usePooling";
@@ -358,8 +355,6 @@ public class ScadrGenerator extends Generator
 	public static final int POST_THOUGHT		= 4;
 	public static final int CREATE_SUBSCRIPTION = 5;
 	
-	public static final int DEFAULT_ZOOKEEPER_SESSION_TIMEOUT = 30000;
-	public static final String APP_SERVER_LIST_SEPARATOR = "\n";
 	public static final String HOSTNAME_PORT_SEPARATOR	= ":";
 	
 	private boolean _usePooling = false;
@@ -388,12 +383,12 @@ public class ScadrGenerator extends Generator
 	// Application-specific variables
 	private boolean _isLoggedIn = false;
 	private boolean _usingZookeeper = false;
-	private ZooKeeper _zconn = null;
-	private boolean _appServerListChanged = false;
+	//private ZooKeeper _zconn = null;
+	//private boolean _appServerListChanged = false;
 	private String[] _appServers = null;
 	private int _currentAppServer = 0;
-	private String _zkConnString = "";
-	private String _zkPath = "";
+	//private String _zkConnString = "";
+	//private String _zkPath = "";
 	
 	public String _loginAuthToken;
 	public String _username;
@@ -457,48 +452,45 @@ public class ScadrGenerator extends Generator
 		if( config.has( CFG_DEBUG_KEY) )
 			this._debug = config.getBoolean( CFG_DEBUG_KEY );
 		
-		// Talk to try to talk to Zookeeper to get the list of app servers.
-		// If we can't contact Zookeeper then use the track information
-		if( config.has( CFG_ZOOKEEPER_APP_SERVER_PATH ) )
+		ScadrScenarioTrack scadrTrack = null;
+		
+		String zkConnString = "";			
+		String zkPath = "";
+		
+		// Get the zookeeper parameter from the RainConfig first. If that doesn't
+		// exist then get it from the generator config parameters
+		try
 		{
-			try 
+			String zkString = RainConfig.getInstance()._zooKeeper; 
+			if( zkString != null && zkString.trim().length() > 0 )
+				zkConnString = zkString;
+			else zkConnString = config.getString( CFG_ZOOKEEPER_CONN_STRING );
+				
+			zkPath = RainConfig.getInstance()._zkPath;
+			if( zkPath == null || zkPath.trim().length() == 0 )
+				zkPath = config.getString( CFG_ZOOKEEPER_APP_SERVER_PATH );
+		
+			// Get the track - see whether it's the "right" kind of track
+			if( this._loadTrack instanceof ScadrScenarioTrack )
 			{
-				// Get the zookeeper parameter from the RainConfig first. If that doesn't
-				// exist then get it from the generator config parameters
-				String zkString = RainConfig.getInstance()._zooKeeper; 
-				if( zkString != null && zkString.trim().length() > 0 )
-					this._zkConnString = zkString;
-				else this._zkConnString = config.getString( CFG_ZOOKEEPER_CONN_STRING );
-				
-				this._zkPath = config.getString( CFG_ZOOKEEPER_APP_SERVER_PATH );
-				
-				this._zconn = new ZooKeeper( this._zkConnString, DEFAULT_ZOOKEEPER_SESSION_TIMEOUT, new ZKAppServerWatcher( this ) );
-				byte[] data = this._zconn.getData( this._zkPath, true, new Stat() );
-				String list = new String( data );
-				
-				this._appServers = list.split( APP_SERVER_LIST_SEPARATOR );
-								
-				this._currentAppServer = 0;
-				
-				this._usingZookeeper = true;
-				/*if( this._debug )
-				{
-					System.out.println( this + " Using Zookeeper" );
-					System.out.println( this + " Zookeeper servers found: " + this._appServers.length );
-					for( String s : this._appServers )
-						System.out.println( this + "App server: " + s );
-				}*/
-			} 
-			catch( Exception e ) 
-			{
-				this._usingZookeeper = false;
-			}
+				scadrTrack = (ScadrScenarioTrack) this._loadTrack;
+				scadrTrack.configureZooKeeper( zkConnString, zkPath );
+				if( scadrTrack.isConfigured() )
+					this._usingZookeeper = true;
+			}		
+		}
+		catch( JSONException e )
+		{
+			System.out.println( this + "Error obtaining ZooKeeper info from RainConfig instance or generator paramters. Falling back on targetHost and port." );
+			this._usingZookeeper = false;
 		}
 		
 		if( this._usingZookeeper )
 		{
+			this._appServers = scadrTrack.getAppServers();
 			// Pick an app server @ random and use that as the target host
 			this._currentAppServer = this._rand.nextInt( this._appServers.length );
+			
 			String[] appServerNamePort = this._appServers[this._currentAppServer].split( HOSTNAME_PORT_SEPARATOR );
 			
 			if( appServerNamePort.length == 2 )
@@ -524,14 +516,6 @@ public class ScadrGenerator extends Generator
 		this.postthoughtpageStatics = joinStatics( POSTTHOUGHTPAGE_STATICS );
 	}
 	
-	public void setAppServerListChanged( boolean val )
-	{ 
-		if( this._debug )
-			System.out.println( this + " app server list changed." );
-		
-		this._appServerListChanged = val; 
-	}
-	
 	/* Pass in index of the last operation */
 	
 	@Override
@@ -553,22 +537,20 @@ public class ScadrGenerator extends Generator
 		}
 		else
 		{
-			if( this._appServerListChanged )
+			if( this._usingZookeeper )
 			{
-				// Reload list from zookeeper
-				try
+				ScadrScenarioTrack scadrTrack = (ScadrScenarioTrack) this._loadTrack;
+				if( scadrTrack.getAppServerListChanged() )
 				{
-					this._zconn.getData( this._zkPath, true, new Stat() );
-					this._currentAppServer = 0; // Reset the list
-					this._appServerListChanged = false;
-				}
-				catch( Exception e )
-				{ 
-					// If we try to get the updated list and fail, keep using the
-					// old list, it's not a big deal
+					// Get new data
+					if( scadrTrack.updateAppServerList( 5000 ) )
+					{
+						this._appServers = scadrTrack.getAppServers();
+						this._currentAppServer = 0; // Reset the list
+					}
 				}
 			}
-			
+						
 			if( this._appServers == null )
 			{
 				String appServer = this.getTrack().getTargetHostName() + HOSTNAME_PORT_SEPARATOR + this.getTrack().getTargetHostPort();

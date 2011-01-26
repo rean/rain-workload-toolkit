@@ -299,12 +299,17 @@ public class ReplayMapReduceGenerator extends Generator
 					if( mapInputSize < this._hdfsFileSize )
 						mapInputSize = this._hdfsFileSize;
 					
-					if( mapOutputSize < 1000 )
-						mapOutputSize = 1000;
+					//if( mapOutputSize < 1000 )
+					//	mapOutputSize = 1000;
+					if( mapOutputSize < this._hdfsFileSize )
+						mapOutputSize = this._hdfsFileSize;
 					
-					if( hdfsBytesWritten < 1000 )
-						hdfsBytesWritten = 1000;
-												
+					//if( hdfsBytesWritten < 1000 )
+					//	hdfsBytesWritten = 1000;
+					if( hdfsBytesWritten < this._hdfsFileSize )
+						hdfsBytesWritten = this._hdfsFileSize;
+					
+					
 					// Check whether there's a max shuffle limit specified in the configuration file
 					if( this._maxMapOutput != UNLIMITED_SIZE && mapOutputSize > this._maxMapOutput )
 					{
@@ -328,6 +333,12 @@ public class ReplayMapReduceGenerator extends Generator
 					// Set the next think/cycle time using the interarrival gap
 					this._nextCycleTime = interArrivalGap;
 					this._nextThinkTime = interArrivalGap;
+					
+					if( this._debug )
+					{
+						System.out.println( this + " next cycle time: " + interArrivalGap );
+						System.out.println( this + " next think time: " + interArrivalGap );
+					}
 					
 					// Compute the ratios
 					shuffleInputRatio = (float) ( (double) mapOutputSize / (double) mapInputSize );

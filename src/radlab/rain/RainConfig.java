@@ -45,6 +45,7 @@ public class RainConfig
 	public boolean _waitForStartSignal = false;
 	// Do we have a zookeeper address?
 	public String _zooKeeper = "";
+	public String _zkPath = "";
 	
 	private static Object configLock = new Object();
 	private static volatile RainConfig config = null;

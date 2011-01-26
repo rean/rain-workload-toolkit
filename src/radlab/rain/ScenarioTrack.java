@@ -63,8 +63,9 @@ public abstract class ScenarioTrack
 	public static String CFG_MEAN_THINK_TIME_KEY                = "meanThinkTime";
 	public static String CFG_INTERACTIVE_KEY                    = "interactive";
 	public static String CFG_TARGET_KEY	                        = "target";
-	public static String CFG_SCOREBOARD_SNAPSHOT_INTERVAL       = "metricSnapshotInterval";
+	public static String CFG_METRIC_SNAPSHOT_INTERVAL       	= "metricSnapshotInterval";
 	public static String CFG_METRIC_SNAPSHOTS					= "metricSnapshots";
+	public static String CFG_METRIC_DB							= "metricDB";
 	// Targets keys: hostname, port
 	public static String CFG_TARGET_HOSTNAME_KEY                = "hostname";
 	public static String CFG_TARGET_PORT_KEY                    = "port";
@@ -303,9 +304,9 @@ public abstract class ScenarioTrack
 			this._mixMap.put( mixName, m );
 		}
 		// 10 Scoreboard snapshot interval
-		if( config.has( ScenarioTrack.CFG_SCOREBOARD_SNAPSHOT_INTERVAL ) )
+		if( config.has( ScenarioTrack.CFG_METRIC_SNAPSHOT_INTERVAL ) )
 		{
-			this._metricSnapshotInterval = config.getDouble( ScenarioTrack.CFG_SCOREBOARD_SNAPSHOT_INTERVAL );
+			this._metricSnapshotInterval = config.getDouble( ScenarioTrack.CFG_METRIC_SNAPSHOT_INTERVAL );
 		}
 		if( config.has( ScenarioTrack.CFG_METRIC_SNAPSHOTS ) )
 			this._useMetricSnapshots = config.getBoolean( ScenarioTrack.CFG_METRIC_SNAPSHOTS );	

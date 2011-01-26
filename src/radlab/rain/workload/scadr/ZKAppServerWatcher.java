@@ -5,11 +5,11 @@ import org.apache.zookeeper.Watcher;
 
 public class ZKAppServerWatcher implements Watcher 
 {
-	ScadrGenerator _generator = null;
-	
-	public ZKAppServerWatcher( ScadrGenerator generator ) 
+	ScadrScenarioTrack _track = null;
+		
+	public ZKAppServerWatcher( ScadrScenarioTrack track ) 
 	{
-		this._generator = generator;
+		this._track = track;
 	}
 
 	@Override
@@ -18,7 +18,6 @@ public class ZKAppServerWatcher implements Watcher
 		// Get the new list of urls, and pass them to the generator
 		//this._generator.setAppServerList( )
 		if( event.getType() == Watcher.Event.EventType.NodeDataChanged )
-			this._generator.setAppServerListChanged( true );
+			this._track.setAppServerListChanged( true );
 	}
-
 }

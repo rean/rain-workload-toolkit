@@ -22,6 +22,7 @@
     	<pathelement location="thirdparty/zookeeper-3.3.2/zookeeper-3.3.2.jar"/>
     	<pathelement location="thirdparty/zookeeper-3.3.2/lib/jline-0.9.94.jar"/>
     	<pathelement location="thirdparty/zookeeper-3.3.2/lib/log4j-1.2.15.jar"/>
+    	<pathelement location="thirdparty/mysql-connector-java-5.1.14/mysql-connector-java-5.1.14-bin.jar"/>
     </path>
 	<path id="rain.classpath.with.mr">
         <pathelement location="bin"/>
@@ -43,6 +44,8 @@
 		<pathelement location="thirdparty/hadoop-0.20.2/hadoop-0.20.2-tools.jar"/>
 		<pathelement location="thirdparty/hadoop-0.20.2/lib/commons-cli-1.2.jar"/>
 		<pathelement location="thirdparty/hadoop-0.20.2/lib/commons-httpclient-3.0.1.jar"/>
+		<!-- mysql stuff -->
+		<pathelement location="thirdparty/mysql-connector-java-5.1.14/mysql-connector-java-5.1.14-bin.jar"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>
@@ -158,6 +161,7 @@
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/zookeeper-3.3.2/zookeeper-3.3.2.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/zookeeper-3.3.2/lib/jline-0.9.94.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/zookeeper-3.3.2/lib/log4j-1.2.15.jar"/>
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/mysql-connector-java-5.1.14/mysql-connector-java-5.1.14-bin.jar"/>
         </jar>
     </target>
 	<target depends="build-with-mr" name="package-with-mr">
@@ -184,6 +188,8 @@
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/hadoop-0.20.2/hadoop-0.20.2-tools.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/hadoop-0.20.2/lib/commons-cli-1.2.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/hadoop-0.20.2/lib/commons-httpclient-3.0.1.jar"/>
+        	<!-- mysql stuff -->
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/mysql-connector-java-5.1.14/mysql-connector-java-5.1.14-bin.jar"/>
         </jar>
     </target>
 	<target depends="build-with-mr" name="package-mapreduce">
