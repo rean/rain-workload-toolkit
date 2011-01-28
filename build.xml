@@ -135,6 +135,15 @@
 	        <arg file="config/rain.config.scadr.wiki.json"/>
 	    </java>
 	</target>
+	<target depends="build" name="Benchmark-gradit">
+		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
+	    	<classpath refid="rain.classpath"/>
+	    	<jvmarg value="-Xmx1g" />
+	    	<jvmarg value="-Xms256m" />
+	    	<jvmarg value="-XX:+DisableExplicitGC"/>
+	        <arg file="config/rain.config.gradit.json"/>
+	    </java>
+	</target>
 	<target depends="build-with-mr" name="Benchmark-mapreduce">
 		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
 	    	<classpath refid="rain.classpath.with.mr"/>
@@ -235,13 +244,21 @@
         </jar>
     </target>
 	<target depends="build" name="package-scadr">
-	        <mkdir dir="workloads"/>
-	        <jar destfile="workloads/scadr.jar" filesetmanifest="mergewithoutmain">
-	            <fileset dir="bin" includes="radlab/rain/workload/scadr/**"/>
-	        	<!-- Bake the configuration files into the jar -->
-	        	<fileset dir="config" includes="*scadr*.json"/>
-	        </jar>
-	    </target>
+        <mkdir dir="workloads"/>
+        <jar destfile="workloads/scadr.jar" filesetmanifest="mergewithoutmain">
+            <fileset dir="bin" includes="radlab/rain/workload/scadr/**"/>
+        	<!-- Bake the configuration files into the jar -->
+        	<fileset dir="config" includes="*scadr*.json"/>
+        </jar>
+    </target>
+	<target depends="build" name="package-gradit">
+        <mkdir dir="workloads"/>
+        <jar destfile="workloads/gradit.jar" filesetmanifest="mergewithoutmain">
+            <fileset dir="bin" includes="radlab/rain/workload/gradit/**"/>
+        	<!-- Bake the configuration files into the jar -->
+        	<fileset dir="config" includes="*gradit*.json"/>
+        </jar>
+    </target>
 	<target depends="build" name="package-daytrader">
 		<mkdir dir="workloads"/>
 	    <jar destfile="workloads/daytrader.jar" filesetmanifest="mergewithoutmain">

@@ -1,0 +1,8 @@
+{
+    "profiles": "config/profiles.config.gradit.json",
+    "timing": {
+        "rampUp": 15,
+        "duration": 420,
+        "rampDown": 15
+    }
+}

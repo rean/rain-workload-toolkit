@@ -72,6 +72,16 @@ public class OperationExecution implements Comparable<OperationExecution>
 		// Pull out any info on when this operation was created
 		this._generatedDuring = operation.getGeneratedDuringProfile();
 		this._profileStartTime = operation.getProfileStartTime();
+		
+		TraceRecord traceRec = operation.getTrace();
+		if ( traceRec != null && traceRec._lstRequests.size() > 0 )
+		{
+			this._actionsPerformed = traceRec._lstRequests.size();
+		}
+		else
+		{
+			this._actionsPerformed = 1;
+		}
 	}
 	
 	/* Delegate to get the execution statistics */

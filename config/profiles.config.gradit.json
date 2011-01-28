@@ -1,13 +1,13 @@
 {
-    "scadr-001": {
-        "generator": "radlab.rain.workload.scadr.ScadrGenerator",
+    "gradit-001": {
+        "generator": "radlab.rain.workload.gradit.GraditGenerator",
         "generatorParameters": {
         	"debug" : "false",
         	"usePooling": "true",
         	"zookeeperConnString": "ec2-50-16-2-36.compute-1.amazonaws.com,ec2-174-129-105-138.compute-1.amazonaws.com",
-			"zookeeperAppServerPath": "/demo/apps/scadr/webServerList"
+			"zookeeperAppServerPath": "/demo/apps/gradit/webServerList"
         },
-        "track": "radlab.rain.workload.scadr.ScadrScenarioTrack",
+        "track": "radlab.rain.workload.gradit.GraditScenarioTrack",
         "resourcePath": "resources/",
         "behavior": {
             "default" : [

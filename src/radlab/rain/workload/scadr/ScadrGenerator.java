@@ -305,23 +305,22 @@ public class ScadrGenerator extends Generator
 	
 	protected static final String[] HOMEPAGE_STATICS = 
 	{
-		//"/stylesheets/base.css?1290059762",
-		//"http://fonts.googleapis.com/css?family=Lobster%7CNobile"
+		"/stylesheets/base.css?1290059762"
 	};
 
 	protected static final String[] LOGINPAGE_STATICS =
 	{
-		//"/stylesheets/base.css?1290059762"
+		"/stylesheets/base.css?1290059762"
 	};
 	
 	protected static final String[] CREATEUSERPAGE_STATICS =
 	{
-		//"/stylesheets/base.css?1290059762"
+		"/stylesheets/base.css?1290059762"
 	};
 
 	protected static final String[] POSTTHOUGHTPAGE_STATICS =
 	{
-		//"/stylesheets/base.css?1290059762"
+		"/stylesheets/base.css?1290059762"
 	};
 	
 	// Statics URLs
