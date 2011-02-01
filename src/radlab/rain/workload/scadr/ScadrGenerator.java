@@ -542,12 +542,12 @@ public class ScadrGenerator extends Generator
 				if( scadrTrack.getAppServerListChanged() )
 				{
 					// Get new data
-					if( scadrTrack.updateAppServerList( 5000 ) )
-					{
-						this._appServers = scadrTrack.getAppServers();
+					if( scadrTrack.updateAppServerList() )
 						this._currentAppServer = 0; // Reset the list
-					}
 				}
+				// Always get the list of app servers cached in the track - this doesn't cause a query to
+				// ZooKeeper
+				this._appServers = scadrTrack.getAppServers();
 			}
 						
 			if( this._appServers == null )
