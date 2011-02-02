@@ -25,11 +25,6 @@ public class GraditScenarioTrack extends DefaultScenarioTrack
 		super(parent);
 	}
 
-	public GraditScenarioTrack(String name, Scenario scenario) 
-	{
-		super(name, scenario);
-	}
-	
 	public boolean isConfigured()
 	{ return this._isConfigured; }
 	
@@ -46,8 +41,8 @@ public class GraditScenarioTrack extends DefaultScenarioTrack
 	
 	public String[] getAppServers()
 	{ 
-		if( this._appServerListChanged )
-			; // do update
+		//if( this._appServerListChanged )
+			//; // do update
 		
 		return this._appServers; 
 	}
@@ -62,7 +57,7 @@ public class GraditScenarioTrack extends DefaultScenarioTrack
 		this._zkConnString = zkConnString;
 		this._zkPath = zkPath;
 		// Update the app server list
-		boolean res = this.updateAppServerList( DEFAULT_ZOOKEEPER_SESSION_TIMEOUT );
+		boolean res = this.initializeAppServerList( DEFAULT_ZOOKEEPER_SESSION_TIMEOUT );
 				
 		if( !res )
 		{
@@ -77,7 +72,7 @@ public class GraditScenarioTrack extends DefaultScenarioTrack
 		return res;
 	}
 	
-	public boolean updateAppServerList( int timeout )
+	private boolean initializeAppServerList( int timeout )
 	{
 		try
 		{
@@ -88,6 +83,25 @@ public class GraditScenarioTrack extends DefaultScenarioTrack
 			if( list.trim().length() > 0 )
 				this._appServers = list.split( APP_SERVER_LIST_SEPARATOR );
 			
+			return true;
+		}
+		catch( Exception e )
+		{
+			return false;
+		}
+	}
+	
+	public synchronized boolean updateAppServerList()
+	{
+		try
+		{
+			byte[] data = this._zconn.getData( this._zkPath, true, new Stat() );
+			String list = new String( data );
+			
+			if( list.trim().length() > 0 )
+				this._appServers = list.split( APP_SERVER_LIST_SEPARATOR );
+			
+			this._appServerListChanged = false;
 			return true;
 		}
 		catch( Exception e )

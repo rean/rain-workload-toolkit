@@ -247,12 +247,12 @@ public class GraditGenerator extends Generator
 				if( graditTrack.getAppServerListChanged() )
 				{
 					// Get new data
-					if( graditTrack.updateAppServerList( 5000 ) )
-					{
-						this._appServers = graditTrack.getAppServers();
+					if( graditTrack.updateAppServerList() )
 						this._currentAppServer = 0; // Reset the list
-					}
 				}
+				// Always get the list of app servers cached in the track - this doesn't cause a query to
+				// ZooKeeper
+				this._appServers = graditTrack.getAppServers();
 			}
 			
 			if( this._appServers == null )
