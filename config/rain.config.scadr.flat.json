@@ -1,5 +1,5 @@
 {
-    "profilesCreatorClass": "radlab.rain.workload.scadr.ScadrRampProfileCreator",
+    "profilesCreatorClass": "radlab.rain.workload.scadr.ScadrFlatProfileCreator",
     "profilesCreatorClassParams": {
     },
     "timing": {
