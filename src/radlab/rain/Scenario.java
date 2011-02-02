@@ -242,11 +242,13 @@ public class Scenario
 		catch ( JSONException e )
 		{
 			System.out.println( "[SCENARIO] ERROR parsing tracks in JSON configuration file/object. Reason: " + e.toString() );
+			e.printStackTrace();
 			System.exit( 1 );
 		}
 		catch( Exception e )
 		{
 			System.out.println( "[SCENARIO] ERROR initializing tracks. Reason: " + e.toString() );
+			e.printStackTrace();
 			System.exit( 1 );
 		}
 	}
