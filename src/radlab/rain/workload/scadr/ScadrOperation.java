@@ -250,6 +250,8 @@ public abstract class ScadrOperation extends Operation
 	 	 commit	Save changes
 	     user[home_town]	somewhere's ville
 		 user[username]	testuser
+		 user[password] foo
+		 confirm_password foo
 		 */
 		
 		// Post the to create user results url
@@ -263,6 +265,8 @@ public abstract class ScadrOperation extends Operation
 		entity.addPart( "commit", new StringBody( commitAction ) );
 		entity.addPart( "user[home_town]", new StringBody( hometown ) );
 		entity.addPart( "user[username]", new StringBody( username ) );
+		entity.addPart( "user[password]", new StringBody( username ) );
+		entity.addPart( "confirm_password", new StringBody( username ) );
 		httpPost.setEntity( entity );
 		
 		// Make the POST request and verify that it succeeds.
@@ -340,6 +344,7 @@ public abstract class ScadrOperation extends Operation
 		 authenticity_token	XiJqPX2XOX0y3RHpVHLbhrjxcuDDnUTcvkrGVP7yDXk=
 		commit	Login
 		user_session[username]	user-
+		user_session[password]	user-
 		 */
 		
 		// Get the username from the generator - if it's not there then make up one
@@ -354,6 +359,7 @@ public abstract class ScadrOperation extends Operation
 		entity.addPart( "authenticity_token", new StringBody( authToken ) );
 		entity.addPart( "commit", new StringBody( commitAction ) );
 		entity.addPart( "user_session[username]", new StringBody( username ) );
+		entity.addPart( "user_session[password]", new StringBody( username ) );
 		httpPost.setEntity( entity );
 		
 		// Make the POST request and verify that it succeeds.

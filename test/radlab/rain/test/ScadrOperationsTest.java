@@ -91,6 +91,7 @@ public class ScadrOperationsTest
 	@Before
 	public void setUp() {		
 		generator = new ScadrGenerator( track );
+		generator.initializeUrls( "localhost", 3000 );
 	}
 
 	private void runOp( Operation op )
@@ -130,6 +131,7 @@ public class ScadrOperationsTest
 	@Test
 	public void testLogoutOperation()
 	{
+		runOp( generator.createLoginOperation() );
 		runOp( generator.createLogoutOperation() );
 	}
 	
