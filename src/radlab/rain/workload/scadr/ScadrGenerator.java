@@ -576,8 +576,18 @@ public class ScadrGenerator extends Generator
 			}
 			
 			// Pick the new target based on the current app server value
-			String nextAppServerHostPort[] = this._appServers[this._currentAppServer].split( HOSTNAME_PORT_SEPARATOR );
+			String nextAppServerHostPort[] = null;
+			if( this._currentAppServer >= this._appServers.length )
+				this._currentAppServer = 0; // Reset the current application server
 			
+			if( this._appServers.length == 0 )
+			{
+				System.out.println( "No app servers available to target. Executing no-op." );
+				return null; // no-op
+			}
+			
+			nextAppServerHostPort = this._appServers[this._currentAppServer].split( HOSTNAME_PORT_SEPARATOR );
+						
 			if( nextAppServerHostPort.length == 2 )
 				this.initializeUrls( nextAppServerHostPort[0], Integer.parseInt( nextAppServerHostPort[1] ) );
 			else if( nextAppServerHostPort.length == 1 )
