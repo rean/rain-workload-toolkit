@@ -305,38 +305,38 @@ public class ScadrGenerator extends Generator
 	
 	protected static final String[] HOMEPAGE_STATICS = 
 	{
-		"/stylesheets/base.css?1296794014",
+		/*"/stylesheets/base.css?1296794014",
 		"/javascripts/jquery.js?1296577051",
 		"/javascripts/jquery-ui.js?1296577051",
 		"/javascripts/jrails.js?1296577051",
-		"/javascripts/application.js?1296577051"
+		"/javascripts/application.js?1296577051"*/
 	};
 
 	protected static final String[] LOGINPAGE_STATICS =
 	{
-		"/stylesheets/base.css?1296794014",
+		/*"/stylesheets/base.css?1296794014",
 		"/javascripts/jquery.js?1296577051",
 		"/javascripts/jquery-ui.js?1296577051",
 		"/javascripts/jrails.js?1296577051",
-		"/javascripts/application.js?1296577051"
+		"/javascripts/application.js?1296577051"*/
 	};
 	
 	protected static final String[] CREATEUSERPAGE_STATICS =
 	{
-		"/stylesheets/base.css?1296794014",
+		/*"/stylesheets/base.css?1296794014",
 		"/javascripts/jquery.js?1296577051",
 		"/javascripts/jquery-ui.js?1296577051",
 		"/javascripts/jrails.js?1296577051",
-		"/javascripts/application.js?1296577051"
+		"/javascripts/application.js?1296577051"*/
 	};
 
 	protected static final String[] POSTTHOUGHTPAGE_STATICS =
 	{
-		"/stylesheets/base.css?1296794014",
+		/*"/stylesheets/base.css?1296794014",
 		"/javascripts/jquery.js?1296577051",
 		"/javascripts/jquery-ui.js?1296577051",
 		"/javascripts/jrails.js?1296577051",
-		"/javascripts/application.js?1296577051"
+		"/javascripts/application.js?1296577051"*/
 	};
 	
 	// Statics URLs
