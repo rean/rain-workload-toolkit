@@ -17,11 +17,11 @@ public class HomePageOperation extends ScadrOperation
 	@Override
 	public void execute() throws Throwable 
 	{
-		String authToken = this.doHomePage();
+		/*String authToken =*/ this.doHomePage();
 		// Save the auth token in the generator if one is returned
-		if( authToken == null || authToken.trim().length() == 0 )
+		/*if( authToken == null || authToken.trim().length() == 0 )
 			throw new Exception( "Authenticity token not found." );
-		else this.getGenerator()._loginAuthToken = authToken; 
+		else this.getGenerator()._loginAuthToken = authToken;*/ 
 				
 		this.setFailed( false );
 	}

@@ -405,7 +405,7 @@ public class ScadrGenerator extends Generator
 	//private String _zkConnString = "";
 	//private String _zkPath = "";
 	
-	public String _loginAuthToken;
+	//public String _loginAuthToken;
 	public String _username;
 	
 	

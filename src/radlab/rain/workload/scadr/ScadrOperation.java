@@ -104,7 +104,7 @@ public abstract class ScadrOperation extends Operation
 		return resetCache;
 	}
 	
-	public String parseAuthTokenRegex( StringBuilder buffer ) throws IOException
+	/*public String parseAuthTokenRegex( StringBuilder buffer ) throws IOException
 	{
 		String token = "";
 		//System.out.println( buffer.toString() );
@@ -119,7 +119,7 @@ public abstract class ScadrOperation extends Operation
 		}
 				
 		return token;
-	}
+	}*/
 	
 	/**
 	 * Parses an HTML document for an authenticity token used by the Ruby on
@@ -197,7 +197,7 @@ public abstract class ScadrOperation extends Operation
 		
 		// Get the authenticity token for login and pass it to the generator so that it can
 		// be used to log in if necessary
-		authToken = this.parseAuthTokenRegex( response ); 
+		authToken = "";//this.parseAuthTokenRegex( response ); 
 				
 		this.loadStatics( this.getGenerator().homepageStatics );
 		this.trace( this.getGenerator().homepageStatics );
@@ -231,9 +231,9 @@ public abstract class ScadrOperation extends Operation
 		}
 		
 		// Get the authToken
-		String authToken = this.parseAuthTokenRegex( response );
+		/*String authToken = this.parseAuthTokenRegex( response );
 		if( authToken == null || authToken.trim().length() == 0 )
-			throw new Exception( "Authenticity token not found." );
+			throw new Exception( "Authenticity token not found." );*/
 		
 		// Load the other statics
 		this.loadStatics( this.getGenerator().createuserpageStatics );
@@ -261,7 +261,7 @@ public abstract class ScadrOperation extends Operation
 		// Scadr-specific issue or not. HTTP POSTs by the Olio (Ruby web-app) driver 
 		// worked without it. 
 		MultipartEntity entity = new MultipartEntity( HttpMultipartMode.BROWSER_COMPATIBLE );
-		entity.addPart( "authenticity_token", new StringBody( authToken ) );
+		//entity.addPart( "authenticity_token", new StringBody( authToken ) );
 		entity.addPart( "commit", new StringBody( commitAction ) );
 		entity.addPart( "user[home_town]", new StringBody( hometown ) );
 		entity.addPart( "user[username]", new StringBody( username ) );
@@ -331,9 +331,9 @@ public abstract class ScadrOperation extends Operation
 		}
 		
 		// Get the authToken
-		String authToken = this.parseAuthTokenRegex( response );
+		/*String authToken = this.parseAuthTokenRegex( response );
 		if( authToken == null || authToken.trim().length() == 0 )
-			throw new Exception( "Authenticity token not found." );
+			throw new Exception( "Authenticity token not found." );*/
 		
 		// Load the other statics
 		this.loadStatics( this.getGenerator().loginpageStatics );
@@ -356,7 +356,7 @@ public abstract class ScadrOperation extends Operation
 		
 		HttpPost httpPost = new HttpPost( this.getGenerator()._loginResultUrl );
 		MultipartEntity entity = new MultipartEntity( HttpMultipartMode.BROWSER_COMPATIBLE );
-		entity.addPart( "authenticity_token", new StringBody( authToken ) );
+		//entity.addPart( "authenticity_token", new StringBody( authToken ) );
 		entity.addPart( "commit", new StringBody( commitAction ) );
 		entity.addPart( "user_session[username]", new StringBody( username ) );
 		entity.addPart( "user_session[password]", new StringBody( username ) );
@@ -419,9 +419,9 @@ public abstract class ScadrOperation extends Operation
 		}
 		
 		// Get the auth token
-		String authToken = this.parseAuthTokenRegex( response );
+		/*String authToken = this.parseAuthTokenRegex( response );
 		if( authToken == null || authToken.trim().length() == 0 )
-			throw new Exception( "Authenticity token not found." );
+			throw new Exception( "Authenticity token not found." );*/
 		
 		// Load the other statics
 		this.loadStatics( this.getGenerator().postthoughtpageStatics );
@@ -441,7 +441,7 @@ public abstract class ScadrOperation extends Operation
 		
 		HttpPost httpPost = new HttpPost( postThoughtResultUrl );
 		MultipartEntity entity = new MultipartEntity( HttpMultipartMode.BROWSER_COMPATIBLE );
-		entity.addPart( "authenticity_token", new StringBody( authToken ) );
+		//entity.addPart( "authenticity_token", new StringBody( authToken ) );
 		entity.addPart( "commit", new StringBody( commitAction ) );
 		entity.addPart( "thought[text]", new StringBody( thought ) );
 		httpPost.setEntity( entity );
@@ -548,9 +548,10 @@ public abstract class ScadrOperation extends Operation
 		}
 		
 		// Get the auth token
+		/*
 		String authToken = this.parseAuthTokenRegex( response );
 		if( authToken == null || authToken.trim().length() == 0 )
-			throw new Exception( "Authenticity token not found." );
+			throw new Exception( "Authenticity token not found." );*/
 		
 		// Load the other statics
 		this.loadStatics( this.getGenerator().postthoughtpageStatics );
@@ -567,7 +568,7 @@ public abstract class ScadrOperation extends Operation
 		String createSubscriptionResultUrl = String.format( this.getGenerator()._createSubscriptionResultUrlTemplate, me ); 
 		HttpPost httpPost = new HttpPost( createSubscriptionResultUrl );
 		MultipartEntity entity = new MultipartEntity( HttpMultipartMode.BROWSER_COMPATIBLE );
-		entity.addPart( "authenticity_token", new StringBody( authToken ) );
+		//entity.addPart( "authenticity_token", new StringBody( authToken ) );
 		entity.addPart( "commit", new StringBody( commitAction ) );
 		entity.addPart( "subscription[target]", new StringBody( targetUser ) );
 		httpPost.setEntity( entity );
