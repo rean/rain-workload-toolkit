@@ -408,6 +408,10 @@ public class ScadrGenerator extends Generator
 	//public String _loginAuthToken;
 	public String _username;
 	
+	// Keep track of every app server we talk to so we can check whether the load
+	// is being rotated like we expect
+	private String _lastAppServer = "";
+	
 	
 	public ScadrGenerator(ScenarioTrack track) 
 	{
@@ -592,6 +596,22 @@ public class ScadrGenerator extends Generator
 				this.initializeUrls( nextAppServerHostPort[0], Integer.parseInt( nextAppServerHostPort[1] ) );
 			else if( nextAppServerHostPort.length == 1 )
 				this.initializeUrls( nextAppServerHostPort[0], DEFAULT_APP_SERVER_PORT );
+			
+			// Check whether the current app server is the same as the previous app server
+			if( this._debug )
+			{
+				//System.out.println( this + " " + this._appServers.length + " app servers found." );
+				
+				if( nextAppServerHostPort[0].equalsIgnoreCase( this._lastAppServer ) )
+					System.out.println( this + " no app server rotation" );
+				/*else
+				{
+					System.out.println( this + " app server rotation. Prev: " + this._lastAppServer + " current: " + nextAppServerHostPort[0] );
+				}*/
+				
+				// Save the app server being targeted now
+				this._lastAppServer = nextAppServerHostPort[0];
+			}
 			
 			// Update the current app server value
 			this._currentAppServer = (this._currentAppServer + 1) % this._appServers.length;
@@ -787,5 +807,13 @@ public class ScadrGenerator extends Generator
 			// Truncate at 5 times the mean (arbitrary truncation)
 			return Math.min( nextThinkTime, (5*this._thinkTime) );
 		}
+	}
+	
+	@Override
+	public String toString()
+	{
+		StringBuffer buf = new StringBuffer();
+		buf.append( "[" ).append( this._name ).append( "]" );
+		return buf.toString();
 	}
 }

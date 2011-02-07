@@ -100,6 +100,11 @@ public class ScadrScenarioTrack extends DefaultScenarioTrack
 			if( list.trim().length() > 0 )
 			{
 				this._appServers = list.split( APP_SERVER_LIST_SEPARATOR );
+				System.out.println( this + " Appserver list initialized, " + this._appServers.length + " app servers found." );
+				for( String s : this._appServers )
+				{
+					System.out.println( this + " Appserver: " + s );
+				}
 				return true; // Signal that we've initialized the app server list
 			}
 			else return false;
@@ -128,6 +133,11 @@ public class ScadrScenarioTrack extends DefaultScenarioTrack
 			if( list.trim().length() > 0 )
 			{
 				this._appServers = list.split( APP_SERVER_LIST_SEPARATOR );
+				System.out.println( this + " Appserver list updated, " + this._appServers.length + " app servers found." );
+				for( String s : this._appServers )
+				{
+					System.out.println( this + " Appserver: " + s );
+				}
 				this._appServerListChanged = false; // Now that we have the new list of appservers squelch the change
 				return true; // Signal that we've updated the app server list
 			}
