@@ -458,7 +458,7 @@ public abstract class ScadrOperation extends Operation
 		String successMessage = "New thought created.";
 		
 		if( !response.toString().contains( successMessage.toString() ) )
-			throw new Exception( "Unable to create new thought." + "URL: " + postThoughtResultUrl + " HTTP Status Code: " + this._http.getStatusCode() + " Response: " + response.toString() );
+			throw new Exception( "Unable to create new thought." + " Logged in status: " + this.getGenerator().getIsLoggedIn() + " URL: " + postThoughtResultUrl + " HTTP Status Code: " + this._http.getStatusCode() + " Response: " + response.toString() );
 		else 
 		{
 			//System.out.println( "PostThought worked." );
@@ -485,8 +485,8 @@ public abstract class ScadrOperation extends Operation
 		{
 			String errorMessage = "";
 			if( response != null )
-				errorMessage = "Logout page GET ERROR - Received an empty/error response. " + "URL: " + this.getGenerator()._logoutUrl + " HTTP Status Code: " + this._http.getStatusCode() + " Response length: " + response.length();
-			else errorMessage = "Logout page GET ERROR - Received an empty/error response. " + "URL: " + this.getGenerator()._logoutUrl + " HTTP Status Code: " + this._http.getStatusCode() + " Response length: 0/NULL";
+				errorMessage = "Logout page GET ERROR - Received an empty/error response. " + " Logged in status: " + this.getGenerator().getIsLoggedIn() + " URL: " + this.getGenerator()._logoutUrl + " HTTP Status Code: " + this._http.getStatusCode() + " Response length: " + response.length();
+			else errorMessage = "Logout page GET ERROR - Received an empty/error response. " + " Logged in status: " + this.getGenerator().getIsLoggedIn() +" URL: " + this.getGenerator()._logoutUrl + " HTTP Status Code: " + this._http.getStatusCode() + " Response length: 0/NULL";
 			throw new IOException( errorMessage );
 		}
 		
@@ -599,8 +599,8 @@ public abstract class ScadrOperation extends Operation
 		else 
 		{
 			if( response != null )
-				throw new Exception( "Unable to subscribe to user: " + targetUser + " @ URL: " + createSubscriptionResultUrl + " HTTP Status Code: " + this._http.getStatusCode() + " Response: " + response.toString() );
-			else throw new Exception( "Unable to subscribe to user: " + targetUser + " @ URL: " + createSubscriptionResultUrl + " HTTP Status Code: " + this._http.getStatusCode() + " Response: NULL" );
+				throw new Exception( "Unable to subscribe to user: " + targetUser + " Logged in status: " + this.getGenerator().getIsLoggedIn() + " URL: " + createSubscriptionResultUrl + " HTTP Status Code: " + this._http.getStatusCode() + " Response: " + response.toString() );
+			else throw new Exception( "Unable to subscribe to user: " + targetUser + " Logged in status: " + this.getGenerator().getIsLoggedIn() + " URL: " + createSubscriptionResultUrl + " HTTP Status Code: " + this._http.getStatusCode() + " Response: NULL" );
 		}
 	}
 	
