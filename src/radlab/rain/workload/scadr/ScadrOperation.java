@@ -243,7 +243,7 @@ public abstract class ScadrOperation extends Operation
 		int rndCity = this._random.nextInt( ScadrGenerator.US_CITIES.length );
 		String hometown = ScadrGenerator.US_CITIES[rndCity];
 		
-		String commitAction = "Save changes";
+		String commitAction = "Submit";
 				
 		/*
 		 authenticity_token	XiJqPX2XOX0y3RHpVHLbhrjxcuDDnUTcvkrGVP7yDXk=
@@ -265,8 +265,8 @@ public abstract class ScadrOperation extends Operation
 		entity.addPart( "commit", new StringBody( commitAction ) );
 		entity.addPart( "user[home_town]", new StringBody( hometown ) );
 		entity.addPart( "user[username]", new StringBody( username ) );
-		entity.addPart( "user[password]", new StringBody( username ) );
-		entity.addPart( "confirm_password", new StringBody( username ) );
+		entity.addPart( "user[plain_password]", new StringBody( username ) );
+		entity.addPart( "user[confirm_password]", new StringBody( username ) );
 		httpPost.setEntity( entity );
 		
 		// Make the POST request and verify that it succeeds.
@@ -532,7 +532,7 @@ public abstract class ScadrOperation extends Operation
 		// Do a get for that user - look for a subscribe button
 		StringBuilder response = this._http.fetchUrl( targetUserUrl );
 		this.trace( targetUserUrl );
-		if( response.length() == 0 || this._http.getStatusCode() > 399 )
+		if( response.length() == 0 || this._http.getStatusCode() > 399 || response.toString().contains( "does not exist" ) )
 		{
 			// Create user if they don't exist
 			if( !createTargetUser )
