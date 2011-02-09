@@ -326,7 +326,10 @@ public abstract class ScadrOperation extends Operation
 		this.trace( this.getGenerator()._loginUrl );
 		if( response.length() == 0 || this._http.getStatusCode() > 399 )
 		{
-			String errorMessage = "Login page GET ERROR - Received an empty/error response";
+			String errorMessage = "";
+			if( response != null )
+				errorMessage = "Login page GET ERROR - Received an empty/error response. URL: " + this.getGenerator()._loginUrl + " HTTP Status Code: " + this._http.getStatusCode() + " Response: " + response.toString();
+			else errorMessage = "Login page GET ERROR - Received an empty/error response. URL: " + this.getGenerator()._loginUrl + " HTTP Status Code: " + this._http.getStatusCode() + " Response: NULL";
 			throw new IOException( errorMessage );
 		}
 		
@@ -455,7 +458,7 @@ public abstract class ScadrOperation extends Operation
 		String successMessage = "New thought created.";
 		
 		if( !response.toString().contains( successMessage.toString() ) )
-			throw new Exception( "Unable to create new thought." );
+			throw new Exception( "Unable to create new thought." + "URL: " + postThoughtResultUrl + " HTTP Status Code: " + this._http.getStatusCode() + " Response: " + response.toString() );
 		else 
 		{
 			//System.out.println( "PostThought worked." );
@@ -480,13 +483,16 @@ public abstract class ScadrOperation extends Operation
 		this.trace( this.getGenerator()._logoutUrl );
 		if( response.length() == 0 || this._http.getStatusCode() > 399 )
 		{
-			String errorMessage = "Logout page GET ERROR - Received an empty/error response";
+			String errorMessage = "";
+			if( response != null )
+				errorMessage = "Logout page GET ERROR - Received an empty/error response. " + "URL: " + this.getGenerator()._logoutUrl + " HTTP Status Code: " + this._http.getStatusCode() + " Response length: " + response.length();
+			else errorMessage = "Logout page GET ERROR - Received an empty/error response. " + "URL: " + this.getGenerator()._logoutUrl + " HTTP Status Code: " + this._http.getStatusCode() + " Response length: 0/NULL";
 			throw new IOException( errorMessage );
 		}
 		
 		String successMessage = "You are now logged out.";
 		if( !response.toString().contains( successMessage.toString() ) )
-			throw new Exception( "Unable to log out." );
+			throw new Exception( "Unable to log out. Response: " + response.toString() );
 		
 		if( debug )
 		{
@@ -590,7 +596,12 @@ public abstract class ScadrOperation extends Operation
 			}
 			return;
 		}
-		else throw new Exception( "Unable to subscribe to user: " + targetUser );
+		else 
+		{
+			if( response != null )
+				throw new Exception( "Unable to subscribe to user: " + targetUser + " @ URL: " + createSubscriptionResultUrl + " HTTP Status Code: " + this._http.getStatusCode() + " Response: " + response.toString() );
+			else throw new Exception( "Unable to subscribe to user: " + targetUser + " @ URL: " + createSubscriptionResultUrl + " HTTP Status Code: " + this._http.getStatusCode() + " Response: NULL" );
+		}
 	}
 	
 	private String subscribeToUser( int numberOfUsers )
