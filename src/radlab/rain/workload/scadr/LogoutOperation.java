@@ -16,7 +16,7 @@ public class LogoutOperation extends ScadrOperation
 	@Override
 	public void execute() throws Throwable 
 	{
-		this.doLogout();
+		//this.doLogout();
 		this.setFailed( false );
 	}
 }
