@@ -3,8 +3,8 @@
     "profilesCreatorClassParams": {
     },
     "timing": {
-        "rampUp": 15,
-        "duration": 420,
+        "rampUp": 60,
+        "duration": 3600,
         "rampDown": 15
     }
 }

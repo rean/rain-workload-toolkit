@@ -458,7 +458,9 @@ public abstract class ScadrOperation extends Operation
 		String successMessage = "New thought created.";
 		
 		if( !response.toString().contains( successMessage.toString() ) )
+		{
 			throw new Exception( "Unable to create new thought." + " Logged in status: " + this.getGenerator().getIsLoggedIn() + " URL: " + postThoughtResultUrl + " HTTP Status Code: " + this._http.getStatusCode() + " Response: " + response.toString() );
+		}
 		else 
 		{
 			//System.out.println( "PostThought worked." );
@@ -472,6 +474,9 @@ public abstract class ScadrOperation extends Operation
 
 	public void doLogout() throws Exception
 	{
+		if( !this.getGenerator().getIsLoggedIn() )
+			return;
+		
 		long start = 0;
 		long end = 0;
 		boolean debug = this.getGenerator().getIsDebugMode();

@@ -39,7 +39,7 @@ public class ScadrRampScheduleCreator extends LoadScheduleCreator
 			   19,
 			   20
 	};
-	private int _incrementSize = 60; // 60 seconds per increment
+	private int _incrementSize = 360; // 60 seconds per increment
 	private int _incrementsPerInterval = 1; // this gives us 10 seconds per interval
 	
 	
