@@ -72,18 +72,21 @@ public class ScadrRampScheduleCreator extends LoadScheduleCreator
 		
 		// Add a long interval with 1 thread for debugging
 		// loadSchedule.add( new LoadProfile( 300, 1, "default", 0, "debug" ) );
-				
+		
+		// Set the transition time to be half of the interval
+		long transitionTime = (this._incrementSize * this._incrementsPerInterval)/2;
+		
 		for( int i = 0; i < this._relativeLoads.length; i++ )
 		{
 			long intervalLength = this._incrementSize * this._incrementsPerInterval;
 			if( i == 0 )
-				loadSchedule.add( new LoadProfile( intervalLength, this._initialWorkload, "default", 0, FORMATTER.format(i) ) );
+				loadSchedule.add( new LoadProfile( intervalLength, this._initialWorkload, "default", transitionTime, FORMATTER.format(i) ) );
 			else 
 			{	
 				int users = 0;
 				users = (int) Math.round( loadSchedule.getFirst().getNumberOfUsers() * this._relativeLoads[i] );
 				
-				loadSchedule.add( new LoadProfile( intervalLength, users, "default", 0, FORMATTER.format(i) ) );
+				loadSchedule.add( new LoadProfile( intervalLength, users, "default", transitionTime, FORMATTER.format(i) ) );
 			}
 		}
 		

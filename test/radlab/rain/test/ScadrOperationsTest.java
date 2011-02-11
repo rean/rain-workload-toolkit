@@ -91,7 +91,7 @@ public class ScadrOperationsTest
 	@Before
 	public void setUp() {		
 		generator = new ScadrGenerator( track );
-		generator.initializeUrls( "localhost", 3000 );
+		generator.initializeUrls( "scadr.knowsql.org", 80 );
 	}
 
 	private void runOp( Operation op )
