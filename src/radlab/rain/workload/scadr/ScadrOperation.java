@@ -24,6 +24,9 @@ import radlab.rain.IScoreboard;
 import radlab.rain.Operation;
 import radlab.rain.util.HttpTransport;
 
+import java.security.MessageDigest;
+import java.math.BigInteger;
+
 public abstract class ScadrOperation extends Operation 
 {
 	public static String AUTH_TOKEN_PATTERN = "(<input name=\"authenticity_token\" (type=\"hidden\") value=\"(\\S*)\" />)";
@@ -617,14 +620,31 @@ public abstract class ScadrOperation extends Operation
 		int rndTarget = this._random.nextInt( numberOfUsers );
 		StringBuilder target = new StringBuilder();
 		target.append( "user-").append( this.getGenerator().getTrack().getName() ).append( "-Generator-" ).append( rndTarget );
-		return target.toString();
+		return distributeUserName(target.toString());
 	}
 	
 	private String getUsername()
 	{
 		// User names can't have any periods in them
-		return "user-" + this._generatedBy.replace( '.', '-');
+	  return distributeUserName("user-" + this._generatedBy.replace( '.', '-'));
 	}
+
+  //Append a hash to the begining of usernames so they distribute better
+  private String distributeUserName(String username)
+  {
+    //Stupid checked exceptions
+    try {
+      MessageDigest digest = MessageDigest.getInstance("MD5");
+      digest.update(username.getBytes(), 0, username.length());
+      byte[] md5Sum = digest.digest();
+      BigInteger bigInt = new BigInteger(1, md5Sum);
+      return bigInt.toString(16) + username;
+    }
+    catch (Exception e) {
+      System.out.println("CANT CALCULATE HASH using undistributed username");
+      return username;
+    }
+  }
 	
 	private String getThought()
 	{
