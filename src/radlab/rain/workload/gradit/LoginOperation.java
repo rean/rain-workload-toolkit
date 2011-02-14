@@ -29,26 +29,37 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package radlab.rain.workload.scadr;
+package radlab.rain.workload.gradit;
 
-import org.apache.zookeeper.WatchedEvent;
-import org.apache.zookeeper.Watcher;
+import radlab.rain.IScoreboard;
 
-public class ZKAppServerWatcher implements Watcher 
+public class LoginOperation extends GraditOperation 
 {
-	ScadrScenarioTrack _track = null;
-		
-	public ZKAppServerWatcher( ScadrScenarioTrack track ) 
+	public static String NAME = "Login";
+	
+	public LoginOperation(boolean interactive, IScoreboard scoreboard) 
 	{
-		this._track = track;
+		super(interactive, scoreboard);
+		this._operationName = NAME;
+		this._operationIndex = GraditGenerator.LOGIN;
 	}
 
 	@Override
-	public void process( WatchedEvent event ) 
+	public void execute() throws Throwable 
 	{
-		// Get the new list of urls, and pass them to the generator
-		//this._generator.setAppServerList( )
-		if( event.getType() == Watcher.Event.EventType.NodeDataChanged )
-			this._track.setAppServerListChanged( true );
+		boolean result = this.doLogin();
+		if( !result )
+		{
+			// Try creating the user first and then re-try the log in
+			this.doRegisterUser();
+			result = this.doLogin();
+		}
+		
+		// If we're not able to log in then throw an exception
+		if( !result )
+			throw new Exception( "Unable to log in." );
+		
+		this.getGenerator().setIsLoggedIn( true );
+		this.setFailed( false );
 	}
 }

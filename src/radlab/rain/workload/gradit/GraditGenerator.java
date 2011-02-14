@@ -53,104 +53,397 @@ public class GraditGenerator extends Generator
 	public static String CFG_ZOOKEEPER_CONN_STRING		= "zookeeperConnString";
 	public static String CFG_ZOOKEEPER_APP_SERVER_PATH	= "zookeeperAppServerPath";
 	public static int DEFAULT_APP_SERVER_PORT = 8080;
-		
-	// Operation indices used in the mix matrix.
-	public static final int HOME_PAGE	= 0;
 	
-	public static final String HOSTNAME_PORT_SEPARATOR	= ":";
-	
+	protected static final String[] US_CITIES = 
+	{
+		"New York",
+		"Los Angeles",
+		"Chicago",
+		"Houston",
+		"Phoenix",
+		"Philadelphia",
+		"San Antonio",
+		"San Diego",
+		"Dallas",
+		"San Jose",
+		"Detroit",
+		"San Francisco",
+		"Jacksonville",
+		"Indianapolis",
+		"Austin",
+		"Columbus",
+		"Fort Worth",
+		"Charlotte",
+		"Memphis",
+		"Boston",
+		"Baltimore",
+		"El Paso",
+		"Seattle",
+		"Denver",
+		"Nashville",
+		"Milwaukee",
+		"Washington",
+		"Las Vegas",
+		"Louisville",
+		"Portland",
+		"Oklahoma City",
+		"Tucson",
+		"Atlanta",
+		"Albuquerque",
+		"Kansas City",
+		"Fresno",
+		"Mesa",
+		"Sacramento",
+		"Long Beach",
+		"Omaha",
+		"Virginia Beach",
+		"Miami",
+		"Cleveland",
+		"Oakland",
+		"Raleigh",
+		"Colorado Springs",
+		"Tulsa",
+		"Minneapolis",
+		"Arlington",
+		"Honolulu",
+		"Wichita",
+		"St. Louis",
+		"New Orleans",
+		"Tampa",
+		"Santa Ana",
+		"Anaheim",
+		"Cincinnati",
+		"Bakersfield",
+		"Aurora",
+		"Toledo",
+		"Pittsburgh",
+		"Riverside",
+		"Lexington",
+		"Stockton",
+		"Corpus Christi",
+		"Anchorage",
+		"St. Paul",
+		"Newark",
+		"Plano",
+		"Buffalo",
+		"Henderson",
+		"Fort Wayne",
+		"Greensboro",
+		"Lincoln",
+		"Glendale",
+		"Chandler",
+		"St. Petersburg",
+		"Jersey City",
+		"Scottsdale",
+		"Orlando",
+		"Madison",
+		"Norfolk",
+		"Birmingham",
+		"Winston-Salem",
+		"Durham",
+		"Laredo",
+		"Lubbock",
+		"Baton Rouge",
+		"North Las Vegas",
+		"Chula Vista",
+		"Chesapeake",
+		"Gilbert",
+		"Garland",
+		"Reno",
+		"Hialeah",
+		"Arlington",
+		"Irvine",
+		"Rochester",
+		"Akron",
+		"Boise",
+		"Irving",
+		"Fremont",
+		"Richmond",
+		"Spokane",
+		"Modesto",
+		"Montgomery",
+		"Yonkers",
+		"Des Moines",
+		"Tacoma",
+		"Shreveport",
+		"San Bernardino",
+		"Fayetteville",
+		"Glendale",
+		"Augusta",
+		"Grand Rapids",
+		"Huntington Beach",
+		"Mobile",
+		"Newport News",
+		"Little Rock",
+		"Moreno Valley",
+		"Columbus",
+		"Amarillo",
+		"Fontana",
+		"Oxnard",
+		"Knoxville",
+		"Fort Lauderdale",
+		"Salt Lake City",
+		"Worcester",
+		"Huntsville",
+		"Tempe",
+		"Brownsville",
+		"Jackson",
+		"Overland Park",
+		"Aurora",
+		"Oceanside",
+		"Tallahassee",
+		"Providence",
+		"Rancho Cucamonga",
+		"Ontario",
+		"Chattanooga",
+		"Santa Clarita",
+		"Garden Grove",
+		"Vancouver",
+		"Grand Prairie",
+		"Peoria",
+		"Sioux Falls",
+		"Springfield",
+		"Santa Rosa",
+		"Rockford",
+		"Springfield",
+		"Salem",
+		"Port St. Lucie",
+		"Cape Coral",
+		"Dayton",
+		"Eugene",
+		"Pomona",
+		"Corona",
+		"Alexandria",
+		"Joliet",
+		"Pembroke Pines",
+		"Paterson",
+		"Pasadena",
+		"Lancaster",
+		"Hayward",
+		"Salinas",
+		"Hampton ",
+		"Palmdale",
+		"Pasadena",
+		"Naperville",
+		"Kansas City",
+		"Hollywood",
+		"Lakewood",
+		"Torrance",
+		"Escondido",
+		"Fort Collins",
+		"Syracuse",
+		"Bridgeport",
+		"Orange",
+		"Cary",
+		"Elk Grove",
+		"Savannah",
+		"Sunnyvale",
+		"Warren",
+		"Mesquite",
+		"Fullerton",
+		"McAllen",
+		"Columbia",
+		"Carrollton",
+		"Cedar Rapids",
+		"McKinney",
+		"Sterling Heights",
+		"Bellevue",
+		"Coral Springs",
+		"Waco",
+		"Elizabeth",
+		"West Valley City",
+		"Clarksville",
+		"Topeka",
+		"Hartford",
+		"Thousand Oaks",
+		"New Haven",
+		"Denton",
+		"Concord",
+		"Visalia",
+		"Olathe",
+		"El Monte",
+		"Independence",
+		"Stamford",
+		"Simi Valley",
+		"Provo",
+		"Killeen",
+		"Springfield",
+		"Thornton",
+		"Abilene",
+		"Gainesville",
+		"Evansville",
+		"Roseville",
+		"Charleston",
+		"Peoria",
+		"Athens ",
+		"Lafayette",
+		"Vallejo",
+		"Lansing",
+		"Ann Arbor",
+		"Inglewood",
+		"Santa Clara",
+		"Flint",
+		"Victorville",
+		"Costa Mesa",
+		"Beaumont",
+		"Miami Gardens",
+		"Manchester",
+		"Westminster",
+		"Miramar",
+		"Norman",
+		"Cambridge",
+		"Midland",
+		"Arvada",
+		"Allentown",
+		"Elgin",
+		"Waterbury",
+		"Downey",
+		"Clearwater",
+		"Billings",
+		"West Covina",
+		"Round Rock",
+		"Murfreesboro",
+		"Lewisville",
+		"West Jordan",
+		"Pueblo",
+		"San Buenaventura (Ventura)",
+		"Lowell",
+		"South Bend",
+		"Fairfield",
+		"Erie",
+		"Rochester",
+		"High Point",
+		"Richardson",
+		"Richmond",
+		"Burbank",
+		"Berkeley",
+		"Pompano Beach",
+		"Norwalk",
+		"Frisco",
+		"Columbia",
+		"Gresham",
+		"Daly City",
+		"Green Bay",
+		"Wilmington",
+		"Davenport",
+		"Wichita Falls",
+		"Antioch",
+		"Palm Bay",
+		"Odessa",
+		"Centennial",
+		"Boulder",
+	};
 	
 	protected static final String[] HOMEPAGE_STATICS = 
 	{
-		"/javascripts/application.js?1296239250",
-		"/stylesheets/search_home.css?1296239250",
-		"/javascripts/prototype.js?1296239250",
-		"/javascripts/effects.js?1296239250",
-		"/javascripts/dragdrop.js?1296239250",
-		"/javascripts/controls.js?1296239250",
+		/*"/stylesheets/base.css?1296794014",
+		"/javascripts/jquery.js?1296577051",
+		"/javascripts/jquery-ui.js?1296577051",
+		"/javascripts/jrails.js?1296577051",
+		"/javascripts/application.js?1296577051"*/
+	};
+
+	protected static final String[] LOGINPAGE_STATICS =
+	{
+		/*"/stylesheets/base.css?1296794014",
+		"/javascripts/jquery.js?1296577051",
+		"/javascripts/jquery-ui.js?1296577051",
+		"/javascripts/jrails.js?1296577051",
+		"/javascripts/application.js?1296577051"*/
+	};
+	
+	protected static final String[] CREATEUSERPAGE_STATICS =
+	{
+		/*"/stylesheets/base.css?1296794014",
+		"/javascripts/jquery.js?1296577051",
+		"/javascripts/jquery-ui.js?1296577051",
+		"/javascripts/jrails.js?1296577051",
+		"/javascripts/application.js?1296577051"*/
 	};
 	
 	// Statics URLs
 	public String[] homepageStatics; 
+	public String[] loginpageStatics;
+	public String[] registeruserpageStatics;
+			
+	// Operation indices - each operation has a unique index 
+	
+	public static final int HOME_PAGE			= 0;
+	public static final int REGISTER_USER		= 1;
+	public static final int LOGIN		 		= 2;
+	public static final int LOGOUT				= 3;
 	
 	
-	// App urls
-	public String _baseUrl;
-	public String _homeUrl;
+	public static final String HOSTNAME_PORT_SEPARATOR	= ":";
 	
+	private boolean _usePooling = false;
+	private boolean _debug = false;
 	
 	private HttpTransport _http;
 	private Random _rand;
 	private NegativeExponential _thinkTimeGenerator  = null;
 	private NegativeExponential _cycleTimeGenerator = null;
-	private boolean _usePooling = false;
-	private boolean _debug = false;
+	
+	// App urls
+	public String _baseUrl;
+	public String _homeUrl;
+	public String _registerUserUrl;
+	public String _createUserUrl;
+	public String _loginUrl;
+	public String _dashboardUrl;
 		
-	public boolean _isLoggedIn = false;
+	public String _logoutUrl;
+	
+	// Application-specific variables
+	private boolean _isLoggedIn = false;
 	private boolean _usingZookeeper = false;
-	
-	public String _loggedInUser = "";
-	public String _homePageAuthToken;
-	
 	private String[] _appServers = null;
 	private int _currentAppServer = 0;
+	
+	//public String _loginAuthToken;
+	public String _username;
+	
+	// Keep track of every app server we talk to so we can check whether the load
+	// is being rotated like we expect
+	private String _lastAppServer = "";
 	
 	
 	public GraditGenerator(ScenarioTrack track) 
 	{
 		super(track);
-		
-		//this._baseUrl 	= "http://" + this._loadTrack.getTargetHostName() + ":" + this._loadTrack.getTargetHostPort();
-		
 		this._rand = new Random();
 	}
 
+	public void initializeUrls( String targetHost, int port )
+	{
+		this._baseUrl 	= "http://" + targetHost + ":" + port;
+		this._homeUrl = this._baseUrl;
+		
+		this._registerUserUrl = this._baseUrl + "/register";
+		this._createUserUrl = this._baseUrl + "/users/create";
+		
+		this._dashboardUrl = this._baseUrl + "/dashboard";
+		
+		this._loginUrl = this._baseUrl + "/users/login_action";
+						
+		this._logoutUrl = this._baseUrl + "/logout";
+		
+		this.initializeStaticUrls();
+	}
+	
 	public boolean getIsLoggedIn()
 	{ return this._isLoggedIn; }
 
 	public void setIsLoggedIn( boolean val )
 	{ this._isLoggedIn = val; }
-
+	
 	public boolean getIsDebugMode()
 	{ return this._debug; }
-	
-	
-	private void initializeUrls( String targetHost, int port )
-	{
-		this._baseUrl 	= "http://" + targetHost + ":" + port;
-		this._homeUrl = this._baseUrl;
-		
-		/*
-		this._createUserUrl = this._baseUrl + "/users/new";
-		this._createUserResultUrl = this._baseUrl + "/users";
-		
-		this._loginUrl = this._baseUrl;
-		this._loginResultUrl = this._baseUrl + "/user_session";
-				
-		this._postThoughtUrlTemplate = this._baseUrl + "/users/%s"; 
-		this._postThoughtResultUrlTemplate = this._baseUrl + "/users/%s/thoughts";
-	
-		this._createSubscriptionResultUrlTemplate = this._baseUrl + "/users/%s/subscriptions";
-		
-		this._logoutUrl = this._baseUrl + "/logout";
-		*/
-		this.initializeStaticUrls();
-	}
-
-	public void initializeStaticUrls()
-	{
-		this.homepageStatics    = joinStatics( HOMEPAGE_STATICS );
-		/*
-		this.loginpageStatics 	= joinStatics( LOGINPAGE_STATICS );
-		this.createuserpageStatics = joinStatics( CREATEUSERPAGE_STATICS );
-		this.postthoughtpageStatics = joinStatics( POSTTHOUGHTPAGE_STATICS );
-		*/
-	}
 	
 	@Override
 	public void dispose() 
 	{}
-
+	
 	@Override
 	public void initialize() 
 	{
@@ -225,14 +518,27 @@ public class GraditGenerator extends Generator
 		}
 	}
 	
-	@Override
-	public Operation nextRequest(int lastOperation) 
+	public void initializeStaticUrls()
 	{
+		this.homepageStatics    = joinStatics( HOMEPAGE_STATICS );
+		this.loginpageStatics 	= joinStatics( LOGINPAGE_STATICS );
+		this.registeruserpageStatics = joinStatics( CREATEUSERPAGE_STATICS );
+		
+	}
+	
+	/* Pass in index of the last operation */
+	
+	@Override
+	public Operation nextRequest(int lastOperation) {
+		
 		// Get the current load profile if we need to look inside of it to decide
 		// what to do next
 		LoadProfile currentLoad = this.getTrack().getCurrentLoadProfile();
 		this._latestLoadProfile = currentLoad;
-				
+		
+		//if( true )
+		//	return getOperation( 0 );
+		
 		int nextOperation = -1;
 		
 		if( lastOperation == -1 )
@@ -254,7 +560,7 @@ public class GraditGenerator extends Generator
 				// ZooKeeper
 				this._appServers = graditTrack.getAppServers();
 			}
-			
+						
 			if( this._appServers == null )
 			{
 				String appServer = this.getTrack().getTargetHostName() + HOSTNAME_PORT_SEPARATOR + this.getTrack().getTargetHostPort();
@@ -265,16 +571,42 @@ public class GraditGenerator extends Generator
 			}
 			
 			// Pick the new target based on the current app server value
-			String nextAppServerHostPort[] = this._appServers[this._currentAppServer].split( HOSTNAME_PORT_SEPARATOR );
+			String nextAppServerHostPort[] = null;
+			if( this._currentAppServer >= this._appServers.length )
+				this._currentAppServer = 0; // Reset the current application server
 			
+			if( this._appServers.length == 0 )
+			{
+				System.out.println( "No app servers available to target. Executing no-op." );
+				return null; // no-op
+			}
+			
+			nextAppServerHostPort = this._appServers[this._currentAppServer].split( HOSTNAME_PORT_SEPARATOR );
+						
 			if( nextAppServerHostPort.length == 2 )
 				this.initializeUrls( nextAppServerHostPort[0], Integer.parseInt( nextAppServerHostPort[1] ) );
 			else if( nextAppServerHostPort.length == 1 )
 				this.initializeUrls( nextAppServerHostPort[0], DEFAULT_APP_SERVER_PORT );
 			
+			// Check whether the current app server is the same as the previous app server
+			if( this._debug )
+			{
+				//System.out.println( this + " " + this._appServers.length + " app servers found." );
+				
+				if( this._appServers.length > 1 && nextAppServerHostPort[0].equalsIgnoreCase( this._lastAppServer ) )
+					System.out.println( this + " no app server rotation" );
+				/*else
+				{
+					System.out.println( this + " app server rotation. Prev: " + this._lastAppServer + " current: " + nextAppServerHostPort[0] );
+				}*/
+				
+				// Save the app server being targeted now
+				this._lastAppServer = nextAppServerHostPort[0];
+			}
+			
 			// Update the current app server value
 			this._currentAppServer = (this._currentAppServer + 1) % this._appServers.length;
-			
+						
 			// Get the selection matrix
 			double[][] selectionMix = this.getTrack().getMixMatrix( currentLoad.getMixName() ).getSelectionMix();
 			double rand = this._rand.nextDouble();
@@ -293,14 +625,13 @@ public class GraditGenerator extends Generator
 	}
 
 	private GraditOperation getOperation( int opIndex )
-	{
-		// Set opIndex to 0 all the time, for testing until the rest of gRADit operations are specified?
-		opIndex = 0;
-		
-		
+	{		
 		switch( opIndex )
 		{
 			case HOME_PAGE: return this.createHomePageOperation();
+			case REGISTER_USER: return this.createRegisterUserOperation();
+			case LOGIN: return this.createLoginOperation();
+			case LOGOUT: return this.createLogoutOperation();
 			default: return null;
 		}
 	}
@@ -322,6 +653,58 @@ public class GraditGenerator extends Generator
 		op.prepare( this );
 		return op;
 	}
+	
+	public LoginOperation createLoginOperation()
+	{
+		LoginOperation op = null;
+		
+		if( this._usePooling )
+		{
+			ObjectPool pool = this.getTrack().getObjectPool();
+			op = (LoginOperation) pool.rentObject( LoginOperation.NAME );	
+		}
+		
+		if( op == null )
+			op = new LoginOperation( this.getTrack().getInteractive(), this.getScoreboard() );
+		
+		op.prepare( this );
+		return op;		
+	}
+
+	public RegisterUserOperation createRegisterUserOperation()
+	{
+		RegisterUserOperation op = null;
+		
+		if( this._usePooling )
+		{
+			ObjectPool pool = this.getTrack().getObjectPool();
+			op = (RegisterUserOperation) pool.rentObject( RegisterUserOperation.NAME );	
+		}
+		
+		if( op == null )
+			op = new RegisterUserOperation( this.getTrack().getInteractive(), this.getScoreboard() );
+		
+		op.prepare( this );
+		return op;		
+	}
+	
+	public LogoutOperation createLogoutOperation()
+	{
+		LogoutOperation op = null;
+		
+		if( this._usePooling )
+		{
+			ObjectPool pool = this.getTrack().getObjectPool();
+			op = (LogoutOperation) pool.rentObject( LogoutOperation.NAME );	
+		}
+		
+		if( op == null )
+			op = new LogoutOperation( this.getTrack().getInteractive(), this.getScoreboard() );
+		
+		op.prepare( this );
+		return op;		
+	}
+	
 	
 	private String[] joinStatics( String[] ... staticsLists ) 
 	{
@@ -380,4 +763,13 @@ public class GraditGenerator extends Generator
 			return Math.min( nextThinkTime, (5*this._thinkTime) );
 		}
 	}
+	
+	@Override
+	public String toString()
+	{
+		StringBuffer buf = new StringBuffer();
+		buf.append( "[" ).append( this._name ).append( "]" );
+		return buf.toString();
+	}
+
 }

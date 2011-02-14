@@ -29,26 +29,26 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package radlab.rain.workload.scadr;
+package radlab.rain.workload.gradit;
 
-import org.apache.zookeeper.WatchedEvent;
-import org.apache.zookeeper.Watcher;
+import radlab.rain.IScoreboard;
 
-public class ZKAppServerWatcher implements Watcher 
+public class RegisterUserOperation extends GraditOperation 
 {
-	ScadrScenarioTrack _track = null;
-		
-	public ZKAppServerWatcher( ScadrScenarioTrack track ) 
+	public static String NAME = "RegisterUser";
+	
+	public RegisterUserOperation(boolean interactive, IScoreboard scoreboard) 
 	{
-		this._track = track;
+		super(interactive, scoreboard);
+		this._operationName = NAME;
+		this._operationIndex = GraditGenerator.REGISTER_USER;
+	}
+	
+	@Override
+	public void execute() throws Throwable 
+	{
+		this.doRegisterUser();
+		this.setFailed( false );
 	}
 
-	@Override
-	public void process( WatchedEvent event ) 
-	{
-		// Get the new list of urls, and pass them to the generator
-		//this._generator.setAppServerList( )
-		if( event.getType() == Watcher.Event.EventType.NodeDataChanged )
-			this._track.setAppServerListChanged( true );
-	}
 }
