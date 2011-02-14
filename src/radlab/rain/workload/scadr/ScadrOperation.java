@@ -194,7 +194,7 @@ public abstract class ScadrOperation extends Operation
 		this.trace( this.getGenerator()._homeUrl );
 		if( response.length() == 0 || this._http.getStatusCode() > 399 )
 		{
-			String errorMessage = "Home page GET ERROR - Received an empty/error response";
+			String errorMessage = "Home page GET ERROR - Received an empty/error response. HTTP Status Code: " + this._http.getStatusCode();
 			throw new IOException( errorMessage );
 		}
 		
@@ -229,7 +229,7 @@ public abstract class ScadrOperation extends Operation
 		this.trace( this.getGenerator()._createUserUrl );
 		if( response.length() == 0 || this._http.getStatusCode() > 399 )
 		{
-			String errorMessage = "Create user page GET ERROR - Received an empty/error response";
+			String errorMessage = "Create user page GET ERROR - Received an empty/error response. HTTP Status Code: " + this._http.getStatusCode();
 			throw new IOException( errorMessage );
 		}
 		
@@ -284,7 +284,7 @@ public abstract class ScadrOperation extends Operation
 		successMessage.append( "\" has been created!" );
 		
 		if(! (response.toString().contains( successMessage.toString() ) ) )
-			throw new Exception( "Creating new user: " + username.toString() + " failed!" );
+			throw new Exception( "Creating new user: " + username.toString() + " failed! No success message found. HTTP Status Code: " + this._http.getStatusCode() );
 		
 		this.trace( this.getGenerator()._createUserResultUrl );
 		//System.out.println( "CreateUser worked" );
@@ -388,7 +388,7 @@ public abstract class ScadrOperation extends Operation
 			
 			return true;
 		}
-		else throw new Exception( "Error unable to log in." );
+		else throw new Exception( "Error unable to log in. No success message found. HTTP Status Code: " + this._http.getStatusCode() + " Response: " + response.toString() );
 	}
 	
 	public void doPostThought() throws Exception
@@ -420,7 +420,7 @@ public abstract class ScadrOperation extends Operation
 		this.trace( postThoughtUrl );
 		if( response.length() == 0 || this._http.getStatusCode() > 399 )
 		{
-			String errorMessage = "PostThought page GET ERROR - Received an empty/error response";
+			String errorMessage = "PostThought page GET ERROR - Received an empty/error response. HTTP Status Code: " + this._http.getStatusCode();
 			throw new IOException( errorMessage );
 		}
 		
@@ -500,7 +500,7 @@ public abstract class ScadrOperation extends Operation
 		
 		String successMessage = "You are now logged out.";
 		if( !response.toString().contains( successMessage.toString() ) )
-			throw new Exception( "Unable to log out. Response: " + response.toString() );
+			throw new Exception( "Unable to log out. HTTP Status Code: " + this._http.getStatusCode() + " Response: " + response.toString() );
 		
 		if( debug )
 		{
@@ -551,7 +551,7 @@ public abstract class ScadrOperation extends Operation
 			// Create user if they don't exist
 			if( !createTargetUser )
 			{
-				String errorMessage = "Subscribe to user page GET ERROR - Received an empty/error response";
+				String errorMessage = "Subscribe to user page GET ERROR - Received an empty/error response. HTTP Status Code: " + this._http.getStatusCode();
 				throw new IOException( errorMessage );
 			}
 			else 

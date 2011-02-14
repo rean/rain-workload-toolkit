@@ -127,6 +127,12 @@ public class Scoreboard implements Runnable, IScoreboard
 	/** Lock for access to waitTime table */
 	private Object _waitTimeDropOffLock = new Object();
 	
+	/** Lock for error summary table */
+	private Object _errorSummaryDropOffLock = new Object();
+	
+	/** TreeMap that contains all the error summaries of failed operations. */
+	private TreeMap<String,ErrorSummary> _errorMap = new TreeMap<String,ErrorSummary>();
+	
 	/** A mapping of each operation with its summary. */
 	//private Hashtable<String,OperationSummary> _operationMap = new Hashtable<String,OperationSummary>();
 	
@@ -356,6 +362,25 @@ public class Scoreboard implements Runnable, IScoreboard
 		// If this operation failed, write out the error information.
 		if ( isSteadyState && result.getOperation().isFailed() )
 		{
+			// Keep track of why the operation failed so we can report it at the end
+			synchronized( this._errorSummaryDropOffLock )
+			{
+				Throwable failure = result.getOperation().getFailureReason();
+				if( failure != null )
+				{
+					StringBuffer failureKey = new StringBuffer();
+					failureKey.append( failure.getMessage() ).append( " (" ).append( failure.getClass().toString() ).append( ")" );
+					String failureClass = failureKey.toString();
+					ErrorSummary errors = this._errorMap.get( failureClass );
+					if( errors == null )
+					{
+						errors = new ErrorSummary( failureClass );
+						this._errorMap.put( failureClass, errors );
+					}
+					errors._errorCount++;
+				}
+			}
+			
 			FileWriter errorLogger = null;
 			synchronized( this._errorLogHandleMap )
 			{
@@ -600,7 +625,26 @@ public class Scoreboard implements Runnable, IScoreboard
 				
 		this.printOperationStatistics( out, true );
 		out.println( "" );
+		this.printErrorSummaryStatistics( out, true );
+		out.println( "" );
 		this.printWaitTimeStatistics( out, true );
+	}
+	
+	private void printErrorSummaryStatistics( PrintStream out, boolean purgeStats )
+	{
+		synchronized( this._errorSummaryDropOffLock )
+		{	                    
+			long totalFailures = 0;
+			out.println( this + " Error Summary Results              : " + this._errorMap.size() + " types of error(s)" );
+			Iterator<String> errorNameIt = this._errorMap.keySet().iterator();
+			while( errorNameIt.hasNext() )
+			{
+				ErrorSummary summary = this._errorMap.get( errorNameIt.next() );
+				out.println( this +  " " + summary.toString() );
+				totalFailures += summary._errorCount;
+			}
+			out.println( this + " Total failures                     : " + totalFailures );
+		}
 	}
 	
 	private void printWaitTimeStatistics( PrintStream out, boolean purgePercentileData )

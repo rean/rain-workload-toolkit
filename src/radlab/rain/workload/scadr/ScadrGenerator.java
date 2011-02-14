@@ -602,7 +602,7 @@ public class ScadrGenerator extends Generator
 			{
 				//System.out.println( this + " " + this._appServers.length + " app servers found." );
 				
-				if( nextAppServerHostPort[0].equalsIgnoreCase( this._lastAppServer ) )
+				if( this._appServers.length > 1 && nextAppServerHostPort[0].equalsIgnoreCase( this._lastAppServer ) )
 					System.out.println( this + " no app server rotation" );
 				/*else
 				{
