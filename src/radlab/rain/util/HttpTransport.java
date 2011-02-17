@@ -111,7 +111,10 @@ public class HttpTransport
 
 	/* URL where we end it if we're redirected at any point. */
 	private String _finalUrl = "";
-		
+	
+	/** Turn on/off debugging/request profiling */
+	private boolean _debug = false;
+	
 	/**
 	 * Returns the HTTP client used to execute requests.
 	 * 
@@ -260,6 +263,9 @@ public class HttpTransport
 	{
 		this._socketIdleTimeout = val;
 	}
+	
+	public boolean getDebug() { return this._debug; }
+	public void setDebug( boolean val ) { this._debug = val; }
 	
 	/**
 	 * Stores the body of the given response into the given buffer. The buffer
@@ -568,8 +574,13 @@ public class HttpTransport
 		// By default we'll end up at the URI being requested (unless a redirect occurs)
 		this._finalUrl = httpRequest.getURI().toString();
 		
+		long start = System.currentTimeMillis();
 		// Execute the HTTP request and get the response entity.
 		HttpResponse response = this._httpClient.execute( httpRequest );
+		long end = System.currentTimeMillis();
+		
+		if( this._debug )
+			System.out.println( "HttpClient request: " + httpRequest.getRequestLine() + " (" +  (end - start)/1000.0 + ")" );
 				
 		HttpEntity entity = response.getEntity();
 		
@@ -594,15 +605,24 @@ public class HttpTransport
 			{
 				// At this point, we will either execute the redirect or throw
 				// an exception. Regardless, we need to consume this entity.
+				start = System.currentTimeMillis();
 				entity.consumeContent();
-				
+				end = System.currentTimeMillis();
+				if( this._debug )
+					System.out.println( "HttpClient request consume content: " + httpRequest.getRequestLine() + " (" +  (end - start)/1000.0 + ")" );
+								
 				if ( redirectsFollowed > 0 )
 				{
 					Header[] locationHeaders = response.getHeaders( "Location" );
 					if ( locationHeaders.length > 0 )
 					{
+						start = System.currentTimeMillis();
 						// TODO: Is it safe to assume all redirects are GET requests?
 						httpRequest = new HttpGet( locationHeaders[0].getValue() );
+						end = System.currentTimeMillis();
+						if( this._debug )
+							System.out.println( "HttpClient request get redirect: " + httpRequest.getRequestLine() + " (" +  (end - start)/1000.0 + ")" );
+						
 						// Save the redirect URL
 						this._finalUrl = locationHeaders[0].getValue();
 						

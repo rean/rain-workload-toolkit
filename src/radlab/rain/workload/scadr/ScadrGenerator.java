@@ -531,7 +531,7 @@ public class ScadrGenerator extends Generator
 		}
 		catch( JSONException e )
 		{
-			System.out.println( this + "Error obtaining ZooKeeper info from RainConfig instance or generator paramters. Falling back on targetHost and port." );
+			System.out.println( this + " Error obtaining ZooKeeper info from RainConfig instance or generator paramters. Falling back on targetHost and port." );
 			this._usingZookeeper = false;
 		}
 		

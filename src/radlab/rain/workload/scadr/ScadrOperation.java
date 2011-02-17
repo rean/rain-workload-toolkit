@@ -343,10 +343,15 @@ public abstract class ScadrOperation extends Operation
 		this.doCreateUser( username );
 		// Save the username in the generator
 		this.getGenerator()._username = username;
+		// Creating a user for ourselves automatically logs us in
+		this.getGenerator().setIsLoggedIn( true );
 	}
 	
 	public boolean doLogin() throws Exception
 	{
+		if( this.getGenerator().getIsLoggedIn() )
+			return true; // Don't re-login
+		
 		long start = 0;
 		long end = 0;
 		boolean debug = this.getGenerator().getIsDebugMode();

@@ -1127,7 +1127,7 @@ public class Scoreboard implements Runnable, IScoreboard
 				System.out.println( this + " " + metricTime + 
 							" ttl response time delta (msecs): " + responseTimeDelta + 
 							" operations successful delta: " + opsSuccessfulDelta + 
-							" actions successful detla: " + actionsSuccessfulDelta );
+							" actions successful delta: " + actionsSuccessfulDelta );
 				
 				if( this._conn != null && !this._conn.isClosed() )
 				{

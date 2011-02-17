@@ -39,6 +39,7 @@ public class RainConfig
 	// What can we configure?
 	public boolean _verboseErrors = true;
 	// Communication server params
+	public boolean _usePipe = false;
 	public int _pipePort = RainPipe.DEFAULT_PORT;
 	public int _pipeThreads = RainPipe.DEFAULT_NUM_THREADS;
 	// Should we wait for a start message before we start the run, default is no

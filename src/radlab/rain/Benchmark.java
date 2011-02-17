@@ -192,9 +192,12 @@ public class Benchmark
 		}
 		
 		// Close down the pipe
-		System.out.println( "[BENCHMARK] Shutting down the communication pipe!" );
-		RainPipe.getInstance().stop();
-				
+		if( RainConfig.getInstance()._usePipe )
+		{
+			System.out.println( "[BENCHMARK] Shutting down the communication pipe!" );
+			RainPipe.getInstance().stop();
+		}
+		
 		System.out.println( "[BENCHMARK] finished!" );
 	}
 	
@@ -298,9 +301,14 @@ public class Benchmark
 		benchmark.waitingForStartSignal = RainConfig.getInstance()._waitForStartSignal;
 		
 		// Now that the Benchmark and Scenario singletons are set up
-		RainPipe pipe = RainPipe.getInstance();
-		System.out.println( "[BENCHMARK] Starting communication pipe! Using port: " + pipe.getPort() + " and running: " + pipe.getNumThreads() + " communication threads." );
-		pipe.start();
+		
+		// Don't start up a RainPipe by default, the user needs to ask (via a setting in the config file)
+		if( RainConfig.getInstance()._usePipe )
+		{
+			RainPipe pipe = RainPipe.getInstance();
+			System.out.println( "[BENCHMARK] Starting communication pipe! Using port: " + pipe.getPort() + " and running: " + pipe.getNumThreads() + " communication threads." );
+			pipe.start();
+		}
 		
 		if( benchmark.waitingForStartSignal )
 			System.out.println( "[BENCHMARK] Waiting for start signal..." );

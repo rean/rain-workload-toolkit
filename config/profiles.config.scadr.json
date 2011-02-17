@@ -3,9 +3,7 @@
         "generator": "radlab.rain.workload.scadr.ScadrGenerator",
         "generatorParameters": {
         	"debug" : "true",
-        	"usePooling": "true",
-        	"zookeeperConnString": "ec2-50-16-2-36.compute-1.amazonaws.com,ec2-174-129-105-138.compute-1.amazonaws.com",
-			"zookeeperAppServerPath": "/demo/apps/scadr/webServerList"
+        	"usePooling": "true"
         },
         "track": "radlab.rain.workload.scadr.ScadrScenarioTrack",
         "resourcePath": "resources/",

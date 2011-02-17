@@ -59,6 +59,7 @@ public class Scenario
 	public static String CFG_DURATION_KEY    					= "duration";
 	public static String CFG_RAMP_DOWN_KEY   					= "rampDown";
 	public static String CFG_VERBOSE_ERRORS_KEY					= "verboseErrors";
+	public static String CFG_USE_PIPE							= "usePipe";
 	public static String CFG_PIPE_PORT							= "pipePort";
 	public static String CFG_PIPE_THREADS						= "pipeThreads";
 	public static String CFG_WAIT_FOR_START_SIGNAL				= "waitForStartSignal";
@@ -163,9 +164,21 @@ public class Scenario
 				RainPipe.getInstance().setNumThreads( RainConfig.getInstance()._pipeThreads );
 			}
 			
-			if( jsonConfig.has( Scenario.CFG_WAIT_FOR_START_SIGNAL ) )
+			boolean usePipe = false;
+			if( jsonConfig.has( Scenario.CFG_USE_PIPE) )
+				usePipe = jsonConfig.getBoolean( Scenario.CFG_USE_PIPE );
+			
+			// We can only wait for start signal if we're using a pipe to the outside world.
+			// If we're not using a pipe to the outside world then just launch the run.
+			if( usePipe )
 			{
-				RainConfig.getInstance()._waitForStartSignal = jsonConfig.getBoolean( Scenario.CFG_WAIT_FOR_START_SIGNAL );
+				// Set in the config that we're using pipes
+				RainConfig.getInstance()._usePipe = usePipe;
+				// Check whether we're supposed to wait for a start signal
+				if( jsonConfig.has( Scenario.CFG_WAIT_FOR_START_SIGNAL ) )
+				{
+					RainConfig.getInstance()._waitForStartSignal = jsonConfig.getBoolean( Scenario.CFG_WAIT_FOR_START_SIGNAL );
+				}
 			}
 			
 			// Look for the profiles key OR the name of a class that generates the
