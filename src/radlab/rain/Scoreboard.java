@@ -1063,6 +1063,11 @@ public class Scoreboard implements Runnable, IScoreboard
 		private boolean _jdbcDriverLoaded = false;
 		// Use JDBC to talk to the db
 		private Connection _conn = null;
+		// Keep track of the last stats sent so that we
+		// can just send the deltas
+		private long _lastTotalResponseTime = -1;
+		private long _lastTotalOpsSuccessful = -1;
+		private long _lastTotalActionsSuccessful = -1;
 		
 		public boolean getDone() { return this._done; }
 		public void setDone( boolean val ) { this._done = val; }
@@ -1090,14 +1095,52 @@ public class Scoreboard implements Runnable, IScoreboard
 						this._conn = DriverManager.getConnection( connectionString );
 				}
 				
+				
+				long responseTimeDelta = 0;
+				long opsSuccessfulDelta = 0;
+				long actionsSuccessfulDelta = 0;
+					
+				long currentTotalOpsResponseTime = this._owner.finalCard._totalOpResponseTime;
+				long currentTotalOpsSuccessful = this._owner.finalCard._totalOpsSuccessful; 
+				long currentTotalActionsSuccessful = this._owner.finalCard._totalActionsSuccessful; 
+					
+				// Should we send the total response time etc. or just the deltas
+				if( this._lastTotalResponseTime == -1 )
+				{
+					responseTimeDelta = currentTotalOpsResponseTime;
+					opsSuccessfulDelta = currentTotalOpsSuccessful;
+					actionsSuccessfulDelta = currentTotalActionsSuccessful;
+				}
+				else
+				{
+					responseTimeDelta = currentTotalOpsResponseTime - this._lastTotalResponseTime;
+					opsSuccessfulDelta = currentTotalOpsSuccessful - this._lastTotalOpsSuccessful;
+					actionsSuccessfulDelta = currentTotalActionsSuccessful - this._lastTotalActionsSuccessful;
+				}
+					
+				// Update the previous observations with the current
+				this._lastTotalResponseTime = currentTotalOpsResponseTime;
+				this._lastTotalOpsSuccessful = currentTotalOpsSuccessful;
+				this._lastTotalActionsSuccessful = currentTotalActionsSuccessful;
+					
+				// Do the printing
+				System.out.println( this + " " + metricTime + 
+							" ttl response time delta (msecs): " + responseTimeDelta + 
+							" operations successful delta: " + opsSuccessfulDelta + 
+							" actions successful detla: " + actionsSuccessfulDelta );
+				
 				if( this._conn != null && !this._conn.isClosed() )
 				{
+					
 					PreparedStatement stmnt = this._conn.prepareStatement( "insert into rainStats (timestamp,trackName,totalResponseTime,operationsSuccessful, actionsSuccessful) values (?,?,?,?,?)" );
 					stmnt.setLong( 1, metricTime );
 					stmnt.setString( 2, this._owner._owner._name );
-					stmnt.setLong( 3, this._owner.finalCard._totalOpResponseTime );
-					stmnt.setLong( 4, this._owner.finalCard._totalOpsSuccessful );
-					stmnt.setLong( 5, this._owner.finalCard._totalActionsSuccessful );
+					//stmnt.setLong( 3, this._owner.finalCard._totalOpResponseTime );
+					//stmnt.setLong( 4, this._owner.finalCard._totalOpsSuccessful );
+					//stmnt.setLong( 5, this._owner.finalCard._totalActionsSuccessful );
+					stmnt.setLong( 3, responseTimeDelta );
+					stmnt.setLong( 4, opsSuccessfulDelta );
+					stmnt.setLong( 5, actionsSuccessfulDelta );
 					stmnt.execute();
 				}
 			}
@@ -1120,10 +1163,10 @@ public class Scoreboard implements Runnable, IScoreboard
 			long now = System.currentTimeMillis();
 			System.out.println( this._owner.toString() + " current time: " + now  + " metric snapshot thread started!" );
 			// Print out stats at time started
-			System.out.println( this + " " + now + 
+			/*System.out.println( this + " " + now + 
 					" ttl response time (msecs): " + this._owner.finalCard._totalOpResponseTime + 
 					" operations successful: " + this._owner.finalCard._totalOpsSuccessful + 
-					" actions successful: " + this._owner.finalCard._totalActionsSuccessful );
+					" actions successful: " + this._owner.finalCard._totalActionsSuccessful );*/
 			try
 			{
 				this.pushStatsToMetricDB();
@@ -1143,11 +1186,11 @@ public class Scoreboard implements Runnable, IScoreboard
 					Thread.sleep( this._owner._metricSnapshotInterval );
 					// Print out the latest stats
 					//this._owner.finalCard._totalOpResponseTime;
-					long metricTime = System.currentTimeMillis();
+					/*long metricTime = System.currentTimeMillis();
 					System.out.println( this + " " + metricTime + 
 										" ttl response time (msecs): " + this._owner.finalCard._totalOpResponseTime + 
 										" operations successful: " + this._owner.finalCard._totalOpsSuccessful + 
-										" actions successful: " + this._owner.finalCard._totalActionsSuccessful );
+										" actions successful: " + this._owner.finalCard._totalActionsSuccessful );*/
 					// Push these stats to the db
 					//this._owner._owner._name
 					this.pushStatsToMetricDB();
