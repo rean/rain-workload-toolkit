@@ -3,20 +3,18 @@
         "generator": "radlab.rain.workload.gradit.GraditGenerator",
         "generatorParameters": {
         	"debug" : "false",
-        	"usePooling": "true",
-        	"zookeeperConnString": "ec2-50-16-2-36.compute-1.amazonaws.com,ec2-174-129-105-138.compute-1.amazonaws.com",
-			"zookeeperAppServerPath": "/demo/apps/gradit/webServerList"
+        	"usePooling": "true"
         },
         "track": "radlab.rain.workload.gradit.GraditScenarioTrack",
         "resourcePath": "resources/",
         "behavior": {
             "default" : [
-				[ 25.0, 75.0, 0.0,  0.0,   0.0, 0.0],
-				[ 0.0,  0.0, 100.0, 0.0,   0.0, 0.0],
-				[ 0.0,  0.0, 20.0,  5.0,   55.0, 20.0],
-				[10.0,  0.0, 50.0,  0.0,   20.0, 20.0],
-				[ 0.0,  0.0,  0.0,  10.0,  40.0, 50.0],
-				[ 0.0,  0.0,  0.0,  20.0, 50.0, 30.0]
+				[ 50.0, 50.0,  0.0,   0.0,   0.0,  0.0],
+				[  0.0,  0.0,  0.0, 100.0,   0.0,  0.0],
+				[  0.0,  0.0, 40.0,  50.0,   0.0, 10.0],
+				[  0.0,  0.0, 15.0,  80.0,   0.0,  5.0],
+				[  0.0,  0.0,  0.0,  80.0,   0.0, 20.0],
+				[ 30.0,  0.0, 20.0,  10.0,  40.0,  0.0]
 			]
         },
         "loadProfile": [
@@ -62,8 +60,8 @@
         },
         "pLogSampling": 0.0,
         "pOpenLoop": 0.0,
-        "meanCycleTime": 0,
-        "meanThinkTime": 0,
+        "meanCycleTime": 0.5,
+        "meanThinkTime": 0.5,
         "interactive": true,
         "objectPoolMaxSize": 500,
         "meanResponseTimeSamplingInterval": 50,

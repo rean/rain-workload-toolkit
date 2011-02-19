@@ -448,6 +448,9 @@ public class ScadrGenerator extends Generator
 	{
 		super(track);
 		this._rand = new Random();
+		//System.out.println( "Think time ctor: " + track.getMeanThinkTime() );
+		this._thinkTime = (long)(track.getMeanThinkTime() * 1000);
+		this._cycleTime = (long)(track.getMeanCycleTime() * 1000);
 	}
 
 	public void initializeUrls( String targetHost, int port )

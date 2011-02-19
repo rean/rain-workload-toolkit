@@ -55,6 +55,7 @@ public class MixMatrix
 	{
 		this._mix = data.clone();
 		this.normalize();
+		//this.printMix();
 		this.createSelectionMatrix();
 	}
 	

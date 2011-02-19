@@ -36,6 +36,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.util.HashSet;
 import java.util.Random;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,7 +53,12 @@ import radlab.rain.util.HttpTransport;
 
 public class GraditOperation extends Operation 
 {
+	public static String AVAILABLE_WORDLIST_URL_PREFIX = "/games/new_game/0?wordlist=";
+	public static String UNFINISHED_GAME_URL_PREFIX = "/games/game_entry/";
+	
 	public static String AUTH_TOKEN_PATTERN = "(<input name=\"authenticity_token\" (type=\"hidden\") value=\"(\\S*)\" />)";
+	public static String AVAILABLE_WORDLIST_PATTERN = "(<a href=\"/games/new_game/0\\?wordlist=(\\w+)\">)";
+	public static String UNFINISHED_GAME_PATTERN = "(<a href=\"/games/game_entry/(\\d+)\">)";
 	
 	// These references will be set by the Generator.
 	protected HttpTransport _http;
@@ -304,6 +310,106 @@ public class GraditOperation extends Operation
 	    }
 	}
 	
+	public StringBuilder doDashboard() throws Exception
+	{
+		long start = 0;
+		long end = 0;
+		boolean debug = this.getGenerator().getIsDebugMode();
+		
+		if( !this.getGenerator().getIsLoggedIn() )
+		{
+			if( !this.doLogin() )
+				throw new Exception( "Error trying to view dashboard. Login failed!" );
+		}
+		
+		if( debug )
+			start = System.currentTimeMillis();
+		
+		StringBuilder response = this._http.fetchUrl( this.getGenerator()._dashboardUrl );
+		this.trace( this.getGenerator()._dashboardUrl );
+		if( response.length() == 0 || this._http.getStatusCode() > 399 )
+		{
+			String errorMessage = "Dashboard GET ERROR - Received an empty/error response. HTTP Status Code: " + this._http.getStatusCode();
+			throw new IOException( errorMessage );
+		}
+						
+		this.loadStatics( this.getGenerator().dashboardStatics );
+		this.trace( this.getGenerator().dashboardStatics );
+		
+		if( debug )
+		{
+			end = System.currentTimeMillis();
+			System.out.println( "Dashboard (s): " + (end - start)/1000.0 );
+		}
+		
+		return response;
+	}
+	
+	public void doStartGame() throws Exception
+	{
+		// Get the dashboard, this will cause a log in of we're not logged in
+		StringBuilder dashboardResponse = this.doDashboard();
+		if( dashboardResponse == null || dashboardResponse.toString().trim().length() == 0 )
+			throw new Exception( "Error starting game. Empty dashboard response." );
+		
+		System.out.println( dashboardResponse.toString() );
+		
+		// Once we get the dashboard response - we can either start a sample game or
+		// resume an unfinished game
+		int availableWordlistCount = 0;
+		int unfinishedGameCount = 0;
+		Vector<String> availableGames = new Vector<String>();
+		Vector<String> unfinishedGames = new Vector<String>();
+		// Parse the response for available wordlists "/games/new_game/0?wordlist=*"
+		// Parse the response for unfinished games "/games/game_entry/*"
+		Pattern availableWordlistPattern = Pattern.compile( AVAILABLE_WORDLIST_PATTERN, Pattern.CASE_INSENSITIVE );
+		Matcher availableWordlistMatch = availableWordlistPattern.matcher( dashboardResponse.toString() );
+		//System.out.println( "Groups: " + match.groupCount() );
+		while( availableWordlistMatch.find() )
+		{
+			//System.out.println( buffer.substring( match.start(), match.end()) );
+			System.out.println( availableWordlistMatch.group(2) );
+			availableGames.add( availableWordlistMatch.group(2) );
+			availableWordlistCount++;
+		}
+		System.out.println( "Available wordlist count: " + availableWordlistCount );
+		
+		// If there are any unfinished games flip a coin and restart an old game 70% of the time
+		// otherwise start a brand new game
+		Pattern unfinishedGamePattern = Pattern.compile( UNFINISHED_GAME_PATTERN, Pattern.CASE_INSENSITIVE );
+		Matcher unfinishedGametMatch = unfinishedGamePattern.matcher( dashboardResponse.toString() );
+		//System.out.println( "Groups: " + match.groupCount() );
+		while( unfinishedGametMatch.find() )
+		{
+			//System.out.println( buffer.substring( match.start(), match.end()) );
+			System.out.println( unfinishedGametMatch.group(2) );
+			unfinishedGames.add( unfinishedGametMatch.group(2) );
+			unfinishedGameCount++;
+		}
+		System.out.println( "Unfinished game count: " + unfinishedGameCount );
+		
+		// Pick a sample game to start - later we can allow users to resume games as well
+		// We could skew the popularity of the sample games if we want to. Choose
+		// randomly for now.
+		if( availableWordlistCount > 0 )
+		{
+			StringBuffer gameUrl = new StringBuffer();
+			gameUrl.append( this.getGenerator()._baseUrl );
+			gameUrl.append( AVAILABLE_WORDLIST_URL_PREFIX );
+			gameUrl.append( availableGames.get( this._random.nextInt( availableWordlistCount ) ) );
+			System.out.println( "GameUrl: " + gameUrl.toString() );
+			StringBuilder gameResponse = this._http.fetchUrl( gameUrl.toString() );
+			this.trace( gameUrl.toString() );
+			System.out.println( gameResponse.toString() );
+			if( gameResponse == null || gameResponse.length() == 0 || this._http.getStatusCode() > 399 )
+			{
+				String errorMessage = "Start Game GET ERROR - Received an empty/error response. HTTP Status Code: " + this._http.getStatusCode();
+				throw new IOException( errorMessage );
+			}
+		}
+		
+	}
+	
 	public boolean doLogin() throws Exception
 	{
 		long start = 0;
@@ -369,7 +475,8 @@ public class GraditOperation extends Operation
 				end = System.currentTimeMillis();
 				System.out.println( "Login (s): " + (end - start)/1000.0 );
 			}
-			
+		
+			this.getGenerator().setIsLoggedIn( true );
 			return true;
 		}
 		else throw new Exception( "Error unable to log in. No success message found. HTTP Status Code: " + this._http.getStatusCode() + " Response: " + response.toString() );

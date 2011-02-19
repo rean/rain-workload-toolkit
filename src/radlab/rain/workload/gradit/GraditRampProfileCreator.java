@@ -29,7 +29,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package radlab.rain.workload.scadr;
+package radlab.rain.workload.gradit;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,9 +38,10 @@ import org.json.JSONObject;
 import radlab.rain.ProfileCreator;
 import radlab.rain.ScenarioTrack;
 
-public class ScadrFlatProfileCreator extends ProfileCreator 
+public class GraditRampProfileCreator extends ProfileCreator 
 {
-	public ScadrFlatProfileCreator() 
+		
+	public GraditRampProfileCreator() 
 	{}
 
 	@Override
@@ -52,32 +53,32 @@ public class ScadrFlatProfileCreator extends ProfileCreator
 		// Let's try creating a track config with 1 track
 		for( int i = 0; i < 1; i++ )
 		{
-			String trackName = "scadr-00" + i;
+			String trackName = "gradit-00" + i;
 			JSONObject trackDetails = new JSONObject();
 			// Fill in details
-			trackDetails.put( ScenarioTrack.CFG_GENERATOR_KEY, "radlab.rain.workload.scadr.ScadrGenerator" );
+			trackDetails.put( ScenarioTrack.CFG_GENERATOR_KEY, "radlab.rain.workload.gradit.GraditGenerator" );
 			// Construct generator parameters
 			JSONObject generatorParams = new JSONObject();
 			
-			generatorParams.put( ScadrGenerator.CFG_ZOOKEEPER_APP_SERVER_PATH, "/demo/apps/scadr/webServerList" );
-			generatorParams.put( ScadrGenerator.CFG_USE_POOLING_KEY, true );
-			generatorParams.put( ScadrGenerator.CFG_DEBUG_KEY, true );
+			generatorParams.put( GraditGenerator.CFG_ZOOKEEPER_APP_SERVER_PATH, "/demo/apps/gradit/webServerList" );
+			generatorParams.put( GraditGenerator.CFG_USE_POOLING_KEY, true );
+			generatorParams.put( GraditGenerator.CFG_DEBUG_KEY, true );
 			
 			trackDetails.put( ScenarioTrack.CFG_GENERATOR_PARAMS_KEY, generatorParams );
 			
-			trackDetails.put( ScenarioTrack.CFG_TRACK_CLASS_KEY, "radlab.rain.workload.scadr.ScadrScenarioTrack" );
+			trackDetails.put( ScenarioTrack.CFG_TRACK_CLASS_KEY, "radlab.rain.workload.gradit.GraditScenarioTrack" );
 			trackDetails.put( ScenarioTrack.CFG_RESOURCE_PATH, "resources/" );
 			// Add in behavior and loadProfileCreatorClass
 			
 			/*
 			"behavior": {
 	            "default" : [
-					[ 25.0, 75.0, 0.0,  0.0,   0.0, 0.0],
-					[ 0.0,  0.0, 100.0, 0.0,   0.0, 0.0],
-					[ 0.0,  0.0, 20.0,  5.0,   55.0, 20.0],
-					[10.0,  0.0, 50.0,  0.0,   20.0, 20.0],
-					[ 0.0,  0.0,  0.0,  10.0,  40.0, 50.0],
-					[ 0.0,  0.0,  0.0,  20.0, 50.0, 30.0]
+					[ 50.0, 50.0,  0.0,   0.0,   0.0,  0.0],
+					[  0.0,  0.0,  0.0, 100.0,   0.0,  0.0],
+					[  0.0,  0.0, 40.0,  50.0,   0.0, 10.0],
+					[  0.0,  0.0, 15.0,  80.0,   0.0,  5.0],
+					[  0.0,  0.0,  0.0,  80.0,   0.0, 20.0],
+					[ 30.0,  0.0, 20.0,  10.0,  40.0,  0.0]
 				]
 	        }*/
 						
@@ -85,14 +86,13 @@ public class ScadrFlatProfileCreator extends ProfileCreator
 			JSONObject behaviorDetails = new JSONObject();
 						
 			// Create an array for each row
-			JSONArray row1 = new JSONArray( new int[] {25,    75,     0,     0,     0,     0} );
-			JSONArray row2 = new JSONArray( new int[] { 0,     0,   100,     0,     0,     0} );
-			JSONArray row3 = new JSONArray( new int[] { 0,     0,    20,     5,    55,    20} );
-			JSONArray row4 = new JSONArray( new int[] {10,     0,    50,     0,    20,    20} );
-			JSONArray row5 = new JSONArray( new int[] { 0,     0,     0,    10,    40,    50} );
-			JSONArray row6 = new JSONArray( new int[] { 0,     0,     0,    20,    50,    30} );
-			
-			
+			JSONArray row1 = new JSONArray( new int[] { 50,    50,     0,     0,     0,     0} );
+			JSONArray row2 = new JSONArray( new int[] {  0,     0,     0,   100,     0,     0} );
+			JSONArray row3 = new JSONArray( new int[] {  0,     0,    40,    50,     0,    10} );
+			JSONArray row4 = new JSONArray( new int[] {  0,     0,    15,    80,     0,     5} );
+			JSONArray row5 = new JSONArray( new int[] {  0,     0,     0,    80,     0,    20} );
+			JSONArray row6 = new JSONArray( new int[] { 30,     0,    20,    10,    40,     0} );
+						
 			// Now create a JSONArray which stores each row
 			JSONArray mix1 = new JSONArray();
 			mix1.put( row1 );
@@ -109,7 +109,7 @@ public class ScadrFlatProfileCreator extends ProfileCreator
 			trackDetails.put( ScenarioTrack.CFG_BEHAVIOR_KEY, behaviorDetails );
 			
 			// Specifiy the load creator class
-			trackDetails.put( ScenarioTrack.CFG_LOAD_SCHEDULE_CREATOR_KEY, "radlab.rain.workload.scadr.ScadrFlatScheduleCreator" );
+			trackDetails.put( ScenarioTrack.CFG_LOAD_SCHEDULE_CREATOR_KEY, "radlab.rain.workload.gradit.GraditRampScheduleCreator" );
 						
 			JSONObject targetDetails = new JSONObject();
 			targetDetails.put( ScenarioTrack.CFG_TARGET_HOSTNAME_KEY, "ec2-50-16-105-73.compute-1.amazonaws.com" );

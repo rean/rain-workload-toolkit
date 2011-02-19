@@ -128,4 +128,16 @@ public class GraditOperationsTest
 		runOp( generator.createLoginOperation() );
 		runOp( generator.createLogoutOperation() );
 	}
+	
+	@Test
+	public void testDashboardOperation()
+	{
+		runOp( generator.createDashboardOperation() );
+	}
+	
+	@Test
+	public void testStartGameOperation()
+	{
+		runOp( generator.createStartGameOperation() );
+	}
 }
