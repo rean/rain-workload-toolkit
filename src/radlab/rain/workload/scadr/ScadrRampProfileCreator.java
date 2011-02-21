@@ -119,8 +119,8 @@ public class ScadrRampProfileCreator extends ProfileCreator
 			trackDetails.put( ScenarioTrack.CFG_TARGET_KEY, targetDetails );
 			trackDetails.put( ScenarioTrack.CFG_LOG_SAMPLING_PROBABILITY_KEY, 0.0 ); // No log sampling
 			trackDetails.put( ScenarioTrack.CFG_OPEN_LOOP_PROBABILITY_KEY, 0.0 );
-			trackDetails.put( ScenarioTrack.CFG_MEAN_CYCLE_TIME_KEY, 0.5 );
-			trackDetails.put( ScenarioTrack.CFG_MEAN_THINK_TIME_KEY, 0.5 );
+			trackDetails.put( ScenarioTrack.CFG_MEAN_CYCLE_TIME_KEY, 0 );
+			trackDetails.put( ScenarioTrack.CFG_MEAN_THINK_TIME_KEY, 0 );
 			trackDetails.put( ScenarioTrack.CFG_INTERACTIVE_KEY, true );
 
 			// Set response time sampling interval - should be tuned based on the expected 
