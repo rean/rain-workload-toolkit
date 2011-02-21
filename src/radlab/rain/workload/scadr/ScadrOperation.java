@@ -106,7 +106,7 @@ public abstract class ScadrOperation extends Operation
 		
 		ScenarioTrack track = this._generator.getTrack();
 		if( track instanceof ScadrScenarioTrack )
-			((ScadrScenarioTrack) track).requestIssue( this._appServerTarget );
+			((ScadrScenarioTrack) track).requestRetire( this._appServerTarget );
 	}
 	
 	@Override
