@@ -419,6 +419,7 @@ public class ScadrGenerator extends Generator
 	private NegativeExponential _cycleTimeGenerator = null;
 	
 	// App urls
+	public String _appServerUrl;
 	public String _baseUrl;
 	public String _homeUrl;
 	public String _createUserUrl;
@@ -463,7 +464,8 @@ public class ScadrGenerator extends Generator
 
 	public void initializeUrls( String targetHost, int port )
 	{
-		this._baseUrl 	= "http://" + targetHost + ":" + port;
+		this._appServerUrl = targetHost;
+		this._baseUrl 	= "http://" + this._appServerUrl + ":" + port;
 		this._homeUrl = this._baseUrl;
 		
 		this._createUserUrl = this._baseUrl + "/users/new";

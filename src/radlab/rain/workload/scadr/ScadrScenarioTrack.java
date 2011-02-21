@@ -260,7 +260,7 @@ public class ScadrScenarioTrack extends DefaultScenarioTrack
 					System.out.println( this + " Appserver: " + s );
 					// Create a stats snapshot with just the server names, 
 					// but null stats values
-					newTrafficSnapshot.put( s, null );
+					newTrafficSnapshot.put( s, new AppServerStats( s, 0L ) );
 				}
 				// Now we that we have the latest list of server names, but no stats
 				// copy over the latest stats from traffic stats table

@@ -115,7 +115,7 @@ public abstract class ScadrOperation extends Operation
 		ScadrGenerator scadrGenerator = (ScadrGenerator) generator;
 		
 		// Save the appServer target that's currently in the generator
-		this._appServerTarget = scadrGenerator._baseUrl;
+		this._appServerTarget = scadrGenerator._appServerUrl;
 						
 		// Refresh the cache to simulate real-world browsing.
 		this.refreshCache();
