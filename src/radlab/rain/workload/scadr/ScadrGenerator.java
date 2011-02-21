@@ -43,8 +43,12 @@ import radlab.rain.util.NegativeExponential;
 import org.json.JSONObject;
 import org.json.JSONException;
 
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Random;
+import java.util.Vector;
 
 public class ScadrGenerator extends Generator 
 {
@@ -400,6 +404,9 @@ public class ScadrGenerator extends Generator
 	public static final int LOGOUT				= 3;
 	public static final int POST_THOUGHT		= 4;
 	public static final int CREATE_SUBSCRIPTION = 5;
+	// Special null-op used only to test request-gating in the generator
+	// it's not part of the offical Scadr mix matrix
+	public static final int NULL_OP				= 42;
 	
 	public static final String HOSTNAME_PORT_SEPARATOR	= ":";
 	
@@ -431,8 +438,9 @@ public class ScadrGenerator extends Generator
 	private boolean _usingZookeeper = false;
 	//private ZooKeeper _zconn = null;
 	//private boolean _appServerListChanged = false;
-	private String[] _appServers = null;
-	private int _currentAppServer = 0;
+	//private String[] _appServers = null;
+	private Vector<AppServerStats> _appServers = new Vector<AppServerStats>();
+	//private int _currentAppServer = 0;
 	//private String _zkConnString = "";
 	//private String _zkPath = "";
 	
@@ -441,7 +449,7 @@ public class ScadrGenerator extends Generator
 	
 	// Keep track of every app server we talk to so we can check whether the load
 	// is being rotated like we expect
-	private String _lastAppServer = "";
+	//private String _lastAppServer = "";
 	
 	
 	public ScadrGenerator(ScenarioTrack track) 
@@ -540,11 +548,25 @@ public class ScadrGenerator extends Generator
 		
 		if( this._usingZookeeper )
 		{
-			this._appServers = scadrTrack.getAppServers();
-			// Pick an app server @ random and use that as the target host
-			this._currentAppServer = this._rand.nextInt( this._appServers.length );
+			// Get the servers
+			Hashtable<String, AppServerStats> appServerTraffic = scadrTrack.getAppServers();
+			// Push them all into a list and sort them
+			if( appServerTraffic.size() > 0 )
+			{
+				this._appServers.clear();
+				// Purge the traffic stats list and then re-populate and sort so that we
+				// get the least loaded server
+				Iterator<AppServerStats> trafficIt = appServerTraffic.values().iterator();
+				while( trafficIt.hasNext() )
+					this._appServers.add( trafficIt.next() );
+				
+				// Sort the traffic stats so that we can find the least loaded server
+				Collections.sort( this._appServers );
+			}
 			
-			String[] appServerNamePort = this._appServers[this._currentAppServer].split( HOSTNAME_PORT_SEPARATOR );
+			// Pick the first server, this should be the most lightly loaded server
+			// based on the sort
+			String[] appServerNamePort = this._appServers.firstElement()._appServer.split( HOSTNAME_PORT_SEPARATOR );//this._appServers[this._currentAppServer].split( HOSTNAME_PORT_SEPARATOR );
 			
 			if( appServerNamePort.length == 2 )
 				this.initializeUrls( appServerNamePort[0], Integer.parseInt( appServerNamePort[1]) );
@@ -554,9 +576,7 @@ public class ScadrGenerator extends Generator
 		else 
 		{
 			String appServer = this.getTrack().getTargetHostName() + HOSTNAME_PORT_SEPARATOR + this.getTrack().getTargetHostPort();
-			this._appServers = new String[1];
-			this._appServers[0] = appServer;
-			this._currentAppServer = 0;
+			this._appServers.add( new AppServerStats( appServer, 0L ) );
 			this.initializeUrls( this.getTrack().getTargetHostName(), this.getTrack().getTargetHostPort() );
 		}
 	}
@@ -579,9 +599,10 @@ public class ScadrGenerator extends Generator
 		LoadProfile currentLoad = this.getTrack().getCurrentLoadProfile();
 		this._latestLoadProfile = currentLoad;
 		
+		// Temporary override to test contention for gating
 		//if( true )
-		//	return getOperation( 0 );
-		
+		//	return this.createNullOperation();
+				
 		int nextOperation = -1;
 		
 		if( lastOperation == -1 )
@@ -594,62 +615,58 @@ public class ScadrGenerator extends Generator
 			{
 				ScadrScenarioTrack scadrTrack = (ScadrScenarioTrack) this._loadTrack;
 				if( scadrTrack.getAppServerListChanged() )
-				{
-					// Get new data
-					if( scadrTrack.updateAppServerList() )
-						this._currentAppServer = 0; // Reset the list
-				}
+					scadrTrack.updateAppServerList();
+				
 				// Always get the list of app servers cached in the track - this doesn't cause a query to
 				// ZooKeeper
-				this._appServers = scadrTrack.getAppServers();
+				Hashtable<String, AppServerStats> appServerTraffic = scadrTrack.getAppServers();
+				// Push them all into a list and sort them
+				if( appServerTraffic.size() > 0 )
+				{
+					this._appServers.clear();
+					// Purge the traffic stats list and then re-populate and sort so that we
+					// get the least loaded server
+					Iterator<AppServerStats> trafficIt = appServerTraffic.values().iterator();
+					while( trafficIt.hasNext() )
+						this._appServers.add( trafficIt.next() );
+					
+					// Sort the traffic stats so that we can find the least loaded server
+					if( appServerTraffic.size() > 1 )
+					{
+						Collections.sort( this._appServers );
+						if( this._debug )
+						{
+							// Print out the list of servers
+							for( AppServerStats stats :  this._appServers )
+								System.out.println( this + stats.toString() );
+						}
+					}
+				}
 			}
 						
 			if( this._appServers == null )
 			{
 				String appServer = this.getTrack().getTargetHostName() + HOSTNAME_PORT_SEPARATOR + this.getTrack().getTargetHostPort();
-				this._appServers = new String[1];
-				this._appServers[0] = appServer;
-				this._currentAppServer = 0;
+				this._appServers.add( new AppServerStats( appServer, 0L ) );
 				this.initializeUrls( this.getTrack().getTargetHostName(), this.getTrack().getTargetHostPort() );
 			}
 			
 			// Pick the new target based on the current app server value
 			String nextAppServerHostPort[] = null;
-			if( this._currentAppServer >= this._appServers.length )
-				this._currentAppServer = 0; // Reset the current application server
 			
-			if( this._appServers.length == 0 )
+			if( this._appServers.size() == 0 )
 			{
 				System.out.println( "No app servers available to target. Executing no-op." );
 				return null; // no-op
 			}
 			
-			nextAppServerHostPort = this._appServers[this._currentAppServer].split( HOSTNAME_PORT_SEPARATOR );
+			nextAppServerHostPort = this._appServers.firstElement()._appServer.split( HOSTNAME_PORT_SEPARATOR );//this._appServers[this._currentAppServer].split( HOSTNAME_PORT_SEPARATOR );
 						
 			if( nextAppServerHostPort.length == 2 )
 				this.initializeUrls( nextAppServerHostPort[0], Integer.parseInt( nextAppServerHostPort[1] ) );
 			else if( nextAppServerHostPort.length == 1 )
 				this.initializeUrls( nextAppServerHostPort[0], DEFAULT_APP_SERVER_PORT );
-			
-			// Check whether the current app server is the same as the previous app server
-			if( this._debug )
-			{
-				//System.out.println( this + " " + this._appServers.length + " app servers found." );
-				
-				if( this._appServers.length > 1 && nextAppServerHostPort[0].equalsIgnoreCase( this._lastAppServer ) )
-					System.out.println( this + " no app server rotation" );
-				/*else
-				{
-					System.out.println( this + " app server rotation. Prev: " + this._lastAppServer + " current: " + nextAppServerHostPort[0] );
-				}*/
-				
-				// Save the app server being targeted now
-				this._lastAppServer = nextAppServerHostPort[0];
-			}
-			
-			// Update the current app server value
-			this._currentAppServer = (this._currentAppServer + 1) % this._appServers.length;
-						
+									
 			// Get the selection matrix
 			double[][] selectionMix = this.getTrack().getMixMatrix( currentLoad.getMixName() ).getSelectionMix();
 			double rand = this._rand.nextDouble();
@@ -668,7 +685,7 @@ public class ScadrGenerator extends Generator
 	}
 
 	private ScadrOperation getOperation( int opIndex )
-	{		
+	{	
 		switch( opIndex )
 		{
 			case HOME_PAGE: return this.createHomePageOperation();
@@ -784,6 +801,22 @@ public class ScadrGenerator extends Generator
 		return op;		
 	}
 	
+	public ScadrNullOperation createNullOperation()
+	{
+		ScadrNullOperation op = null;
+		
+		if( this._usePooling )
+		{
+			ObjectPool pool = this.getTrack().getObjectPool();
+			op = (ScadrNullOperation) pool.rentObject( ScadrNullOperation.NAME );	
+		}
+		
+		if( op == null )
+			op = new ScadrNullOperation( this.getTrack().getInteractive(), this.getScoreboard() );
+		
+		op.prepare( this );
+		return op;
+	}
 	
 	private String[] joinStatics( String[] ... staticsLists ) 
 	{

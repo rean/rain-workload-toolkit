@@ -191,7 +191,7 @@ public class GraditGenerator extends Generator {
 	public void initialize() {
 		this._http = new HttpTransport();
 		// Set the redirect limit to 5 for Gradit
-		this._http.setRedirectLimit( 5 );
+		this._http.setRedirectLimit( 10 );
 	}
 
 	@Override

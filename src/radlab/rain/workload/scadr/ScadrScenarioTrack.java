@@ -40,6 +40,11 @@ import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.KeeperException.Code;
 import org.apache.zookeeper.data.Stat;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.Hashtable;
+import java.util.Iterator;
+
 public class ScadrScenarioTrack extends DefaultScenarioTrack 
 {
 	public static final int DEFAULT_ZOOKEEPER_SESSION_TIMEOUT 	= 30000;
@@ -47,10 +52,84 @@ public class ScadrScenarioTrack extends DefaultScenarioTrack
 	public static int DEFAULT_RETRIES							= 3;
 	public static long DEFAULT_RETRY_TIMEOUT					= 3000; // 3 sec retry timeout
 	
-	private boolean _isConfigured 			= false;
-	private ZooKeeper _zconn 				= null;
-	private boolean _appServerListChanged 	= false;
-	private String[] _appServers 			= null;
+	private NumberFormat _formatter 				 = new DecimalFormat( "#0.0000" );
+	private boolean _isConfigured 					 = false;
+	private ZooKeeper _zconn 						 = null;
+	private boolean _appServerListChanged 			 = false;
+	private String[] _appServers 					 = null;
+	
+	// Mechanisms associated with keeping traffic stats for request-gating.
+	// We want to get the generators to send requests to least loaded server
+	private long _totalTrafficLockWaitTime 				= 0;
+	private long _totalTrafficLockRequestCount			= 0;
+	private long _maxTrafficLockWaitTime 				= 0;
+	private Object _trafficLock 					 	= new Object();
+	//private Hashtable<String,Long> _appServerTraffic 	= new Hashtable<String,Long>();
+	private Hashtable<String, AppServerStats> _appServerTraffic = new Hashtable<String, AppServerStats>();
+		
+	// Accessor methods such that operations can indicate that they're targeting a 
+	// specific server (based on the base url in the generator that created the operation)
+	public void requestIssue( String appServer )
+	{
+		long start = System.currentTimeMillis();
+		synchronized( this._trafficLock )
+		{
+			long end = System.currentTimeMillis();
+			// How long did we wait for the lock?
+			long lockWaitTime = end - start;
+			// Keep track of the total time waiting on the traffic lock
+			this._totalTrafficLockWaitTime += lockWaitTime; 
+			// Keep counting the lock requests
+			this._totalTrafficLockRequestCount++;
+			// Track the worst case lock wait time seen so far
+			if( lockWaitTime >  this._maxTrafficLockWaitTime )
+				this._maxTrafficLockWaitTime = lockWaitTime;
+			
+			// Get the request counter for this server
+			//Long outstandingRequests = this._appServerTraffic.get( appServer );
+			AppServerStats stats = this._appServerTraffic.get( appServer );
+			if( stats == null )
+			{
+				// We might want to know whether requests are coming in for servers
+				// not in the Hashtable, that would mean that we're messing up somewhere
+				// re: keeping the Hashtable up-to-date with the latest info from
+				// ZooKeeper, e.g., the list changes before we get a chance to update the
+				// Hashtable
+				this._appServerTraffic.put( appServer, new AppServerStats(appServer, 0L ) );
+			}
+			else stats._outstandingRequests++;
+		}
+	}
+	
+	public void requestRetire( String appServer )
+	{
+		long start = System.currentTimeMillis();
+		synchronized( this._trafficLock )
+		{
+			long end = System.currentTimeMillis();
+			// How long did we wait for the lock?
+			long lockWaitTime = end - start;
+			// Keep track of the total time waiting on the traffic lock
+			this._totalTrafficLockWaitTime += lockWaitTime; 
+			// Keep counting the lock requests
+			this._totalTrafficLockRequestCount++;
+			// Track the worst case lock wait time seen so far
+			if( lockWaitTime >  this._maxTrafficLockWaitTime )
+				this._maxTrafficLockWaitTime = lockWaitTime;
+			
+			// Get the request counter for this server
+			//Long outstandingRequests = this._appServerTraffic.get( appServer );
+			AppServerStats stats = this._appServerTraffic.get( appServer );
+			
+			// outstandingRequests should never be null on request retire (frequently) - 
+			// a request can't be retired from a server that's not in the traffic stats hashtable 
+			// unless a request was sent to a slow app server and by the time the request 
+			// finished the slow server was purged from a recent ZooKeeper list. In that
+			// eventuality it's safe to ignore the retire message
+			if( stats != null )
+				stats._outstandingRequests--;	
+		}
+	}
 	
 	private String _zkConnString = "";
 	private String _zkPath = "";
@@ -79,13 +158,16 @@ public class ScadrScenarioTrack extends DefaultScenarioTrack
 	public boolean getAppServerListChanged()
 	{ return this._appServerListChanged; }
 	
-	public String[] getAppServers()
+	/*public String[] getAppServers()
 	{ 
 		//if( this._appServerListChanged )
 			//; // do update
 		
 		return this._appServers; 
-	}
+	}*/
+	
+	public Hashtable<String, AppServerStats> getAppServers()
+	{ return this._appServerTraffic; }
 	
 	public synchronized boolean configureZooKeeper( String zkConnString, String zkPath )
 	{
@@ -134,6 +216,8 @@ public class ScadrScenarioTrack extends DefaultScenarioTrack
 				System.out.println( this + " Appserver list initialized, " + this._appServers.length + " app servers found." );
 				for( String s : this._appServers )
 				{
+					// Set up empty stats
+					this._appServerTraffic.put( s, new AppServerStats( s, 0L ) );
 					System.out.println( this + " Appserver: " + s );
 				}
 				return true; // Signal that we've initialized the app server list
@@ -165,10 +249,41 @@ public class ScadrScenarioTrack extends DefaultScenarioTrack
 			{
 				this._appServers = list.split( APP_SERVER_LIST_SEPARATOR );
 				System.out.println( this + " Appserver list updated, " + this._appServers.length + " app servers found." );
+								
+				// Here's where we'd want to purge the traffic table of entries that are not in
+				// this list - we need to purge so that non-existent servers don't get
+				// picked as the least loaded
+				
+				Hashtable<String,AppServerStats> newTrafficSnapshot = new Hashtable<String,AppServerStats>();
 				for( String s : this._appServers )
 				{
 					System.out.println( this + " Appserver: " + s );
+					// Create a stats snapshot with just the server names, 
+					// but null stats values
+					newTrafficSnapshot.put( s, null );
 				}
+				// Now we that we have the latest list of server names, but no stats
+				// copy over the latest stats from traffic stats table
+				synchronized( this._trafficLock )
+				{
+					// Go through the current stats, if that server is in the new snapshot
+					// then copy its stats otherwise ignore it
+					Iterator<String> appIt = this._appServerTraffic.keySet().iterator();
+					while( appIt.hasNext() )
+					{
+						AppServerStats currentServerStats = this._appServerTraffic.get( appIt.next() );
+						// If an existing server is still on the latest list of servers
+						// then copy over its stats
+						if( newTrafficSnapshot.containsKey( currentServerStats._appServer ) )
+						{
+							// Copy over the latest stats for this server
+							newTrafficSnapshot.put( currentServerStats._appServer, currentServerStats );
+						}
+					}
+					// Replace the current appServerTraffic table with the new version
+					this._appServerTraffic = newTrafficSnapshot;
+				}
+							
 				this._appServerListChanged = false; // Now that we have the new list of appservers squelch the change
 				return true; // Signal that we've updated the app server list
 			}
@@ -237,5 +352,19 @@ public class ScadrScenarioTrack extends DefaultScenarioTrack
 	public String toString()
 	{
 		return "[SCADRTRACK: " + this._name + "]";
+	}
+	
+	@Override
+	public void end()
+	{
+		// Dump traffic lock stats
+		if( this._totalTrafficLockRequestCount > 0 )
+			System.out.println( this + " Gating stats - Average traffic lock wait time (ms) : " + this._formatter.format( (double) this._totalTrafficLockWaitTime / (double) this._totalTrafficLockRequestCount ) );
+		else System.out.println( this + " Gating stats - Average traffic lock wait time (ms) : " + this._formatter.format( 0.0 ) );
+		
+		System.out.println( this + " Gating stats - Total traffic lock requests         : " + this._totalTrafficLockRequestCount );
+		System.out.println( this + " Gating stats - Max traffic lock wait time (ms)     : " + this._formatter.format( this._maxTrafficLockWaitTime ) );
+		// Let the base class finish its regular cleanup
+		super.end();
 	}
 }

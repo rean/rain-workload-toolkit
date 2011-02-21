@@ -53,6 +53,7 @@ import radlab.rain.Generator;
 import radlab.rain.LoadProfile;
 import radlab.rain.IScoreboard;
 import radlab.rain.Operation;
+import radlab.rain.ScenarioTrack;
 import radlab.rain.util.HttpTransport;
 
 import java.security.MessageDigest;
@@ -67,7 +68,10 @@ public abstract class ScadrOperation extends Operation
 	// These references will be set by the Generator.
 	protected HttpTransport _http;
 	protected HashSet<String> _cachedURLs = new HashSet<String>();
-	private Random _random = new Random();	
+	private Random _random = new Random();
+	// Keep track of where this operation is supposed to go so that
+	// we can update the app server traffic stats
+	private String _appServerTarget = "";
 	
 	public ScadrOperation(boolean interactive, IScoreboard scoreboard) 
 	{
@@ -83,11 +87,36 @@ public abstract class ScadrOperation extends Operation
 	public void cleanup() 
 	{}
 
+	@Override 
+	public void preExecute()
+	{
+		if( this._appServerTarget == null || this._appServerTarget.trim().length() == 0 )
+			return;
+		
+		ScenarioTrack track = this._generator.getTrack();
+		if( track instanceof ScadrScenarioTrack )
+			((ScadrScenarioTrack) track).requestIssue( this._appServerTarget );
+	}
+	
+	@Override
+	public void postExecute()
+	{
+		if( this._appServerTarget == null || this._appServerTarget.trim().length() == 0 )
+			return;
+		
+		ScenarioTrack track = this._generator.getTrack();
+		if( track instanceof ScadrScenarioTrack )
+			((ScadrScenarioTrack) track).requestIssue( this._appServerTarget );
+	}
+	
 	@Override
 	public void prepare(Generator generator) {
 		this._generator = generator;
 		ScadrGenerator scadrGenerator = (ScadrGenerator) generator;
 		
+		// Save the appServer target that's currently in the generator
+		this._appServerTarget = scadrGenerator._baseUrl;
+						
 		// Refresh the cache to simulate real-world browsing.
 		this.refreshCache();
 		

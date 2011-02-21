@@ -190,6 +190,10 @@ public abstract class Operation implements Runnable
 	 */
 	public void run()
 	{
+		// Invoke the pre-execute hook here before we start the clock to time the
+		// operation's execution
+		this.preExecute();
+		
 		this.setTimeStarted( System.currentTimeMillis() );
 		try
 		{
@@ -203,6 +207,10 @@ public abstract class Operation implements Runnable
 		finally
 		{
 			this.setTimeFinished( System.currentTimeMillis() );
+			// Invoke the post-execute hook here after we stop the clock to time the
+			// operation's execution
+			this.postExecute();
+			
 			if ( this._scoreboard != null )
 			{
 				OperationExecution result = new OperationExecution(this);
@@ -226,6 +234,18 @@ public abstract class Operation implements Runnable
 	 * @throws Throwable 
 	 */
 	public abstract void execute() throws Throwable;
+	
+	/** Hook method for actions to be performed right before execution starts 
+	 * (before the clock starts to time the execute method). There's no throws
+	 * clause on this method so if something fails the methods need to deal with it.
+	 */
+	public void preExecute(){}
+	
+	/** Hook method for actions to be performed right after execution finishes 
+	 * (after the clock stops to time the execute method). There's no throws
+	 * clause on this method so if something fails the methods need to deal with it.
+	 */
+	public void postExecute() {}
 	
 	/**
 	 * Do any potential cleanup necessary after execution of this operation.

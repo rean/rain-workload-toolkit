@@ -20,7 +20,7 @@
         "loadProfile": [
         {
             "interval": 600,
-            "users": 1,
+            "users": 3,
             "mix": "default"
         },
         {
@@ -60,8 +60,8 @@
         },
         "pLogSampling": 0.0,
         "pOpenLoop": 0.0,
-        "meanCycleTime": 0.5,
-        "meanThinkTime": 0.5,
+        "meanCycleTime": 0,
+        "meanThinkTime": 0,
         "interactive": true,
         "objectPoolMaxSize": 500,
         "meanResponseTimeSamplingInterval": 50,
