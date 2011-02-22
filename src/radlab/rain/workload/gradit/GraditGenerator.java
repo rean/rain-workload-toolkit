@@ -37,11 +37,16 @@ import radlab.rain.ObjectPool;
 import radlab.rain.Operation;
 import radlab.rain.RainConfig;
 import radlab.rain.ScenarioTrack;
+import radlab.rain.util.AppServerStats;
 import radlab.rain.util.HttpTransport;
 import radlab.rain.util.NegativeExponential;
 
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Random;
+import java.util.Vector;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -136,17 +141,12 @@ public class GraditGenerator extends Generator {
 	// Application-specific variables
 	private boolean _isLoggedIn = false;
 	private boolean _usingZookeeper = false;
-	private String[] _appServers = null;
-	private int _currentAppServer = 0;
-
+	private Vector<AppServerStats> _appServers = new Vector<AppServerStats>();
+	
 	// public String _loginAuthToken;
 	public String _username;
 
-	// Keep track of every app server we talk to so we can check whether the
-	// load
-	// is being rotated like we expect
-	private String _lastAppServer = "";
-
+	
 	public GraditGenerator(ScenarioTrack track) {
 		super(track);
 		this._rand = new Random();
@@ -236,14 +236,26 @@ public class GraditGenerator extends Generator {
 		}
 
 		if (this._usingZookeeper) {
-			this._appServers = graditTrack.getAppServers();
-			// Pick an app server @ random and use that as the target host
-			this._currentAppServer = this._rand
-					.nextInt(this._appServers.length);
-
-			String[] appServerNamePort = this._appServers[this._currentAppServer]
-					.split(HOSTNAME_PORT_SEPARATOR);
-
+			// Get the servers
+			Hashtable<String, AppServerStats> appServerTraffic = graditTrack.getAppServers();
+			// Push them all into a list and sort them
+			if( appServerTraffic.size() > 0 )
+			{
+				this._appServers.clear();
+				// Purge the traffic stats list and then re-populate and sort so that we
+				// get the least loaded server
+				Iterator<AppServerStats> trafficIt = appServerTraffic.values().iterator();
+				while( trafficIt.hasNext() )
+					this._appServers.add( trafficIt.next() );
+				
+				// Sort the traffic stats so that we can find the least loaded server
+				Collections.sort( this._appServers );
+			}
+			
+			// Pick the first server, this should be the most lightly loaded server
+			// based on the sort
+			String[] appServerNamePort = this._appServers.firstElement()._appServer.split( HOSTNAME_PORT_SEPARATOR );//this._appServers[this._currentAppServer].split( HOSTNAME_PORT_SEPARATOR );
+		
 			if (appServerNamePort.length == 2)
 				this.initializeUrls(appServerNamePort[0], Integer
 						.parseInt(appServerNamePort[1]));
@@ -251,12 +263,8 @@ public class GraditGenerator extends Generator {
 				this.initializeUrls(appServerNamePort[0],
 						DEFAULT_APP_SERVER_PORT);
 		} else {
-			String appServer = this.getTrack().getTargetHostName()
-					+ HOSTNAME_PORT_SEPARATOR
-					+ this.getTrack().getTargetHostPort();
-			this._appServers = new String[1];
-			this._appServers[0] = appServer;
-			this._currentAppServer = 0;
+			String appServer = this.getTrack().getTargetHostName() + HOSTNAME_PORT_SEPARATOR + this.getTrack().getTargetHostPort();
+			this._appServers.add( new AppServerStats( appServer, 0L ) );
 			this.initializeUrls(this.getTrack().getTargetHostName(), this
 					.getTrack().getTargetHostPort());
 		}
@@ -296,42 +304,53 @@ public class GraditGenerator extends Generator {
 		} else {
 			if (this._usingZookeeper) {
 				GraditScenarioTrack graditTrack = (GraditScenarioTrack) this._loadTrack;
-				if (graditTrack.getAppServerListChanged()) {
-					// Get new data
-					if (graditTrack.updateAppServerList())
-						this._currentAppServer = 0; // Reset the list
-				}
-				// Always get the list of app servers cached in the track - this
-				// doesn't cause a query to
+				if( graditTrack.getAppServerListChanged() )
+					graditTrack.updateAppServerList();
+				
+				// Always get the list of app servers cached in the track - this doesn't cause a query to
 				// ZooKeeper
-				this._appServers = graditTrack.getAppServers();
+				Hashtable<String, AppServerStats> appServerTraffic = graditTrack.getAppServers();
+				// Push them all into a list and sort them
+				if( appServerTraffic.size() > 0 )
+				{
+					this._appServers.clear();
+					// Purge the traffic stats list and then re-populate and sort so that we
+					// get the least loaded server
+					Iterator<AppServerStats> trafficIt = appServerTraffic.values().iterator();
+					while( trafficIt.hasNext() )
+						this._appServers.add( trafficIt.next() );
+					
+					// Sort the traffic stats so that we can find the least loaded server
+					if( appServerTraffic.size() > 1 )
+					{
+						Collections.sort( this._appServers );
+						if( this._debug )
+						{
+							// Print out the list of servers
+							for( AppServerStats stats :  this._appServers )
+								System.out.println( this + stats.toString() );
+						}
+					}
+				}
 			}
 
 			if (this._appServers == null) {
-				String appServer = this.getTrack().getTargetHostName()
-						+ HOSTNAME_PORT_SEPARATOR
-						+ this.getTrack().getTargetHostPort();
-				this._appServers = new String[1];
-				this._appServers[0] = appServer;
-				this._currentAppServer = 0;
+				String appServer = this.getTrack().getTargetHostName() + HOSTNAME_PORT_SEPARATOR + this.getTrack().getTargetHostPort();
+				this._appServers.add( new AppServerStats( appServer, 0L ) );
 				this.initializeUrls(this.getTrack().getTargetHostName(), this
 						.getTrack().getTargetHostPort());
 			}
 
 			// Pick the new target based on the current app server value
 			String nextAppServerHostPort[] = null;
-			if (this._currentAppServer >= this._appServers.length)
-				this._currentAppServer = 0; // Reset the current application
-											// server
-
-			if (this._appServers.length == 0) {
+			
+			if (this._appServers.size() == 0) {
 				System.out
 						.println("No app servers available to target. Executing no-op.");
 				return null; // no-op
 			}
 
-			nextAppServerHostPort = this._appServers[this._currentAppServer]
-					.split(HOSTNAME_PORT_SEPARATOR);
+			nextAppServerHostPort = this._appServers.firstElement()._appServer.split( HOSTNAME_PORT_SEPARATOR );
 
 			if (nextAppServerHostPort.length == 2)
 				this.initializeUrls(nextAppServerHostPort[0], Integer
@@ -339,30 +358,6 @@ public class GraditGenerator extends Generator {
 			else if (nextAppServerHostPort.length == 1)
 				this.initializeUrls(nextAppServerHostPort[0],
 						DEFAULT_APP_SERVER_PORT);
-
-			// Check whether the current app server is the same as the previous
-			// app server
-			if (this._debug) {
-				// System.out.println( this + " " + this._appServers.length +
-				// " app servers found." );
-
-				if (this._appServers.length > 1
-						&& nextAppServerHostPort[0]
-								.equalsIgnoreCase(this._lastAppServer))
-					System.out.println(this + " no app server rotation");
-				/*
-				 * else { System.out.println( this +
-				 * " app server rotation. Prev: " + this._lastAppServer +
-				 * " current: " + nextAppServerHostPort[0] ); }
-				 */
-
-				// Save the app server being targeted now
-				this._lastAppServer = nextAppServerHostPort[0];
-			}
-
-			// Update the current app server value
-			this._currentAppServer = (this._currentAppServer + 1)
-					% this._appServers.length;
 
 			// Get the selection matrix
 			double[][] selectionMix = this.getTrack().getMixMatrix(
@@ -380,22 +375,17 @@ public class GraditGenerator extends Generator {
 		return getOperation(nextOperation);
 	}
 
-	private GraditOperation getOperation(int opIndex) {
-		switch (opIndex) {
-		case HOME_PAGE:
-			return this.createHomePageOperation();
-		case REGISTER_USER:
-			return this.createRegisterUserOperation();
-		case LOGIN:
-			return this.createLoginOperation();
-		case LOGOUT:
-			return this.createLogoutOperation();
-		case DASHBOARD:
-			return this.createDashboardOperation();
-		case START_GAME:
-			return this.createStartGameOperation();
-		default:
-			return null;
+	private GraditOperation getOperation(int opIndex) 
+	{
+		switch (opIndex) 
+		{
+			case HOME_PAGE: return this.createHomePageOperation();
+			case REGISTER_USER: return this.createRegisterUserOperation();
+			case LOGIN: return this.createLoginOperation();
+			case LOGOUT: return this.createLogoutOperation();
+			case DASHBOARD: return this.createDashboardOperation();
+			case START_GAME: return this.createStartGameOperation();
+			default: return null;
 		}
 	}
 

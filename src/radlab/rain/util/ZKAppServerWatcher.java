@@ -29,16 +29,20 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package radlab.rain.workload.gradit;
+package radlab.rain.util;
 
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 
+/** 
+ * Class implements a watcher for changes in a specific ZooKeeper node containing a list
+ * of web/application servers to be loaded.
+ */
 public class ZKAppServerWatcher implements Watcher 
 {
-	GraditScenarioTrack _track = null;
+	ZKGatingScenarioTrack _track = null;
 		
-	public ZKAppServerWatcher( GraditScenarioTrack track ) 
+	public ZKAppServerWatcher( ZKGatingScenarioTrack track ) 
 	{
 		this._track = track;
 	}
@@ -46,8 +50,7 @@ public class ZKAppServerWatcher implements Watcher
 	@Override
 	public void process( WatchedEvent event ) 
 	{
-		// Get the new list of urls, and pass them to the generator
-		//this._generator.setAppServerList( )
+		// Mark that the list of app servers changed
 		if( event.getType() == Watcher.Event.EventType.NodeDataChanged )
 			this._track.setAppServerListChanged( true );
 	}

@@ -29,21 +29,21 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package radlab.rain.workload.gradit;
+package radlab.rain.workload.comrades;
 
 import radlab.rain.Scenario;
 import radlab.rain.util.ZKGatingScenarioTrack;
 
-public class GraditScenarioTrack extends ZKGatingScenarioTrack 
+public class ComradesScenarioTrack extends ZKGatingScenarioTrack 
 {
-	public GraditScenarioTrack(String name, Scenario scenario) 
+	public ComradesScenarioTrack(String name, Scenario scenario) 
 	{
 		super(name, scenario);
 	}
-	
+
 	@Override
-	public String toString()
+	public String toString() 
 	{
-		return "[GRADITTRACK: " + this._name + "]";
+		return "[COMRADESTRACK: " + this._name + "]";
 	}
 }

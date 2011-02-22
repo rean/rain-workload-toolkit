@@ -259,6 +259,14 @@
         	<fileset dir="config" includes="*gradit*.json"/>
         </jar>
     </target>
+	<target depends="build" name="package-comrades">
+        <mkdir dir="workloads"/>
+        <jar destfile="workloads/comrades.jar" filesetmanifest="mergewithoutmain">
+            <fileset dir="bin" includes="radlab/rain/workload/comrades/**"/>
+        	<!-- Bake the configuration files into the jar -->
+        	<fileset dir="config" includes="*comrades*.json"/>
+        </jar>
+    </target>
 	<target depends="build" name="package-daytrader">
 		<mkdir dir="workloads"/>
 	    <jar destfile="workloads/daytrader.jar" filesetmanifest="mergewithoutmain">

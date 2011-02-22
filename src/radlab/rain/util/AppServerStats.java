@@ -29,21 +29,40 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package radlab.rain.workload.gradit;
+package radlab.rain.util;
 
-import radlab.rain.Scenario;
-import radlab.rain.util.ZKGatingScenarioTrack;
-
-public class GraditScenarioTrack extends ZKGatingScenarioTrack 
+/** 
+ * Class stores the number of requests outstanding at a specific web/application server. 
+ */
+public class AppServerStats implements Comparable<AppServerStats> 
 {
-	public GraditScenarioTrack(String name, Scenario scenario) 
+	public String _appServer 			= "";
+	public long _outstandingRequests 	= 0;
+	
+	public AppServerStats()
+	{}
+	
+	public AppServerStats( String appServer, long outstandingRequests )
 	{
-		super(name, scenario);
+		this._appServer = appServer;
+		this._outstandingRequests = outstandingRequests;
+	}
+
+	@Override
+	public int compareTo( AppServerStats rhs ) 
+	{
+		if( this._outstandingRequests == rhs._outstandingRequests )
+			return 0;
+		else if( this._outstandingRequests < rhs._outstandingRequests )
+			return -1;
+		else return 1;
 	}
 	
 	@Override
 	public String toString()
 	{
-		return "[GRADITTRACK: " + this._name + "]";
+		StringBuffer buf = new StringBuffer();
+		buf.append( this._outstandingRequests ).append( " " ).append( this._appServer );
+		return buf.toString();
 	}
 }

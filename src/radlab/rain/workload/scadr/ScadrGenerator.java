@@ -39,6 +39,7 @@ import radlab.rain.RainConfig;
 import radlab.rain.ScenarioTrack;
 import radlab.rain.util.HttpTransport;
 import radlab.rain.util.NegativeExponential;
+import radlab.rain.util.AppServerStats;
 
 import org.json.JSONObject;
 import org.json.JSONException;

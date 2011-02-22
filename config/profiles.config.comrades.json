@@ -1,11 +1,11 @@
 {
-    "scadr-001": {
+    "comrades-001": {
         "generator": "radlab.rain.workload.comrades.ComradesGenerator",
         "generatorParameters": {
         	"debug" : "true",
         	"usePooling": "true"
         },
-        "track": "radlab.rain.workload.scadr.ScadrScenarioTrack",
+        "track": "radlab.rain.workload.comrades.ComradesScenarioTrack",
         "resourcePath": "resources/",
         "behavior": {
             "default" : [

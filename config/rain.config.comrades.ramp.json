@@ -1,0 +1,10 @@
+{
+    "profilesCreatorClass": "radlab.rain.workload.comrades.ComradesRampProfileCreator",
+    "profilesCreatorClassParams": {
+    },
+    "timing": {
+        "rampUp": 60,
+        "duration": 10800,
+        "rampDown": 15
+    }
+}

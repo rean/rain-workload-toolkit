@@ -29,21 +29,26 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package radlab.rain.workload.gradit;
+package radlab.rain.workload.comrades;
 
-import radlab.rain.Scenario;
-import radlab.rain.util.ZKGatingScenarioTrack;
+import radlab.rain.IScoreboard;
 
-public class GraditScenarioTrack extends ZKGatingScenarioTrack 
+public class UpdateInterviewOperation extends ComradesOperation 
 {
-	public GraditScenarioTrack(String name, Scenario scenario) 
-	{
-		super(name, scenario);
-	}
+	public static String NAME = "UpdateInterview";
 	
-	@Override
-	public String toString()
+	public UpdateInterviewOperation(boolean interactive, IScoreboard scoreboard) 
 	{
-		return "[GRADITTRACK: " + this._name + "]";
+		super(interactive, scoreboard);
+		this._operationName = NAME;
+		this._operationIndex = ComradesGenerator.UPDATE_INTERVIEW;
 	}
+
+	@Override
+	public void execute() throws Throwable 
+	{
+		this.doUpdateInterview();
+		this.setFailed( false );
+	}
+
 }

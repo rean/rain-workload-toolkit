@@ -29,24 +29,33 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package radlab.rain.workload.scadr;
-
-
-import radlab.rain.DefaultScenarioTrack;
-import radlab.rain.Scenario;
-import radlab.rain.util.AppServerStats;
-
-import org.apache.zookeeper.KeeperException;
-import org.apache.zookeeper.ZooKeeper;
-import org.apache.zookeeper.KeeperException.Code;
-import org.apache.zookeeper.data.Stat;
+package radlab.rain.util;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Hashtable;
 import java.util.Iterator;
 
-public class ScadrScenarioTrack extends DefaultScenarioTrack 
+import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.KeeperException.Code;
+import org.apache.zookeeper.data.Stat;
+
+import radlab.rain.Scenario;
+import radlab.rain.DefaultScenarioTrack;
+import radlab.rain.util.AppServerStats;
+import radlab.rain.util.ZKAppServerWatcher;
+
+/** 
+ * (Abstract) ScenarioTrack-inheriting class that interacts with ZooKeeper and 
+ * performs even-load spreading across a list of web/app servers stored in ZooKeeper. 
+ * This is the pre-cursor to more sophisticated request-gating where we could limit 
+ * the outstanding requests to a server, e.g., to construct a workload that has a
+ * constant number of outstanding requests to a target throughout a run.
+ * For now we just expect generators that use this track to pick the least loaded server
+ * to avoid being backed up behind a slow server.
+ */
+public abstract class ZKGatingScenarioTrack extends DefaultScenarioTrack 
 {
 	public static final int DEFAULT_ZOOKEEPER_SESSION_TIMEOUT 	= 30000;
 	public static final String APP_SERVER_LIST_SEPARATOR 		= "\n";
@@ -65,7 +74,6 @@ public class ScadrScenarioTrack extends DefaultScenarioTrack
 	private long _totalTrafficLockRequestCount			= 0;
 	private long _maxTrafficLockWaitTime 				= 0;
 	private Object _trafficLock 					 	= new Object();
-	//private Hashtable<String,Long> _appServerTraffic 	= new Hashtable<String,Long>();
 	private Hashtable<String, AppServerStats> _appServerTraffic = new Hashtable<String, AppServerStats>();
 		
 	// Accessor methods such that operations can indicate that they're targeting a 
@@ -134,13 +142,8 @@ public class ScadrScenarioTrack extends DefaultScenarioTrack
 	
 	private String _zkConnString = "";
 	private String _zkPath = "";
-	
-	public ScadrScenarioTrack(Scenario parent) 
-	{
-		super(parent);
-	}
 
-	public ScadrScenarioTrack(String name, Scenario scenario) 
+	public ZKGatingScenarioTrack(String name, Scenario scenario) 
 	{
 		super(name, scenario);
 	}
@@ -158,14 +161,6 @@ public class ScadrScenarioTrack extends DefaultScenarioTrack
 	
 	public boolean getAppServerListChanged()
 	{ return this._appServerListChanged; }
-	
-	/*public String[] getAppServers()
-	{ 
-		//if( this._appServerListChanged )
-			//; // do update
-		
-		return this._appServers; 
-	}*/
 	
 	public Hashtable<String, AppServerStats> getAppServers()
 	{ return this._appServerTraffic; }
@@ -205,7 +200,7 @@ public class ScadrScenarioTrack extends DefaultScenarioTrack
 			int retries = DEFAULT_RETRIES;
 			long retryTimeout = DEFAULT_RETRY_TIMEOUT;
 			
-			byte[] data = ScadrScenarioTrack.readZooKeeperData( this._zconn, this._zkPath, retries, retryTimeout );//this._zconn.getData( this._zkPath, true, new Stat() );
+			byte[] data = ZKGatingScenarioTrack.readZooKeeperData( this._zconn, this._zkPath, retries, retryTimeout );//this._zconn.getData( this._zkPath, true, new Stat() );
 			if( data == null )
 				throw new Exception( "No data returned from ZooKeeper path: " + this._zkPath + " after: " + retries + " retries." );
 				
@@ -240,7 +235,7 @@ public class ScadrScenarioTrack extends DefaultScenarioTrack
 			int retries = DEFAULT_RETRIES;
 			long retryTimeout = DEFAULT_RETRY_TIMEOUT;
 			
-			byte[] data = ScadrScenarioTrack.readZooKeeperData( this._zconn, this._zkPath, retries, retryTimeout );//this._zconn.getData( this._zkPath, true, new Stat() );
+			byte[] data = ZKGatingScenarioTrack.readZooKeeperData( this._zconn, this._zkPath, retries, retryTimeout );//this._zconn.getData( this._zkPath, true, new Stat() );
 			if( data == null )
 				throw new Exception( "No data returned from ZooKeeper path: " + this._zkPath + " after: " + retries + " retries." );
 				
@@ -350,11 +345,8 @@ public class ScadrScenarioTrack extends DefaultScenarioTrack
 	}
 	
 	@Override
-	public String toString()
-	{
-		return "[SCADRTRACK: " + this._name + "]";
-	}
-	
+	public abstract String toString();
+		
 	@Override
 	public void end()
 	{
