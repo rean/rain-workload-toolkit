@@ -1,5 +1,5 @@
 {
-    "profilesCreatorClass": "radlab.rain.workload.scadr.ComradesDemoProfileCreator",
+    "profilesCreatorClass": "radlab.rain.workload.comrades.ComradesDemoProfileCreator",
     "profilesCreatorClassParams": {
     },
     "timing": {
