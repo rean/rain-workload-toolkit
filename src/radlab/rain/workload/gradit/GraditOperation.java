@@ -368,11 +368,11 @@ public class GraditOperation extends Operation
 		while( availableWordlistMatch.find() )
 		{
 			//System.out.println( buffer.substring( match.start(), match.end()) );
-			System.out.println( availableWordlistMatch.group(2) );
+			//System.out.println( availableWordlistMatch.group(2) );
 			availableGames.add( availableWordlistMatch.group(2) );
 			availableWordlistCount++;
 		}
-		System.out.println( "Available wordlist count: " + availableWordlistCount );
+		//System.out.println( "Available wordlist count: " + availableWordlistCount );
 		
 		// If there are any unfinished games flip a coin and restart an old game 70% of the time
 		// otherwise start a brand new game
@@ -382,11 +382,11 @@ public class GraditOperation extends Operation
 		while( unfinishedGametMatch.find() )
 		{
 			//System.out.println( buffer.substring( match.start(), match.end()) );
-			System.out.println( unfinishedGametMatch.group(2) );
+			//System.out.println( unfinishedGametMatch.group(2) );
 			unfinishedGames.add( unfinishedGametMatch.group(2) );
 			unfinishedGameCount++;
 		}
-		System.out.println( "Unfinished game count: " + unfinishedGameCount );
+		//System.out.println( "Unfinished game count: " + unfinishedGameCount );
 		
 		// Pick a sample game to start - later we can allow users to resume games as well
 		// We could skew the popularity of the sample games if we want to. Choose
@@ -397,10 +397,10 @@ public class GraditOperation extends Operation
 			gameUrl.append( this.getGenerator()._baseUrl );
 			gameUrl.append( AVAILABLE_WORDLIST_URL_PREFIX );
 			gameUrl.append( availableGames.get( this._random.nextInt( availableWordlistCount ) ) );
-			System.out.println( "GameUrl: " + gameUrl.toString() );
+			//System.out.println( "GameUrl: " + gameUrl.toString() );
 			StringBuilder gameResponse = this._http.fetchUrl( gameUrl.toString() );
 			this.trace( gameUrl.toString() );
-			System.out.println( gameResponse.toString() );
+			//System.out.println( gameResponse.toString() );
 			if( gameResponse == null || gameResponse.length() == 0 || this._http.getStatusCode() > 399 )
 			{
 				String errorMessage = "Start Game GET ERROR - Received an empty/error response. HTTP Status Code: " + this._http.getStatusCode();

@@ -209,12 +209,12 @@ public abstract class ZKGatingScenarioTrack extends DefaultScenarioTrack
 			if( list.trim().length() > 0 )
 			{
 				this._appServers = list.split( APP_SERVER_LIST_SEPARATOR );
-				System.out.println( this + " Appserver list initialized, " + this._appServers.length + " app servers found." );
+				//System.out.println( this + " Appserver list initialized, " + this._appServers.length + " app servers found." );
 				for( String s : this._appServers )
 				{
 					// Set up empty stats
 					this._appServerTraffic.put( s, new AppServerStats( s, 0L ) );
-					System.out.println( this + " Appserver: " + s );
+					//System.out.println( this + " Appserver: " + s );
 				}
 				return true; // Signal that we've initialized the app server list
 			}
@@ -244,7 +244,7 @@ public abstract class ZKGatingScenarioTrack extends DefaultScenarioTrack
 			if( list.trim().length() > 0 )
 			{
 				this._appServers = list.split( APP_SERVER_LIST_SEPARATOR );
-				System.out.println( this + " Appserver list updated, " + this._appServers.length + " app servers found." );
+				//System.out.println( this + " Appserver list updated, " + this._appServers.length + " app servers found." );
 								
 				// Here's where we'd want to purge the traffic table of entries that are not in
 				// this list - we need to purge so that non-existent servers don't get
@@ -253,7 +253,7 @@ public abstract class ZKGatingScenarioTrack extends DefaultScenarioTrack
 				Hashtable<String,AppServerStats> newTrafficSnapshot = new Hashtable<String,AppServerStats>();
 				for( String s : this._appServers )
 				{
-					System.out.println( this + " Appserver: " + s );
+					//System.out.println( this + " Appserver: " + s );
 					// Create a stats snapshot with just the server names, 
 					// but null stats values
 					newTrafficSnapshot.put( s, new AppServerStats( s, 0L ) );

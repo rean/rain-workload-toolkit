@@ -361,7 +361,7 @@ public abstract class ComradesOperation extends Operation
 				//interviewDetailsUrl.append( this.getGenerator()._candidatesUrl ).append( "/" );
 				interviewDetailsUrl.append( status._interviewDetailsUrl );
 				
-				System.out.println( "Found interviewee: " + interviewDetailsUrl.toString() );
+				//System.out.println( "Found interviewee: " + interviewDetailsUrl.toString() );
 				score = this.doSubmitInterview( interviewDetailsUrl.toString() );
 							
 				foundInterviewee = true;
@@ -442,7 +442,7 @@ public abstract class ComradesOperation extends Operation
 			if( status != null && status._canInterview && this._random.nextDouble() < 0.5 )
 			{
 				// Force an interview
-				System.out.println( "Forcing interview..." );
+				//System.out.println( "Forcing interview..." );
 				/*int score =*/ this.doSubmitInterview( status._interviewDetailsUrl );
 				status._canInterview = false;
 			}
@@ -454,7 +454,7 @@ public abstract class ComradesOperation extends Operation
 				interviewDecisionUrl.append( status._interviewDetailsUrl );
 				interviewDecisionUrl.append( "/decide" );
 				
-				System.out.println( "Found offeree: " + interviewDecisionUrl.toString() );
+				//System.out.println( "Found offeree: " + interviewDecisionUrl.toString() );
 				
 				HttpPost httpPost = new HttpPost( interviewDecisionUrl.toString() );
 				// Weird things happen if we don't specify HttpMultipartMode.BROWSER_COMPATIBLE.
