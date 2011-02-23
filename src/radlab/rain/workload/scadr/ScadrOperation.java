@@ -591,7 +591,7 @@ public abstract class ScadrOperation extends Operation
 		// If we're not logged in, try to log in
 		if( !this.getGenerator().getIsLoggedIn() )
 			result = this.doLogin();
-		else result = true;
+		else result = true; // We're logged in
 		
 		if( !result )
 			throw new Exception( "Error logging in. Can't subscribe to user." );

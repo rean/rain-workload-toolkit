@@ -610,7 +610,7 @@ public class ScadrGenerator extends Generator
 		
 		if( lastOperation == -1 )
 		{
-			nextOperation = 0;
+			nextOperation = CREATE_USER;
 		}
 		else
 		{
