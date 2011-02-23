@@ -265,6 +265,7 @@
             <fileset dir="bin" includes="radlab/rain/workload/comrades/**"/>
         	<!-- Bake the configuration files into the jar -->
         	<fileset dir="config" includes="*comrades*.json"/>
+        	<fileset dir="resources" includes="comrades_names.txt"/>
         </jar>
     </target>
 	<target depends="build" name="package-daytrader">

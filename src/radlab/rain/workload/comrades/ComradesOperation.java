@@ -280,17 +280,23 @@ public abstract class ComradesOperation extends Operation
 	
 	private String getUserName()
 	{ 
-		// Make firstnames with up to 6 characters
-		// Make lastnames with up to 9 characters
-		String firstname = this.randomString( 6 );
-		String lastname = this.randomString( 9 );
-		
-		StringBuffer buf = new StringBuffer();
-		buf.append( firstname );
-		buf.append( " " );
-		buf.append( lastname );
-		
-		return buf.toString(); 
+		// Use pre-loaded names (if available)
+		if( ComradesScenarioTrack.NAMES.size() > 0 )
+			return ComradesScenarioTrack.NAMES.get( this._random.nextInt( ComradesScenarioTrack.NAMES.size() ) );
+		else // Use random names if we can't find pre-loaded names 
+		{
+			// Make firstnames with up to 6 characters
+			// Make lastnames with up to 9 characters
+			String firstname = this.randomString( 6 );
+			String lastname = this.randomString( 9 );
+			
+			StringBuffer buf = new StringBuffer();
+			buf.append( firstname );
+			buf.append( " " );
+			buf.append( lastname );
+			
+			return buf.toString();
+		}
 	}
 	
 	private String randomString( int length )

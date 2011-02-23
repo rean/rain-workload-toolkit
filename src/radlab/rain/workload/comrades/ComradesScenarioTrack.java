@@ -31,16 +31,55 @@
 
 package radlab.rain.workload.comrades;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Vector;
+
 import radlab.rain.Scenario;
 import radlab.rain.util.ZKGatingScenarioTrack;
 
 public class ComradesScenarioTrack extends ZKGatingScenarioTrack 
 {
+	public static Vector<String> NAMES	= new Vector<String>();
+	public static String NAMES_FILE 	= "comrades_names.txt";
+	
 	public ComradesScenarioTrack(String name, Scenario scenario) 
 	{
 		super(name, scenario);
 	}
 
+	@Override
+	public void start()
+	{
+		// Load in the names file from the workload jar file
+		try
+		{
+			InputStream in = ClassLoader.getSystemClassLoader().getResourceAsStream( NAMES_FILE );
+			if( in != null )
+			{
+				System.out.println( this + " Reading candidate/interviewer names from resource stream." );
+				BufferedReader reader = new BufferedReader( new InputStreamReader( in ) );
+				String line = "";
+				// Read in the entire file put each line into the vector of names
+				while( ( line = reader.readLine() ) != null )
+					NAMES.add( line );
+			}
+			else
+			{
+				System.out.println( this + " Using random string candidate/interviewer names. Could not read candidate/interviewer names from resource stream." );
+			}
+		}
+		catch( IOException ioe )
+		{
+			
+		}
+		
+		// Start the scenario track as usual
+		super.start();
+	}
+	
 	@Override
 	public String toString() 
 	{

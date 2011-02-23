@@ -113,8 +113,8 @@ public class ComradesDemoProfileCreator extends ProfileCreator
 			trackDetails.put( ScenarioTrack.CFG_LOAD_SCHEDULE_CREATOR_KEY, "radlab.rain.workload.comrades.ComradesDemoScheduleCreator" );
 						
 			JSONObject targetDetails = new JSONObject();
-			targetDetails.put( ScenarioTrack.CFG_TARGET_HOSTNAME_KEY, "ec2-50-16-105-73.compute-1.amazonaws.com" );
-			targetDetails.put( ScenarioTrack.CFG_TARGET_PORT_KEY, 8080 );
+			targetDetails.put( ScenarioTrack.CFG_TARGET_HOSTNAME_KEY, "localhost" );
+			targetDetails.put( ScenarioTrack.CFG_TARGET_PORT_KEY, 3000 );
 			
 			trackDetails.put( ScenarioTrack.CFG_TARGET_KEY, targetDetails );
 			trackDetails.put( ScenarioTrack.CFG_LOG_SAMPLING_PROBABILITY_KEY, 0.0 ); // No log sampling
