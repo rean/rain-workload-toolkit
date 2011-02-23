@@ -355,7 +355,7 @@ public abstract class ComradesOperation extends Operation
 		while( maxSearches > 0 )
 		{
 			InterviewStatus status = this.doCandidateDetails();
-			if( status._canInterview )
+			if( status != null && status._canInterview )
 			{
 				StringBuffer interviewDetailsUrl = new StringBuffer();
 				//interviewDetailsUrl.append( this.getGenerator()._candidatesUrl ).append( "/" );
@@ -439,7 +439,7 @@ public abstract class ComradesOperation extends Operation
 		{
 			InterviewStatus status = this.doCandidateDetails();
 			// 50% of the time force a decision
-			if( status._canInterview && this._random.nextDouble() < 0.5 )
+			if( status != null && status._canInterview && this._random.nextDouble() < 0.5 )
 			{
 				// Force an interview
 				System.out.println( "Forcing interview..." );

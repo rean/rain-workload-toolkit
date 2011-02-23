@@ -91,7 +91,8 @@ public class GraditOperationsTest
 	@Before
 	public void setUp() {		
 		generator = new GraditGenerator( track );
-		generator.initializeUrls( "localhost", 3000 );
+		//generator.initializeUrls( "localhost", 3000 );
+		generator.initializeUrls( "gradit.radlab.net", 80 );
 	}
 
 	private void runOp( Operation op )

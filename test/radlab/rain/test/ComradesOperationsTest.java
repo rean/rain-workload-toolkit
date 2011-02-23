@@ -94,7 +94,8 @@ public class ComradesOperationsTest
 	{		
 		generator = new ComradesGenerator( track );
 		//generator.initializeUrls( "comrades-1506271933.us-east-1.elb.amazonaws.com", 80 );
-		generator.initializeUrls( "localhost", 3000 );
+		//generator.initializeUrls( "localhost", 3000 );
+		generator.initializeUrls( "comrades.radlab.net", 80 );
 	}
 
 	private void runOp( Operation op )

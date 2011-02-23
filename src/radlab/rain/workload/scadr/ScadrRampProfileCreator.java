@@ -53,7 +53,7 @@ public class ScadrRampProfileCreator extends ProfileCreator
 		// Let's try creating a track config with 1 track
 		for( int i = 0; i < 1; i++ )
 		{
-			String trackName = "scadr-00" + i;
+			String trackName = "SCADr";//"scadr-00" + i;
 			JSONObject trackDetails = new JSONObject();
 			// Fill in details
 			trackDetails.put( ScenarioTrack.CFG_GENERATOR_KEY, "radlab.rain.workload.scadr.ScadrGenerator" );
