@@ -219,7 +219,7 @@ public class ScadrScenarioTrack extends DefaultScenarioTrack
 				{
 					// Set up empty stats
 					this._appServerTraffic.put( s, new AppServerStats( s, 0L ) );
-					System.out.println( this + " Appserver: " + s );
+					//System.out.println( this + " Appserver: " + s );
 				}
 				return true; // Signal that we've initialized the app server list
 			}
@@ -258,7 +258,7 @@ public class ScadrScenarioTrack extends DefaultScenarioTrack
 				Hashtable<String,AppServerStats> newTrafficSnapshot = new Hashtable<String,AppServerStats>();
 				for( String s : this._appServers )
 				{
-					System.out.println( this + " Appserver: " + s );
+					//System.out.println( this + " Appserver: " + s );
 					// Create a stats snapshot with just the server names, 
 					// but null stats values
 					newTrafficSnapshot.put( s, new AppServerStats( s, 0L ) );
