@@ -343,8 +343,8 @@ public abstract class ScadrOperation extends Operation
 		successMessage.append( username.toString() );
 		successMessage.append( "\" has been created!" );
 		
-		if(! (response.toString().contains( successMessage.toString() ) ) )
-			throw new Exception( "Creating new user: " + username.toString() + " failed! No success message found. HTTP Status Code: " + this._http.getStatusCode() );
+		if( !(response.toString().contains( successMessage.toString() ) ) && !(response.toString().contains( "has already been taken" ) ) )
+			throw new Exception( "Creating new user: " + username.toString() + " failed! No success message found. HTTP Status Code: " + this._http.getStatusCode() + " Response: " + response.toString() );
 		
 		this.trace( this.getGenerator()._createUserResultUrl );
 		//System.out.println( "CreateUser worked" );
