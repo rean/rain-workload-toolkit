@@ -611,19 +611,19 @@ public abstract class ScadrOperation extends Operation
 		// Do a get for that user - look for a subscribe button
 		StringBuilder response = this._http.fetchUrl( targetUserUrl );
 		this.trace( targetUserUrl );
-		if( response.length() == 0 || this._http.getStatusCode() > 399 || response.toString().contains( "does not exist" ) )
+		if( response == null || (response.length() == 0 || this._http.getStatusCode() > 399) || response.toString().contains( "does not exist" ) )
 		{
 			// Create user if they don't exist
-			if( !createTargetUser )
+			/*if( !createTargetUser )
 			{
 				String errorMessage = "Subscribe to user page GET ERROR - Received an empty/error response. HTTP Status Code: " + this._http.getStatusCode();
 				throw new IOException( errorMessage );
 			}
 			else 
-			{
+			{*/
 				//System.out.println( "Creating target user: " + targetUser + " so we can subscribe to their thoughtstream." );
 				this.doCreateUser( targetUser );
-			}
+			//}
 		}
 		
 		// Get the auth token
