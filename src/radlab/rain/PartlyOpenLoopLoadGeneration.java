@@ -371,6 +371,6 @@ public class PartlyOpenLoopLoadGeneration extends LoadGenerationStrategy
 	protected boolean isActive()
 	{
 		LoadProfile loadProfile = this._generator.getTrack().getCurrentLoadProfile();
-		return ( this._id <= loadProfile.getNumberOfUsers() );
+		return ( this._id < loadProfile.getNumberOfUsers() );
 	}
 }
