@@ -1,0 +1,45 @@
+{
+	"mongo-001": {
+		"generator": "radlab.rain.workload.mongodb.MongoGenerator",
+		"generatorParameters":{
+        	"usePooling": "true",
+        	"rngSeed": 67510,
+        	"dbName": "test",
+			"collectionName": "test-ns",
+			"debug":"false"
+        },
+		"track": "radlab.rain.DefaultScenarioTrack",
+		"loadProfileClass": "radlab.rain.workload.mongodb.MongoLoadProfile",
+		"resourcePath": "resources/",
+		"behavior": {
+			
+		},
+		"loadProfile": [
+		{
+			"interval": 20,
+			"users": 100,
+			"mix": "uniform50r/50w",
+			"keyGenerator": "radlab.rain.util.storage.UniformKeyGenerator",
+			"keyGeneratorConfig": {
+				"rngSeed": 1,
+				"minKey": 1,
+				"maxKey": 100000,
+				"a": 1.001,
+				"r": 3.456
+			},
+			"size": 1024,
+			"readPct": 0.5,
+			"writePct": 0.5
+		}
+		],
+		"target": {
+		  "hostname": "localhost",
+		  "port": 27017
+		},
+		"pLogSampling": 1.0,
+		"pOpenLoop": 0.0,
+		"meanCycleTime": 0,
+		"meanThinkTime": 0,
+		"interactive": true
+	}
+}

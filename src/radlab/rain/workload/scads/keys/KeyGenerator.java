@@ -57,7 +57,7 @@ public abstract class KeyGenerator
 	 * @return  An integral key.
 	 */
 	public abstract int generateKey();
-
+	
 	/**
 	 * Returns the name of this generator.
 	 * 
@@ -77,5 +77,4 @@ public abstract class KeyGenerator
 		keyGenerator = (KeyGenerator) keyGeneratorCtor.newInstance( new Object[] { keyGeneratorConfig } );
 		return keyGenerator;
 	}
-
 }

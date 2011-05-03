@@ -29,65 +29,55 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package radlab.rain.workload.scads;
+package radlab.rain.util.storage;
+
+import java.lang.reflect.Constructor;
 
 import org.json.JSONObject;
 
-import radlab.rain.*;
-import radlab.rain.workload.scads.keys.KeyGenerator;
 
-/**
- * The SampleOperation class contains common static methods for use by the
- * operations that inherit from this abstract class.
- */
-public abstract class ScadsOperation extends Operation 
+public abstract class KeyGenerator
 {
-	/** The key used in this SCADs operation. */
-	protected int key;
+	protected static final long DEFAULT_RNG_SEED		= 1;
+	
+	// Configuration constants
+	public static final String RNG_SEED_KEY			= "rngSeed";
+	public static final String MIN_KEY_CONFIG_KEY 	= "minKey";
+	public static final String MAX_KEY_CONFIG_KEY 	= "maxKey";
+	public static final String A_CONFIG_KEY 			= "a";
+	public static final String R_CONFIG_KEY 			= "r";
+	public static final String KEY_FILE_KEY			= "keyFile";
+	public static final String NUMBER_OF_KEYS_KEY	= "numKeys";
+		
+	/** The name of this generator. */
+	protected String name;
 
 	/**
-	 * Returns the SampleGenerator that created this operation.
+	 * Generates a key, usually based on a distribution represented
+	 * by this key generator. Subsequent invocations of this method may not
+	 * return the same value.
 	 * 
-	 * @return      The SampleGenerator that created this operation.
+	 * @return  An integral key.
 	 */
-	public ScadsGenerator getGenerator()
+	public abstract int generateKey();
+	
+	/**
+	 * Returns the name of this generator.
+	 * 
+	 * @return  The name of this generator.
+	 */
+	public String getName()
 	{
-		return (ScadsGenerator) this._generator;
+		return this.name;
 	}
 
-	public ScadsOperation( boolean interactive, IScoreboard scoreboard )
+	@SuppressWarnings("unchecked")
+	public static KeyGenerator createKeyGenerator( String name, JSONObject keyGeneratorConfig ) throws Exception
 	{
-		super( interactive, scoreboard );
-	}
-
-	@Override
-	public void prepare(Generator generator) 
-	{
-		this._generator = generator;
-
-		ScadsLoadProfile currentLoad = (ScadsLoadProfile) generator.getTrack().getCurrentLoadProfile(); 
-
-		// Create the key generator...
-		JSONObject keyGeneratorConfig = currentLoad.getKeyGeneratorConfig();
-		String keyGeneratorName = currentLoad.getKeyGeneratorName();
 		KeyGenerator keyGenerator = null;
-		try {
-			keyGenerator = KeyGenerator.createKeyGenerator( keyGeneratorName, keyGeneratorConfig );
-		} catch (Exception e) {
-			// Error creating key generator!
-			e.printStackTrace();
-		}
-
-		// ...so that we can generate a key.
-		this.key = keyGenerator.generateKey();
-
-		// TODO: Move key generator out into the generator (share it).
+		Class<KeyGenerator> keyGeneratorClass = (Class<KeyGenerator>) Class.forName( name );
+		Constructor<KeyGenerator> keyGeneratorCtor = keyGeneratorClass.getConstructor( new Class[]{ JSONObject.class } );
+		keyGenerator = (KeyGenerator) keyGeneratorCtor.newInstance( new Object[] { keyGeneratorConfig } );
+		return keyGenerator;
 	}
-
-	@Override
-	public void cleanup()
-	{
-		
-	}
-
 }

@@ -19,10 +19,19 @@
         <pathelement location="thirdparty/httpcomponents-client-4.0.1/lib/httpmime-4.0.1.jar"/>
         <pathelement location="thirdparty/json-20090211.jar"/>
     	<pathelement location="thirdparty/colt-1.2.0/colt.jar"/>
+    	<!-- zookeeper stuff -->
     	<pathelement location="thirdparty/zookeeper-3.3.2/zookeeper-3.3.2.jar"/>
     	<pathelement location="thirdparty/zookeeper-3.3.2/lib/jline-0.9.94.jar"/>
     	<pathelement location="thirdparty/zookeeper-3.3.2/lib/log4j-1.2.15.jar"/>
+    	<!-- mysql stuff -->
     	<pathelement location="thirdparty/mysql-connector-java-5.1.14/mysql-connector-java-5.1.14-bin.jar"/>
+    	<!-- Mongo stuff -->
+    	<pathelement location="thirdparty/mongo-2.5.3/mongo-2.5.3.jar"/>
+    	<!-- Riak stuff -->
+    	<pathelement location="thirdparty/riak-java-client/target/riak-client-0.14.2-SNAPSHOT.jar"/>
+    	<pathelement location="thirdparty/riak-java-client/lib/commons-codec-1.2.jar"/>
+    	<pathelement location="thirdparty/riak-java-client/lib/commons-httpclient-3.1.jar"/>
+    	<pathelement location="thirdparty/riak-java-client/lib/commons-logging-1.0.4.jar"/>
     </path>
 	<path id="rain.classpath.with.mr">
         <pathelement location="bin"/>
@@ -46,6 +55,13 @@
 		<pathelement location="thirdparty/hadoop-0.20.2/lib/commons-httpclient-3.0.1.jar"/>
 		<!-- mysql stuff -->
 		<pathelement location="thirdparty/mysql-connector-java-5.1.14/mysql-connector-java-5.1.14-bin.jar"/>
+		<!-- Mongo stuff -->
+		<pathelement location="thirdparty/mongo-2.5.3/mongo-2.5.3.jar"/>
+		<!-- Riak stuff -->
+		<pathelement location="thirdparty/riak-java-client/target/riak-client-0.14.2-SNAPSHOT.jar"/>
+		<pathelement location="thirdparty/riak-java-client/lib/commons-codec-1.2.jar"/>
+		<pathelement location="thirdparty/riak-java-client/lib/commons-httpclient-3.1.jar"/>
+		<pathelement location="thirdparty/riak-java-client/lib/commons-logging-1.0.4.jar"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>
@@ -153,6 +169,24 @@
 	        <arg file="config/rain.config.mapreduce.json"/>
 	    </java>
 	</target>
+	<target depends="build" name="Benchmark-mongodb">
+		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
+	    	<classpath refid="rain.classpath"/>
+	    	<jvmarg value="-Xmx1g" />
+	    	<jvmarg value="-Xms256m" />
+	    	<jvmarg value="-XX:+DisableExplicitGC"/>
+	        <arg file="config/rain.config.mongo.json"/>
+	    </java>
+	</target>
+	<target depends="build" name="Benchmark-riak">
+		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
+	    	<classpath refid="rain.classpath"/>
+	    	<jvmarg value="-Xmx1g" />
+	    	<jvmarg value="-Xms256m" />
+	    	<jvmarg value="-XX:+DisableExplicitGC"/>
+	        <arg file="config/rain.config.riak.json"/>
+	    </java>
+	</target>
     <target depends="build" name="package">
         <jar destfile="rain.jar" filesetmanifest="mergewithoutmain">
             <manifest>
@@ -167,10 +201,19 @@
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.0.1/lib/httpmime-4.0.1.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/json-20090211.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/colt-1.2.0/colt.jar"/>
+        	<!-- Zookeeper stuff -->
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/zookeeper-3.3.2/zookeeper-3.3.2.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/zookeeper-3.3.2/lib/jline-0.9.94.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/zookeeper-3.3.2/lib/log4j-1.2.15.jar"/>
+        	<!-- MySQL stuff -->
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/mysql-connector-java-5.1.14/mysql-connector-java-5.1.14-bin.jar"/>
+        	<!-- Mongo stuff -->
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/mongo-2.5.3/mongo-2.5.3.jar"/>
+        	<!-- Riak stuff -->
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/riak-java-client/target/riak-client-0.14.2-SNAPSHOT.jar"/>
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/riak-java-client/lib/commons-codec-1.2.jar"/>
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/riak-java-client/lib/commons-httpclient-3.1.jar"/>
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/riak-java-client/lib/commons-logging-1.0.4.jar"/>
         </jar>
     </target>
 	<target depends="build-with-mr" name="package-with-mr">
@@ -199,6 +242,13 @@
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/hadoop-0.20.2/lib/commons-httpclient-3.0.1.jar"/>
         	<!-- mysql stuff -->
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/mysql-connector-java-5.1.14/mysql-connector-java-5.1.14-bin.jar"/>
+        	<!-- Mongo stuff -->
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/mongo-2.5.3/mongo-2.5.3.jar"/>
+        	<!-- Riak stuff -->
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/riak-java-client/target/riak-client-0.14.2-SNAPSHOT.jar"/>
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/riak-java-client/lib/commons-codec-1.2.jar"/>
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/riak-java-client/lib/commons-httpclient-3.1.jar"/>
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/riak-java-client/lib/commons-logging-1.0.4.jar"/>
         </jar>
     </target>
 	<target depends="build-with-mr" name="package-mapreduce">
@@ -280,7 +330,23 @@
 	    	<fileset dir="bin" includes="radlab/rain/workload/rubis/**"/>
 	    </jar>
 	</target>	
-    <target depends="build" name="Benchmark-memprof">
+	<target depends="build" name="package-mongodb">
+        <mkdir dir="workloads"/>
+        <jar destfile="workloads/mongodb.jar" filesetmanifest="mergewithoutmain">
+            <fileset dir="bin" includes="radlab/rain/workload/mongodb/**"/>
+        	<!-- Bake the configuration files into the jar -->
+        	<fileset dir="config" includes="*mongo*.json"/>
+        </jar>
+    </target>
+	<target depends="build" name="package-riak">
+        <mkdir dir="workloads"/>
+        <jar destfile="workloads/riak.jar" filesetmanifest="mergewithoutmain">
+            <fileset dir="bin" includes="radlab/rain/workload/riak/**"/>
+        	<!-- Bake the configuration files into the jar -->
+        	<fileset dir="config" includes="*riak*.json"/>
+        </jar>
+    </target>
+	<target depends="build" name="Benchmark-memprof">
       <java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
 	<classpath refid="rain.classpath"/>
 	<jvmarg value="-Xmx1g" />

@@ -1,5 +1,4 @@
 bin
 .DS_Store
 *.log
-*.jar
 *~

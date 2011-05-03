@@ -33,10 +33,10 @@ package radlab.rain.workload.scads;
 
 import radlab.rain.Generator;
 
-import radlab.rain.workload.scads.keys.*;
 import radlab.rain.LoadProfile;
 import radlab.rain.Operation;
 import radlab.rain.ScenarioTrack;
+import radlab.rain.workload.scads.keys.KeyGenerator;
 
 /**
  * The ScadsGenerator class generates SCADs operations according to the given

@@ -10,6 +10,25 @@ public class Multinomial implements IMultinomial {
 	private ArrayList<Double> cdf;
 	private Random rnd = new Random();
 	
+	public void shrink( int targetSize )
+	{
+		while( this.size() > targetSize )
+		{
+			this.probabilities.remove( (this.probabilities.size() - 1) );
+		}
+		this.probabilities = normalize( this.probabilities );
+		this.cdf = computeCDF(this.probabilities);
+	}
+	
+	public Multinomial( double[] arrProbabilities )
+	{
+		ArrayList<Double> rawData = new ArrayList<Double>();
+		for( int i = 0; i < arrProbabilities.length; i++ )
+			rawData.add( arrProbabilities[i] );
+		this.probabilities = normalize( rawData );
+		this.cdf = computeCDF(this.probabilities);
+	}	
+	
 	public Multinomial(ArrayList<Double> probabilities) {
 		this.probabilities = normalize(probabilities);
 		this.cdf = computeCDF(this.probabilities);

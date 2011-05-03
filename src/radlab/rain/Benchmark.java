@@ -103,6 +103,7 @@ public class Benchmark
 		long startSteadyState = start + (scenario.getRampUp() * 1000);
 		long endSteadyState   = startSteadyState + (scenario.getDuration() * 1000);
 		
+		System.out.println( "[BENCHMARK] Initializing " + scenario.getTracks().size() + " track(s)." );
 		for ( ScenarioTrack track : scenario.getTracks().values() )
 		{
 			// Start the scoreboard. It needs to know the timings because we only

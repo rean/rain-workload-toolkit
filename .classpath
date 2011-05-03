@@ -21,9 +21,10 @@
 	<classpathentry kind="lib" path="thirdparty/zookeeper-3.3.2/lib/jline-0.9.94.jar"/>
 	<classpathentry kind="lib" path="thirdparty/zookeeper-3.3.2/lib/log4j-1.2.15.jar"/>
 	<classpathentry kind="lib" path="thirdparty/mysql-connector-java-5.1.14/mysql-connector-java-5.1.14-bin.jar"/>
-	<classpathentry kind="lib" path="thirdparty/riak-client-0.9.1/commons-codec-1.2.jar"/>
-	<classpathentry kind="lib" path="thirdparty/riak-client-0.9.1/commons-httpclient-3.1.jar"/>
-	<classpathentry kind="lib" path="thirdparty/riak-client-0.9.1/commons-logging-1.0.4.jar"/>
-	<classpathentry kind="lib" path="thirdparty/riak-client-0.9.1/riak-client-0.14.1-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="thirdparty/mongo-2.5.3/mongo-2.5.3.jar"/>
+	<classpathentry kind="lib" path="thirdparty/riak-java-client/lib/commons-codec-1.2.jar"/>
+	<classpathentry kind="lib" path="thirdparty/riak-java-client/lib/commons-httpclient-3.1.jar"/>
+	<classpathentry kind="lib" path="thirdparty/riak-java-client/lib/commons-logging-1.0.4.jar"/>
+	<classpathentry kind="lib" path="thirdparty/riak-java-client/target/riak-client-0.14.2-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
