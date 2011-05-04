@@ -28,10 +28,7 @@
 			},
 			"size": 1024,
 			"readPct": 0.5,
-			"writePct": 0.5,
-			"numHotObjects": 200,
-			"hotTrafficFraction":0.5,
-			"hotSetEntropy":0.5
+			"writePct": 0.5
 		}
 		],
 		"target": {
