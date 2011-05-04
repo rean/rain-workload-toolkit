@@ -48,7 +48,7 @@ public class RiakUtil
 		else
 		{
 			System.out.println( "Usage   : RiakUtil <host> <port> <bucket> <min key> <max key>" );
-			System.out.println( "Example : MongoUtil localhost 27017 testbkt 1 10000000" );
+			System.out.println( "Example : RiakUtil localhost 8098 testbkt 1 100000" );
 			System.exit( -1 );
 		}
 		

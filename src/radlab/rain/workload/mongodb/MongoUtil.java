@@ -53,7 +53,7 @@ public class MongoUtil
 		else
 		{
 			System.out.println( "Usage   : MongoUtil <host> <port> <dbName> <collection name> <min key> <max key>" );
-			System.out.println( "Example : MongoUtil localhost 27017 test test-ns 1 10000000" );
+			System.out.println( "Example : MongoUtil localhost 27017 test test-ns 1 100000" );
 			System.exit( -1 );
 		}
 		
