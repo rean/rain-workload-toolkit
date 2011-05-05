@@ -1,0 +1,8 @@
+{
+    "profiles": "config/profiles.config.redis.json",
+    "timing": {
+        "rampUp": 10,
+        "duration": 100,
+        "rampDown": 10
+    }
+}

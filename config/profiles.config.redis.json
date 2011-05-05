@@ -1,14 +1,13 @@
 {
-	"riak-001": {
-		"generator": "radlab.rain.workload.riak.RiakGenerator",
+	"redis-001": {
+		"generator": "radlab.rain.workload.redis.RedisGenerator",
 		"generatorParameters":{
         	"usePooling": "true",
         	"rngSeed": 67510,
-        	"bucket" : "testbkt",
         	"debug":"false"
         },
 		"track": "radlab.rain.DefaultScenarioTrack",
-		"loadProfileClass": "radlab.rain.workload.riak.RiakLoadProfile",
+		"loadProfileClass": "radlab.rain.workload.redis.RedisLoadProfile",
 		"resourcePath": "resources/",
 		"behavior": {
 			
@@ -33,7 +32,7 @@
 		],
 		"target": {
 		  "hostname": "localhost",
-		  "port": 8098
+		  "port": 6379
 		},
 		"pLogSampling": 1.0,
 		"pOpenLoop": 0.0,

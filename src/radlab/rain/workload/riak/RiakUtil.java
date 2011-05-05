@@ -24,7 +24,7 @@ public class RiakUtil
 	
 	public static void main( String[] args ) throws Exception
 	{
-		// Need the name of a server, a db to use and a collection
+		// Need the name of a server and a bucket
 		int port = RiakTransport.DEFAULT_RIAK_PORT;
 		String host = "localhost";
 		String bucket = "testbkt";

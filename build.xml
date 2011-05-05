@@ -32,6 +32,9 @@
     	<pathelement location="thirdparty/riak-java-client/lib/commons-codec-1.2.jar"/>
     	<pathelement location="thirdparty/riak-java-client/lib/commons-httpclient-3.1.jar"/>
     	<pathelement location="thirdparty/riak-java-client/lib/commons-logging-1.0.4.jar"/>
+    	<!-- Redis stuff -->
+    	<pathelement location="thirdparty/jedis/target/jedis-1.5.3-SNAPSHOT.jar"/>
+    	<pathelement location="thirdparty/commons-pool-1.5.6/commons-pool-1.5.6.jar"/>
     </path>
 	<path id="rain.classpath.with.mr">
         <pathelement location="bin"/>
@@ -62,6 +65,9 @@
 		<pathelement location="thirdparty/riak-java-client/lib/commons-codec-1.2.jar"/>
 		<pathelement location="thirdparty/riak-java-client/lib/commons-httpclient-3.1.jar"/>
 		<pathelement location="thirdparty/riak-java-client/lib/commons-logging-1.0.4.jar"/>
+		<!-- Redis stuff -->
+		<pathelement location="thirdparty/jedis/target/jedis-1.5.3-SNAPSHOT.jar"/>
+		<pathelement location="thirdparty/commons-pool-1.5.6/commons-pool-1.5.6.jar"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>
@@ -187,6 +193,15 @@
 	        <arg file="config/rain.config.riak.json"/>
 	    </java>
 	</target>
+	<target depends="build" name="Benchmark-redis">
+		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
+	    	<classpath refid="rain.classpath"/>
+	    	<jvmarg value="-Xmx1g" />
+	    	<jvmarg value="-Xms256m" />
+	    	<jvmarg value="-XX:+DisableExplicitGC"/>
+	        <arg file="config/rain.config.redis.json"/>
+	    </java>
+	</target>
     <target depends="build" name="package">
         <jar destfile="rain.jar" filesetmanifest="mergewithoutmain">
             <manifest>
@@ -214,6 +229,9 @@
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/riak-java-client/lib/commons-codec-1.2.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/riak-java-client/lib/commons-httpclient-3.1.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/riak-java-client/lib/commons-logging-1.0.4.jar"/>
+        	<!-- Redis stuff -->
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jedis/target/jedis-1.5.3-SNAPSHOT.jar"/>
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/commons-pool-1.5.6/commons-pool-1.5.6.jar"/>
         </jar>
     </target>
 	<target depends="build-with-mr" name="package-with-mr">
@@ -249,6 +267,9 @@
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/riak-java-client/lib/commons-codec-1.2.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/riak-java-client/lib/commons-httpclient-3.1.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/riak-java-client/lib/commons-logging-1.0.4.jar"/>
+        	<!-- Redis stuff -->
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jedis/target/jedis-1.5.3-SNAPSHOT.jar"/>
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/commons-pool-1.5.6/commons-pool-1.5.6.jar"/>
         </jar>
     </target>
 	<target depends="build-with-mr" name="package-mapreduce">
@@ -344,6 +365,14 @@
             <fileset dir="bin" includes="radlab/rain/workload/riak/**"/>
         	<!-- Bake the configuration files into the jar -->
         	<fileset dir="config" includes="*riak*.json"/>
+        </jar>
+    </target>
+	<target depends="build" name="package-redis">
+        <mkdir dir="workloads"/>
+        <jar destfile="workloads/redis.jar" filesetmanifest="mergewithoutmain">
+            <fileset dir="bin" includes="radlab/rain/workload/redis/**"/>
+        	<!-- Bake the configuration files into the jar -->
+        	<fileset dir="config" includes="*redis*.json"/>
         </jar>
     </target>
 	<target depends="build" name="Benchmark-memprof">
