@@ -8,6 +8,7 @@ import radlab.rain.Operation;
 import com.mongodb.BasicDBObject;
 import com.mongodb.CommandResult;
 import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
 import com.mongodb.WriteResult;
 
 public abstract class MongoOperation extends Operation 
@@ -54,6 +55,10 @@ public abstract class MongoOperation extends Operation
 		query.put( key, null );
 		DBCursor cursor = this._mongoClient.get( this._dbName, this._collectionName, query );
 		int count = cursor.count();
+		while( cursor.hasNext() )
+		{
+			DBObject o = cursor.curr();
+		}
 		// Close the db cursor
 		cursor.close();
 		return count;
