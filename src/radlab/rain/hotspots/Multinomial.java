@@ -10,7 +10,7 @@ public class Multinomial implements IMultinomial {
 	private ArrayList<Double> cdf;
 	private Random rnd = new Random();
 	
-	public void shrink( int targetSize )
+	/*public void shrink( int targetSize )
 	{
 		while( this.size() > targetSize )
 		{
@@ -18,7 +18,7 @@ public class Multinomial implements IMultinomial {
 		}
 		this.probabilities = normalize( this.probabilities );
 		this.cdf = computeCDF(this.probabilities);
-	}
+	}*/
 	
 	public Multinomial( double[] arrProbabilities )
 	{

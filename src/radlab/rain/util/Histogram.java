@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.TreeMap;
 
 public class Histogram<T> 
@@ -81,5 +82,48 @@ public class Histogram<T>
 		}
 		
 		return buf.toString();
+	}
+	
+	public Set<T> getKeySet()
+	{
+		return this._hist.keySet();
+	}
+	
+	public double[] getKeyPopularity()
+	{
+		double[] probabilities = new double[this._hist.size()];
+		int i = 0;
+		Iterator<T> it = this._hist.keySet().iterator();
+		while( it.hasNext() )
+		{
+			T key = it.next();
+			long count = this._hist.get( key );
+			double frequency = (double) count / (double) this._totalObservations;
+			probabilities[i] = frequency;
+			i++;
+		}
+		return probabilities;
+	}
+	
+	public double[] getKeyCdf()
+	{
+		double[] cdf = new double[this._hist.size()];
+		
+		int i = 0;
+		Iterator<T> it = this._hist.keySet().iterator();
+		while( it.hasNext() )
+		{
+			T key = it.next();
+			long count = this._hist.get( key );
+			double frequency = (double) count / (double) this._totalObservations;
+			
+			if( i == 0 )
+				cdf[i] = frequency;
+			else cdf[i] = frequency + cdf[i-1];
+			
+			i++;
+		}
+		
+		return cdf;
 	}
 }

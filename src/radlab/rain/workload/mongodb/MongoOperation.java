@@ -8,7 +8,6 @@ import radlab.rain.Operation;
 import com.mongodb.BasicDBObject;
 import com.mongodb.CommandResult;
 import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
 import com.mongodb.WriteResult;
 
 public abstract class MongoOperation extends Operation 
@@ -49,27 +48,26 @@ public abstract class MongoOperation extends Operation
 		this._collectionName = mongoGenerator._collectionName;
 	}
 
-	public int doGet( String key ) throws Exception
+	public DBCursor doGet( String key ) throws Exception
 	{
 		BasicDBObject query = new BasicDBObject();
-		query.put( key, null );
+		query.put( "key", key );
 		DBCursor cursor = this._mongoClient.get( this._dbName, this._collectionName, query );
-		int count = cursor.count();
-		while( cursor.hasNext() )
-		{
-			DBObject o = cursor.curr();
-		}
-		// Close the db cursor
-		cursor.close();
-		return count;
+		return cursor;
 	}
 	
+	// Make sure that when we put, we insert if it doesn't exist and that we update if it does
 	public void doPut( String key, byte[] value ) throws Exception
 	{
 		BasicDBObject obj = new BasicDBObject();
-		obj.put( key, value );
 		
-		WriteResult res = this._mongoClient.put( this._dbName, this._collectionName, obj );
+		obj.put( "key", key );
+		obj.put( "value", value );
+		
+		BasicDBObject query = new BasicDBObject();
+		query.put( "key", key );
+		
+		WriteResult res = this._mongoClient.updateOne( this._dbName, this._collectionName, query, obj );
 		CommandResult cmdRes = res.getLastError();
 		if( cmdRes == null )
 			throw new Exception( "Error getting command result after write." );

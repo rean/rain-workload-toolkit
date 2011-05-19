@@ -36,17 +36,13 @@ import java.util.Random;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import radlab.rain.util.Histogram;
+
 public class ZipfKeyGenerator extends KeyGenerator 
 {
 	protected String name = "Zipf";
 
 	protected Random random = null;
-
-	/** Lower bound of the key(s) generated. */
-	protected int lowerBound;
-
-	/** Upper bound of the key(s) generated. */
-	protected int upperBound;
 
 	/** Shape of the Zipf distribution; larger value implies taller peaks. */
 	protected double a;
@@ -54,6 +50,8 @@ public class ZipfKeyGenerator extends KeyGenerator
 	/** Random number used to shuffle keys around. */
 	protected double r;
 
+	protected double[] cdf;
+	
 	public ZipfKeyGenerator( JSONObject configObj ) throws JSONException
 	{
 		this( configObj.getDouble( A_CONFIG_KEY ),
@@ -74,22 +72,87 @@ public class ZipfKeyGenerator extends KeyGenerator
 		this.lowerBound = minKey;
 		// maxKey is inclusive, upperBound is exclusive.
 		this.upperBound = maxKey + 1;
-		this.random = new Random( seed );
+		this.seed = seed;
+		this.random = new Random( this.seed );
 	}
 
 	public int generateKey()
 	{
+		// Generate zipf numbers directly
+		return this.generateKeyDirect();
+	}
+	
+	public int generateKeyReject()
+	{
 		int k = -1;
 		do {
-			k = sampleZipf();
+			k = sampleZipfReject();
 		} while ( k > upperBound );
 		return Math.abs( (Double.valueOf( ( k + 1 ) * r ) ).hashCode() ) % ( upperBound - lowerBound ) + lowerBound;
 	}
 
+	public int generateKeyDirect()
+	{
+		int k = this.sampleZipfDirect();
+		// Unlike the rejection method, we won't get values out of bounds
+		return Math.abs( (Double.valueOf( ( k + 1 ) * r ) ).hashCode() ) % ( upperBound - lowerBound ) + lowerBound;
+	}
+	
+	// Compute Zipfian numbers directly
+	private double[] computeZipfCdf()
+	{
+		// Compute the zipf probabilities directly using the shape parameter
+		int keys = this.upperBound - this.lowerBound;
+		double[] probabilities = new double[keys];
+		double[] cdf = new double[keys];
+		double sum = 0.0;
+				
+		for( int i = 0; i < keys; i++ )
+		{
+			probabilities[i] = Math.pow( 1.0/(i+1), this.a );
+			sum += probabilities[i];
+			//System.out.println( "i: " + i + " p(i) raw: " + p_i[i] );
+		}
+		
+		//System.out.println( "Normalizing" );
+		
+		// Normalize the probabilities so they sum to 1, and compute the cdf using the normalized probabilities
+		for( int i = 0; i < keys; i++ )
+		{
+			probabilities[i] /= sum; // Normalized probability
+			
+			//System.out.println( Math.log( i+1 ) + "\t" + /*"i: " + i + " p(i) norm: " +*/ Math.log(probabilities[i]) );
+			
+			if( i == 0 )
+				cdf[i] = probabilities[i];
+			else cdf[i] = cdf[i-1] + probabilities[i];
+			
+			//System.out.println( (i+1) + " " + probabilities[i] + " " + cdf[i] );
+		}
+		return cdf;
+	}
+	
+	private int sampleZipfDirect()
+	{
+		if( this.cdf == null )
+			this.cdf = this.computeZipfCdf();
+				
+		// Generate a random number
+		double rndVal = this.random.nextDouble();
+		int i = 0;
+		for( i = 0; i < cdf.length; i++ )
+		{
+			if( rndVal <= cdf[i] )
+				break;
+		}
+		
+		return i + this.lowerBound;
+	}
+	
 	// Rejection method for generating Zipfian numbers
 	// See: Non-Uniform Random Variate Generation, Chapter 10: Discrete Univariate Distributions,  
 	// Luc Devroye (http://cg.scs.carleton.ca/~luc/rnbookindex.html)
-	private int sampleZipf()
+	private int sampleZipfReject()
 	{
 		double b = Math.pow( 2, a - 1 );
 		double u, v, x, t = 0.0;
@@ -100,5 +163,69 @@ public class ZipfKeyGenerator extends KeyGenerator
 			t = Math.pow( 1.0 + 1.0 / x, a - 1.0 );
 		} while ( v * x * ( t - 1.0 ) / ( b - 1.0 ) > t / b );
 		return (int) x;
+	}
+		
+	public static void main( String[] args )
+	{
+		/*double probSum = 0.0;
+		int numItems = 1000;
+		double[] p_i = new double[numItems];
+		
+		for( int i = 0; i < numItems; i++ )
+		{
+			p_i[i] = Math.pow( 1.0/(i+1), 1.001 );
+			probSum += p_i[i];
+			//System.out.println( "i: " + i + " p(i) raw: " + p_i[i] );
+		}
+		// Normalize
+		for( int i = 0; i < numItems; i++ )
+		{
+			System.out.println( Math.log( i+1 ) + "\t" + /*"i: " + i + " p(i) norm: " +*/ //Math.log(p_i[i]/probSum) );
+		//}
+		
+		ZipfKeyGenerator g1 = new ZipfKeyGenerator( 1.001, 3.456, 1, 1000, 1 );
+		ZipfKeyGenerator g2 = new ZipfKeyGenerator( 1.001, 3.456, 1, 1000, 1 );
+		Histogram<Integer> h1 = new Histogram<Integer>();
+		Histogram<Integer> h2 = new Histogram<Integer>();
+		
+		int keys = 1000000;
+		
+		for( int i = 0; i < keys; i++ )
+		{
+			int key1 = g1.generateKey();
+			int key2 = g2.generateKeyDirect();
+			h1.addObservation( key1 );
+			h2.addObservation( key2 );
+			//System.out.println( key1 + " " + key2 );
+		}
+		
+		System.out.println( h1.toString() );
+		System.out.println( "-----xxxxxxxxxxxx-----" );
+		System.out.println( h2.toString() );
+				
+		//double[] p1 = h1.getKeyPopularity();
+		//double[] p2 = h2.getKeyPopularity();
+		
+		// Need to preserve the key rank
+		/*
+		for( int i = 0; i < p1.length; i++ )
+		{
+			System.out.println( Math.log( i+1 ) + "\t" + Math.log( p1[i] ) );
+		}
+		
+		System.out.println( "-----xxxxxxxxxxxx-----" );
+		
+		for( int i = 0; i < p2.length; i++ )
+		{
+			System.out.println( Math.log( i+1 ) + "\t" + Math.log( p2[i] ) );
+		}
+		*/
+		
+		/*
+		for( int i = 0; i < keys; i++ )
+		{
+			System.out.println( Math.log( i+1 ) + "\t" + Math.log( p1[i] ) + "\t" + Math.log( p2[i] ) );		
+		}
+		*/
 	}
 }

@@ -44,14 +44,27 @@ public abstract class KeyGenerator
 	public static final String RNG_SEED_KEY			= "rngSeed";
 	public static final String MIN_KEY_CONFIG_KEY 	= "minKey";
 	public static final String MAX_KEY_CONFIG_KEY 	= "maxKey";
-	public static final String A_CONFIG_KEY 			= "a";
-	public static final String R_CONFIG_KEY 			= "r";
+	public static final String A_CONFIG_KEY 		= "a";
+	public static final String R_CONFIG_KEY 		= "r";
+	// Unused
 	public static final String KEY_FILE_KEY			= "keyFile";
 	public static final String NUMBER_OF_KEYS_KEY	= "numKeys";
 		
 	/** The name of this generator. */
 	protected String name;
+	
+	/** Lower bound of the key(s) generated, inclusive. */
+	protected int lowerBound;
 
+	/** Upper bound of the key(s) generated, exclusive. */
+	protected int upperBound;
+
+	public int getMinKey() { return this.lowerBound; }
+	public int getMaxKey() { return this.upperBound; }
+	
+	protected long seed = KeyGenerator.DEFAULT_RNG_SEED;
+	public long getSeed() { return this.seed; }
+		
 	/**
 	 * Generates a key, usually based on a distribution represented
 	 * by this key generator. Subsequent invocations of this method may not

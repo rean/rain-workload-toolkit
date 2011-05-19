@@ -3,12 +3,10 @@ package radlab.rain.workload.mongodb;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-import com.mongodb.CommandResult;
 import com.mongodb.DBCursor;
 import com.mongodb.Mongo;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
-import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.MongoOptions;
 import com.mongodb.ServerAddress;
@@ -86,6 +84,32 @@ public class MongoTransport
 		return collection.insert( obj );
 	}	
 	
+	public WriteResult updateOne( String dbName, String collectionName, DBObject query, DBObject obj )
+	{
+		if( !this._initialized )
+			this.initialize();
+		
+		// Make any per-request changes
+		this.configure();
+		
+		DB db = this._conn.getDB( dbName );
+		DBCollection collection = db.getCollection( collectionName );
+		return collection.update( query, obj, true, false );
+	}
+	
+	public WriteResult updateAll( String dbName, String collectionName, DBObject query, DBObject obj )
+	{
+		if( !this._initialized )
+			this.initialize();
+		
+		// Make any per-request changes
+		this.configure();
+		
+		DB db = this._conn.getDB( dbName );
+		DBCollection collection = db.getCollection( collectionName );
+		return collection.update( query, obj, true, true );
+	}
+	
 	public WriteResult delete( String dbName, String collectionName, DBObject match )
 	{
 		if( !this._initialized )
@@ -97,37 +121,5 @@ public class MongoTransport
 		DB db = this._conn.getDB( dbName );
 		DBCollection collection = db.getCollection( collectionName );
 		return collection.remove( match );
-	}
-	
-	public static void main( String[] args )
-	{
-		try
-		{
-			MongoTransport xport = new MongoTransport( "localhost", DEFAULT_MONGO_PORT );
-			int keys = 100000;
-			String dbName = "test";
-			String collectionName = "test-namespace";
-			long start = System.currentTimeMillis();
-			
-			for( int i = 0; i < keys; i++ )
-			{
-				BasicDBObject obj = new BasicDBObject();
-				obj.put( String.valueOf( i ), i );
-				WriteResult res = xport.put( dbName, collectionName, obj );
-				CommandResult cmdRes = res.getLastError();
-				if( cmdRes != null )
-				{
-					if( !cmdRes.ok() )
-						System.out.println( "Failed" );
-				}
-			}
-			
-			long end = System.currentTimeMillis();
-			System.out.println( "Time: " + (end - start)/1000.0 );
-		}
-		catch( Exception e )
-		{
-			e.printStackTrace();
-		}
 	}
 }

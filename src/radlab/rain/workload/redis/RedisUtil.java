@@ -4,16 +4,17 @@ import java.util.Random;
 
 public class RedisUtil 
 {
-	public static long loadDbCollection( RedisTransport redisClient, int minKey, int maxKey )
+	public static long loadDbCollection( RedisTransport redisClient, int minKey, int maxKey, int size )
 	{
 		Random random = new Random();
 		int successes = 0;
 		int failures = 0;
+		int count = (maxKey - minKey) + 1;
 		
-		for( int i = 0; i < maxKey; i++ )
+		for( int i = 0; i < count; i++ )
 		{
-			String key = String.valueOf( i );
-			byte[] value = new byte[4096];
+			String key = String.valueOf( i + minKey );
+			byte[] value = new byte[size];
 			random.nextBytes( value );
 			
 			String response = redisClient.set( key, value );
@@ -40,14 +41,16 @@ public class RedisUtil
 				
 		int minKey = 1;
 		int maxKey = 100000;
+		int size = 4096;
 		
 		// RiakUtil <host> <port> <min key> <max key>
-		if( args.length == 4 )
+		if( args.length == 5 )
 		{
 			host = args[0];
 			port = Integer.parseInt( args[1] );
 			minKey = Integer.parseInt( args[2] );
 			maxKey = Integer.parseInt( args[3] );
+			size = Integer.parseInt( args[4] );
 		}
 		else if( args.length == 0 )
 		{
@@ -55,15 +58,15 @@ public class RedisUtil
 		}
 		else
 		{
-			System.out.println( "Usage   : RedisUtil <host> <port> <min key> <max key>" );
-			System.out.println( "Example : RedisUtil localhost 6379 1 100000" );
+			System.out.println( "Usage   : RedisUtil <host> <port> <min key> <max key> <size>" );
+			System.out.println( "Example : RedisUtil localhost 6379 1 100000 4096" );
 			System.exit( -1 );
 		}
 		
 		RedisTransport redisClient = new RedisTransport( host, port );
-		System.out.println( "Loading: " + ((maxKey - minKey)+1) + " keys with 4K values each." );
+		System.out.println( "Loading: " + ((maxKey - minKey)+1) + " keys with " + size + " byte(s) values each." );
 		long start = System.currentTimeMillis();
-		RedisUtil.loadDbCollection( redisClient, minKey, maxKey );
+		RedisUtil.loadDbCollection( redisClient, minKey, maxKey, size );
 		long end = System.currentTimeMillis();
 		System.out.println( "Load finished: " + (end-start)/1000.0 + " seconds" );
 	}

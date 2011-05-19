@@ -17,6 +17,9 @@ public class RedisGetOperation extends RedisOperation
 	public void execute() throws Throwable 
 	{
 		byte[] result = this.doGet( this._key );
+		
+		//System.out.println( new String( result ) );
+		
 		// Better checking for what gets returned when attempting to get a nonexistent key
 		if( result != null )
 			this.setFailed( false );

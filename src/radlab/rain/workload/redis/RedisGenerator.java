@@ -1,5 +1,7 @@
 package radlab.rain.workload.redis;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Random;
 
 import org.json.JSONException;
@@ -33,7 +35,8 @@ public class RedisGenerator extends Generator
 	private Random _random						= null;
 	// Debug key popularity
 	Histogram<String> _keyHist					= new Histogram<String>();
-	
+	// Debug hot object popularity
+	Histogram<String> _hotObjHist				= new Histogram<String>();
 	
 	public RedisGenerator(ScenarioTrack track) 
 	{
@@ -47,7 +50,9 @@ public class RedisGenerator extends Generator
 		if( this._debug )
 		{
 			System.out.println( "Generator: " + this._name  + " key stats: " + this._keyHist.getTotalObservations() + " observations" );
-			System.out.println( this._keyHist.toString() );
+			//System.out.println( this._keyHist.toString() );
+			System.out.println( "Generator: " + this._name  + " hot obj stats: " + this._hotObjHist.getTotalObservations() + " observations" );
+			System.out.println( this._hotObjHist.toString() );
 		}
 	}
 
@@ -74,6 +79,9 @@ public class RedisGenerator extends Generator
 		return this._redis;
 	}
 
+	public void setUsePooling( boolean value ) { this._usePooling = value; }
+	public boolean getUsePooling() { return this._usePooling; }
+		
 	@Override
 	public void configure( JSONObject config ) throws JSONException
 	{
@@ -96,12 +104,37 @@ public class RedisGenerator extends Generator
 	{
 		LoadProfile currentLoad = this.getTrack().getCurrentLoadProfile();
 		this._latestLoadProfile = currentLoad;
-	
+		int key = -1;
+		
 		RedisLoadProfile redisProfile = (RedisLoadProfile) this._latestLoadProfile;
 		
-		// Pick a key using the keygen
-		KeyGenerator keyGen = redisProfile.getKeyGenerator();
-		int key = keyGen.generateKey();		
+		// Check whether we're sending traffic to hot objects or not
+		double rndVal = this._random.nextDouble();
+		ArrayList<Integer> hotObjectList = redisProfile.getHotObjectList();
+		HashSet<Integer> hotObjectSet = redisProfile.getHotObjectSet();
+		
+		int numHotObjects = hotObjectList.size(); 
+		
+		if( rndVal < redisProfile.getHotTrafficFraction() &&  numHotObjects > 0 )
+		{
+			// Choose a key from the hot set uniformly at random.
+			// Later we can use add skew within the hot object set
+			key = hotObjectList.get( this._random.nextInt( numHotObjects ) );
+			this._hotObjHist.addObservation( String.valueOf( key ) );
+		}
+		else
+		{	
+			// Pick a key using the regular keygen strategy
+			KeyGenerator keyGen = redisProfile.getKeyGenerator();
+			key = keyGen.generateKey();
+			// Check whether we picked a key that's in the hot set - if we did, try again
+			while( hotObjectSet.contains( key ) ) 
+				key = keyGen.generateKey();
+			
+			// Do some stats checking for non-hot objects
+			this._keyHist.addObservation( String.valueOf( key ) );
+		}
+		
 		// Assume raw keys for now - here's where we could use the raw key to index into some 
 		// other structure to produce the "real" key
 		
@@ -110,10 +143,7 @@ public class RedisGenerator extends Generator
 		// Turn the integer key into a string
 		nextRequest.key = String.valueOf( key );
 		
-		// Do some stats checking
-		this._keyHist.addObservation( nextRequest.key );
-		
-		double rndVal = this._random.nextDouble();
+		rndVal = this._random.nextDouble();
 		int i = 0;
 		
 		// If we cared about access sequences we could check whether we just did a read or write
@@ -177,14 +207,22 @@ public class RedisGenerator extends Generator
 		if( op == null )
 			op = new RedisSetOperation( this.getTrack().getInteractive(), this.getScoreboard() );
 		
+		
 		// Set the specific fields
 		op._key = request.key;
-		if( request.size < Integer.MAX_VALUE )
+		
+		// Check whether a value has been pre-set, if not then fill in random bytes
+		if( request.value == null )
 		{
-			op._value = new byte[request.size];
+			if( request.size < Integer.MAX_VALUE )
+			{
+				op._value = new byte[request.size];
+			}
+			else op._value = new byte[DEFAULT_OBJECT_SIZE];
+			
+			this._random.nextBytes( op._value );
 		}
-		else op._value = new byte[DEFAULT_OBJECT_SIZE];
-		this._random.nextBytes( op._value );
+		else op._value = request.value;
 		
 		op.prepare( this );
 		return op;

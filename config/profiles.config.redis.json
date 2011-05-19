@@ -17,7 +17,7 @@
 			"interval": 20,
 			"users": 100,
 			"mix": "uniform50r/50w",
-			"keyGenerator": "radlab.rain.util.storage.UniformKeyGenerator",
+			"keyGenerator": "radlab.rain.util.storage.ZipfKeyGenerator",
 			"keyGeneratorConfig": {
 				"rngSeed": 1,
 				"minKey": 1,
@@ -27,7 +27,9 @@
 			},
 			"size": 4096,
 			"readPct": 0.5,
-			"writePct": 0.5
+			"writePct": 0.5,
+			"numHotObjects" : 10,
+			"hotTrafficFraction": 0.6
 		}
 		],
 		"target": {

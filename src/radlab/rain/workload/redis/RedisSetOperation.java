@@ -17,7 +17,7 @@ public class RedisSetOperation extends RedisOperation
 	public void execute() throws Throwable 
 	{
 		String result = this.doSet( this._key, this._value );
-		if( result != null )
+		if( result != null && result.equalsIgnoreCase( "ok" ) )
 			this.setFailed( false );
 	}
 }

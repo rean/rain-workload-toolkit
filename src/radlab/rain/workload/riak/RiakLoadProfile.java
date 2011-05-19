@@ -3,10 +3,9 @@ package radlab.rain.workload.riak;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import radlab.rain.LoadProfile;
-import radlab.rain.util.storage.KeyGenerator;
+import radlab.rain.util.storage.StorageLoadProfile;
 
-public class RiakLoadProfile extends LoadProfile 
+public class RiakLoadProfile extends StorageLoadProfile 
 {
 	public static final int FETCH 			= 0; // Read
 	public static final int STORE 			= 1; // Write
@@ -16,8 +15,6 @@ public class RiakLoadProfile extends LoadProfile
 	public static final int FETCH_STREAM	= 5; // Read
 	public static final int MAX_OPERATIONS 	= 6; // supporting core operations read, write, update and delete
 	
-	public static String CFG_LOAD_PROFILE_KEY_GENERATOR_KEY        	= "keyGenerator";
-	public static String CFG_LOAD_PROFILE_KEY_GENERATOR_CONFIG_KEY 	= "keyGeneratorConfig";
 	public static String CFG_LOAD_PROFILE_REQUEST_SIZE_KEY			= "size";
 	public static String CFG_LOAD_PROFILE_READ_PCT_KEY				= "readPct";
 	public static String CFG_LOAD_PROFILE_WRITE_PCT_KEY				= "writePct";
@@ -25,10 +22,7 @@ public class RiakLoadProfile extends LoadProfile
 	public static String CFG_LOAD_PROFILE_DELETE_PCT_KEY			= "deletePct";
 	public static String CFG_LOAD_PROFILE_LIST_BUCKET_PCT_KEY		= "listBucketPct";
 	public static String CFG_LOAD_PROFILE_READ_STREAM_PCT_KEY		= "readStreamPct";
-	
-	private String _keyGeneratorClass				= "";
-	private JSONObject _keyGeneratorConfig			= null;
-	private KeyGenerator _keyGenerator				= null;
+
 	// Default request size
 	private int _size				= 4096;
 	private double _readPct 		= 0.9;
@@ -44,7 +38,6 @@ public class RiakLoadProfile extends LoadProfile
 	{
 		super(profileObj);
 		
-		this._keyGeneratorClass = profileObj.getString( CFG_LOAD_PROFILE_KEY_GENERATOR_KEY );
 		this._size = profileObj.getInt( CFG_LOAD_PROFILE_REQUEST_SIZE_KEY );
 		// Read and write must be specified (even if 0)
 		this._readPct = profileObj.getDouble( CFG_LOAD_PROFILE_READ_PCT_KEY );
@@ -74,17 +67,7 @@ public class RiakLoadProfile extends LoadProfile
 		this._opselect[UPDATE]	= this._opselect[STORE] + this._updatePct;
 		this._opselect[DELETE] 	= this._opselect[UPDATE] + this._deletePct;
 		this._opselect[LIST_BUCKET] = this._opselect[DELETE] + this._listBucketPct;
-		this._opselect[FETCH_STREAM] = this._opselect[LIST_BUCKET] + this._readStreamPct;
-		
-		try
-		{
-			this._keyGeneratorConfig = profileObj.getJSONObject( CFG_LOAD_PROFILE_KEY_GENERATOR_CONFIG_KEY );
-			this._keyGenerator = KeyGenerator.createKeyGenerator( this._keyGeneratorClass, this._keyGeneratorConfig );
-		}
-		catch( Exception e )
-		{
-			throw new JSONException( e );
-		}
+		this._opselect[FETCH_STREAM] = this._opselect[LIST_BUCKET] + this._readStreamPct;		
 	}
 
 	public RiakLoadProfile(long interval, int numberOfUsers, String mixName) 
@@ -102,14 +85,6 @@ public class RiakLoadProfile extends LoadProfile
 		super(interval, numberOfUsers, mixName, transitionTime, name);
 	}
 
-	public String getKeyGeneratorName() { return this._keyGeneratorClass; }
-	public void setKeyGeneratorName( String val ) { this._keyGeneratorClass = val; }
-
-	public JSONObject getKeyGeneratorConfig() { return this._keyGeneratorConfig; }
-	public void setKeyGeneratorConfig( JSONObject val ) { this._keyGeneratorConfig = val; }
-	
-	public KeyGenerator getKeyGenerator(){ return this._keyGenerator; }
-	
 	public int getSize() { return this._size; }
 	public void setSize( int value ) { this._size = value; };
 	

@@ -3,10 +3,9 @@ package radlab.rain.workload.mongodb;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import radlab.rain.LoadProfile;
-import radlab.rain.util.storage.KeyGenerator;
+import radlab.rain.util.storage.StorageLoadProfile;
 
-public class MongoLoadProfile extends LoadProfile 
+public class MongoLoadProfile extends StorageLoadProfile 
 {	
 	public static final int READ 	= 0;
 	public static final int WRITE 	= 1;
@@ -14,17 +13,12 @@ public class MongoLoadProfile extends LoadProfile
 	public static final int DELETE	= 3;
 	public static final int MAX_OPERATIONS = 4; // supporting core operations read, write, update and delete
 	
-	public static String CFG_LOAD_PROFILE_KEY_GENERATOR_KEY        	= "keyGenerator";
-	public static String CFG_LOAD_PROFILE_KEY_GENERATOR_CONFIG_KEY 	= "keyGeneratorConfig";
 	public static String CFG_LOAD_PROFILE_REQUEST_SIZE_KEY			= "size";
 	public static String CFG_LOAD_PROFILE_READ_PCT_KEY				= "readPct";
 	public static String CFG_LOAD_PROFILE_WRITE_PCT_KEY				= "writePct";
 	public static String CFG_LOAD_PROFILE_UPDATE_PCT_KEY			= "updatePct";
 	public static String CFG_LOAD_PROFILE_DELETE_PCT_KEY			= "deletePct";
-		
-	private String _keyGeneratorClass				= "";
-	private JSONObject _keyGeneratorConfig			= null;
-	private KeyGenerator _keyGenerator				= null;
+	
 	// Default request size
 	private int _size			= 4096;
 	private double _readPct 	= 0.9;
@@ -36,7 +30,7 @@ public class MongoLoadProfile extends LoadProfile
 	public MongoLoadProfile(JSONObject profileObj) throws JSONException 
 	{
 		super(profileObj);
-		this._keyGeneratorClass = profileObj.getString( CFG_LOAD_PROFILE_KEY_GENERATOR_KEY );
+		
 		this._size = profileObj.getInt( CFG_LOAD_PROFILE_REQUEST_SIZE_KEY );
 		// Read and write must be specified (even if 0)
 		this._readPct = profileObj.getDouble( CFG_LOAD_PROFILE_READ_PCT_KEY );
@@ -59,16 +53,6 @@ public class MongoLoadProfile extends LoadProfile
 		this._opselect[WRITE] 	= this._opselect[READ] + this._writePct;
 		this._opselect[UPDATE]	= this._opselect[WRITE] + this._updatePct;
 		this._opselect[DELETE] 	= this._opselect[UPDATE] + this._deletePct;
-		
-		try
-		{
-			this._keyGeneratorConfig = profileObj.getJSONObject( CFG_LOAD_PROFILE_KEY_GENERATOR_CONFIG_KEY );
-			this._keyGenerator = KeyGenerator.createKeyGenerator( this._keyGeneratorClass, this._keyGeneratorConfig );
-		}
-		catch( Exception e )
-		{
-			throw new JSONException( e );
-		}
 	}
 
 	public MongoLoadProfile(long interval, int numberOfUsers, String mixName) 
@@ -85,15 +69,7 @@ public class MongoLoadProfile extends LoadProfile
 	{
 		super(interval, numberOfUsers, mixName, transitionTime, name);
 	}
-	
-	public String getKeyGeneratorName() { return this._keyGeneratorClass; }
-	public void setKeyGeneratorName( String val ) { this._keyGeneratorClass = val; }
 
-	public JSONObject getKeyGeneratorConfig() { return this._keyGeneratorConfig; }
-	public void setKeyGeneratorConfig( JSONObject val ) { this._keyGeneratorConfig = val; }
-	
-	public KeyGenerator getKeyGenerator(){ return this._keyGenerator; }
-	
 	public int getSize() { return this._size; }
 	public void setSize( int value ) { this._size = value; };
 	
