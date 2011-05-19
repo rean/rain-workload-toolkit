@@ -39,7 +39,7 @@ public class MongoUtil
 		String dbName = "test";
 		String dbCollection = "test-ns";
 		int minKey = 1;
-		int maxKey = 10000;
+		int maxKey = 100000;
 		int size = 4096;
 		
 		// MongoUtil <host> <port> <db> <col>
