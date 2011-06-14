@@ -33,6 +33,7 @@ package radlab.rain.workload.olio;
 
 import radlab.rain.Generator;
 import radlab.rain.IScoreboard;
+import radlab.rain.LoadProfile;
 import radlab.rain.Operation;
 
 import radlab.rain.util.HttpTransport;
@@ -105,6 +106,10 @@ public abstract class OlioOperation extends Operation
 	{
 		this._generator = generator;
 		OlioGenerator olioGenerator = (OlioGenerator) generator;
+		
+		LoadProfile currentLoadProfile = generator.getLatestLoadProfile();
+		if( currentLoadProfile != null )
+			this.setGeneratedDuringProfile( currentLoadProfile );
 		
 		// TODO: Should these values be cloned instead of assigned? (e.g. asynchronous operations)
 		this._http       = olioGenerator.getHttpTransport();

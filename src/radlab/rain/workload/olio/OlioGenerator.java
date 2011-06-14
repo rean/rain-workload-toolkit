@@ -82,24 +82,6 @@ public class OlioGenerator extends Generator
 		"/images/main_nav_hover_bg.gif"
 	};
 	
-	/** Static URLs loaded when the tiny_mce editor is present. */
-	protected static final String[] TINYMCE_STATICS = {
-		"/javascripts/tiny_mce/tiny_mce.js",
-		"/javascripts/tiny_mce/themes/simple/editor_template.js",
-		"/javascripts/tiny_mce/langs/en.js",
-		"/javascripts/tiny_mce/themes/simple/css/editor_ui.css",
-		"/javascripts/tiny_mce/themes/simple/images/italic.gif",
-		"/javascripts/tiny_mce/themes/simple/images/underline.gif",
-		"/javascripts/tiny_mce/themes/simple/images/strikethrough.gif",
-		"/javascripts/tiny_mce/themes/simple/images/undo.gif",
-		"/javascripts/tiny_mce/themes/simple/images/separator.gif",
-		"/javascripts/tiny_mce/themes/simple/images/redo.gif",
-		"/javascripts/tiny_mce/themes/simple/images/cleanup.gif",
-		"/javascripts/tiny_mce/themes/simple/images/bullist.gif",
-		"/javascripts/tiny_mce/themes/simple/images/numlist.gif",
-		"/javascripts/tiny_mce/themes/simple/css/editor_content.css"
-	};
-	
 	/*
 	 * @Row({  0, 11, 52, 36,  0, 1,  0 }), // Home Page
 	 * @Row({  0,  0, 60, 20,  0, 0, 20 }), // Login
@@ -308,9 +290,9 @@ public class OlioGenerator extends Generator
 		this.personStatics      = joinStatics( LAYOUT_STATICS );
 		this.personGets         = joinStatics( LAYOUT_STATICS );
 		this.tagSearchStatics   = joinStatics( LAYOUT_STATICS );
-		this.eventDetailStatics = joinStatics( LAYOUT_STATICS, TINYMCE_STATICS );
-		this.addPersonStatics   = joinStatics( LAYOUT_STATICS, TINYMCE_STATICS );
-		this.addEventStatics    = joinStatics( LAYOUT_STATICS, TINYMCE_STATICS );
+		this.eventDetailStatics = joinStatics( LAYOUT_STATICS);
+		this.addPersonStatics   = joinStatics( LAYOUT_STATICS);
+		this.addEventStatics    = joinStatics( LAYOUT_STATICS);
 	}
 	
 	/**
@@ -408,6 +390,7 @@ public class OlioGenerator extends Generator
 	public Operation nextRequest( int lastOperation )
 	{
 		LoadProfile currentLoad = this.getTrack().getCurrentLoadProfile();
+		this._latestLoadProfile = currentLoad;
 		int nextOperation = -1;
 		
 		if( lastOperation == -1 )

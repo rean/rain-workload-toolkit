@@ -130,6 +130,15 @@
                 <arg file="config/rain.config.null.json"/>
         </java>
     </target>
+	<target depends="build" name="Benchmark-olio">
+        <java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
+            <classpath refid="rain.classpath"/>
+                <jvmarg value="-Xmx1g" />
+                <jvmarg value="-Xms256m" />
+                <jvmarg value="-XX:+DisableExplicitGC"/>
+                <arg file="config/rain.config.olio.json"/>
+        </java>
+    </target>
 	<target depends="build" name="Benchmark-httptest">
 		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
 	    	<classpath refid="rain.classpath"/>

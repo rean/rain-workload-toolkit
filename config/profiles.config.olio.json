@@ -32,7 +32,7 @@
 		}
 		],
 		"target": {
-		  "hostname": "ec2-184-73-31-220.compute-1.amazonaws.com",
+		  "hostname": "localhost",
 		  "port": 80
 		},
 		"pLogSampling": 1.0,
