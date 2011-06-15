@@ -193,6 +193,15 @@
 	        <arg file="config/rain.config.mongo.json"/>
 	    </java>
 	</target>
+	<target depends="build" name="Benchmark-mongodb-diurnal">
+		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
+	    	<classpath refid="rain.classpath"/>
+	    	<jvmarg value="-Xmx1g" />
+	    	<jvmarg value="-Xms256m" />
+	    	<jvmarg value="-XX:+DisableExplicitGC"/>
+	        <arg file="config/rain.config.mongo.diurnal.json"/>
+	    </java>
+	</target>
 	<target depends="build" name="Benchmark-riak">
 		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
 	    	<classpath refid="rain.classpath"/>
