@@ -50,7 +50,8 @@ public class LoadProfile
 	protected int    _numberOfUsers;
 	protected String _mixName = "";
 	protected long _activeCount = 0; // How often has this interval become active, the load scheduler updates this
-
+	protected JSONObject _config = null; // Save the original configuration object if its passed
+	
 	private long _timeStarted = -1; // LoadManagerThreads need to update this every time they advance the "clock"
 
 	public LoadProfile( JSONObject profileObj ) throws JSONException
@@ -66,6 +67,8 @@ public class LoadProfile
 		// Load the interval name (if specified)
 		if( profileObj.has( CFG_LOAD_PROFILE_NAME_KEY) )
 			this._name = profileObj.getString( CFG_LOAD_PROFILE_NAME_KEY );
+		
+		this._config = profileObj;
 	}
 
 	public LoadProfile( long interval, int numberOfUsers, String mixName )
@@ -105,6 +108,9 @@ public class LoadProfile
 	
 	public long getTimeStarted() { return this._timeStarted; }
 	public void setTimeStarted( long val ) { this._timeStarted = val; }
+	
+	public JSONObject getConfig() { return this._config; }
+	public void setConfig( JSONObject val ) { this._config = val; }
 	
 	public String toString()
 	{

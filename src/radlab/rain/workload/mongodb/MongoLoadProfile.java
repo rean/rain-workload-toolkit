@@ -13,11 +13,13 @@ public class MongoLoadProfile extends StorageLoadProfile
 	public static final int DELETE	= 3;
 	public static final int MAX_OPERATIONS = 4; // supporting core operations read, write, update and delete
 	
+	/*
 	public static String CFG_LOAD_PROFILE_REQUEST_SIZE_KEY			= "size";
 	public static String CFG_LOAD_PROFILE_READ_PCT_KEY				= "readPct";
 	public static String CFG_LOAD_PROFILE_WRITE_PCT_KEY				= "writePct";
 	public static String CFG_LOAD_PROFILE_UPDATE_PCT_KEY			= "updatePct";
 	public static String CFG_LOAD_PROFILE_DELETE_PCT_KEY			= "deletePct";
+	
 	
 	// Default request size
 	private int _size			= 4096;
@@ -25,12 +27,14 @@ public class MongoLoadProfile extends StorageLoadProfile
 	private double _writePct 	= 0.1;
 	private double _updatePct 	= 0.0;
 	private double _deletePct 	= 0.0;
+	*/
 	public double[] _opselect 	= new double[MAX_OPERATIONS];
+	
 	
 	public MongoLoadProfile(JSONObject profileObj) throws JSONException 
 	{
 		super(profileObj);
-		
+		/*
 		this._size = profileObj.getInt( CFG_LOAD_PROFILE_REQUEST_SIZE_KEY );
 		// Read and write must be specified (even if 0)
 		this._readPct = profileObj.getDouble( CFG_LOAD_PROFILE_READ_PCT_KEY );
@@ -39,8 +43,11 @@ public class MongoLoadProfile extends StorageLoadProfile
 			this._updatePct = profileObj.getDouble( CFG_LOAD_PROFILE_UPDATE_PCT_KEY );
 		if( profileObj.has( CFG_LOAD_PROFILE_DELETE_PCT_KEY) )
 			this._deletePct = profileObj.getDouble( CFG_LOAD_PROFILE_DELETE_PCT_KEY );
-		
+		*/
 		// Normalize the read/write/update/delete
+		
+		// Look for other operation parameters if we need to
+		
 		double sum = this._readPct + this._writePct + this._updatePct + this._deletePct;
 		
 		this._readPct /= sum;
@@ -70,6 +77,7 @@ public class MongoLoadProfile extends StorageLoadProfile
 		super(interval, numberOfUsers, mixName, transitionTime, name);
 	}
 
+	/*
 	public int getSize() { return this._size; }
 	public void setSize( int value ) { this._size = value; };
 	
@@ -84,4 +92,5 @@ public class MongoLoadProfile extends StorageLoadProfile
 	
 	public double getDeletePct() { return this._deletePct; }
 	public void setDeletePct( double value ) { this._deletePct = value; }
+	*/
 }

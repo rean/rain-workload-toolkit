@@ -24,6 +24,12 @@ public class StorageLoadProfile extends LoadProfile
 	public static String CFG_NUM_HOT_OBJECTS_KEY					= "numHotObjects";
 	public static String CFG_HOT_TRAFFIC_FRACTION_KEY				= "hotTrafficFraction";
 	
+	public static String CFG_LOAD_PROFILE_REQUEST_SIZE_KEY			= "size";
+	public static String CFG_LOAD_PROFILE_READ_PCT_KEY				= "readPct";
+	public static String CFG_LOAD_PROFILE_WRITE_PCT_KEY				= "writePct";
+	public static String CFG_LOAD_PROFILE_UPDATE_PCT_KEY			= "updatePct";
+	public static String CFG_LOAD_PROFILE_DELETE_PCT_KEY			= "deletePct";
+	
 	protected String _keyGeneratorClass				= "";
 	protected JSONObject _keyGeneratorConfig			= null;
 	protected KeyGenerator _keyGenerator				= null;
@@ -35,10 +41,25 @@ public class StorageLoadProfile extends LoadProfile
 	// We'll eventually add support for hotSet skew, in the short term all hot objects
 	// will be equally popular, later we'll let some be more popular than others
 	
+	protected int _size					= 4096;
+	protected double _readPct 			= 0.9;
+	protected double _writePct 			= 0.1;
+	protected double _updatePct 		= 0.0;
+	protected double _deletePct 		= 0.0;
+		
 	public StorageLoadProfile(JSONObject profileObj) throws JSONException 
 	{
 		super(profileObj);
 		
+		this._size = profileObj.getInt( CFG_LOAD_PROFILE_REQUEST_SIZE_KEY );
+		// Read and write must be specified (even if 0)
+		this._readPct = profileObj.getDouble( CFG_LOAD_PROFILE_READ_PCT_KEY );
+		this._writePct = profileObj.getDouble( CFG_LOAD_PROFILE_WRITE_PCT_KEY );
+		if( profileObj.has( CFG_LOAD_PROFILE_UPDATE_PCT_KEY) )
+			this._updatePct = profileObj.getDouble( CFG_LOAD_PROFILE_UPDATE_PCT_KEY );
+		if( profileObj.has( CFG_LOAD_PROFILE_DELETE_PCT_KEY) )
+			this._deletePct = profileObj.getDouble( CFG_LOAD_PROFILE_DELETE_PCT_KEY );
+				
 		// Key gen initialization
 		this._keyGeneratorClass = profileObj.getString( CFG_LOAD_PROFILE_KEY_GENERATOR_KEY );
 	
@@ -142,4 +163,19 @@ public class StorageLoadProfile extends LoadProfile
 	
 	public ArrayList<Integer> getHotObjectList() { return this._hotObjectList; }
 	public HashSet<Integer> getHotObjectSet() { return this._hotObjectSet; }
+	
+	public int getSize() { return this._size; }
+	public void setSize( int value ) { this._size = value; };
+	
+	public double getReadPct() { return this._readPct; }
+	public void setReadPct( double value ) { this._readPct = value; }
+	
+	public double getWritePct() { return this._writePct; }
+	public void setWritePct( double value ) { this._writePct = value; }
+	
+	public double getUpdatePct() { return this._updatePct; }
+	public void setUpdatePct( double value ) { this._updatePct = value; }
+	
+	public double getDeletePct() { return this._deletePct; }
+	public void setDeletePct( double value ) { this._deletePct = value; }
 }

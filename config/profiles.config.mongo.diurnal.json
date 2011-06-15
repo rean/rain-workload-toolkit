@@ -1,0 +1,32 @@
+{
+	"mongo-001": {
+		"generator": "radlab.rain.workload.mongodb.MongoGenerator",
+		"generatorParameters":{
+        	"usePooling": "true",
+        	"rngSeed": 67510,
+        	"dbName": "test",
+			"collectionName": "test-ns",
+			"debug":"false"
+        },
+		"track": "radlab.rain.DefaultScenarioTrack",
+		"loadProfileClass": "radlab.rain.workload.mongodb.MongoLoadProfile",
+		"resourcePath": "resources/",
+		"behavior": {
+			
+		},
+		"loadScheduleCreator" : "radlab.rain.workloadtraits.MongoDiurnalScheduleCreator",
+		"loadScheduleCreatorParameters" : {
+			"initialWorkload" : 200,
+			"incrementSize" : 30, 
+		}, 
+		"target": {
+		  "hostname": "localhost",
+		  "port": 27017
+		},
+		"pLogSampling": 1.0,
+		"pOpenLoop": 0.0,
+		"meanCycleTime": 0,
+		"meanThinkTime": 0,
+		"interactive": true
+	}
+}

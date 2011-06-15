@@ -15,20 +15,25 @@ public class RiakLoadProfile extends StorageLoadProfile
 	public static final int FETCH_STREAM	= 5; // Read
 	public static final int MAX_OPERATIONS 	= 6; // supporting core operations read, write, update and delete
 	
+	/*
 	public static String CFG_LOAD_PROFILE_REQUEST_SIZE_KEY			= "size";
 	public static String CFG_LOAD_PROFILE_READ_PCT_KEY				= "readPct";
 	public static String CFG_LOAD_PROFILE_WRITE_PCT_KEY				= "writePct";
 	public static String CFG_LOAD_PROFILE_UPDATE_PCT_KEY			= "updatePct";
 	public static String CFG_LOAD_PROFILE_DELETE_PCT_KEY			= "deletePct";
+	*/
+	
 	public static String CFG_LOAD_PROFILE_LIST_BUCKET_PCT_KEY		= "listBucketPct";
 	public static String CFG_LOAD_PROFILE_READ_STREAM_PCT_KEY		= "readStreamPct";
 
-	// Default request size
+	/*
 	private int _size				= 4096;
 	private double _readPct 		= 0.9;
 	private double _writePct 		= 0.1;
 	private double _updatePct 		= 0.0;
 	private double _deletePct 		= 0.0;
+	*/
+	
 	private double _listBucketPct 	= 0.0;
 	private double _readStreamPct 	= 0.0;
 	
@@ -37,7 +42,7 @@ public class RiakLoadProfile extends StorageLoadProfile
 	public RiakLoadProfile(JSONObject profileObj) throws JSONException 
 	{
 		super(profileObj);
-		
+		/*
 		this._size = profileObj.getInt( CFG_LOAD_PROFILE_REQUEST_SIZE_KEY );
 		// Read and write must be specified (even if 0)
 		this._readPct = profileObj.getDouble( CFG_LOAD_PROFILE_READ_PCT_KEY );
@@ -46,6 +51,8 @@ public class RiakLoadProfile extends StorageLoadProfile
 			this._updatePct = profileObj.getDouble( CFG_LOAD_PROFILE_UPDATE_PCT_KEY );
 		if( profileObj.has( CFG_LOAD_PROFILE_DELETE_PCT_KEY) )
 			this._deletePct = profileObj.getDouble( CFG_LOAD_PROFILE_DELETE_PCT_KEY );
+		*/
+		
 		if( profileObj.has( CFG_LOAD_PROFILE_LIST_BUCKET_PCT_KEY) )
 			this._listBucketPct = profileObj.getDouble( CFG_LOAD_PROFILE_LIST_BUCKET_PCT_KEY );
 		if( profileObj.has( CFG_LOAD_PROFILE_READ_STREAM_PCT_KEY) )
@@ -85,6 +92,7 @@ public class RiakLoadProfile extends StorageLoadProfile
 		super(interval, numberOfUsers, mixName, transitionTime, name);
 	}
 
+	/*
 	public int getSize() { return this._size; }
 	public void setSize( int value ) { this._size = value; };
 	
@@ -99,4 +107,5 @@ public class RiakLoadProfile extends StorageLoadProfile
 	
 	public double getDeletePct() { return this._deletePct; }
 	public void setDeletePct( double value ) { this._deletePct = value; }
+	*/
 }
