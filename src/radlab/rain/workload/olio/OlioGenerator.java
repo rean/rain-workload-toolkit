@@ -266,11 +266,11 @@ public class OlioGenerator extends Generator
 		// Initialize the cycle time and think time generators. If you want non-stop
 		// activity, then set mean cycle time, and mean think times to 0 and the
 		// number generators should just *always* return 0 for the think/cycle time
-		this._cycleTimeGenerator = new NegativeExponential( track.getMeanCycleTime() );
-		this._thinkTimeGenerator = new NegativeExponential( track.getMeanThinkTime() );
+		this._cycleTimeGenerator = new NegativeExponential( track.getMeanCycleTime()*1000 );
+		this._thinkTimeGenerator = new NegativeExponential( track.getMeanThinkTime()*1000 );
 		ScaleFactors.setActiveUsers( this.getTrack().getMaxUsers() );
-		this._cycleTime = (long) track.getMeanCycleTime();
-		this._thinkTime = (long) track.getMeanThinkTime();
+		this._cycleTime = (long) track.getMeanCycleTime()*1000;
+		this._thinkTime = (long) track.getMeanThinkTime()*1000;
 	}
 	
 	/**
