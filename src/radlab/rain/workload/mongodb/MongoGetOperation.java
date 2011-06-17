@@ -22,18 +22,22 @@ public class MongoGetOperation extends MongoOperation
 		DBCursor cursor = this.doGet( this._key );
 		try
 		{
+			int count = 0;
 			//System.out.println( cursor.count() );
-			if( cursor.count() == 0 )
-				throw new Exception( "Empty cursor for key: " + this._key );
-			
+			//if( cursor.count() == 0 )
+						
 			while( cursor.hasNext() )
 			{
+				count++;
 				// Get the object and the value
 				DBObject o = cursor.next();
 				@SuppressWarnings("unused")
 				byte[] value = (byte[]) o.get( "value" );
 				//System.out.println( new String(value) );
 			}
+			
+			if( count == 0 )
+				throw new Exception( "Empty cursor for key: " + this._key );
 		}
 		catch( Throwable e )
 		{
