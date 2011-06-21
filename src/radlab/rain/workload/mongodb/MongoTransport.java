@@ -3,6 +3,7 @@ package radlab.rain.workload.mongodb;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.Mongo;
 import com.mongodb.DB;
@@ -122,4 +123,72 @@ public class MongoTransport
 		DBCollection collection = db.getCollection( collectionName );
 		return collection.remove( match );
 	}
+	
+	public void createIndex( String dbName, String collectionName, int keyField )
+	{
+		if( !this._initialized )
+			this.initialize();
+		
+		// Make any per-request changes
+		this.configure();
+		
+		DB db = this._conn.getDB( dbName );
+		DBCollection collection = db.getCollection( collectionName );
+		BasicDBObject obj = new BasicDBObject();
+		obj.put( "key", keyField );
+		collection.ensureIndex( obj );
+	}
+	
+	public boolean dropCollection( String dbName, String collectionName )
+	{
+		if( !this._initialized )
+			this.initialize();
+		
+		// Make any per-request changes
+		this.configure();
+		
+		try
+		{
+			DB db = this._conn.getDB( dbName );
+			DBCollection collection = db.getCollection( collectionName );
+			if( collection != null )
+				collection.drop();
+		}
+		catch( Exception ex )
+		{
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public boolean dropIndex( String dbName, String collectionName, int keyField )
+	{
+		if( !this._initialized )
+			this.initialize();
+		
+		// Make any per-request changes
+		this.configure();
+		
+		try
+		{
+			DB db = this._conn.getDB( dbName );
+			DBCollection collection = db.getCollection( collectionName );
+			BasicDBObject obj = new BasicDBObject();
+			obj.put( "key", keyField );
+			collection.dropIndex( obj );
+		}
+		catch( Exception ex )
+		{
+			return false;
+		}
+			
+		return true;
+	}
+	
+	public int getConnectionTimeout() { return this._connectTimeout; }
+	public void setConnectionTimeout( int val ) { this._connectTimeout = val; }
+	
+	public int getSocketIdleTimeout() { return this._socketIdleTimeout; }
+	public void setSocketIdleTimeout( int val ) { this._socketIdleTimeout = val; }
 }

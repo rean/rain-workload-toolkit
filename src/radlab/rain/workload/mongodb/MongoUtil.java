@@ -8,6 +8,16 @@ import com.mongodb.WriteResult;
 
 public class MongoUtil 
 {
+	public static void createIndex( MongoTransport mongoClient, String dbName, String collectionName, int keyField )
+	{
+		mongoClient.createIndex( dbName, collectionName, keyField );
+	}
+	
+	public static boolean dropCollection( MongoTransport mongoClient, String dbName, String collectionName )
+	{
+		return mongoClient.dropCollection( dbName, collectionName );
+	}
+	
 	public static long loadDbCollection( MongoTransport mongoClient, String dbName, String collectionName, int minKey, int maxKey, int size )
 	{
 		Random random = new Random();
@@ -65,10 +75,25 @@ public class MongoUtil
 		}
 		
 		MongoTransport mongoClient = new MongoTransport( host, port );
+		// Set the timeouts
+		mongoClient.setConnectionTimeout( 60000 );
+		mongoClient.setSocketIdleTimeout( 60000 );
+		// Explicitly initialize
+		mongoClient.initialize();
+		int indexField = 1; // create an index on the "first" field of the preloaded key-value pairs i.e., our integer keys
+		System.out.println( "Dropping index on collection: " + dbCollection + " index field: " + indexField );
+		mongoClient.dropIndex( dbName, dbCollection, indexField );
+		// Drop the database first (if it exists)
+		System.out.println( "Dropping collection: " + dbCollection );
+		mongoClient.dropCollection( dbName, dbCollection );
 		System.out.println( "Loading: " + ((maxKey - minKey)+1) + " keys with " + size + " byte(s) values each." );
 		long start = System.currentTimeMillis();
 		MongoUtil.loadDbCollection( mongoClient, dbName, dbCollection, minKey, maxKey, size );
 		long end = System.currentTimeMillis();
 		System.out.println( "Load finished: " + (end-start)/1000.0 + " seconds" );
+		System.out.println( "Creating index on collection: " + dbCollection + " index field: " + indexField );
+		// Create the index
+		mongoClient.createIndex( dbName, dbCollection, indexField );
+		System.out.println( "Finished creating index on collection: " + dbCollection + " index field: " + indexField );
 	}
 }
