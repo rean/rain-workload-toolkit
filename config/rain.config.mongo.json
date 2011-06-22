@@ -2,7 +2,7 @@
     "profiles": "config/profiles.config.mongo.json",
     "timing": {
         "rampUp": 10,
-        "duration": 100,
+        "duration": 300,
         "rampDown": 10
     }
 }

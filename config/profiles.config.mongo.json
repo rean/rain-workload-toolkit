@@ -38,10 +38,11 @@
 		  "hostname": "localhost",
 		  "port": 27017
 		},
-		"pLogSampling": 1.0,
+		"pLogSampling": 0.0,
 		"pOpenLoop": 0.0,
 		"meanCycleTime": 0,
 		"meanThinkTime": 0,
-		"interactive": true
+		"interactive": true,
+		"meanResponseTimeSamplingInterval" : 100
 	}
 }
