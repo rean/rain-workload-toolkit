@@ -239,10 +239,13 @@ class RainOutputParser:
                     #for s in opCounters:
                     #    print s
                     #print opCounters[1].strip(), opCounters[8], opCounters[9]
-                    # Store the op name with a tuple (90th pct,99th pct)
+                    # Store the op name with a tuple (90th pct,99th pct, avg, min, max)
                     summary.op_response_times[opCounters[1].strip()]=\
                         (float(opCounters[8].strip()), \
-                             float(opCounters[9].strip()))
+                             float(opCounters[9].strip()), \
+                             float(opCounters[5].strip()), \
+                             float(opCounters[6].strip()), \
+                             float(opCounters[7].strip())) 
                 #else:
                 #   print "no operation match" 
 
