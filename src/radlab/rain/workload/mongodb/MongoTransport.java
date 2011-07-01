@@ -72,7 +72,7 @@ public class MongoTransport
 		return collection.find( query );
 	}
 	
-	public WriteResult put( String dbName, String collectionName, DBObject obj )
+	public WriteResult insert( String dbName, String collectionName, DBObject obj )
 	{
 		if( !this._initialized )
 			this.initialize();
