@@ -1,5 +1,6 @@
 package radlab.rain.workload.mongodb;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import com.mongodb.CommandResult;
@@ -32,8 +33,7 @@ public class MongoUtil
 			kv.put( "key", String.valueOf( i + minKey ) );
 			kv.put( "value", arrBytes );
 			
-			//kv.put( String.valueOf( i + minKey ), arrBytes );
-			WriteResult res = mongoClient.put( dbName, collectionName, kv );
+			WriteResult res = mongoClient.insert( dbName, collectionName, kv );
 			CommandResult cmdRes = res.getLastError();
 			if( !cmdRes.ok() )
 				throw cmdRes.getException();
@@ -73,6 +73,28 @@ public class MongoUtil
 			System.out.println( "Example : MongoUtil localhost 27017 test test-ns 1 100000 4096" );
 			System.exit( -1 );
 		}
+	
+		// Do data loads in parallel, shoot for using 10 threads
+		int keyCount = (maxKey - minKey) + 1;
+		int keyBlockSize = 10000;
+		int loaderThreads = new Double( Math.ceil( (double) keyCount / (double) keyBlockSize ) ).intValue();
+				
+		ArrayList<MongoLoaderThread> threads = new ArrayList<MongoLoaderThread>();
+		for( int i = 0; i < loaderThreads; i++ )
+		{
+			MongoTransport client = new MongoTransport( host, port );
+			// String dbName, String collectionName, int minKey, int maxKey, int size, MongoTransport client )
+			// Set the timeouts
+			client.setConnectionTimeout( 60000 );
+			client.setSocketIdleTimeout( 60000 );
+			// Explicitly initialize
+			client.initialize();
+			int startKey = (i * keyBlockSize) + 1;
+			int endKey = (startKey + keyBlockSize) - 1;
+			System.out.println( "Start key: " + startKey + " end key: " + endKey );
+			MongoLoaderThread thread = new MongoLoaderThread( dbName, dbCollection, startKey, endKey, size, client );
+			threads.add( thread );
+		}
 		
 		MongoTransport mongoClient = new MongoTransport( host, port );
 		// Set the timeouts
@@ -88,7 +110,15 @@ public class MongoUtil
 		mongoClient.dropCollection( dbName, dbCollection );
 		System.out.println( "Loading: " + ((maxKey - minKey)+1) + " keys with " + size + " byte(s) values each." );
 		long start = System.currentTimeMillis();
-		MongoUtil.loadDbCollection( mongoClient, dbName, dbCollection, minKey, maxKey, size );
+		// Start all the loader threads
+		for( MongoLoaderThread thread : threads )
+			thread.start();
+		
+		// Wait on them to finish
+		for( MongoLoaderThread thread : threads )
+			thread.join();
+		
+		//MongoUtil.loadDbCollection( mongoClient, dbName, dbCollection, minKey, maxKey, size );
 		long end = System.currentTimeMillis();
 		System.out.println( "Load finished: " + (end-start)/1000.0 + " seconds" );
 		System.out.println( "Creating index on collection: " + dbCollection + " index field: " + indexField );
