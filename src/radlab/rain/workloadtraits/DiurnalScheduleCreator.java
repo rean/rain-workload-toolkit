@@ -75,6 +75,8 @@ public class DiurnalScheduleCreator extends LoadScheduleCreator
 		if( config.has( CFG_INCREMENTS_PER_INTERVAL) )
 			this._incrementsPerInterval = config.getInt( CFG_INCREMENTS_PER_INTERVAL );
 
+		// Accept parameters for the number min and max key and the object size
+		
 		/* Example storage load profile that we're creating programmatically
 		 
 		 "interval": 20,
@@ -96,22 +98,48 @@ public class DiurnalScheduleCreator extends LoadScheduleCreator
 			"hotTrafficFraction": 0.0
 		 */
 		
-		LinkedList<LoadProfile> loadSchedule = new LinkedList<LoadProfile>();
-		
-		// Specify the key generator parameters
-		JSONObject keyGenConfig = new JSONObject();
-		keyGenConfig.put( KeyGenerator.RNG_SEED_KEY, 1 );
-		keyGenConfig.put( KeyGenerator.MIN_KEY_CONFIG_KEY, 1 );
-		keyGenConfig.put( KeyGenerator.MAX_KEY_CONFIG_KEY, 100000 );
-		keyGenConfig.put( KeyGenerator.A_CONFIG_KEY, 1.001 );
-		keyGenConfig.put( KeyGenerator.R_CONFIG_KEY, 3.456 );
-		
+		// Here are some default parameters
 		String mixName = "uniform50r/50w";
 		long objectSize = 4096;
 		double readPct = 0.5;
 		double writePct = 0.5;
 		long numHotObjects = 0;
 		double hotTrafficFraction = 0.0;
+		int minKey = 1;
+		int maxKey = 100000;
+		
+		// See whether our config contained any overrides
+		if( config.has( StorageLoadProfile.CFG_LOAD_PROFILE_REQUEST_SIZE_KEY ) )
+			objectSize = config.getInt( StorageLoadProfile.CFG_LOAD_PROFILE_REQUEST_SIZE_KEY );
+		
+		if( config.has( StorageLoadProfile.CFG_LOAD_PROFILE_READ_PCT_KEY ) )
+			readPct = config.getDouble( StorageLoadProfile.CFG_LOAD_PROFILE_READ_PCT_KEY );
+		
+		if( config.has( StorageLoadProfile.CFG_LOAD_PROFILE_WRITE_PCT_KEY ) )
+			writePct = config.getDouble( StorageLoadProfile.CFG_LOAD_PROFILE_WRITE_PCT_KEY );
+		
+		if( config.has( StorageLoadProfile.CFG_NUM_HOT_OBJECTS_KEY ) )
+			numHotObjects = config.getInt( StorageLoadProfile.CFG_NUM_HOT_OBJECTS_KEY );
+		
+		if( config.has( StorageLoadProfile.CFG_HOT_TRAFFIC_FRACTION_KEY ) )
+			hotTrafficFraction = config.getDouble( StorageLoadProfile.CFG_HOT_TRAFFIC_FRACTION_KEY );
+		
+		if( config.has( KeyGenerator.MIN_KEY_CONFIG_KEY ) )
+			minKey = config.getInt( KeyGenerator.MIN_KEY_CONFIG_KEY );
+		
+		if( config.has( KeyGenerator.MAX_KEY_CONFIG_KEY ) )
+			maxKey = config.getInt( KeyGenerator.MAX_KEY_CONFIG_KEY );		
+		
+		LinkedList<LoadProfile> loadSchedule = new LinkedList<LoadProfile>();
+		
+		// Specify the key generator parameters
+		JSONObject keyGenConfig = new JSONObject();
+		keyGenConfig.put( KeyGenerator.RNG_SEED_KEY, 1 );
+		keyGenConfig.put( KeyGenerator.MIN_KEY_CONFIG_KEY, minKey );
+		keyGenConfig.put( KeyGenerator.MAX_KEY_CONFIG_KEY, maxKey );
+		keyGenConfig.put( KeyGenerator.A_CONFIG_KEY, 1.001 );
+		keyGenConfig.put( KeyGenerator.R_CONFIG_KEY, 3.456 );
+		
 		
 		for( int i = 0; i < this._relativeLoads.length; i++ )
 		{
@@ -172,7 +200,7 @@ public class DiurnalScheduleCreator extends LoadScheduleCreator
 	{
 		DiurnalScheduleCreator creator = new DiurnalScheduleCreator();
 		
-		creator.setInitialWorkload( 200 );
+		creator.setInitialWorkload( 800 );
 		
 		// Would like to give a duration and have the workload stretched/compressed into that
 		LinkedList<LoadProfile> profiles = creator.createSchedule( new JSONObject() );
