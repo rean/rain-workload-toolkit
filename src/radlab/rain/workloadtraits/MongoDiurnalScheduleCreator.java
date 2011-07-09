@@ -29,6 +29,7 @@ public class MongoDiurnalScheduleCreator extends DiurnalScheduleCreator
 			if( p instanceof StorageLoadProfile )
 			{
 				MongoLoadProfile m = new MongoLoadProfile( p.getConfig() );
+				m._name = p._name;
 				mongoSchedule.add( m );
 			}
 		}
