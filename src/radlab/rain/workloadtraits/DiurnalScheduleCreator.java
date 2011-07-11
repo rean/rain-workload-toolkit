@@ -193,6 +193,31 @@ public class DiurnalScheduleCreator extends LoadScheduleCreator
 			}
 		}
 		
+		// Pad the workload with 3 intervals back at the initial workload level
+		for( int i = 0; i < 3; i++ )
+		{
+			long intervalLength = this._incrementSize * this._incrementsPerInterval;
+			JSONObject profileConfig = new JSONObject();
+			// Set the basics: # interval, users, mix name
+			profileConfig.put( LoadProfile.CFG_LOAD_PROFILE_INTERVAL_KEY, intervalLength );
+			profileConfig.put( LoadProfile.CFG_LOAD_PROFILE_USERS_KEY, this._initialWorkload );
+			profileConfig.put( LoadProfile.CFG_LOAD_PROFILE_MIX_KEY, mixName );
+			// Set the Storage specific elements
+			profileConfig.put( StorageLoadProfile.CFG_LOAD_PROFILE_KEY_GENERATOR_KEY, "radlab.rain.util.storage.UniformKeyGenerator" );
+			profileConfig.put( StorageLoadProfile.CFG_LOAD_PROFILE_KEY_GENERATOR_CONFIG_KEY, keyGenConfig );
+			profileConfig.put( StorageLoadProfile.CFG_LOAD_PROFILE_REQUEST_SIZE_KEY, objectSize );
+			profileConfig.put( StorageLoadProfile.CFG_LOAD_PROFILE_READ_PCT_KEY, readPct );
+			profileConfig.put( StorageLoadProfile.CFG_LOAD_PROFILE_WRITE_PCT_KEY, writePct );
+			profileConfig.put( StorageLoadProfile.CFG_NUM_HOT_OBJECTS_KEY, numHotObjects );
+			profileConfig.put( StorageLoadProfile.CFG_HOT_TRAFFIC_FRACTION_KEY, hotTrafficFraction );
+			
+			StorageLoadProfile profile = new StorageLoadProfile( profileConfig );
+			profile._name = FORMATTER.format(i);
+			profile.setTransitionTime( 0 );
+			
+			loadSchedule.add( profile );
+		}
+		
 		return loadSchedule;
 	}
 	
