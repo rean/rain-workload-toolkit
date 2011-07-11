@@ -17,7 +17,7 @@
 		"loadScheduleCreator" : "radlab.rain.workloadtraits.MongoDiurnalScheduleCreator",
 		"loadScheduleCreatorParameters" : {
 			"initialWorkload" : 200,
-			"incrementSize" : 30,
+			"incrementSize" : 150,
             "minKey": 1,
             "maxKey": 100000,
             "size": 4096,
