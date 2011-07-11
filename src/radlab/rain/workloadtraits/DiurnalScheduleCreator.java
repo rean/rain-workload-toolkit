@@ -193,7 +193,7 @@ public class DiurnalScheduleCreator extends LoadScheduleCreator
 			}
 		}
 		
-		int padIntervals = 3;
+		int padIntervals = 5;
 		
 		// Pad the workload with 3 intervals back at the initial workload level
 		for( int i = 0; i < padIntervals; i++ )
