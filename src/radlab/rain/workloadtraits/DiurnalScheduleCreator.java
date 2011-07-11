@@ -193,8 +193,10 @@ public class DiurnalScheduleCreator extends LoadScheduleCreator
 			}
 		}
 		
+		int padIntervals = 3;
+		
 		// Pad the workload with 3 intervals back at the initial workload level
-		for( int i = 0; i < 3; i++ )
+		for( int i = 0; i < padIntervals; i++ )
 		{
 			long intervalLength = this._incrementSize * this._incrementsPerInterval;
 			JSONObject profileConfig = new JSONObject();
@@ -212,7 +214,7 @@ public class DiurnalScheduleCreator extends LoadScheduleCreator
 			profileConfig.put( StorageLoadProfile.CFG_HOT_TRAFFIC_FRACTION_KEY, hotTrafficFraction );
 			
 			StorageLoadProfile profile = new StorageLoadProfile( profileConfig );
-			profile._name = FORMATTER.format(i);
+			profile._name = "pad-" + FORMATTER.format(i);
 			profile.setTransitionTime( 0 );
 			
 			loadSchedule.add( profile );
