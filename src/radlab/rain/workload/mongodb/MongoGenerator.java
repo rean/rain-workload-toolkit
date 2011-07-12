@@ -137,7 +137,8 @@ public class MongoGenerator extends Generator
 			// Choose a key from the hot set uniformly at random.
 			// Later we can use add skew within the hot object set
 			key = hotObjectList.get( this._random.nextInt( numHotObjects ) );
-			this._hotObjHist.addObservation( String.valueOf( key ) );
+			if( this._debug )
+				this._hotObjHist.addObservation( String.valueOf( key ) );
 		}
 		else
 		{	
@@ -149,7 +150,8 @@ public class MongoGenerator extends Generator
 				key = keyGen.generateKey();
 			
 			// Do some stats checking for non-hot objects
-			this._keyHist.addObservation( String.valueOf( key ) );
+			if( this._debug )
+				this._keyHist.addObservation( String.valueOf( key ) );
 		}
 		
 		// Assume raw keys for now - we could use this to index into some other structure
