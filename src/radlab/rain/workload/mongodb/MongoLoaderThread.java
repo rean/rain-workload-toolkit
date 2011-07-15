@@ -24,6 +24,7 @@ public class MongoLoaderThread extends Thread
 		this.minKey = minKey;
 		this.maxKey = maxKey;
 		this.mongoClient = client;
+		this.size = size;
 	}
 
 	public void run()
