@@ -59,10 +59,13 @@ public class MongoGenerator extends Generator
 		// Dump generator stats
 		if( this._debug )
 		{
-			System.out.println( "Generator: " + this._name  + " key stats: " + this._keyHist.getTotalObservations() + " observations" );
+			long totalObservations = this._keyHist.getTotalObservations() + this._hotObjHist.getTotalObservations();
+			double hotTraffic = (this._hotObjHist.getTotalObservations() / (double) totalObservations) * 100;
+			double nonHotTraffic = (this._keyHist.getTotalObservations() / (double) totalObservations) * 100;
+			System.out.println( "Generator: " + this._name  + " key stats    : " + this._keyHist.getTotalObservations()    + " observations. Keys: " + this._keyHist.getKeySet().size()    + " Traffic %: " + nonHotTraffic );
 			//System.out.println( this._keyHist.toString() );
-			System.out.println( "Generator: " + this._name  + " hot obj stats: " + this._hotObjHist.getTotalObservations() + " observations" );
-			System.out.println( this._hotObjHist.toString() );
+			System.out.println( "Generator: " + this._name  + " hot obj stats: " + this._hotObjHist.getTotalObservations() + " observations. Keys: " + this._hotObjHist.getKeySet().size() + " Traffic %: " + hotTraffic );
+			//System.out.println( this._hotObjHist.toString() );
 		}
 	}
 
