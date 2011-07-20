@@ -2,7 +2,7 @@
     "profiles": "config/profiles.config.mongo.hotspot.json",
     "timing": {
         "rampUp": 10,
-        "duration": 400,
+        "duration": 4200,
         "rampDown": 10
     }
 }
