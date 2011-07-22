@@ -220,6 +220,15 @@
 	        <arg file="config/rain.config.redis.json"/>
 	    </java>
 	</target>
+	<target depends="build" name="Benchmark-s3">
+		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
+	    	<classpath refid="rain.classpath"/>
+	    	<jvmarg value="-Xmx1g" />
+	    	<jvmarg value="-Xms256m" />
+	    	<jvmarg value="-XX:+DisableExplicitGC"/>
+	        <arg file="config/rain.config.s3.json"/>
+	    </java>
+	</target>
     <target depends="build" name="package">
         <jar destfile="rain.jar" filesetmanifest="mergewithoutmain">
             <manifest>
@@ -391,6 +400,14 @@
             <fileset dir="bin" includes="radlab/rain/workload/redis/**"/>
         	<!-- Bake the configuration files into the jar -->
         	<fileset dir="config" includes="*redis*.json"/>
+        </jar>
+    </target>
+	<target depends="build" name="package-s3">
+        <mkdir dir="workloads"/>
+        <jar destfile="workloads/s3.jar" filesetmanifest="mergewithoutmain">
+            <fileset dir="bin" includes="radlab/rain/workload/s3/**"/>
+        	<!-- Bake the configuration files into the jar -->
+        	<fileset dir="config" includes="*s3*.json"/>
         </jar>
     </target>
 	<target depends="build" name="Benchmark-memprof">

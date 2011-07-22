@@ -1,0 +1,44 @@
+{
+	"s3-001": {
+		"generator": "radlab.rain.workload.s3.S3Generator",
+		"generatorParameters":{
+        	"usePooling": "true",
+        	"rngSeed": 67510,
+			"debug":"false"
+        },
+		"track": "radlab.rain.DefaultScenarioTrack",
+		"loadProfileClass": "radlab.rain.workload.s3.S3LoadProfile",
+		"resourcePath": "resources/",
+		"behavior": {
+			
+		},
+		"loadProfile": [
+		{
+			"interval": 20,
+			"users": 100,
+			"mix": "eval",
+			"size": 4096,
+			"readPct": 0.1,
+			"writePct": 0.1,
+            "headPct": 0.1,
+            "deletePct": 0.1,
+            "createBucketPct": 0.1,
+            "listBucketPct": 0.1,
+            "deleteBucketPct": 0.1,
+            "listAllBucketsPct": 0.1,
+            "renamePct" : 0.1,
+            "movePct" : 0.1
+		}
+		],
+		"target": {
+		  "hostname": "localhost",
+		  "port": 27017
+		},
+		"pLogSampling": 0.0,
+		"pOpenLoop": 0.0,
+		"meanCycleTime": 0,
+		"meanThinkTime": 0,
+		"interactive": true,
+		"meanResponseTimeSamplingInterval" : 100
+	}
+}
