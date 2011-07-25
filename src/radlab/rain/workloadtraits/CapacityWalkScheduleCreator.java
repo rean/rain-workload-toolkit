@@ -132,7 +132,7 @@ public class CapacityWalkScheduleCreator extends LoadScheduleCreator
 			profileConfig.put( StorageLoadProfile.CFG_HOT_TRAFFIC_FRACTION_KEY, hotTrafficFraction );
 			
 			StorageLoadProfile profile = new StorageLoadProfile( profileConfig );
-			profile._name = FORMATTER.format(i);
+			profile._name = FORMATTER.format(i) + "-" + mix._name;
 			profile.setTransitionTime( 0 );
 			
 			loadSchedule.add( profile );
