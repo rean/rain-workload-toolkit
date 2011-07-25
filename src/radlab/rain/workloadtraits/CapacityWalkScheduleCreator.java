@@ -29,14 +29,16 @@ public class CapacityWalkScheduleCreator extends LoadScheduleCreator
 
 	private class ReadWriteMix
 	{
-		ReadWriteMix( double readPct, double writePct )
+		ReadWriteMix( double readPct, double writePct, String name )
 		{ 
 			this._readPct = readPct;
 			this._writePct = writePct;
+			this._name = name;
 		}
 		
 		public double _readPct;
 		public double _writePct;
+		public String _name;
 	}
 	
 	public int getInitialWorkload() { return this._initialWorkload; }
@@ -102,13 +104,13 @@ public class CapacityWalkScheduleCreator extends LoadScheduleCreator
 		  5 : 95
 		 */
 				
-		lstMix.add( new ReadWriteMix( 0.95, 0.05 ) );
-		lstMix.add( new ReadWriteMix( 0.90, 0.10 ) );
-		lstMix.add( new ReadWriteMix( 0.80, 0.20 ) );
-		lstMix.add( new ReadWriteMix( 0.50, 0.50 ) );
-		lstMix.add( new ReadWriteMix( 0.80, 0.20 ) );
-		lstMix.add( new ReadWriteMix( 0.10, 0.90 ) );
-		lstMix.add( new ReadWriteMix( 0.05, 0.95 ) );
+		lstMix.add( new ReadWriteMix( 0.95, 0.05, "95r/5w" ) );
+		lstMix.add( new ReadWriteMix( 0.90, 0.10, "90r/10w" ) );
+		lstMix.add( new ReadWriteMix( 0.80, 0.20, "80r/20w" ) );
+		lstMix.add( new ReadWriteMix( 0.50, 0.50, "50r/50w" ) );
+		lstMix.add( new ReadWriteMix( 0.20, 0.80, "20r/80w" ) );
+		lstMix.add( new ReadWriteMix( 0.10, 0.90, "10r/90w" ) );
+		lstMix.add( new ReadWriteMix( 0.05, 0.95, "5r/95w" ) );
 				
 		for( int i = 0; i < lstMix.size(); i++ )
 		{
@@ -119,7 +121,7 @@ public class CapacityWalkScheduleCreator extends LoadScheduleCreator
 			// Set the basics: # interval, users, mix name
 			profileConfig.put( LoadProfile.CFG_LOAD_PROFILE_INTERVAL_KEY, intervalLength );
 			profileConfig.put( LoadProfile.CFG_LOAD_PROFILE_USERS_KEY, this._initialWorkload );
-			profileConfig.put( LoadProfile.CFG_LOAD_PROFILE_MIX_KEY, mixName );
+			profileConfig.put( LoadProfile.CFG_LOAD_PROFILE_MIX_KEY, mix._name );
 			// Set the Storage specific elements
 			profileConfig.put( StorageLoadProfile.CFG_LOAD_PROFILE_KEY_GENERATOR_KEY, "radlab.rain.util.storage.UniformKeyGenerator" );
 			profileConfig.put( StorageLoadProfile.CFG_LOAD_PROFILE_KEY_GENERATOR_CONFIG_KEY, keyGenConfig );
