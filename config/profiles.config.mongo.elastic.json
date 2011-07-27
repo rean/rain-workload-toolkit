@@ -19,7 +19,7 @@
 			"interval": 300,
 			"users": 1600,
 			"mix": "uniform50r/50w",
-            "name": "pre-shard",
+            "name": "00000-pre-shard",
 			"keyGenerator": "radlab.rain.util.storage.UniformKeyGenerator",
 			"keyGeneratorConfig": {
 				"rngSeed": 1,
@@ -38,7 +38,7 @@
 			"interval": 300,
 			"users": 1600,
 			"mix": "uniform50r/50w",
-            "name": "in-shard",
+            "name": "00001-in-shard",
 			"keyGenerator": "radlab.rain.util.storage.UniformKeyGenerator",
 			"keyGeneratorConfig": {
 				"rngSeed": 1,
@@ -57,7 +57,7 @@
 			"interval": 300,
 			"users": 1600,
 			"mix": "uniform50r/50w",
-            "name": "post-shard",
+            "name": "00002-post-shard",
 			"keyGenerator": "radlab.rain.util.storage.UniformKeyGenerator",
 			"keyGeneratorConfig": {
 				"rngSeed": 1,
