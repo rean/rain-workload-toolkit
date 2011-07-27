@@ -1,0 +1,87 @@
+{
+	"mongo-001": {
+		"generator": "radlab.rain.workload.mongodb.MongoGenerator",
+		"generatorParameters":{
+        	"usePooling": "true",
+        	"rngSeed": 67510,
+        	"dbName": "test",
+			"collectionName": "test-ns",
+			"debug":"false"
+        },
+		"track": "radlab.rain.DefaultScenarioTrack",
+		"loadProfileClass": "radlab.rain.workload.mongodb.MongoLoadProfile",
+		"resourcePath": "resources/",
+		"behavior": {
+			
+		},
+		"loadProfile": [
+		{
+			"interval": 300,
+			"users": 1600,
+			"mix": "uniform50r/50w",
+            "name": "pre-shard",
+			"keyGenerator": "radlab.rain.util.storage.UniformKeyGenerator",
+			"keyGeneratorConfig": {
+				"rngSeed": 1,
+				"minKey": 1,
+				"maxKey": 100000,
+				"a": 1.001,
+				"r": 3.456
+			},
+			"size": 4096,
+			"readPct": 0.5,
+			"writePct": 0.5,
+			"numHotObjects" : 10,
+			"hotTrafficFraction": 0.0
+		},
+        {
+			"interval": 300,
+			"users": 1600,
+			"mix": "uniform50r/50w",
+            "name": "in-shard",
+			"keyGenerator": "radlab.rain.util.storage.UniformKeyGenerator",
+			"keyGeneratorConfig": {
+				"rngSeed": 1,
+				"minKey": 1,
+				"maxKey": 100000,
+				"a": 1.001,
+				"r": 3.456
+			},
+			"size": 4096,
+			"readPct": 0.5,
+			"writePct": 0.5,
+			"numHotObjects" : 10,
+			"hotTrafficFraction": 0.0
+		},
+        {
+			"interval": 300,
+			"users": 1600,
+			"mix": "uniform50r/50w",
+            "name": "post-shard",
+			"keyGenerator": "radlab.rain.util.storage.UniformKeyGenerator",
+			"keyGeneratorConfig": {
+				"rngSeed": 1,
+				"minKey": 1,
+				"maxKey": 100000,
+				"a": 1.001,
+				"r": 3.456
+			},
+			"size": 4096,
+			"readPct": 0.5,
+			"writePct": 0.5,
+			"numHotObjects" : 10,
+			"hotTrafficFraction": 0.0
+		}
+		],
+		"target": {
+		  "hostname": "localhost",
+		  "port": 27017
+		},
+		"pLogSampling": 0.0,
+		"pOpenLoop": 0.0,
+		"meanCycleTime": 0,
+		"meanThinkTime": 0,
+		"interactive": true,
+		"meanResponseTimeSamplingInterval" : 100
+	}
+}

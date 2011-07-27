@@ -1,0 +1,8 @@
+{
+    "profiles": "config/profiles.config.mongo.elastic.json",
+    "timing": {
+        "rampUp": 10,
+        "duration": 1000,
+        "rampDown": 10
+    }
+}
