@@ -150,7 +150,7 @@ public class CapacityWalkScheduleCreator extends LoadScheduleCreator
 				profileConfig.put( StorageLoadProfile.CFG_HOT_TRAFFIC_FRACTION_KEY, hotTrafficFraction );
 				
 				StorageLoadProfile profile = new StorageLoadProfile( profileConfig );
-				profile._name = FORMATTER.format(i) + "-" + mix._name;
+				profile._name = FORMATTER.format(i) + "-" + FORMATTER.format( j ) + "-" + mix._name;
 				profile.setTransitionTime( 0 );
 				
 				loadSchedule.add( profile );
@@ -165,7 +165,7 @@ public class CapacityWalkScheduleCreator extends LoadScheduleCreator
 		CapacityWalkScheduleCreator creator = new CapacityWalkScheduleCreator();
 		
 		creator.setMaxWorkload( 300 );
-		creator.setSteps( 50 );
+		creator.setSteps( 8 );
 		
 		// Would like to give a duration and have the workload stretched/compressed into that
 		LinkedList<LoadProfile> profiles = creator.createSchedule( new JSONObject() );
