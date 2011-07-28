@@ -1,5 +1,7 @@
 package radlab.rain.workload.s3;
 
+import org.jets3t.service.model.S3Bucket;
+
 import radlab.rain.IScoreboard;
 
 public class S3ListAllBucketsOperation extends S3Operation 
@@ -16,7 +18,8 @@ public class S3ListAllBucketsOperation extends S3Operation
 	@Override
 	public void execute() throws Throwable
 	{
-		this.doListAllBuckets();
+		@SuppressWarnings("unused")
+		S3Bucket[] buckets = this.doListAllBuckets();
 		this.setFailed( false );
 	}
 }

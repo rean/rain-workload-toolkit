@@ -16,7 +16,7 @@ public class S3DeleteBucketOperation extends S3Operation
 	@Override
 	public void execute() throws Throwable
 	{
-		this.doDeleteBucket();
+		this.doDeleteBucket( this._bucket );
 		this.setFailed( false );
 	}
 }

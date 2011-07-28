@@ -16,7 +16,7 @@ public class S3PutOperation extends S3Operation
 	@Override
 	public void execute() throws Throwable
 	{
-		this.doPut();
+		this.doPut( this._bucket, this._key, this._value );
 		this.setFailed( false );
 	}
 }

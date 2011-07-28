@@ -1,5 +1,10 @@
 package radlab.rain.workload.s3;
 
+import java.util.Map;
+
+import org.jets3t.service.model.S3Bucket;
+import org.jets3t.service.model.S3Object;
+
 import radlab.rain.Generator;
 import radlab.rain.IScoreboard;
 import radlab.rain.LoadProfile;
@@ -7,6 +12,9 @@ import radlab.rain.Operation;
 
 public abstract class S3Operation extends Operation 
 {
+	public static int BUF_SIZE = 4096;
+	
+	public String _bucket;
 	public String _key;
 	public String _newBucket; // To support moves
 	public String _newKey; // To support renames
@@ -21,7 +29,11 @@ public abstract class S3Operation extends Operation
 	@Override
 	public void cleanup() 
 	{
-
+		this._bucket = "";
+		this._key = "";
+		this._newBucket = "";
+		this._newKey = "";
+		this._value = null;
 	}
 
 	@Override
@@ -38,53 +50,54 @@ public abstract class S3Operation extends Operation
 	}
 
 	// Main operations
-	public void doGet() throws Throwable
+	public S3Object doGet( String bucketName, String key) throws Throwable
 	{ 
-		Thread.sleep( 50 ); 	
+		S3Object object = this._s3Client.getObject( bucketName, key );
+		return object;
 	}
 	
-	public void doPut() throws Throwable
+	public void doPut( String bucketName, String key, byte[] value ) throws Throwable
 	{ 
-		Thread.sleep( 50 ); 	
+		this._s3Client.putObject( bucketName, key, value );	
 	}
 	
-	public void doDelete() throws Throwable
+	public void doDelete( String bucketName, String key ) throws Throwable
 	{ 
-		Thread.sleep( 50 ); 	
+		this._s3Client.deleteObject( bucketName, key ); 	
 	}
 	
-	public void doHead() throws Throwable
+	public S3Object doHead( String bucketName, String key ) throws Throwable
 	{ 
-		Thread.sleep( 50 ); 	
+		return this._s3Client.headObject( bucketName, key ); 	
 	}
 	
-	public void doCreateBucket() throws Throwable
+	public S3Bucket doCreateBucket( String bucketName ) throws Throwable
 	{ 
-		Thread.sleep( 50 ); 	
+		return this._s3Client.createBucket( bucketName );
 	}
 	
-	public void doDeleteBucket() throws Throwable
+	public void doDeleteBucket( String bucketName ) throws Throwable
 	{ 
-		Thread.sleep( 50 ); 	
+		this._s3Client.deleteBucket( bucketName ); 	
 	}
 	
-	public void doListAllBuckets() throws Throwable
+	public S3Bucket[] doListAllBuckets() throws Throwable
 	{ 
-		Thread.sleep( 50 ); 	
+		return this._s3Client.listAllBuckets(); 	
 	}
 	
-	public void doListBucket() throws Throwable
+	public S3Object[] doListBucket( String bucketName ) throws Throwable
 	{ 
-		Thread.sleep( 50 ); 	
+		return this._s3Client.listBucket( bucketName );
 	}
 	
-	public void doRename() throws Throwable
+	public Map<String, Object> doRename( String bucketName, String oldKey, String newKey ) throws Throwable
 	{ 
-		Thread.sleep( 50 ); 	
+		return this._s3Client.renameObject( bucketName, oldKey, newKey );
 	}
 	
-	public void doMove() throws Throwable
+	public Map<String, Object> doMove( String oldBucketName, String oldKey, String newBucketName, String newKey ) throws Throwable
 	{ 
-		Thread.sleep( 50 ); 	
+		return this._s3Client.moveObject( oldBucketName, oldKey, newBucketName, newKey );	
 	}
 }

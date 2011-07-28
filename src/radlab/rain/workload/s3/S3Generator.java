@@ -1,7 +1,13 @@
 package radlab.rain.workload.s3;
 
+import java.io.InputStream;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.HashMap;
+import java.util.Properties;
 import java.util.Random;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -13,9 +19,15 @@ import radlab.rain.ScenarioTrack;
 
 public class S3Generator extends Generator 
 {
+	public static String AWS_PROPERTIES_FILE			= "aws.properties";
+	public static final String AWS_ACCESS_KEY_PROPERTY 	= "awsAccessKey";
+    public static final String AWS_SECRET_KEY_PROPERTY 	= "awsSecretKey";
+    	
 	public static String CFG_USE_POOLING_KEY 		= "usePooling";
 	public static String CFG_DEBUG_KEY		 		= "debug";
 	public static String CFG_RNG_SEED_KEY	 		= "rngSeed";
+	public static String CFG_OBJECT_KEYS			= "objectKeys";
+	public static String CFG_OBJECT_KEY_PREFIXES	= "objectKeyPrefixes";
 	
 	public static int GET 					= 0;
 	public static int PUT 					= 1;
@@ -31,11 +43,27 @@ public class S3Generator extends Generator
 		
 	public static int DEFAULT_OBJECT_SIZE	= 4096;
 	
-	private boolean _usePooling					= true;
+	public static String DEFAULT_LEVEL1_PREFIX = "level1zdc";
+	public static String DEFAULT_LEVEL2_PREFIX = "level2uhy";
+	public static String DEFAULT_LEVEL3_PREFIX = "level3pfg";
+	
+	// By default we expect 10 million object keys organized in 3 level pseudo-hierarchy with distribution as follows
+	// <10 level 1 folders>/<1000 level 2 folders per level 1>/<1000 level 3 objects per level 2>
+	public static int[] OBJECT_KEYS = new int[]{10, 1000, 1000};
+	// We need to do some bookeeping to track object renames or moves so that we can
+	// deterministically generate the object we want to touch but then check whether it's been
+	// moved somewhere else. Multiple Generator threads will have to co-ordinate to prevent
+	// concurrent moves of the same objects
+	public static HashMap<String, String> _keyAliasMap = new HashMap<String,String>(); 
+		
+	private boolean _usePooling							= true;
 	@SuppressWarnings("unused")
-	private boolean _debug 						= false;
-	private Random _random						= null;
-	private S3Transport _s3Client				= null;
+	private boolean _debug 								= false;
+	private Random _random								= null;
+	private S3Transport _s3Client						= null;
+	private int[] _objectKeys							= null;						
+	private HashMap<Integer,String> _objectKeyPrefixes 	= null;
+	private NumberFormat _formatter 					= new DecimalFormat( "00000" );
 	
 	@SuppressWarnings("unused")
 	private S3Request<String> _lastRequest 	= null;
@@ -82,7 +110,55 @@ public class S3Generator extends Generator
 			this._random = new Random( config.getLong(CFG_RNG_SEED_KEY) );
 		else this._random = new Random();
 		
-		// Configure the s3 transport with the credentials we need to connect etc.
+		// Configure the s3 transport with the credentials we need to connect etc. 
+		// - load from a local properties file.
+		// If we don't find any credentials then throw a JSONException to that effect
+		Properties aws = new Properties();
+		try
+		{
+			InputStream stream = ClassLoader.getSystemClassLoader().getResourceAsStream( AWS_PROPERTIES_FILE ); 
+			aws.load( stream );			
+			this._s3Client = new S3Transport( aws.getProperty( AWS_ACCESS_KEY_PROPERTY ), aws.getProperty( AWS_SECRET_KEY_PROPERTY ) );
+		}
+		catch( Exception e )
+		{
+			throw new JSONException( "Error initializing S3Transport. Make sure the properties file: " + AWS_PROPERTIES_FILE + " is on the classpath!" );
+		}
+		
+		if( config.has( CFG_OBJECT_KEYS ) )
+		{
+			// Copy the object key hierarchy information from the JSON array
+			JSONArray objectKeys = config.getJSONArray( CFG_OBJECT_KEYS );
+			this._objectKeys = new int[objectKeys.length()];
+			
+			for( int i = 0; i < objectKeys.length(); i++ )
+				this._objectKeys[i] = objectKeys.getInt( i );
+		}
+		else
+		{
+			this._objectKeys = S3Generator.OBJECT_KEYS;
+		}
+		
+		// Get the list of prefixes
+		if( config.has( CFG_OBJECT_KEY_PREFIXES ) )
+		{
+			JSONArray objectKeyPrefixes = config.getJSONArray( CFG_OBJECT_KEY_PREFIXES );
+			this._objectKeyPrefixes = new HashMap<Integer,String>();
+			
+			// The number of object key prefixes must equal the number of object key hierarchy levels
+			if( objectKeyPrefixes.length() != this._objectKeys.length )
+				throw new JSONException( "The number of object key prefixes (" + objectKeyPrefixes.length() + ") is not equal to the number of object key hierarchy levels (" + this._objectKeys.length + ")" );
+			
+			for( int i = 0; i < objectKeyPrefixes.length(); i++ )
+				this._objectKeyPrefixes.put( i, objectKeyPrefixes.getString( i ) );
+		}
+		else
+		{
+			this._objectKeyPrefixes = new HashMap<Integer,String>();
+			this._objectKeyPrefixes.put( 0, S3Generator.DEFAULT_LEVEL1_PREFIX );
+			this._objectKeyPrefixes.put( 1, S3Generator.DEFAULT_LEVEL2_PREFIX );
+			this._objectKeyPrefixes.put( 2, S3Generator.DEFAULT_LEVEL3_PREFIX );
+		}
 	}
 	
 	@Override
@@ -94,9 +170,36 @@ public class S3Generator extends Generator
 		S3LoadProfile s3Profile = (S3LoadProfile) this._latestLoadProfile;
 		
 		S3Request<String> nextRequest = new S3Request<String>();
-		// Pick the name of the object - this will involve choosing the folder names 
+		
+		StringBuffer bucket = new StringBuffer();
+		StringBuffer key = new StringBuffer();
+		for( int i = 0; i < this._objectKeys.length; i++ )
+		{
+			// Pick a random number between 0 and the number of items at this level of 
+			// the object key hierarchy
+			int val = this._random.nextInt( this._objectKeys[i] );
+			if( i == 0 )
+			{
+				bucket.append( this._objectKeyPrefixes.get( i ) );
+				bucket.append( this._formatter.format( val ) );
+				nextRequest.bucket = bucket.toString();
+			}
+			else 
+			{
+				key.append( this._objectKeyPrefixes.get( i ) );
+				// Add the suffix - the formatted random number we generated
+				key.append( this._formatter.format( val ) );
+				if( i+1 < this._objectKeys.length )
+					key.append( "/" );
+			}
+		}
+		
+		nextRequest.key = key.toString();
+		// Check the alias map here if necessary to see whether the key we want has been renamed or moved
 		
 		
+		System.out.println( "Bucket: " + nextRequest.bucket + " key: " + nextRequest.key );
+				
 		double rndVal = this._random.nextDouble();
 		int i = 0;
 		
@@ -122,7 +225,28 @@ public class S3Generator extends Generator
 			}
 			nextRequest.size = s3Profile._sizes[j];
 		}
+		else if( nextRequest.op == MOVE )
+		{
+			// Pick a new bucket that is not the same as the current one
+			String newBucket = nextRequest.bucket;
+			while( newBucket.equals( nextRequest.bucket ) )
+			{
+				StringBuffer buf = new StringBuffer();
+				int val = this._random.nextInt( this._objectKeys[0] );
+				buf.append( this._objectKeyPrefixes.get( 0 ) );
+				buf.append( this._formatter.format( val ) );
+				newBucket = buf.toString();
+			}
+			nextRequest.newBucket = newBucket;
 			
+			// Update the alias map to reflect that bucket/key is now newBucket/key
+		}
+		else if( nextRequest.op == RENAME )
+		{
+			// Pick a new name for the key and update the alias map
+			
+		}
+		
 		// Update the last request
 		this._lastRequest = nextRequest;
 		return this.getS3Operation( nextRequest );
@@ -167,6 +291,7 @@ public class S3Generator extends Generator
 			op = new S3GetOperation( this.getTrack().getInteractive(), this.getScoreboard() );
 		
 		// Set the specific fields
+		op._bucket = request.bucket;
 		op._key = request.key;
 		
 		op.prepare( this );
@@ -187,6 +312,7 @@ public class S3Generator extends Generator
 			op = new S3PutOperation( this.getTrack().getInteractive(), this.getScoreboard() );
 		
 		// Set the specific fields
+		op._bucket = request.bucket;
 		op._key = request.key;
 		
 		// Check whether a value has been pre-set, if not then fill in random bytes
@@ -219,6 +345,7 @@ public class S3Generator extends Generator
 			op = new S3HeadOperation( this.getTrack().getInteractive(), this.getScoreboard() );
 		
 		// Set the specific fields
+		op._bucket = request.bucket;
 		op._key = request.key;
 		
 		op.prepare( this );
@@ -239,6 +366,7 @@ public class S3Generator extends Generator
 			op = new S3DeleteOperation( this.getTrack().getInteractive(), this.getScoreboard() );
 		
 		// Set the specific fields
+		op._bucket = request.bucket;
 		op._key = request.key;
 		
 		op.prepare( this );
@@ -259,8 +387,8 @@ public class S3Generator extends Generator
 			op = new S3CreateBucketOperation( this.getTrack().getInteractive(), this.getScoreboard() );
 		
 		// Set the specific fields
-		op._key = request.key;
-		
+		op._bucket = request.bucket;
+				
 		op.prepare( this );
 		return op;
 	}
@@ -279,8 +407,8 @@ public class S3Generator extends Generator
 			op = new S3ListBucketOperation( this.getTrack().getInteractive(), this.getScoreboard() );
 		
 		// Set the specific fields
-		op._key = request.key;
-		
+		op._bucket = request.bucket;
+				
 		op.prepare( this );
 		return op;
 	}
@@ -299,7 +427,7 @@ public class S3Generator extends Generator
 			op = new S3DeleteBucketOperation( this.getTrack().getInteractive(), this.getScoreboard() );
 		
 		// Set the specific fields
-		op._key = request.key;
+		op._bucket = request.bucket;
 		
 		op.prepare( this );
 		return op;
@@ -338,6 +466,7 @@ public class S3Generator extends Generator
 			op = new S3MoveOperation( this.getTrack().getInteractive(), this.getScoreboard() );
 		
 		// Set the specific fields
+		op._bucket = request.bucket;
 		op._key = request.key;
 		op._newBucket = request.newBucket;
 		
@@ -359,6 +488,7 @@ public class S3Generator extends Generator
 			op = new S3RenameOperation( this.getTrack().getInteractive(), this.getScoreboard() );
 		
 		// Set the specific fields
+		op._bucket = request.bucket;
 		op._key = request.key;
 		op._newKey = request.newKey;
 		

@@ -4,7 +4,9 @@
 		"generatorParameters":{
         	"usePooling": "true",
         	"rngSeed": 67510,
-			"debug":"false"
+			"debug":"false",
+            "objectKeys": [10, 1000, 1000],
+            "objectKeyPrefixes": ["level1zdc", "level2uhy", "level3pfg"]
         },
 		"track": "radlab.rain.DefaultScenarioTrack",
 		"loadProfileClass": "radlab.rain.workload.s3.S3LoadProfile",
@@ -15,9 +17,10 @@
 		"loadProfile": [
 		{
 			"interval": 20,
-			"users": 100,
+			"users": 1,
 			"mix": "eval",
-			"size": 4096,
+			"sizes":   [1024, 1048576, 104857600],
+            "sizeMix": [1.00, 0.00, 0.00],
 			"readPct": 0.1,
 			"writePct": 0.1,
             "headPct": 0.1,

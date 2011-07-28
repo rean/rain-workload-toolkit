@@ -1,5 +1,10 @@
 package radlab.rain.workload.s3;
 
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.jets3t.service.model.S3Object;
+
 import radlab.rain.IScoreboard;
 
 public class S3GetOperation extends S3Operation 
@@ -16,7 +21,24 @@ public class S3GetOperation extends S3Operation
 	@Override
 	public void execute() throws Throwable
 	{
-		this.doGet();
+		S3Object object = this.doGet( this._bucket, this._key );
+		byte[] buf = new byte[BUF_SIZE];
+		
+		InputStream input = object.getDataInputStream();
+		try
+		{
+			while( input.read( buf ) != -1 )
+				input.read( buf );
+		}
+		catch( IOException ioe )
+		{
+			throw ioe;
+		}
+		finally
+		{
+			if( input != null )
+				input.close();
+		}
 		this.setFailed( false );
 	}
 }
