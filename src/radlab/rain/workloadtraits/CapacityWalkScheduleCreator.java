@@ -16,14 +16,17 @@ import radlab.rain.util.storage.StorageLoadProfile;
 public class CapacityWalkScheduleCreator extends LoadScheduleCreator 
 {
 	private static NumberFormat FORMATTER = new DecimalFormat( "00000" );
-	public static String CFG_INITIAL = "initialWorkload";
+	//public static String CFG_INITIAL = "initialWorkload";
+	public static String CFG_MAX_WORKLOAD = "maxWorkload";
+	public static String CFG_STEPS_PER_MIX = "steps";
 	public static String CFG_INCREMENT_SIZE = "incrementSize";
 	public static String CFG_INCREMENTS_PER_INTERVAL = "incrementsPerInterval";
 	
-	private int _initialWorkload = 1;
+	private int _maxWorkload = 100;
 	private int _incrementSize = 30; // 30 seconds per increment
 	private int _incrementsPerInterval = 1; // this gives us 10 seconds per interval
-		
+	private int _steps = 10;
+	
 	public CapacityWalkScheduleCreator() 
 	{}
 
@@ -41,8 +44,14 @@ public class CapacityWalkScheduleCreator extends LoadScheduleCreator
 		public String _name;
 	}
 	
-	public int getInitialWorkload() { return this._initialWorkload; }
-	public void setInitialWorkload( int val ){ this._initialWorkload = val; }
+	//public int getInitialWorkload() { return this._initialWorkload; }
+	//public void setInitialWorkload( int val ){ this._initialWorkload = val; }
+	
+	public int getMaxWorkload() { return this._maxWorkload; }
+	public void setMaxWorkload( int val ) { this._maxWorkload = val; }
+	
+	public int getSteps() { return this._steps; }
+	public void setSteps( int val ) { this._steps = val; }
 	
 	public int getIncrementSize() { return this._incrementSize; }
 	public void setIncrementSize( int val ){ this._incrementSize = val; }
@@ -53,9 +62,13 @@ public class CapacityWalkScheduleCreator extends LoadScheduleCreator
 	@Override
 	public LinkedList<LoadProfile> createSchedule(JSONObject config) throws JSONException 
 	{
-		// Pull out the base offset
-		if( config.has( CFG_INITIAL ) )
-			this._initialWorkload = config.getInt( CFG_INITIAL );
+		//if( config.has( CFG_INITIAL ) )
+		//	this._initialWorkload = config.getInt( CFG_INITIAL );
+		if( config.has( CFG_MAX_WORKLOAD ) )
+			this._maxWorkload = config.getInt( CFG_MAX_WORKLOAD );
+		
+		if( config.has( CFG_STEPS_PER_MIX ) )
+			this._steps = config.getInt( CFG_STEPS_PER_MIX );
 		
 		if( config.has(CFG_INCREMENT_SIZE) )
 			this._incrementSize = config.getInt( CFG_INCREMENT_SIZE );
@@ -63,7 +76,6 @@ public class CapacityWalkScheduleCreator extends LoadScheduleCreator
 		if( config.has( CFG_INCREMENTS_PER_INTERVAL) )
 			this._incrementsPerInterval = config.getInt( CFG_INCREMENTS_PER_INTERVAL );
 		
-		String mixName = "capacityWalk";
 		int objectSize = 4096;
 		int minKey = 1;
 		int maxKey = 100000;
@@ -111,31 +123,38 @@ public class CapacityWalkScheduleCreator extends LoadScheduleCreator
 		lstMix.add( new ReadWriteMix( 0.20, 0.80, "20r/80w" ) );
 		lstMix.add( new ReadWriteMix( 0.10, 0.90, "10r/90w" ) );
 		lstMix.add( new ReadWriteMix( 0.05, 0.95, "5r/95w" ) );
+		
+		int stepSize = this._maxWorkload / this._steps;
 				
 		for( int i = 0; i < lstMix.size(); i++ )
 		{
 			ReadWriteMix mix = lstMix.get( i );
+			// Have a list of #user values to stride through
 			long intervalLength = this._incrementSize * this._incrementsPerInterval;
-			
-			JSONObject profileConfig = new JSONObject();
-			// Set the basics: # interval, users, mix name
-			profileConfig.put( LoadProfile.CFG_LOAD_PROFILE_INTERVAL_KEY, intervalLength );
-			profileConfig.put( LoadProfile.CFG_LOAD_PROFILE_USERS_KEY, this._initialWorkload );
-			profileConfig.put( LoadProfile.CFG_LOAD_PROFILE_MIX_KEY, mix._name );
-			// Set the Storage specific elements
-			profileConfig.put( StorageLoadProfile.CFG_LOAD_PROFILE_KEY_GENERATOR_KEY, "radlab.rain.util.storage.UniformKeyGenerator" );
-			profileConfig.put( StorageLoadProfile.CFG_LOAD_PROFILE_KEY_GENERATOR_CONFIG_KEY, keyGenConfig );
-			profileConfig.put( StorageLoadProfile.CFG_LOAD_PROFILE_REQUEST_SIZE_KEY, objectSize );
-			profileConfig.put( StorageLoadProfile.CFG_LOAD_PROFILE_READ_PCT_KEY, mix._readPct );
-			profileConfig.put( StorageLoadProfile.CFG_LOAD_PROFILE_WRITE_PCT_KEY, mix._writePct );
-			profileConfig.put( StorageLoadProfile.CFG_NUM_HOT_OBJECTS_KEY, numHotObjects );
-			profileConfig.put( StorageLoadProfile.CFG_HOT_TRAFFIC_FRACTION_KEY, hotTrafficFraction );
-			
-			StorageLoadProfile profile = new StorageLoadProfile( profileConfig );
-			profile._name = FORMATTER.format(i) + "-" + mix._name;
-			profile.setTransitionTime( 0 );
-			
-			loadSchedule.add( profile );
+						
+			for( int j = stepSize; j <= this._maxWorkload; j+= stepSize )
+			{
+				JSONObject profileConfig = new JSONObject();
+				// Set the basics: # interval, users, mix name
+				profileConfig.put( LoadProfile.CFG_LOAD_PROFILE_INTERVAL_KEY, intervalLength );
+				profileConfig.put( LoadProfile.CFG_LOAD_PROFILE_USERS_KEY, j );
+				
+				profileConfig.put( LoadProfile.CFG_LOAD_PROFILE_MIX_KEY, mix._name );
+				// Set the Storage specific elements
+				profileConfig.put( StorageLoadProfile.CFG_LOAD_PROFILE_KEY_GENERATOR_KEY, "radlab.rain.util.storage.UniformKeyGenerator" );
+				profileConfig.put( StorageLoadProfile.CFG_LOAD_PROFILE_KEY_GENERATOR_CONFIG_KEY, keyGenConfig );
+				profileConfig.put( StorageLoadProfile.CFG_LOAD_PROFILE_REQUEST_SIZE_KEY, objectSize );
+				profileConfig.put( StorageLoadProfile.CFG_LOAD_PROFILE_READ_PCT_KEY, mix._readPct );
+				profileConfig.put( StorageLoadProfile.CFG_LOAD_PROFILE_WRITE_PCT_KEY, mix._writePct );
+				profileConfig.put( StorageLoadProfile.CFG_NUM_HOT_OBJECTS_KEY, numHotObjects );
+				profileConfig.put( StorageLoadProfile.CFG_HOT_TRAFFIC_FRACTION_KEY, hotTrafficFraction );
+				
+				StorageLoadProfile profile = new StorageLoadProfile( profileConfig );
+				profile._name = FORMATTER.format(i) + "-" + mix._name;
+				profile.setTransitionTime( 0 );
+				
+				loadSchedule.add( profile );
+			}
 		}
 		
 		return loadSchedule;
@@ -145,7 +164,8 @@ public class CapacityWalkScheduleCreator extends LoadScheduleCreator
 	{
 		CapacityWalkScheduleCreator creator = new CapacityWalkScheduleCreator();
 		
-		creator.setInitialWorkload( 200 );
+		creator.setMaxWorkload( 300 );
+		creator.setSteps( 50 );
 		
 		// Would like to give a duration and have the workload stretched/compressed into that
 		LinkedList<LoadProfile> profiles = creator.createSchedule( new JSONObject() );

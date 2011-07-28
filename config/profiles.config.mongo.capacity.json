@@ -16,7 +16,8 @@
 		},
         "loadScheduleCreator" : "radlab.rain.workloadtraits.MongoCapacityWalkScheduleCreator",
 		"loadScheduleCreatorParameters" : {
-			"initialWorkload" : 200,
+			"maxWorkload" : 300,
+            "steps": 50,
 			"incrementSize" : 100,
             "minKey": 1,
             "maxKey": 100000,
