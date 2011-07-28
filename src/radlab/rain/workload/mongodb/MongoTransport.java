@@ -23,7 +23,7 @@ public class MongoTransport
 	private Mongo _conn = null;
 	
 	// Configuration options
-	private boolean _slaveOk 		= false;
+	private boolean _slaveOk 		= true;//false;
 	private int _connectTimeout 	= 10000;
 	private int _socketIdleTimeout	= 10000;
 	private boolean _initialized 	= false;
