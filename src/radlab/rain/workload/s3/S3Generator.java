@@ -237,8 +237,9 @@ public class S3Generator extends Generator
 				buf.append( this._formatter.format( val ) );
 				newBucket = buf.toString();
 			}
+			// Keep the same name, just change the bucket
+			nextRequest.newKey = nextRequest.key;
 			nextRequest.newBucket = newBucket;
-			
 			// Update the alias map to reflect that bucket/key is now newBucket/key
 		}
 		else if( nextRequest.op == RENAME )
@@ -469,6 +470,7 @@ public class S3Generator extends Generator
 		op._bucket = request.bucket;
 		op._key = request.key;
 		op._newBucket = request.newBucket;
+		op._newKey = request.newKey;
 		
 		op.prepare( this );
 		return op;
