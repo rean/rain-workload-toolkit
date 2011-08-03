@@ -21,7 +21,9 @@
 			"incrementSize" : 100,
             "minKey": 1,
             "maxKey": 100000,
-            "size": 4096
+            "size": 4096,
+            "readPct": 0.5,
+            "writePct": 0.5
 		},
 		"target": {
 		  "hostname": "localhost",

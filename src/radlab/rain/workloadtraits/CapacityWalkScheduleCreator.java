@@ -21,6 +21,8 @@ public class CapacityWalkScheduleCreator extends LoadScheduleCreator
 	public static String CFG_STEPS_PER_MIX = "steps";
 	public static String CFG_INCREMENT_SIZE = "incrementSize";
 	public static String CFG_INCREMENTS_PER_INTERVAL = "incrementsPerInterval";
+	public static String CFG_READ_PCT = "readPct";
+	public static String CFG_WRITE_PCT = "writePct";
 	
 	private int _maxWorkload = 100;
 	private int _incrementSize = 30; // 30 seconds per increment
@@ -104,25 +106,38 @@ public class CapacityWalkScheduleCreator extends LoadScheduleCreator
 		
 		LinkedList<ReadWriteMix> lstMix = new LinkedList<ReadWriteMix>();
 		
-		// We have 7 intervals with different r/w mixes
-		/*
-		  r : w
-		 95 :  5
-		 90 : 10
-		 80 : 20
-		 50 : 50
-		 20 : 80
-		 10 : 90
-		  5 : 95
-		 */
-				
-		lstMix.add( new ReadWriteMix( 0.95, 0.05, "95r/5w" ) );
-		lstMix.add( new ReadWriteMix( 0.90, 0.10, "90r/10w" ) );
-		lstMix.add( new ReadWriteMix( 0.80, 0.20, "80r/20w" ) );
-		lstMix.add( new ReadWriteMix( 0.50, 0.50, "50r/50w" ) );
-		lstMix.add( new ReadWriteMix( 0.20, 0.80, "20r/80w" ) );
-		lstMix.add( new ReadWriteMix( 0.10, 0.90, "10r/90w" ) );
-		lstMix.add( new ReadWriteMix( 0.05, 0.95, "5r/95w" ) );
+		// If the config file contains read/write mix data then use that
+		// otherwise use our default 7 mixes
+		if( config.has( CFG_READ_PCT ) && config.has( CFG_WRITE_PCT ) )
+		{
+			double readPct = config.getDouble( CFG_READ_PCT );
+			double writePct = config.getDouble( CFG_WRITE_PCT );
+			double sum = readPct + writePct;
+			String name = "custom-" + (long)((readPct/sum)*100) + "r/" + (long)((writePct/sum)*100) + "w"; 
+			lstMix.add( new ReadWriteMix( readPct/sum, writePct/sum, name ) );
+		}
+		else
+		{
+			// We have 7 intervals with different r/w mixes
+			/*
+			  r : w
+			 95 :  5
+			 90 : 10
+			 80 : 20
+			 50 : 50
+			 20 : 80
+			 10 : 90
+			  5 : 95
+			 */
+					
+			lstMix.add( new ReadWriteMix( 0.95, 0.05, "95r/5w" ) );
+			lstMix.add( new ReadWriteMix( 0.90, 0.10, "90r/10w" ) );
+			lstMix.add( new ReadWriteMix( 0.80, 0.20, "80r/20w" ) );
+			lstMix.add( new ReadWriteMix( 0.50, 0.50, "50r/50w" ) );
+			lstMix.add( new ReadWriteMix( 0.20, 0.80, "20r/80w" ) );
+			lstMix.add( new ReadWriteMix( 0.10, 0.90, "10r/90w" ) );
+			lstMix.add( new ReadWriteMix( 0.05, 0.95, "5r/95w" ) );
+		}
 		
 		int stepSize = this._maxWorkload / this._steps;
 				
