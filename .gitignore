@@ -2,3 +2,5 @@ bin
 .DS_Store
 *.log
 *~
+thirdparty
+aws.properties

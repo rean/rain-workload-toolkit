@@ -29,23 +29,24 @@ public class S3Generator extends Generator
 	public static String CFG_OBJECT_KEYS			= "objectKeys";
 	public static String CFG_OBJECT_KEY_PREFIXES	= "objectKeyPrefixes";
 	
-	public static int GET 					= 0;
-	public static int PUT 					= 1;
-	public static int HEAD					= 2;
-	public static int DELETE				= 3;
-	public static int CREATE_BUCKET			= 4;
-	public static int LIST_BUCKET			= 5;
-	public static int DELETE_BUCKET			= 6;
-	public static int LIST_ALL_BUCKETS		= 7;
-	public static int RENAME				= 8;
-	public static int MOVE					= 9;
-	public static int MAX_OPERATIONS 		= 10;
+	public static final int GET 					= 0;
+	public static final int PUT 					= 1;
+	public static final int HEAD					= 2;
+	public static final int DELETE					= 3;
+	public static final int CREATE_BUCKET			= 4;
+	public static final int LIST_BUCKET				= 5;
+	public static final int DELETE_BUCKET			= 6;
+	public static final int LIST_ALL_BUCKETS		= 7;
+	public static final int RENAME					= 8;
+	public static final int MOVE					= 9;
+	public static final int MAX_OPERATIONS 			= 10;
 		
-	public static int DEFAULT_OBJECT_SIZE	= 4096;
+	public static int DEFAULT_OBJECT_SIZE			= 4096;
 	
 	public static String DEFAULT_LEVEL1_PREFIX = "level1zdc";
 	public static String DEFAULT_LEVEL2_PREFIX = "level2uhy";
 	public static String DEFAULT_LEVEL3_PREFIX = "level3pfg";
+	public static String DEFAULT_LEVEL_SEPARATOR = "/";
 	
 	// By default we expect 10 million object keys organized in 3 level pseudo-hierarchy with distribution as follows
 	// <10 level 1 folders>/<1000 level 2 folders per level 1>/<1000 level 3 objects per level 2>
@@ -190,16 +191,13 @@ public class S3Generator extends Generator
 				// Add the suffix - the formatted random number we generated
 				key.append( this._formatter.format( val ) );
 				if( i+1 < this._objectKeys.length )
-					key.append( "/" );
+					key.append( DEFAULT_LEVEL_SEPARATOR );
 			}
 		}
 		
 		nextRequest.key = key.toString();
 		// Check the alias map here if necessary to see whether the key we want has been renamed or moved
-		
-		
-		System.out.println( "Bucket: " + nextRequest.bucket + " key: " + nextRequest.key );
-				
+						
 		double rndVal = this._random.nextDouble();
 		int i = 0;
 		
@@ -240,14 +238,33 @@ public class S3Generator extends Generator
 			// Keep the same name, just change the bucket
 			nextRequest.newKey = nextRequest.key;
 			nextRequest.newBucket = newBucket;
-			// Update the alias map to reflect that bucket/key is now newBucket/key
 		}
 		else if( nextRequest.op == RENAME )
 		{
-			// Pick a new name for the key and update the alias map
+			// Pick a new name for the key
+			String newKey = nextRequest.key;
+			while( newKey.equals( nextRequest.key ) )
+			{
+				StringBuffer buf = new StringBuffer();
+				for( int j = 1; j < this._objectKeys.length; j++ )
+				{
+					int val = this._random.nextInt( this._objectKeys[j] );
+					buf.append( this._objectKeyPrefixes.get( j ) );
+					// Add the suffix - the formatted random number we generated
+					buf.append( this._formatter.format( val ) );
+					if( j+1 < this._objectKeys.length )
+						buf.append( DEFAULT_LEVEL_SEPARATOR );
+				}
+				
+				newKey = buf.toString();
+			}
 			
+			nextRequest.newKey = newKey;
 		}
 		
+		if( this._debug )
+			System.out.println( nextRequest );
+				
 		// Update the last request
 		this._lastRequest = nextRequest;
 		return this.getS3Operation( nextRequest );
@@ -255,6 +272,9 @@ public class S3Generator extends Generator
 	
 	private S3Operation getS3Operation( S3Request<String> request )
 	{
+		//if( true )
+			//return null; // short circuit for testing
+		
 		if( request.op == GET )
 			return this.createGetOperation( request );
 		else if( request.op == PUT )

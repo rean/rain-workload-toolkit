@@ -5,7 +5,7 @@
         	"usePooling": "true",
         	"rngSeed": 67510,
 			"debug":"false",
-            "objectKeys": [10, 1000, 1000],
+            "objectKeys": [2, 5, 5],
             "objectKeyPrefixes": ["level1zdc", "level2uhy", "level3pfg"]
         },
 		"track": "radlab.rain.DefaultScenarioTrack",
@@ -24,13 +24,13 @@
 			"readPct": 0.1,
 			"writePct": 0.1,
             "headPct": 0.1,
-            "deletePct": 0.1,
+            "deletePct": 0.0,
             "createBucketPct": 0.1,
             "listBucketPct": 0.1,
-            "deleteBucketPct": 0.1,
+            "deleteBucketPct": 0.0,
             "listAllBucketsPct": 0.1,
             "renamePct" : 0.1,
-            "movePct" : 0.1
+            "movePct" : 0.0
 		}
 		],
 		"target": {
