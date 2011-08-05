@@ -17,7 +17,7 @@
 		"loadProfile": [
 		{
 			"interval": 20,
-			"users": 1,
+			"users": 10,
 			"mix": "eval",
 			"sizes":   [1024, 1048576, 104857600],
             "sizeMix": [1.00, 0.00, 0.00],
@@ -25,7 +25,7 @@
 			"writePct": 0.1,
             "headPct": 0.1,
             "deletePct": 0.0,
-            "createBucketPct": 0.1,
+            "createBucketPct": 0.0,
             "listBucketPct": 0.1,
             "deleteBucketPct": 0.0,
             "listAllBucketsPct": 0.1,
