@@ -8,8 +8,7 @@ import java.util.Properties;
 import java.util.Random;
 
 import org.jets3t.service.model.S3Bucket;
-import org.jets3t.service.model.S3Object;
-import org.json.JSONException;
+//import org.jets3t.service.model.S3Object;
 
 public class S3Util 
 {
@@ -91,7 +90,7 @@ public class S3Util
 					System.out.println( "Bucket: " + bucketName.toString() + " key: " + key );
 					byte[] value = new byte[1024];
 					rnd.nextBytes( value );
-					S3Object obj = s3Client.putObject( bucketName.toString(), key, value );
+					/*S3Object obj =*/ s3Client.putObject( bucketName.toString(), key, value );
 				}
 			}
 		}

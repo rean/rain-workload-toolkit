@@ -49,7 +49,11 @@ public class MongoTransport
 		options.slaveOk = this._slaveOk;
 		options.connectTimeout = this._connectTimeout;
 		options.socketTimeout = this._socketIdleTimeout;
-	
+		//System.out.println( "Default connections per host: " + options.connectionsPerHost );
+		//System.out.println( "Default connection multiplier: " + options.threadsAllowedToBlockForConnectionMultiplier );
+		options.connectionsPerHost = 100;
+		options.threadsAllowedToBlockForConnectionMultiplier = 50;
+		
 		this._conn = new Mongo( this._servers, options );
 		this._initialized = true;
 	}

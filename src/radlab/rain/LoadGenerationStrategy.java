@@ -74,6 +74,11 @@ public abstract class LoadGenerationStrategy extends Thread
 	/** If false, requests won't be issued; only the trace is generated. */
 	protected boolean _interactive = true;
 	
+	/** Determine whether we async requests should be limited/throttled down to a max of x/sec */
+	protected long _sendNextRequest = -1;
+	protected LoadProfile _lastLoadProfile = null;
+	
+	
 	/** The shared pool of worker threads. */
 	protected ExecutorService _sharedWorkPool;
 	
@@ -117,6 +122,11 @@ public abstract class LoadGenerationStrategy extends Thread
 	public boolean getInteractive() { return this._interactive; }
 	public void setInteractive( boolean val ) { this._interactive = val; }
 	
+	public void resetRateLimitCounters()
+	{
+		this._sendNextRequest = -1;
+	}
+	
 	public abstract void run();
 	
 	public abstract void dispose();
@@ -136,7 +146,60 @@ public abstract class LoadGenerationStrategy extends Thread
 		}
 		else 
 		{
-			this._sharedWorkPool.submit( operation );
+			LoadProfile currentProfile = operation.getGeneratedDuringProfile();
+			if( currentProfile != null )
+			{				
+				long activeUsers = currentProfile._numberOfUsers;
+				long aggRatePerSec = currentProfile._openLoopMaxOpsPerSec;
+				
+				if( aggRatePerSec == 0 )
+				{
+					// no rate limit, just submit and leave
+					this._sharedWorkPool.submit( operation );
+				}
+				else
+				{
+					// Check whether intervals have changed if they have then reset the rate counters
+					long now = System.currentTimeMillis(); 
+					
+					if( now >= this._sendNextRequest ) 
+					{
+						double myRate = (aggRatePerSec)/(double) activeUsers;
+						// Send at most 1 per second
+						if( myRate == 0 )
+							myRate = 1000.0;
+						else if( myRate < 0 )
+						{
+							; // probabilistic send
+							myRate = 1000.0;
+						}
+						
+						double waitIntervalMsecs = (1000.0/myRate)*2;
+						
+						this._sendNextRequest = System.currentTimeMillis() + new Double(waitIntervalMsecs).longValue();
+						//System.out.println( this.getName() + " my rate: " + myRate + " wait interval: " + waitIntervalMsecs +  " now: " + now + " next Request @ " + this._sendNextRequest );
+						// Send a request now and figure out the timestamp of the next request based on the
+						// rate
+						this._sharedWorkPool.submit( operation );	
+					}
+					else
+					{
+						// Sleep until it's time to send another request
+						long sleepTime = this._sendNextRequest - now;
+						try 
+						{
+							Thread.sleep( sleepTime );
+						} 
+						catch (InterruptedException e) 
+						{
+							System.out.println( this.getName() + " interrupted from sleep" );
+						}
+						
+						this._sharedWorkPool.submit( operation );
+					}
+				}
+			}
+			else this._sharedWorkPool.submit( operation );
 		}
 	}
 }

@@ -58,7 +58,7 @@ public class S3Generator extends Generator
 	public static HashMap<String, String> _keyAliasMap = new HashMap<String,String>(); 
 		
 	private boolean _usePooling							= true;
-	@SuppressWarnings("unused")
+	
 	private boolean _debug 								= false;
 	private Random _random								= null;
 	private S3Transport _s3Client						= null;
@@ -263,7 +263,7 @@ public class S3Generator extends Generator
 		}
 		
 		if( this._debug )
-			System.out.println( nextRequest );
+			System.out.println( this + " " + nextRequest );
 				
 		// Update the last request
 		this._lastRequest = nextRequest;
@@ -516,5 +516,11 @@ public class S3Generator extends Generator
 		
 		op.prepare( this );
 		return op;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return this._name;
 	}
 }

@@ -81,7 +81,7 @@ public abstract class ScenarioTrack
 	public static String CFG_OBJECT_POOL_MAX_SIZE               = "objectPoolMaxSize";
 	public static String CFG_MEAN_RESPONSE_TIME_SAMPLE_INTERVAL = "meanResponseTimeSamplingInterval";
 	public static String CFG_MAX_USERS							= "maxUsers";
-	
+		
 	// Defaults
 	public static long DEFAULT_OBJECT_POOL_MAX_SIZE             = 50000;
 	public static long DEFAULT_MEAN_RESPONSE_TIME_SAMPLE_INTERVAL = 500;
@@ -139,7 +139,7 @@ public abstract class ScenarioTrack
 	public long getRampDown() { return this._parentScenario.getRampDown(); }
 	public boolean getInteractive() { return this._interactive; }
 	public void setInteractive( boolean val ) { this._interactive = val; }
-
+			
 	public ObjectPool getObjectPool() { return this._objPool; };
 	
 	public int getMaxUsers() 

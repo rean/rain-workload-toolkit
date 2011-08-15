@@ -92,8 +92,11 @@ public class Benchmark
 		// Create a new thread pool -- either a fixed or an unbounded thread pool.
 		// (In practice, we should put a limit on the size of the thread pool).
 		// The thread pool will be used to hand off asynchronous requests.
-		ExecutorService pool = Executors.newCachedThreadPool(); // Executors.newFixedThreadPool( maxThreads );
 		
+		int sharedThreads = scenario.getMaxSharedThreads();
+		ExecutorService pool = Executors.newFixedThreadPool( sharedThreads );
+		System.out.println( "[BENCHMARK] Creating " + sharedThreads + " shared threads." );
+				
 		LinkedList<LoadGenerationStrategy> threads = new LinkedList<LoadGenerationStrategy>();
 		
 		// Calculate the run timings that will be used for all threads.

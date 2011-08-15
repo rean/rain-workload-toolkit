@@ -59,7 +59,7 @@ public class StorageLoadProfile extends LoadProfile
 			this._updatePct = profileObj.getDouble( CFG_LOAD_PROFILE_UPDATE_PCT_KEY );
 		if( profileObj.has( CFG_LOAD_PROFILE_DELETE_PCT_KEY) )
 			this._deletePct = profileObj.getDouble( CFG_LOAD_PROFILE_DELETE_PCT_KEY );
-				
+		
 		// Key gen initialization
 		this._keyGeneratorClass = profileObj.getString( CFG_LOAD_PROFILE_KEY_GENERATOR_KEY );
 	

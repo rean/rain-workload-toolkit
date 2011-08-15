@@ -243,7 +243,6 @@ public class MongoGenerator extends Generator
 			this._random.nextBytes( op._value );
 		}
 		else op._value = request.value;
-		
 		op.prepare( this );
 		return op;
 	}

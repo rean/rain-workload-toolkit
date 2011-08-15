@@ -41,7 +41,7 @@ public class LoadProfile
 	public static String CFG_LOAD_PROFILE_USERS_KEY           = "users";
 	public static String CFG_LOAD_PROFILE_MIX_KEY             = "mix";
 	public static String CFG_LOAD_PROFILE_NAME_KEY			  = "name";
-	
+	public static String CFG_OPEN_LOOP_MAX_OPS_PER_SEC_KEY	  = "openLoopMaxOpsPerSec";	
 	// Allow LoadProfile intervals to have names (no getter/setter)
 	public String _name = "";
 	
@@ -50,6 +50,7 @@ public class LoadProfile
 	protected int    _numberOfUsers;
 	protected String _mixName = "";
 	protected long _activeCount = 0; // How often has this interval become active, the load scheduler updates this
+	protected int _openLoopMaxOpsPerSec	= 0; // Rate limit on async operations. A value of 0 means no rate limiting.
 	protected JSONObject _config = null; // Save the original configuration object if its passed
 	
 	private long _timeStarted = -1; // LoadManagerThreads need to update this every time they advance the "clock"
@@ -67,6 +68,14 @@ public class LoadProfile
 		// Load the interval name (if specified)
 		if( profileObj.has( CFG_LOAD_PROFILE_NAME_KEY) )
 			this._name = profileObj.getString( CFG_LOAD_PROFILE_NAME_KEY );
+		
+		// Open loop rate limiting (if that's configured). By default there's no rate limiting
+		if( profileObj.has( CFG_OPEN_LOOP_MAX_OPS_PER_SEC_KEY) )
+		{
+			this._openLoopMaxOpsPerSec = profileObj.getInt( CFG_OPEN_LOOP_MAX_OPS_PER_SEC_KEY );
+			if( this._openLoopMaxOpsPerSec < 0 )
+				this._openLoopMaxOpsPerSec = 0;
+		}
 		
 		this._config = profileObj;
 	}
@@ -111,6 +120,9 @@ public class LoadProfile
 	
 	public JSONObject getConfig() { return this._config; }
 	public void setConfig( JSONObject val ) { this._config = val; }
+	
+	public int getOpenLoopMaxOpsPerSec() { return this._openLoopMaxOpsPerSec; }
+	public void setOpenLoopMaxOpsPerSec( int val ) { this._openLoopMaxOpsPerSec = val; }
 	
 	public String toString()
 	{
