@@ -2,6 +2,7 @@ package radlab.rain.workload.mongodb;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
@@ -11,6 +12,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.MongoOptions;
 import com.mongodb.ServerAddress;
+import com.mongodb.WriteConcern;
 import com.mongodb.WriteResult;
 
 /*
@@ -27,17 +29,45 @@ public class MongoTransport
 	private int _connectTimeout 	= 10000;
 	private int _socketIdleTimeout	= 10000;
 	private boolean _initialized 	= false;
-		
+	
+	
 	private ArrayList<ServerAddress> _servers = new ArrayList<ServerAddress>();
 	
-	public MongoTransport( ArrayList<ServerAddress> servers ) throws UnknownHostException
+	private static Object lock		= new Object();
+	private static volatile Hashtable<String,MongoTransport> instanceMap = new Hashtable<String,MongoTransport>();
+	
+	private MongoTransport( ArrayList<ServerAddress> servers ) throws UnknownHostException
 	{
 		this._servers = servers;
 	}
 	
-	public MongoTransport( String host, int port ) throws UnknownHostException
+	private MongoTransport( String host, int port ) throws UnknownHostException
 	{
 		this._servers.add( new ServerAddress( host, port ) );
+	}
+	
+	public static MongoTransport getInstance( String host, int port ) throws UnknownHostException
+	{
+		String key = host + ":" + port;
+				
+		if( instanceMap.containsKey( key ) )
+		{
+			return instanceMap.get( key );
+		}
+		else
+		{
+			synchronized( lock )
+			{
+				if( instanceMap.containsKey( key ) )
+				{
+					return instanceMap.get( key );
+				}
+				
+				MongoTransport client = new MongoTransport( host, port );
+				instanceMap.put( key, client );
+				return client;
+			}
+		}
 	}
 	
 	public synchronized void initialize()
@@ -86,7 +116,7 @@ public class MongoTransport
 		
 		DB db = this._conn.getDB( dbName );
 		DBCollection collection = db.getCollection( collectionName );
-		return collection.insert( obj );
+		return collection.insert( obj, WriteConcern.SAFE );
 	}	
 	
 	public WriteResult updateOne( String dbName, String collectionName, DBObject query, DBObject obj )
@@ -99,7 +129,7 @@ public class MongoTransport
 		
 		DB db = this._conn.getDB( dbName );
 		DBCollection collection = db.getCollection( collectionName );
-		return collection.update( query, obj, true, false );
+		return collection.update( query, obj, true, false, WriteConcern.SAFE );
 	}
 	
 	public WriteResult updateAll( String dbName, String collectionName, DBObject query, DBObject obj )
@@ -112,7 +142,7 @@ public class MongoTransport
 		
 		DB db = this._conn.getDB( dbName );
 		DBCollection collection = db.getCollection( collectionName );
-		return collection.update( query, obj, true, true );
+		return collection.update( query, obj, true, true, WriteConcern.SAFE );
 	}
 	
 	public WriteResult delete( String dbName, String collectionName, DBObject match )
@@ -125,7 +155,7 @@ public class MongoTransport
 		
 		DB db = this._conn.getDB( dbName );
 		DBCollection collection = db.getCollection( collectionName );
-		return collection.remove( match );
+		return collection.remove( match, WriteConcern.SAFE );
 	}
 	
 	public void createIndex( String dbName, String collectionName, int keyField )

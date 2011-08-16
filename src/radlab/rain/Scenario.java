@@ -65,7 +65,7 @@ public class Scenario
 	public static String CFG_WAIT_FOR_START_SIGNAL				= "waitForStartSignal";
 	public static String CFG_MAX_SHARED_THREADS					= "maxSharedThreads";
 	
-	public static final int DEFAULT_MAX_SHARED_THREADS			= 100;
+	public static final int DEFAULT_MAX_SHARED_THREADS			= 10;
 	
 	/** Ramp up time in seconds. */
 	private long _rampUp;

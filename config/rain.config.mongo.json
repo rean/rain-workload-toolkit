@@ -5,5 +5,5 @@
         "duration": 300,
         "rampDown": 10
     },
-    "maxSharedThreads": 500
+    "maxSharedThreads": 10
 }

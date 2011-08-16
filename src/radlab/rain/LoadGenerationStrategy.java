@@ -174,7 +174,7 @@ public abstract class LoadGenerationStrategy extends Thread
 							myRate = 1000.0;
 						}
 						
-						double waitIntervalMsecs = (1000.0/myRate)*2;
+						double waitIntervalMsecs = (1000.0/myRate);
 						
 						this._sendNextRequest = System.currentTimeMillis() + new Double(waitIntervalMsecs).longValue();
 						//System.out.println( this.getName() + " my rate: " + myRate + " wait interval: " + waitIntervalMsecs +  " now: " + now + " next Request @ " + this._sendNextRequest );

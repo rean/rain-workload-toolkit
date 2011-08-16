@@ -82,7 +82,7 @@ public class MongoUtil
 		ArrayList<MongoLoaderThread> threads = new ArrayList<MongoLoaderThread>();
 		for( int i = 0; i < loaderThreads; i++ )
 		{
-			MongoTransport client = new MongoTransport( host, port );
+			MongoTransport client = MongoTransport.getInstance( host, port );//new MongoTransport( host, port );
 			// String dbName, String collectionName, int minKey, int maxKey, int size, MongoTransport client )
 			// Set the timeouts
 			client.setConnectionTimeout( 60000 );
@@ -96,7 +96,7 @@ public class MongoUtil
 			threads.add( thread );
 		}
 		
-		MongoTransport mongoClient = new MongoTransport( host, port );
+		MongoTransport mongoClient = MongoTransport.getInstance( host, port );//new MongoTransport( host, port );
 		// Set the timeouts
 		mongoClient.setConnectionTimeout( 60000 );
 		mongoClient.setSocketIdleTimeout( 60000 );
