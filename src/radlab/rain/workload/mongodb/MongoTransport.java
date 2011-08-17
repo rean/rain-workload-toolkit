@@ -2,7 +2,7 @@ package radlab.rain.workload.mongodb;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Hashtable;
+//import java.util.Hashtable;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
@@ -33,19 +33,19 @@ public class MongoTransport
 	
 	private ArrayList<ServerAddress> _servers = new ArrayList<ServerAddress>();
 	
-	private static Object lock		= new Object();
-	private static volatile Hashtable<String,MongoTransport> instanceMap = new Hashtable<String,MongoTransport>();
+	//private static Object lock		= new Object();
+	//private static volatile Hashtable<String,MongoTransport> instanceMap = new Hashtable<String,MongoTransport>();
 	
-	private MongoTransport( ArrayList<ServerAddress> servers ) throws UnknownHostException
+	public MongoTransport( ArrayList<ServerAddress> servers ) throws UnknownHostException
 	{
 		this._servers = servers;
 	}
 	
-	private MongoTransport( String host, int port ) throws UnknownHostException
+	public MongoTransport( String host, int port ) throws UnknownHostException
 	{
 		this._servers.add( new ServerAddress( host, port ) );
 	}
-	
+	/*
 	public static MongoTransport getInstance( String host, int port ) throws UnknownHostException
 	{
 		String key = host + ":" + port;
@@ -69,7 +69,7 @@ public class MongoTransport
 			}
 		}
 	}
-	
+	*/
 	public synchronized void initialize()
 	{
 		MongoOptions options = new MongoOptions();

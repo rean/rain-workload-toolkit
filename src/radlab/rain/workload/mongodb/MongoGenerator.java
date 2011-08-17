@@ -111,7 +111,7 @@ public class MongoGenerator extends Generator
 		// Look for a mongo connection string otherwise just use the target host and port info
 		try
 		{
-			this._mongoClient = MongoTransport.getInstance( this._loadTrack.getTargetHostName(), this._loadTrack.getTargetHostPort() );//new MongoTransport( this._loadTrack.getTargetHostName(), this._loadTrack.getTargetHostPort() );
+			this._mongoClient = new MongoTransport( this._loadTrack.getTargetHostName(), this._loadTrack.getTargetHostPort() );
 		}
 		catch( UnknownHostException uhe )
 		{
