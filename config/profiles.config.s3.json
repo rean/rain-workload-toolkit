@@ -17,19 +17,19 @@
 		"loadProfile": [
 		{
 			"interval": 20,
-			"users": 10,
+			"users": 1,
 			"mix": "eval",
-			"sizes":   [1024, 1048576, 104857600],
-            "sizeMix": [1.00, 0.00, 0.00],
+			"sizes":   [1024, 10240, 102400, 1048576, 104857600],
+            "sizeMix": [0.6, 0.4, 0.00, 0.00, 0.00],
 			"readPct": 0.1,
 			"writePct": 0.1,
             "headPct": 0.1,
             "deletePct": 0.0,
             "createBucketPct": 0.0,
-            "listBucketPct": 0.1,
+            "listBucketPct": 0.0,
             "deleteBucketPct": 0.0,
-            "listAllBucketsPct": 0.1,
-            "renamePct" : 0.1,
+            "listAllBucketsPct": 0.0,
+            "renamePct" : 0.0,
             "movePct" : 0.0
 		}
 		],
