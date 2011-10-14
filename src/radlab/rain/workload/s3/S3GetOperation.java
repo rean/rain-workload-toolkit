@@ -27,8 +27,19 @@ public class S3GetOperation extends S3Operation
 		InputStream input = object.getDataInputStream();
 		try
 		{
-			while( input.read( buf ) != -1 )
-				input.read( buf );
+			int bytesRead = 0;
+			int totalBytesRead = 0;
+			
+			while( ( bytesRead = input.read( buf ) ) != -1 )
+			{
+				totalBytesRead += bytesRead;
+				bytesRead = input.read( buf );
+				if( bytesRead != -1)
+					totalBytesRead += bytesRead;
+			}
+			
+			// Append the bytes read to the operation name
+			this._operationName = NAME + "_" + totalBytesRead;
 		}
 		catch( IOException ioe )
 		{
