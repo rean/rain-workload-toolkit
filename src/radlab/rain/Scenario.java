@@ -64,8 +64,10 @@ public class Scenario
 	public static String CFG_PIPE_THREADS						= "pipeThreads";
 	public static String CFG_WAIT_FOR_START_SIGNAL				= "waitForStartSignal";
 	public static String CFG_MAX_SHARED_THREADS					= "maxSharedThreads";
+	public static String CFG_AGGREGATE_STATS					= "aggregateStats";
 	
 	public static final int DEFAULT_MAX_SHARED_THREADS			= 10;
+	public static final boolean DEFAULT_AGGREGATE_STATS			= false;
 	
 	/** Ramp up time in seconds. */
 	private long _rampUp;
@@ -78,6 +80,8 @@ public class Scenario
 	
 	/** Max number of threads to keep in the shared threadpool */
 	private int _maxSharedThreads = DEFAULT_MAX_SHARED_THREADS;
+	
+	private boolean _aggregateStats = DEFAULT_AGGREGATE_STATS;
 	
 	/** The instantiated tracks specified by the JSON configuration. */
 	// Use Hashtable instead of flat list
@@ -95,6 +99,9 @@ public class Scenario
 	
 	public int getMaxSharedThreads() { return this._maxSharedThreads; }
 	public void setMaxSharedThreads( int val ) { this._maxSharedThreads = val; }
+	
+	public boolean getAggregateStats() { return this._aggregateStats; }
+	public void setAggregateStats( boolean val ) { this._aggregateStats = val; }
 	
 	public TreeMap<String,ScenarioTrack> getTracks() { return this._tracks; }
 	
@@ -218,6 +225,9 @@ public class Scenario
 				if( sharedThreads > 0 )
 					this._maxSharedThreads = sharedThreads;
 			}
+			
+			if( jsonConfig.has( CFG_AGGREGATE_STATS ) )
+				this._aggregateStats = jsonConfig.getBoolean( CFG_AGGREGATE_STATS );
 		}
 		catch ( JSONException e )
 		{

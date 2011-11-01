@@ -149,6 +149,8 @@ public class PoissonSamplingStrategy implements ISamplingStrategy
 		return false;
 	}
 
+	public LinkedList<Long> getRawSamples() { return this._samples; };
+	
 	/*
 	public static void main(String[] args) 
 	{

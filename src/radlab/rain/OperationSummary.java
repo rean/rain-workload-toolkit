@@ -31,6 +31,8 @@
 
 package radlab.rain;
 
+import java.util.LinkedList;
+
 import radlab.rain.util.ISamplingStrategy;
 
 public class OperationSummary 
@@ -96,5 +98,24 @@ public class OperationSummary
 	public double getTvalue( double averageResponseTime ) 
 	{
 		return this.responseTimeSampler.getTvalue( averageResponseTime );
+	}
+	
+	protected ISamplingStrategy getResponseTimeSampler()
+	{ return this.responseTimeSampler; }
+	
+	public void merge( OperationSummary rhs )
+	{
+		this.succeeded += rhs.succeeded;
+		this.failed += rhs.failed;
+		this.totalActions += rhs.totalActions;
+		this.totalResponseTime += rhs.totalResponseTime;
+		this.totalAsyncInvocations += rhs.totalAsyncInvocations;
+		this.totalSyncInvocations += rhs.totalSyncInvocations;
+		this.minResponseTime = Math.min( this.minResponseTime, rhs.minResponseTime );
+		this.maxResponseTime = Math.max( this.maxResponseTime, rhs.maxResponseTime );
+		
+		LinkedList<Long> rhsRawSamples = rhs.getResponseTimeSampler().getRawSamples();
+		for( Long obs : rhsRawSamples )
+			this.responseTimeSampler.accept( obs );
 	}
 }

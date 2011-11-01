@@ -151,4 +151,6 @@ public interface IScoreboard
 
 	String getTargetHost();
 	void setTargetHost( String val );
+	
+	Scorecard getFinalScorecard();
 }

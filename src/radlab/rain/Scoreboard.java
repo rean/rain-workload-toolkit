@@ -93,8 +93,8 @@ public class Scoreboard implements Runnable, IScoreboard
 	private boolean _usingMetricSnapshots = false;
 	
 	// Scorecards - per-interval scorecards plus the final scorecard
-	TreeMap<String,Scorecard> _intervalScorecards = new TreeMap<String,Scorecard>();
-	Scorecard finalCard 							= null;
+	private TreeMap<String,Scorecard> _intervalScorecards = new TreeMap<String,Scorecard>();
+	private Scorecard finalCard 							= null;
 	
 	/* Other aggregate counters for steady state. */
 	/*private long _totalOpsSuccessful     = 0;
@@ -184,6 +184,8 @@ public class Scoreboard implements Runnable, IScoreboard
 	
 	public String getTargetHost() { return this._trackTargetHost; }
 	public void setTargetHost( String val ) { this._trackTargetHost = val; }
+	
+	public Scorecard getFinalScorecard() { return this.finalCard; }
 	
 	public void registerErrorLogHandle( String owner, FileWriter logHandle )
 	{
@@ -589,7 +591,7 @@ public class Scoreboard implements Runnable, IScoreboard
 		double averageNumberOfUsers = 0.0;
 		if( totalIntervalActivations != 0 )
 			averageNumberOfUsers = totalUsers/totalIntervalActivations;
-				
+		finalCard._numberOfUsers = averageNumberOfUsers;		
 		out.println( this + " Final results----------------------: " );
 		out.println( this + " Target host                        : " + this._trackTargetHost );
 		out.println( this + " Total drop offs                    : " + this._totalDropoffs );
@@ -623,11 +625,11 @@ public class Scoreboard implements Runnable, IScoreboard
 		
 		out.println( this + " Mean response time sample interval : " + this._meanResponseTimeSamplingInterval + " (using Poisson sampling)");
 				
-		this.printOperationStatistics( out, true );
+		this.printOperationStatistics( out, false );
 		out.println( "" );
-		this.printErrorSummaryStatistics( out, true );
+		this.printErrorSummaryStatistics( out, false );
 		out.println( "" );
-		this.printWaitTimeStatistics( out, true );
+		this.printWaitTimeStatistics( out, false );
 	}
 	
 	private void printErrorSummaryStatistics( PrintStream out, boolean purgeStats )

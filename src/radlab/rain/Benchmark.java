@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
+import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -169,14 +170,53 @@ public class Benchmark
 		System.out.println( "[BENCHMARK] Purging threads and shutting down... exiting!" );
 		threads.clear();
 		
+		// Set up for stats aggregation across tracks based on the generators used
+		TreeMap<String,Scorecard> aggStats = new TreeMap<String,Scorecard>();
+		
 		// Shutdown the scoreboards and tally up the results.
 		for ( ScenarioTrack track : scenario.getTracks().values() )
 		{
+			// Aggregate stats across track based on the generator class name. If the generator
+			// class names are identical then there is potentially overlap in the operations issued
+			// based on the mix matrix used (if any)	
+			// Stop the scoreboard
 			track.getScoreboard().stop();
+			// Print out the stats for this track
 			track.getScoreboard().printStatistics( System.out );
+			
+			// Get the name of the generator active for this track
+			String generatorClassName = track.getGeneratorClassName(); 
+			// Get the final scorecard for this track
+			Scorecard finalScorecard = track.getScoreboard().getFinalScorecard();
+			if( !aggStats.containsKey( generatorClassName ) )
+			{
+				StringBuffer buf = new StringBuffer();
+				buf.append( generatorClassName ).append( " (agg)");
+				Scorecard aggCard = new Scorecard( "aggregated", finalScorecard._intervalDuration, buf.toString() );
+				aggStats.put( generatorClassName, aggCard );
+			}			
+			// Get the current aggregated scorecard for this generator
+			Scorecard aggCard = aggStats.get( generatorClassName ); 
+			// Merge the final card for this track with the current per-driver aggregated scorecard
+			aggCard.merge( finalScorecard );
+			aggStats.put( generatorClassName, aggCard );
 			// Collect scoreboard results
 			// Collect object pool results
 			track.getObjectPool().shutdown();
+		}
+		
+		// Check whether we're printing out aggregated stats
+		if( scenario.getAggregateStats() )
+		{
+			// Print aggregated stats
+			if( aggStats.size() > 0 )
+				System.out.println( "" );
+			
+			for( String generatorName : aggStats.keySet() )
+			{
+				Scorecard card = aggStats.get( generatorName );
+				card.printStatistics( System.out );
+			}
 		}
 		
 		// Shutdown the shared threadpool.

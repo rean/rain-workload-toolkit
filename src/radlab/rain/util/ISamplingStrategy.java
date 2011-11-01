@@ -31,6 +31,8 @@
 
 package radlab.rain.util;
 
+import java.util.LinkedList;
+
 public interface ISamplingStrategy 
 {
 	double getMeanSamplingInterval();
@@ -43,4 +45,5 @@ public interface ISamplingStrategy
 	double getSampleMean();
 	double getSampleStandardDeviation();
 	double getTvalue( double populationMean );
+	LinkedList<Long> getRawSamples();
 }

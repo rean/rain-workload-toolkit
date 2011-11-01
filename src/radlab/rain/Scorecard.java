@@ -8,6 +8,8 @@ import java.util.Iterator;
 import java.util.TreeMap;
 //import java.util.Hashtable;
 
+import radlab.rain.util.NullSamplingStrategy;
+
 // Not even going to try to make Scorecards thread-safe, the Scoreboard must do "the right thing"(tm)
 public class Scorecard 
 {
@@ -63,6 +65,8 @@ public class Scorecard
 		this._totalOpsLate = 0;
 		this._totalOpResponseTime = 0;
 		this._intervalDuration = 0;
+		this._activeCount = 0.0;
+		this._numberOfUsers = 0.0;
 	}
 	
 	public void printStatistics( PrintStream out )
@@ -187,6 +191,40 @@ public class Scorecard
 				System.out.println( this + " Error printing operation summary. Reason: " + e.toString() );
 				e.printStackTrace();
 			}
+		}
+	}
+	
+	public void merge( Scorecard rhs )
+	{
+		// We expect to merge only "final" scorecards
+		
+		// For merges the activeCount is always set to 1
+		this._activeCount = 1;
+		// Merge another scorecard with "me"
+		// Let's compute total operations
+		this._totalOpsSuccessful += rhs._totalOpsSuccessful;
+		this._totalOpsFailed += rhs._totalOpsFailed;
+		this._totalActionsSuccessful += rhs._totalActionsSuccessful;
+		this._totalOpsAsync += rhs._totalOpsAsync;
+		this._totalOpsSync += rhs._totalOpsSync;
+		this._totalOpsInitiated += rhs._totalOpsInitiated;
+		this._totalOpsLate += rhs._totalOpsLate;
+		this._totalOpResponseTime += rhs._totalOpResponseTime;
+		this._numberOfUsers += rhs._numberOfUsers;
+		
+		// Merge operation maps
+		for( String opName : rhs._operationMap.keySet() )
+		{
+			OperationSummary lhsOpSummary = null;
+			OperationSummary rhsOpSummary = rhs._operationMap.get( opName );
+			// Do we have an operationSummary for this operation yet?
+			// If we don't have one, initialize an OperationSummary with a Null/dummy sampler that will
+			// simply accept all of the samples from the rhs' sampler
+			if( this._operationMap.containsKey( opName ) )
+				lhsOpSummary = this._operationMap.get( opName );
+			else lhsOpSummary = new OperationSummary( new NullSamplingStrategy() );
+			lhsOpSummary.merge( rhsOpSummary );
+			this._operationMap.put( opName, lhsOpSummary );
 		}
 	}
 	
