@@ -21,6 +21,7 @@ import com.mongodb.WriteResult;
 public class MongoTransport 
 {
 	public static int DEFAULT_MONGO_PORT = 27017;
+	public static int DEFAULT_MAX_CONNECTIONS_PER_HOST = 100;
 	
 	private Mongo _conn = null;
 	
@@ -29,6 +30,8 @@ public class MongoTransport
 	private int _connectTimeout 	= 10000;
 	private int _socketIdleTimeout	= 10000;
 	private boolean _initialized 	= false;
+	private int _maxConnectionsPerServer = DEFAULT_MAX_CONNECTIONS_PER_HOST;
+	
 	
 	
 	private ArrayList<ServerAddress> _servers = new ArrayList<ServerAddress>();
@@ -43,7 +46,13 @@ public class MongoTransport
 	
 	public MongoTransport( String host, int port ) throws UnknownHostException
 	{
+		this( host, port, DEFAULT_MAX_CONNECTIONS_PER_HOST );
+	}
+	
+	public MongoTransport( String host, int port, int maxConnectionsPerServer ) throws UnknownHostException
+	{
 		this._servers.add( new ServerAddress( host, port ) );
+		this._maxConnectionsPerServer = maxConnectionsPerServer;
 	}
 	/*
 	public static MongoTransport getInstance( String host, int port ) throws UnknownHostException
@@ -81,11 +90,21 @@ public class MongoTransport
 		options.socketTimeout = this._socketIdleTimeout;
 		//System.out.println( "Default connections per host: " + options.connectionsPerHost );
 		//System.out.println( "Default connection multiplier: " + options.threadsAllowedToBlockForConnectionMultiplier );
-		options.connectionsPerHost = 100;
+		
+		//options.connectionsPerHost = 100;
+		//options.threadsAllowedToBlockForConnectionMultiplier = 50;
+		
+		options.connectionsPerHost = this._maxConnectionsPerServer;
 		options.threadsAllowedToBlockForConnectionMultiplier = 50;
 		
 		this._conn = new Mongo( this._servers, options );
 		this._initialized = true;
+	}
+
+	public synchronized void close()
+	{
+		this._conn.close();
+		this._initialized = false;
 	}
 	
 	// Can be called repeatedly
