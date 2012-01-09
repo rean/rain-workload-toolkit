@@ -38,6 +38,7 @@ import java.util.TreeMap;
 import java.util.Iterator;
 //import java.util.Enumeration;
 import java.util.Random;
+import java.io.File;
 import java.io.PrintStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -95,6 +96,10 @@ public class Scoreboard implements Runnable, IScoreboard
 	// Scorecards - per-interval scorecards plus the final scorecard
 	private TreeMap<String,Scorecard> _intervalScorecards = new TreeMap<String,Scorecard>();
 	private Scorecard finalCard 							= null;
+	// Interim stats support
+	ObjectPoolGeneric _statsObjPool 			= null;
+	LinkedList<ResponseTimeStat> _responseTimeQ = new LinkedList<ResponseTimeStat>();
+	Object _responseTimeQLock 					= new Object();
 	
 	/* Other aggregate counters for steady state. */
 	/*private long _totalOpsSuccessful     = 0;
@@ -228,6 +233,9 @@ public class Scoreboard implements Runnable, IScoreboard
 	public Scoreboard( String trackName )
 	{
 		this._trackName = trackName;
+		// Create a small object pool for stats objects
+		this._statsObjPool = new ObjectPoolGeneric( 80000 );
+		this._statsObjPool.setTrackName( trackName );
 	}
 	
 	public ScenarioTrack getScenarioTrack() { return this._owner; }	
@@ -835,6 +843,10 @@ public class Scoreboard implements Runnable, IScoreboard
 					}
 				}
 				
+				// Shutdown the object pool if it's active
+				if( this._statsObjPool.isActive() )
+					this._statsObjPool.shutdown();
+				
 				//System.out.println( this + " processingQ contains: " + this._processingQ.size() + " unprocessed records." );
 			}
 			catch( InterruptedException ie )
@@ -980,7 +992,7 @@ public class Scoreboard implements Runnable, IScoreboard
 						if( responseTime > intervalSummary.maxResponseTime )
 							intervalSummary.maxResponseTime = responseTime;
 						if( responseTime < intervalSummary.minResponseTime )
-							intervalSummary.minResponseTime = responseTime;
+							intervalSummary.minResponseTime = responseTime; 
 					}
 				}
 				else
@@ -1048,6 +1060,35 @@ public class Scoreboard implements Runnable, IScoreboard
 				{
 					summary.minResponseTime = responseTime;
 				}
+				
+				// Only save response times if we're doing metric snapshots so we don't just leak memory via object instances
+				if( this._usingMetricSnapshots )
+				{
+					// Save the response time for the snapshot thread
+					ResponseTimeStat stat = null;
+					stat = (ResponseTimeStat) this._statsObjPool.rentObject( ResponseTimeStat.NAME );
+					if( stat == null )
+					{
+						//System.out.println( "Got stats container from heap (not pool)" );
+						stat = new ResponseTimeStat();
+					}
+					//else System.out.println( "Got stats container from pool" );
+					
+					stat._timestamp = result.getTimeFinished();
+					stat._responseTime = responseTime;
+					stat._totalResponseTime = this.finalCard._totalOpResponseTime;
+					stat._numObservations = this.finalCard._totalOpsSuccessful;
+					stat._operationName = result._operationName;
+					
+					//System.out.println( "Pre-push stat: " + stat );
+					
+					// Push this stat onto a Queue for the snapshot thread
+					synchronized( this._responseTimeQLock )
+					{
+						// put something in the queue
+						this._responseTimeQ.add( stat );
+					}
+				}
 			}	
 		}
 	}
@@ -1070,9 +1111,12 @@ public class Scoreboard implements Runnable, IScoreboard
 		private long _lastTotalResponseTime = -1;
 		private long _lastTotalOpsSuccessful = -1;
 		private long _lastTotalActionsSuccessful = -1;
+		private File _statsLog;
 		
 		public boolean getDone() { return this._done; }
 		public void setDone( boolean val ) { this._done = val; }
+		
+		private LinkedList<ResponseTimeStat> _todoQ = new LinkedList<ResponseTimeStat>();
 		
 		public SnapshotWriterThread( Scoreboard owner )
 		{
@@ -1149,7 +1193,98 @@ public class Scoreboard implements Runnable, IScoreboard
 		}
 		
 		public void run()
+		{			
+			PrintStream out = null;
+			try
+			{
+				out = new PrintStream( new File( "metrics-snapshots-" + this._owner._trackName + ".log" ) );
+			}
+			catch( Exception e )
+			{}
+			
+			// Do the queue swap and then write until there's nothing left to write
+			while( !this._done || this._owner._responseTimeQ.size() > 0 )
+			{
+				if( this._owner._responseTimeQ.size() > 0 )
+				{
+					// Print pre-swap sizes
+					//System.out.println( "Pre-swap todoQ: " + this._todoQ.size() + " responseTimeQ: " + this._owner._responseTimeQ.size() );
+					
+					// grab the queue lock and swap queues so we can write what's currently there
+					synchronized( this._owner._responseTimeQLock )
+					{
+						LinkedList<ResponseTimeStat> temp = this._owner._responseTimeQ;
+						this._owner._responseTimeQ = this._todoQ;
+						this._todoQ = temp;
+					}
+					
+					//System.out.println( "Post-swap todoQ: " + this._todoQ.size() + " responseTimeQ: " + this._owner._responseTimeQ.size() );
+					
+					// Now write everything out
+					while( !this._todoQ.isEmpty() )
+					{
+						ResponseTimeStat stat = this._todoQ.removeFirst();
+						
+						try
+						{
+							out.println( stat );
+						}
+						catch( Exception e )
+						{}
+						finally
+						{
+							// Return the stats object to the pool
+							if( stat != null )
+							{
+								this._owner._statsObjPool.returnObject( stat );
+							}
+						}
+					}
+					//System.out.println( this + " todoQ empty, re-checking..." );
+				}
+				else
+				{
+					try
+					{
+						Thread.sleep( 1000 );
+					}
+					catch( InterruptedException tie )
+					{ 
+						System.out.println( this + " snapshot thread interrupted." );
+						// Close the log file if we're interrupted
+						if( out != null )
+						{
+							try
+							{
+								out.flush();
+								out.close();
+							}
+							catch( Exception e )
+							{}
+						}
+					}
+				}
+			}// end-while there's work to do
+			
+			// Close nicely if we're not interrupted
+			if( out != null )
+			{
+				try
+				{
+					out.flush();
+					out.close();
+				}
+				catch( Exception e )
+				{}
+			}
+		}
+		
+		/*
+		public void run()
 		{
+			// Do another Queue swap if things are non-empty
+					
+			
 			//Speed up the metric snapshot interval for debugging db connectivity issues
 			//this._owner._metricSnapshotInterval = 10000;
 			
@@ -1164,11 +1299,13 @@ public class Scoreboard implements Runnable, IScoreboard
 			
 			long now = System.currentTimeMillis();
 			System.out.println( this._owner.toString() + " current time: " + now  + " metric snapshot thread started!" );
+			*/
 			// Print out stats at time started
 			/*System.out.println( this + " " + now + 
 					" ttl response time (msecs): " + this._owner.finalCard._totalOpResponseTime + 
 					" operations successful: " + this._owner.finalCard._totalOpsSuccessful + 
 					" actions successful: " + this._owner.finalCard._totalActionsSuccessful );*/
+			/*
 			try
 			{
 				this.pushStatsToMetricDB();
@@ -1188,16 +1325,19 @@ public class Scoreboard implements Runnable, IScoreboard
 					Thread.sleep( this._owner._metricSnapshotInterval );
 					// Print out the latest stats
 					//this._owner.finalCard._totalOpResponseTime;
+					*/
 					/*long metricTime = System.currentTimeMillis();
 					System.out.println( this + " " + metricTime + 
 										" ttl response time (msecs): " + this._owner.finalCard._totalOpResponseTime + 
 										" operations successful: " + this._owner.finalCard._totalOpsSuccessful + 
 										" actions successful: " + this._owner.finalCard._totalActionsSuccessful );*/
+					/*
 					// Push these stats to the db
 					//this._owner._owner._name
 					this.pushStatsToMetricDB();
-					
-					/*// Open a log file if none is open
+					*/
+		
+					/* inactive block // Open a log file if none is open
 					if( out == null )
 						out = new PrintStream( new File( "metrics-snapshots-" + this._owner._trackName + ".log" ) ); 
 									
@@ -1207,7 +1347,7 @@ public class Scoreboard implements Runnable, IScoreboard
 					out.println( now );
 					this._owner.printOperationStatistics( out, true );
 					*/
-				}
+				/*}
 				catch( InterruptedException ie )
 				{
 					this._done = true;
@@ -1245,6 +1385,6 @@ public class Scoreboard implements Runnable, IScoreboard
 			}
 			
 			System.out.println( this._owner + " snapshot-writer thread finished!" );
-		}
+		}*/
 	}
 }
