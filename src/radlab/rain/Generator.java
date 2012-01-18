@@ -78,7 +78,7 @@ public abstract class Generator
 	public Generator( ScenarioTrack track )
 	{
 		this._loadTrack = track;
-		this.initialize();
+		//this.initialize(); // let the Benchmark call initialize
 	}
 	
 	public abstract long getThinkTime();
