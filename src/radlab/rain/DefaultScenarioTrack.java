@@ -201,7 +201,7 @@ public class DefaultScenarioTrack extends ScenarioTrack
 		this._openLoopProbability = 0.0;
 		// 2) Concrete Generator
 		this._generatorClassName = generatorClassName;
-		try
+		/*try
 		{
 			// Create generator with no parameters by passing null
 			this._generator = this.createWorkloadGenerator( this._generatorClassName, null );
@@ -210,7 +210,7 @@ public class DefaultScenarioTrack extends ScenarioTrack
 		{
 			System.out.println( "ERROR creating default generator. Reason: " + e.toString() );
 			System.exit( 1 );
-		}
+		}*/
 		// 3) Target Information
 		this._targetHostname = hostname;
 		this._targetPort = port;

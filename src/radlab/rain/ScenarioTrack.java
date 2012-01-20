@@ -88,7 +88,7 @@ public abstract class ScenarioTrack
 	public static String DEFAULT_LOAD_PROFILE_CLASS             = "radlab.rain.LoadProfile";
 	
 	protected Scenario _parentScenario                          = null;
-	protected Generator _generator                              = null;
+	//protected Generator _generator                              = null;
 	protected String _name                                      = "none";
 	protected String _targetHostname                            = null;
 	protected int _targetPort                                   = 80;
@@ -191,8 +191,8 @@ public abstract class ScenarioTrack
 	public String getResourcePath() { return this._resourcePath; }
 	public void setResourcePath( String val ) { this._resourcePath = val; }
 	
-	public Generator getGenerator() { return this._generator; }
-	public void setGenerator( Generator val ) { this._generator = val; }
+	//public Generator getGenerator() { return this._generator; }
+	//public void setGenerator( Generator val ) { this._generator = val; }
 		
 	public double getLogSamplingProbability() { return this._logSamplingProbability; }
 	public void setLogSamplingProbability( double val ) { this._logSamplingProbability = val; }
@@ -223,15 +223,15 @@ public abstract class ScenarioTrack
 		this._generatorParams = null;
 		if( config.has( ScenarioTrack.CFG_GENERATOR_PARAMS_KEY ) )
 			this._generatorParams = config.getJSONObject( ScenarioTrack.CFG_GENERATOR_PARAMS_KEY );
-		this._generator = this.createWorkloadGenerator( this._generatorClassName, this._generatorParams );
+		//this._generator = this.createWorkloadGenerator( this._generatorClassName, this._generatorParams );
 		// 4) Log Sampling Probability
 		this._logSamplingProbability = config.getDouble( ScenarioTrack.CFG_LOG_SAMPLING_PROBABILITY_KEY );
 		// 5) Mean Cycle Time
 		this._meanCycleTime = config.getDouble( ScenarioTrack.CFG_MEAN_CYCLE_TIME_KEY );
 		// 6) Mean Think Time
 		this._meanThinkTime = config.getDouble( ScenarioTrack.CFG_MEAN_THINK_TIME_KEY );
-		this._generator.setMeanCycleTime( (long) (this._meanCycleTime * 1000) );
-		this._generator.setMeanThinkTime( (long) (this._meanThinkTime * 1000) );
+		//this._generator.setMeanCycleTime( (long) (this._meanCycleTime * 1000) );
+		//this._generator.setMeanThinkTime( (long) (this._meanThinkTime * 1000) );
 		// 7) Interactive?
 		this._interactive = config.getBoolean( ScenarioTrack.CFG_INTERACTIVE_KEY );
 		// 8) Concrete Load Profile and Load Profile Array
