@@ -136,7 +136,8 @@ public class Benchmark
 				generator.setScoreboard( scoreboard );
 				generator.setMeanCycleTime( (long)(track.getMeanCycleTime() * 1000) );
 				generator.setMeanThinkTime( (long)(track.getMeanThinkTime() * 1000) );
-				LoadGenerationStrategy lgThread = new PartlyOpenLoopLoadGeneration( generator, i );
+				// Allow the load generation strategy to be configurable
+				LoadGenerationStrategy lgThread = track.createLoadGenerationStrategy( track.getLoadGenerationStrategyClassName(), track.getLoadGenerationStrategyParams(), generator, i );
 				generator.setName( lgThread.getName() );
 				generator.initialize();
 				lgThread.setInteractive( track.getInteractive() );

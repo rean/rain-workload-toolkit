@@ -33,6 +33,8 @@ package radlab.rain;
 
 import java.util.concurrent.ExecutorService;
 
+import org.json.JSONObject;
+
 /**
  * The LoadGenerationStrategy abstract class is a basic thread that keeps
  * track of its state (waiting to begin, active, or inactive) and associates
@@ -89,6 +91,29 @@ public abstract class LoadGenerationStrategy extends Thread
 	 * @param id            The unique ID of this thread.
 	 */
 	public LoadGenerationStrategy( Generator generator, long id )
+	{
+		this._generator = generator;
+		this._id = id;
+		
+		StringBuffer trackName = new StringBuffer( generator.getTrack().getName() );
+		if( trackName.length() > 0 )
+		{
+			this.setName( trackName.append( ".Generator-" ).append( this._id ).toString() );
+		}
+		else
+		{
+			this.setName( "NoTrack.Generator-" + this._id );
+		}
+	}
+	
+	/**
+	 * Creates a new LoadGenerationStrategy thread.
+	 * 
+	 * @param generator     The generator to associate with this thread.
+	 * @param id            The unique ID of this thread.
+	 * @param params		Additional configuration parameters.
+	 */
+	public LoadGenerationStrategy( Generator generator, long id, JSONObject params )
 	{
 		this._generator = generator;
 		this._id = id;

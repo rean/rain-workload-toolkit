@@ -55,7 +55,7 @@ public abstract class ScenarioTrack
 	public static final int ERROR_INVALID_LOAD_PROFILE_BAD_MIX_NAME 		= 1778;
 	public static final int ERROR_INVALID_LOAD_PROFILE_BAD_BEHAVIOR_HINT 	= 1779;
 	public static final int ERROR_TRACK_NOT_FOUND							= 1780;
-	
+		
 	public static String CFG_TRACK_CLASS_KEY 					= "track";
 	public static String CFG_OPEN_LOOP_PROBABILITY_KEY          = "pOpenLoop";
 	public static String CFG_LOG_SAMPLING_PROBABILITY_KEY       = "pLogSampling";
@@ -75,6 +75,9 @@ public abstract class ScenarioTrack
 	public static String CFG_LOAD_PROFILE_KEY                   = "loadProfile";
 	public static String CFG_LOAD_SCHEDULE_CREATOR_KEY			= "loadScheduleCreator";
 	public static String CFG_LOAD_SCHEDULE_CREATOR_PARAMS_KEY	= "loadScheduleCreatorParameters";
+	public static String CFG_LOAD_GENERATION_STRATEGY_KEY		= "loadGenerationStrategy";
+	public static String CFG_LOAD_GENERATION_STRATEGY_PARAMS_KEY= "loadGenerationStrategyParams";
+	
 	// Load behavioral hints
 	public static String CFG_BEHAVIOR_KEY                       = "behavior";
 	public static String CFG_RESOURCE_PATH                      = "resourcePath";
@@ -83,9 +86,10 @@ public abstract class ScenarioTrack
 	public static String CFG_MAX_USERS							= "maxUsers";
 		
 	// Defaults
-	public static long DEFAULT_OBJECT_POOL_MAX_SIZE             = 50000;
-	public static long DEFAULT_MEAN_RESPONSE_TIME_SAMPLE_INTERVAL = 500;
-	public static String DEFAULT_LOAD_PROFILE_CLASS             = "radlab.rain.LoadProfile";
+	public static long DEFAULT_OBJECT_POOL_MAX_SIZE             		= 50000;
+	public static long DEFAULT_MEAN_RESPONSE_TIME_SAMPLE_INTERVAL 		= 500;
+	public static String DEFAULT_LOAD_PROFILE_CLASS             		= "radlab.rain.LoadProfile";
+	public static final String DEFAULT_LOAD_GENERATION_STRATEGY_CLASS 	= "radlab.rain.PartlyOpenLoopLoadGeneration";
 	
 	protected Scenario _parentScenario                          = null;
 	//protected Generator _generator                              = null;
@@ -99,6 +103,8 @@ public abstract class ScenarioTrack
 	protected String _generatorClassName                        = "";
 	protected JSONObject _generatorParams						= null;
 	protected String _loadProfileClassName                      = "";
+	protected String _loadGenerationStrategyClassName			= "";
+	protected JSONObject _loadGenerationStrategyParams			= null;
 	protected boolean _interactive                              = true;
 	private IScoreboard _scoreboard                             = null;
 	protected double _openLoopProbability                       = 0.0;
@@ -139,7 +145,9 @@ public abstract class ScenarioTrack
 	public long getRampDown() { return this._parentScenario.getRampDown(); }
 	public boolean getInteractive() { return this._interactive; }
 	public void setInteractive( boolean val ) { this._interactive = val; }
-			
+	public String getLoadGenerationStrategyClassName() { return this._loadGenerationStrategyClassName; }
+	public JSONObject getLoadGenerationStrategyParams() { return this._loadGenerationStrategyParams; }
+	
 	public ObjectPool getObjectPool() { return this._objPool; };
 	
 	public int getMaxUsers() 
@@ -327,6 +335,20 @@ public abstract class ScenarioTrack
 		// 13 Configure the maxUsers if specified
 		if( config.has( ScenarioTrack.CFG_MAX_USERS ) )
 			this._maxUsersFromConfig = config.getInt( ScenarioTrack.CFG_MAX_USERS );
+		// 14 Look for a load generation strategy and optional params if they exist
+		if( config.has( ScenarioTrack.CFG_LOAD_GENERATION_STRATEGY_KEY ) )
+		{
+			this._loadGenerationStrategyClassName = config.getString( ScenarioTrack.CFG_LOAD_GENERATION_STRATEGY_KEY );
+			// Check for parameters
+			if( config.has( ScenarioTrack.CFG_LOAD_GENERATION_STRATEGY_PARAMS_KEY ) )
+				this._loadGenerationStrategyParams = config.getJSONObject( ScenarioTrack.CFG_LOAD_GENERATION_STRATEGY_PARAMS_KEY );
+			else this._loadGenerationStrategyParams = new JSONObject();
+		}
+		else
+		{
+			this._loadGenerationStrategyClassName = ScenarioTrack.DEFAULT_LOAD_GENERATION_STRATEGY_CLASS;
+			this._loadGenerationStrategyParams = new JSONObject();
+		}
 	}
 	
 	// Factory methods
@@ -378,6 +400,16 @@ public abstract class ScenarioTrack
 		scoreboard.setUsingMetricSnapshots( this._useMetricSnapshots );
 		scoreboard.setMeanResponseTimeSamplingInterval( this._meanResponseTimeSamplingInterval );
 		return scoreboard;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public LoadGenerationStrategy createLoadGenerationStrategy( String loadGenerationStrategyClassName, JSONObject loadGenerationStrategyParams, Generator generator, int id ) throws Exception
+	{
+		LoadGenerationStrategy loadGenStrategy = null;
+		Class<LoadGenerationStrategy> loadGenStrategyClass = (Class<LoadGenerationStrategy>) Class.forName( loadGenerationStrategyClassName );
+		Constructor<LoadGenerationStrategy> loadGenStrategyCtor = loadGenStrategyClass.getConstructor( new Class[] {Generator.class, long.class, JSONObject.class} );
+		loadGenStrategy = (LoadGenerationStrategy) loadGenStrategyCtor.newInstance( new Object[] { generator, id, loadGenerationStrategyParams } );
+		return loadGenStrategy;
 	}
 	
 	public String toString()

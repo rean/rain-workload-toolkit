@@ -36,6 +36,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.json.JSONObject;
+
 /**
  * The PartlyOpenLoopLoadGeneration class is a thread that supports partly
  * open loop load generation.
@@ -72,6 +74,23 @@ public class PartlyOpenLoopLoadGeneration extends LoadGenerationStrategy
 	public PartlyOpenLoopLoadGeneration( Generator generator, long id )
 	{
 		super( generator, id );
+		
+		// If a thread dies for some reason (e.g. the JVM runs out of heap
+		// space, which causes an Error not an Exception), use our uncaught
+		// exception handler to catch it and print some useful debugging info.
+		Thread.setDefaultUncaughtExceptionHandler( new UnexpectedDeathHandler() );
+	}
+	
+	/**
+	 * Creates a load generation thread that supports partly open loop.
+	 * 
+	 * @param generator     The generator used to generate this thread's load.
+	 * @param id            The ID of this thread; used to sleep it on demand.
+	 * @param params		Additional configuration parameters.
+	 */
+	public PartlyOpenLoopLoadGeneration( Generator generator, long id, JSONObject params )
+	{
+		super( generator, id, params );
 		
 		// If a thread dies for some reason (e.g. the JVM runs out of heap
 		// space, which causes an Error not an Exception), use our uncaught
