@@ -45,6 +45,7 @@ public abstract class Operation implements Runnable
 	// Describes the operation
 	protected int _operationIndex       = -1;
 	protected String _operationName     = "";
+	protected String _operationRequest	= "";
 	// Describes who generated the operation and when (during what interval)
 	protected String _generatedBy       			= "";
 	// LoadProfile in effect when this operation was generated/initialized

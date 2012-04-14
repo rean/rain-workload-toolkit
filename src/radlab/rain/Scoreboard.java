@@ -1079,7 +1079,9 @@ public class Scoreboard implements Runnable, IScoreboard
 					stat._totalResponseTime = this.finalCard._totalOpResponseTime;
 					stat._numObservations = this.finalCard._totalOpsSuccessful;
 					stat._operationName = result._operationName;
-					
+					stat._operationRequest = result._operationRequest;
+					if( result._generatedDuring != null )
+						stat._generatedDuring = result._generatedDuring._name;
 					//System.out.println( "Pre-push stat: " + stat );
 					
 					// Push this stat onto a Queue for the snapshot thread

@@ -45,6 +45,7 @@ public class OperationExecution implements Comparable<OperationExecution>
 	private long _timeStarted = 0;
 	private long _timeFinished = 0;
 	public String _operationName;
+	public String _operationRequest;
 	public LoadProfile _generatedDuring = null;
 	public long _profileStartTime = -1;
 	public long _actionsPerformed = 1;
@@ -67,6 +68,7 @@ public class OperationExecution implements Comparable<OperationExecution>
 		this._timeStarted = operation.getTimeStarted();
 		this._timeFinished = operation.getTimeFinished();
 		this._operationName = operation._operationName;
+		this._operationRequest = operation._operationRequest;
 		this._async = operation.getAsync();
 		this._failed = operation._failed;
 		// Pull out any info on when this operation was created
