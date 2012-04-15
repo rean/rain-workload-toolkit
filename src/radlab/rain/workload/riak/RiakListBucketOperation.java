@@ -1,7 +1,5 @@
 package radlab.rain.workload.riak;
 
-import com.basho.riak.client.response.BucketResponse;
-
 import radlab.rain.IScoreboard;
 
 public class RiakListBucketOperation extends RiakOperation 
@@ -18,9 +16,9 @@ public class RiakListBucketOperation extends RiakOperation
 	@Override
 	public void execute() throws Throwable 
 	{
-		BucketResponse response = this.doListBucket( this._bucket );
-		if( response != null )
-			response.close();
+		Iterable<String> response = this.doListBucket( this._bucket );
+		if( response == null )
+			throw new Exception( "Empty response for list bucket: " + this._bucket );
 		this.setFailed( false );
 	}
 }

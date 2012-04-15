@@ -1,7 +1,6 @@
 package radlab.rain.workload.riak;
 
-import com.basho.riak.client.response.StoreResponse;
-
+import com.basho.riak.client.IRiakObject;
 import radlab.rain.IScoreboard;
 
 public class RiakStoreOperation extends RiakOperation 
@@ -18,10 +17,10 @@ public class RiakStoreOperation extends RiakOperation
 	@Override
 	public void execute() throws Throwable 
 	{
-		StoreResponse response = null;
+		IRiakObject response = null;
 		response = this.doStore( this._bucket, this._key, this._value );
-		if( response != null )
-			response.close();
+		//if( response == null )
+		//	throw new Exception( "Empty response for store value of key: " + this._key );
 		this.setFailed( false );
 	}
 }

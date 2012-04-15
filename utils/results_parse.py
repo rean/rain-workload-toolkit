@@ -7,18 +7,29 @@ import numpy
 
 if __name__=='__main__':
     
-    repeats = 4
-    results_dir = "300secs"
-    #input_fname = "{0}/expt_2V1P_users_100_size_4096_run_0.log".format( results_dir )
-
+    repeats = 5
+    # Result dirs/tags used
+    # 1) 2V1P/2V1P - mongodb without journaling enabled
+    # 1a) 2V1P/300secs-3200 - mongodb without journaling enabled for 3200 users for 4K - 16K objects
+    # 2) 2V1P/2V1PwJournal - mongodb with journaling enabled
+    # 3) 2V1P/ds_2x_RAM - mongodb with a dataset 2X the amount of RAM
+    # 4) 2V1P/diurnal - mongodb with a diurnal workload
+    # 5) 2V1P/hotspot - mongodb with a data hotspot workload
+    
+    # 6) 0V2P/0V2P - mongodb without journaling over 1 Gbps link from rain
+    # 7) 2V2P/2V2P - mongodb without journaling over 1 Gbps link from rain
+    results_dir = "2V2P/300secs"
+    
     #results_file = open( input_fname, "r" )
     #results = results_file.read()
     #track_results = RainOutputParser.parse_output( results )
     #RainOutputParser.print_results( track_results )
 
-    expt_tag = "2V1P"
-    users = [100, 200, 400, 800, 1600, 3200]
-    sizes = [4096, 8192]
+    expt_tag = "2V2P-usenix"
+    #users = [100, 200, 400, 800, 1600, 3200]
+    users = [3200]
+    #sizes = [1024, 2048, 4096, 8192, 16384, 32768]
+    sizes = [16384]
     header = False
 
     # At the end of the day we want:

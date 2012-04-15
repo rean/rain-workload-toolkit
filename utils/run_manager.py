@@ -10,6 +10,7 @@ class TrackValidation:
     '''
     def __init__(self, trackname):
         self.track_name = trackname
+        self.interval_name = None
         self.pct_overhead_ops = 0.0
         self.pct_overhead_ops_acceptable = False
         self.pct_ops_failed = 0.0
@@ -27,6 +28,7 @@ class TrackSummary:
     '''
     def __init__(self, trackname):
         self.name = trackname
+        self.interval_name = None
         self.offered_load_ops_per_sec = 0
         self.effective_load_ops_per_sec = 0
         self.littles_estimate_ops_per_sec = 0
@@ -37,6 +39,7 @@ class TrackSummary:
         self.average_users = 0
         #self.op_response_time_targets_met = True
         self.op_response_times = {}
+        self.op_proportions = {}
         # Specifiy validation thresholds
         self.pct_overhead_ops_threshold=5.0
         self.pct_failed_ops_threshold=5.0
@@ -130,6 +133,179 @@ class RainOutputParser:
     RESULTS_DATA = "{0:<20} {1:10.4f} {2:10.4f} {3:10.4f} {4:10.4f} {5:10.4f}"\
                    "{6:10.4f} {7:10} {8:10} {9:10.4f} {10:<5s} ({11})"
 
+
+    @staticmethod
+    def parse_interval_output( output ):
+        # Get each track and for each track find the interval markers
+        track_results = []
+        track_pattern = \
+            re.compile( '\[TRACK: (.*)\] starting load scheduler' )
+        tracks = \
+            track_pattern.findall( output )
+        
+        # for each track go get some numbers from the final results section
+        for track in tracks:
+            #print track
+            
+            # sub-pattern of the end of a result line from rain
+            # <metric><space*>:<space+><decimal value>
+            number_pattern = '([-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?)'
+            result_line_tail_pattern = \
+                '\s*:\s+([-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?)'
+            name_tail_pattern = \
+                '\s*:\s+(.*)'
+            
+            track_final_results_pattern = \
+              re.compile( '\[SCOREBOARD TRACK: ' + track + '\] Final results' )
+        
+            track_interval_results_pattern = \
+              re.compile( '\[SCOREBOARD TRACK: ' + track + '\] Interval results' )
+            track_final_results_interval_name_pattern = \
+              re.compile( '\[SCOREBOARD TRACK: ' + track + '\] Interval name' + name_tail_pattern )
+            track_offered_load_ops_pattern = \
+                re.compile( '\[SCOREBOARD TRACK: ' + track + '\] ' \
+                       'Offered load \(ops/sec\)' + result_line_tail_pattern )
+            track_effective_load_ops_pattern = \
+                re.compile( '\[SCOREBOARD TRACK: ' + track + '\] ' \
+                      'Effective load \(ops/sec\)' + result_line_tail_pattern )
+            track_effective_load_reqs_pattern = \
+                re.compile( '\[SCOREBOARD TRACK: ' + track + '\] ' \
+                'Effective load \(requests/sec\)' + result_line_tail_pattern )
+            track_ops_successful_pattern = \
+               re.compile( '\[SCOREBOARD TRACK: ' + track + '\] ' \
+               'Operations successfully completed' + result_line_tail_pattern )
+            track_ops_failed_pattern = \
+               re.compile( '\[SCOREBOARD TRACK: ' + track + '\] ' \
+                           'Operations failed' + result_line_tail_pattern )
+            track_avg_op_response_time_pattern = \
+             re.compile( '\[SCOREBOARD TRACK: ' + track + '\] ' \
+                         'Average operation response time \(s\)' + \
+                             result_line_tail_pattern )
+            track_avg_users_pattern = \
+                re.compile( '\[SCOREBOARD TRACK: ' + track + '\] ' \
+                      'Active users' + result_line_tail_pattern )
+
+            # Patterns for operations - doesn't group like we'd like
+            # but matches the right lines
+            track_operation_pattern = \
+                re.compile( '\[SCOREBOARD TRACK: ' + track + '\]' \
+                       '\|(.+)\|'\
+                       '\s*(' + number_pattern + ')%\s*\|'\
+                       '\s*(' + number_pattern + ')\s*\|'\
+                       '\s*(' + number_pattern + ')\s*\|'\
+                       '\s*(' + number_pattern + ')\s*\|'\
+                       '\s*(' + number_pattern + ')\s*\|'\
+                       '\s*(' + number_pattern + ')\s*\|'\
+                       '\s*(' + number_pattern + ')\s*\|'\
+                       '\s*(' + number_pattern + ')\s*\|')
+
+            # Find the "Final results" marker for this track so we know where
+            # all the track intervals end
+            final_results_section_start = None    
+            match = track_final_results_pattern.search( output )
+            if match:
+                final_results_section_start = match.start()
+            
+            # Find the "Interval results" markers for this track and then
+            # search for individual metrics
+            match = track_interval_results_pattern.search( output )
+            if match:    
+                interval_name_start = None                
+
+                interval_pattern = \
+                    re.compile( '\[SCOREBOARD TRACK: ' + track + '\] Interval name' + name_tail_pattern )
+
+                intervals = \
+                    interval_pattern.findall( output )
+
+                intervals2 = interval_pattern.finditer( output )
+
+                #print intervals2
+                interval_endpoints = []
+                
+                for interval in intervals2:
+                    interval_endpoints.append( interval.start() )
+                
+                #for interval in intervals:
+                for i in range(0, len(intervals) ):
+                    interval = intervals[i]
+                    interval_end = None
+                    #print( "{0} start: {1}".format( interval, interval_endpoints[i] ) )
+                    if i+1 < len(intervals):
+                        interval_end = interval_endpoints[i+1]
+                        #print( "{0} end: {1}".format( interval, interval_endpoints[i+1] ) )
+                    else:
+                        #print( "{0} end: {1}".format( interval, final_results_section_start ) )
+                        interval_end = final_results_section_start # use the final results marker start
+                    
+                    #print interval
+                    summary = TrackSummary( "{0}-{1}".format(track, interval) )
+
+                    interval_results_start_pattern = \
+                        re.compile( '\[SCOREBOARD TRACK: ' + track + '\] Interval name\s*:\s+(' + interval + ')' )
+                    interval_results_section_start = interval_results_start_pattern.search( output ).start()
+                    
+                    summary.offered_load_ops_per_sec = \
+                    float( track_offered_load_ops_pattern.search\
+                             ( output, interval_results_section_start ).group(1) )
+                    
+                    summary.effective_load_ops_per_sec = \
+                    float( track_effective_load_ops_pattern.search\
+                             ( output, interval_results_section_start ).group(1) )
+                    summary.effective_load_reqs_per_sec = \
+                        float( track_effective_load_reqs_pattern.search\
+                                 ( output, interval_results_section_start ).group(1) )
+                    summary.operations_successful = \
+                        long( track_ops_successful_pattern.search\
+                                 ( output, interval_results_section_start ).group(1) )
+                    summary.operations_failed = \
+                        long( track_ops_failed_pattern.search\
+                                 ( output, interval_results_section_start ).group(1) )
+                    summary.average_op_response_time_sec = \
+                        float( track_avg_op_response_time_pattern.search\
+                                 ( output, interval_results_section_start ).group(1) )
+                    summary.average_users = \
+                        float( track_avg_users_pattern.search\
+                                 ( output, interval_results_section_start ).group(1) )
+                    
+                    # Need to make sure that we only include the operation results for
+                    # the current interval. If intervals don't contain
+                    # the same operations, then operation results could get mis-aligned
+                    # with the intervals
+                    
+                     
+                    # find all the operations and print out the 90th and 99th
+                    # percentiles
+                    for opMatch in track_operation_pattern.\
+                        finditer( output, interval_results_section_start ):
+                    
+                        if opMatch.start() < interval_end:
+                            #print opMatch
+                            #print opMatch.group(0)
+                            # Split group(0) on |
+                            opCounters = opMatch.group(0).split( "|" )
+                            #for s in opCounters:
+                            #    print s
+                            #print opCounters[1].strip(), opCounters[8], opCounters[9]
+                            # Store the op name with a tuple (90th pct,99th pct, avg, min, max)
+                            
+                            #if not summary.op_response_times.has_key(opCounters[1].strip()):
+                            summary.op_response_times[opCounters[1].strip()]=\
+                                    (float(opCounters[8].strip()), \
+                                     float(opCounters[9].strip()), \
+                                     float(opCounters[5].strip()), \
+                                     float(opCounters[6].strip()), \
+                                     float(opCounters[7].strip())) 
+                            #if not summary.op_proportions.has_key(opCounters[1].strip()):
+                            summary.op_proportions[opCounters[1].strip()]=float(opCounters[2].replace('%', ''))/100.0
+                            #print summary.op_proportions[opCounters[1].strip()]
+                                                        
+
+                    # save the summary to the list we have so far
+                    #print summary.name, summary.op_response_times
+                    track_results.append(summary)
+        # return the list of track results we found
+        return track_results
 
     @staticmethod
     def parse_output( output ):

@@ -7,6 +7,8 @@ import java.util.Random;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.basho.riak.client.RiakException;
+
 import radlab.rain.Generator;
 import radlab.rain.LoadProfile;
 import radlab.rain.ObjectPool;
@@ -64,6 +66,8 @@ public class RiakGenerator extends Generator
 			System.out.println( "Generator: " + this._name  + " hot obj stats: " + this._hotObjHist.getTotalObservations() + " observations" );
 			System.out.println( this._hotObjHist.toString() );
 		}
+		// Very important to shut down this client so the thread can exit
+		this._riak.dispose();
 	}
 
 	@Override
@@ -110,12 +114,14 @@ public class RiakGenerator extends Generator
 		if( config.has( CFG_BUCKET_KEY ) )
 			this._bucket = config.getString( CFG_BUCKET_KEY );
 		
-		// "http://localhost:8098/riak"
-		StringBuffer riakUrl = new StringBuffer();
-		riakUrl.append( "http://" );
-		riakUrl.append( this._loadTrack.getTargetHostName() ).append( ":" ).append( this._loadTrack.getTargetHostPort() );
-		riakUrl.append( "/riak" );
-		this._riak = new RiakTransport( riakUrl.toString() );
+		try
+		{
+			this._riak = new RiakTransport( this._loadTrack.getTargetHostName(), this._loadTrack.getTargetHostPort() );
+		}
+		catch( RiakException re )
+		{
+			throw new JSONException( re );
+		}
 	}
 	
 	@Override

@@ -70,6 +70,19 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 
+// SSL 
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import org.apache.http.client.HttpClient;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.impl.client.DefaultHttpClient;
+
 /**
  * The HttpTransport class is used to issue various HTTP requests.
  */
@@ -382,8 +395,38 @@ public class HttpTransport
 		*/
 		
 		// Single-threaded (100% closed loop) operation
-		this._httpClient = new DefaultHttpClient();
+		this._httpClient = wrapClient( new DefaultHttpClient() );
 		
+	}
+	
+	// Allow the apache http client to skip checks (and avoid throwing exceptions) for expired or self-signed certificates
+	// Adapted from: http://tech.chitgoks.com/2011/04/24/how-to-avoid-javax-net-ssl-sslpeerunverifiedexception-peer-not-authenticated-problem-using-apache-httpclient/ 
+	public static HttpClient wrapClient(HttpClient base) 
+	{
+	    try
+	    {
+	        SSLContext ctx = SSLContext.getInstance("TLS");
+	        // Create a trust manager that skips all the certificate checks
+	        X509TrustManager tm = new X509TrustManager() 
+	        {
+	            public void checkClientTrusted(X509Certificate[] xcs, String string) throws CertificateException {}
+	            public void checkServerTrusted(X509Certificate[] xcs, String string) throws CertificateException {}
+	            public X509Certificate[] getAcceptedIssuers() { return null; }
+	        };
+	        
+	        // Initialize our SSLContext with the custom do-nothing trust manager
+	        ctx.init( null, new TrustManager[]{tm}, null );
+	        SSLSocketFactory ssf = new SSLSocketFactory( ctx );
+	        ssf.setHostnameVerifier( SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER );
+	        ClientConnectionManager ccm = base.getConnectionManager();
+	        SchemeRegistry sr = ccm.getSchemeRegistry();
+	        sr.register( new Scheme( "https", ssf, 443 ) );
+	        return new DefaultHttpClient( ccm, base.getParams() );
+	    } 
+	    catch (Exception ex) 
+	    {
+	        return null;
+	    }
 	}
 	
 	/**
