@@ -30,9 +30,6 @@
     	<pathelement location="thirdparty/mongo-2.5.3/mongo-2.5.3.jar"/>
     	<!-- Riak stuff -->
     	<pathelement location="thirdparty/riak-java-client/target/riak-client-1.0.6-SNAPSHOT-jar-with-dependencies.jar"/>
-    	<pathelement location="thirdparty/riak-java-client/lib/commons-codec-1.2.jar"/>
-    	<pathelement location="thirdparty/riak-java-client/lib/commons-httpclient-3.1.jar"/>
-    	<pathelement location="thirdparty/riak-java-client/lib/commons-logging-1.0.4.jar"/>
     	<!-- Redis stuff -->
     	<pathelement location="thirdparty/jedis/target/jedis-1.5.3-SNAPSHOT.jar"/>
     	<pathelement location="thirdparty/commons-pool-1.5.6/commons-pool-1.5.6.jar"/>
@@ -68,9 +65,6 @@
 		<pathelement location="thirdparty/mongo-2.5.3/mongo-2.5.3.jar"/>
 		<!-- Riak stuff -->
 		<pathelement location="thirdparty/riak-java-client/target/riak-client-1.0.6-SNAPSHOT-jar-with-dependencies.jar"/>
-		<pathelement location="thirdparty/riak-java-client/lib/commons-codec-1.2.jar"/>
-		<pathelement location="thirdparty/riak-java-client/lib/commons-httpclient-3.1.jar"/>
-		<pathelement location="thirdparty/riak-java-client/lib/commons-logging-1.0.4.jar"/>
 		<!-- Redis stuff -->
 		<pathelement location="thirdparty/jedis/target/jedis-1.5.3-SNAPSHOT.jar"/>
 		<pathelement location="thirdparty/commons-pool-1.5.6/commons-pool-1.5.6.jar"/>
@@ -264,9 +258,6 @@
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/mongo-2.5.3/mongo-2.5.3.jar"/>
         	<!-- Riak stuff -->
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/riak-java-client/target/riak-client-1.0.6-SNAPSHOT-jar-with-dependencies.jar"/>
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/riak-java-client/lib/commons-codec-1.2.jar"/>
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/riak-java-client/lib/commons-httpclient-3.1.jar"/>
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/riak-java-client/lib/commons-logging-1.0.4.jar"/>
         	<!-- Redis stuff -->
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jedis/target/jedis-1.5.3-SNAPSHOT.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/commons-pool-1.5.6/commons-pool-1.5.6.jar"/>
@@ -307,9 +298,6 @@
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/mongo-2.5.3/mongo-2.5.3.jar"/>
         	<!-- Riak stuff -->
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/riak-java-client/target/riak-client-1.0.6-SNAPSHOT-jar-with-dependencies.jar"/>
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/riak-java-client/lib/commons-codec-1.2.jar"/>
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/riak-java-client/lib/commons-httpclient-3.1.jar"/>
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/riak-java-client/lib/commons-logging-1.0.4.jar"/>
         	<!-- Redis stuff -->
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jedis/target/jedis-1.5.3-SNAPSHOT.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/commons-pool-1.5.6/commons-pool-1.5.6.jar"/>
