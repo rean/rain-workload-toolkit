@@ -69,19 +69,19 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 //import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
 
 // SSL 
+import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.impl.client.DefaultHttpClient;
 
 /**
  * The HttpTransport class is used to issue various HTTP requests.
@@ -416,11 +416,12 @@ public class HttpTransport
 	        
 	        // Initialize our SSLContext with the custom do-nothing trust manager
 	        ctx.init( null, new TrustManager[]{tm}, null );
-	        SSLSocketFactory ssf = new SSLSocketFactory( ctx );
-	        ssf.setHostnameVerifier( SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER );
+	        SSLSocketFactory ssf = new SSLSocketFactory( ctx, SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER );	        
+	        //ssf.setHostnameVerifier( SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER ); [deprecated]
 	        ClientConnectionManager ccm = base.getConnectionManager();
 	        SchemeRegistry sr = ccm.getSchemeRegistry();
-	        sr.register( new Scheme( "https", ssf, 443 ) );
+	        sr.register( new Scheme( "https", 443, ssf ) );
+	        //sr.register( new Scheme( "https", ssf, 443 ) ); [deprecated]
 	        return new DefaultHttpClient( ccm, base.getParams() );
 	    } 
 	    catch (Exception ex) 
@@ -649,7 +650,8 @@ public class HttpTransport
 				// At this point, we will either execute the redirect or throw
 				// an exception. Regardless, we need to consume this entity.
 				start = System.currentTimeMillis();
-				entity.consumeContent();
+				//entity.consumeContent();
+				EntityUtils.consume( entity );
 				end = System.currentTimeMillis();
 				if( this._debug )
 					System.out.println( "HttpClient request consume content: " + httpRequest.getRequestLine() + " (" +  (end - start)/1000.0 + ")" );
@@ -702,7 +704,8 @@ public class HttpTransport
 		}
 		finally
 		{
-			entity.consumeContent();
+			//entity.consumeContent();
+			EntityUtils.consume( entity );
 		}
 		
 		return this._responseBuffer;

@@ -349,7 +349,7 @@ public class Scoreboard implements Runnable, IScoreboard
 		{
 			result.setTraceLabel( Scoreboard.RAMP_UP_LABEL );
 		}
-		if ( this.isSteadyState( result.getTimeFinished() ) ) // Finished in steady state
+		else if ( this.isSteadyState( result.getTimeFinished() ) ) // Finished in steady state
 		{
 			result.setTraceLabel( Scoreboard.STEADY_STATE_TRACE_LABEL );
 			isSteadyState = true;
@@ -714,6 +714,7 @@ public class Scoreboard implements Runnable, IScoreboard
 		}
 	}
 	
+	@SuppressWarnings("unused")
 	private void printOperationStatistics( PrintStream out, boolean purgePercentileData )
 	{
 		long totalOperations = this.finalCard._totalOpsSuccessful + this.finalCard._totalOpsFailed;
@@ -1113,7 +1114,7 @@ public class Scoreboard implements Runnable, IScoreboard
 		private long _lastTotalResponseTime = -1;
 		private long _lastTotalOpsSuccessful = -1;
 		private long _lastTotalActionsSuccessful = -1;
-		private File _statsLog;
+		//private File _statsLog;
 		
 		public boolean getDone() { return this._done; }
 		public void setDone( boolean val ) { this._done = val; }
@@ -1130,6 +1131,7 @@ public class Scoreboard implements Runnable, IScoreboard
 			return "[SNAPSHOTWRITER TRACK: " + this._owner._trackName + "]";
 		}
 		
+		@SuppressWarnings("unused")
 		private void pushStatsToMetricDB() throws SQLException
 		{
 			long metricTime = System.currentTimeMillis();

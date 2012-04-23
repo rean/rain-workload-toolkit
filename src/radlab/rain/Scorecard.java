@@ -122,6 +122,7 @@ public class Scorecard
 		
 	}
 	
+	@SuppressWarnings("unused")
 	private void printOperationStatistics( PrintStream out, boolean purgePercentileData )
 	{
 		long totalOperations = this._totalOpsSuccessful + this._totalOpsFailed;
