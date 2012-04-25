@@ -43,6 +43,8 @@
 		"meanCycleTime": 0,
 		"meanThinkTime": 0,
 		"interactive": true,
-		"meanResponseTimeSamplingInterval" : 100
+		"meanResponseTimeSamplingInterval" : 100,
+		"metricSnapshots" : true,
+        "metricSnapshotsFileSuffix": "mongodb-metrics"
 	}
 }

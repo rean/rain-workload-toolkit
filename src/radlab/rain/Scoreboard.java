@@ -1197,14 +1197,20 @@ public class Scoreboard implements Runnable, IScoreboard
 		}
 		
 		public void run()
-		{			
+		{	
+			StringBuffer buf = new StringBuffer();
+			buf.append( "metrics-snapshots-" ).append( this._owner._trackName ).append( "-" ).append( this._owner._owner._metricSnapshotFileSuffix ).append( ".log" );
+			String metricSnapshotFileName = buf.toString();
+			
 			PrintStream out = null;
 			try
 			{
-				out = new PrintStream( new File( "metrics-snapshots-" + this._owner._trackName + ".log" ) );
+				out = new PrintStream( new File( metricSnapshotFileName ) );
 			}
 			catch( Exception e )
-			{}
+			{
+				System.out.println( this + " Unable to create metric snapshots file: " + metricSnapshotFileName );
+			}
 			
 			// Do the queue swap and then write until there's nothing left to write
 			while( !this._done || this._owner._responseTimeQ.size() > 0 )

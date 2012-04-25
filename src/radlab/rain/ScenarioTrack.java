@@ -65,6 +65,7 @@ public abstract class ScenarioTrack
 	public static String CFG_TARGET_KEY	                        = "target";
 	public static String CFG_METRIC_SNAPSHOT_INTERVAL       	= "metricSnapshotInterval";
 	public static String CFG_METRIC_SNAPSHOTS					= "metricSnapshots";
+	public static String CFG_METRIC_SNAPSHOT_FILE_SUFFIX		= "metricSnapshotsFileSuffix";
 	public static String CFG_METRIC_DB							= "metricDB";
 	// Targets keys: hostname, port
 	public static String CFG_TARGET_HOSTNAME_KEY                = "hostname";
@@ -114,6 +115,7 @@ public abstract class ScenarioTrack
 	protected double _logSamplingProbability                    = 1.0; // Log every executed request seen by the Scoreboard
 	protected double _metricSnapshotInterval                    = 60.0; // (seconds)
 	protected boolean _useMetricSnapshots						= false;
+	protected String _metricSnapshotFileSuffix					= "";
 	protected ObjectPool _objPool                               = null;
 	protected long _meanResponseTimeSamplingInterval            = DEFAULT_MEAN_RESPONSE_TIME_SAMPLE_INTERVAL;
 	protected int _maxUsersFromConfig							= 0;
@@ -318,6 +320,8 @@ public abstract class ScenarioTrack
 		}
 		if( config.has( ScenarioTrack.CFG_METRIC_SNAPSHOTS ) )
 			this._useMetricSnapshots = config.getBoolean( ScenarioTrack.CFG_METRIC_SNAPSHOTS );	
+		if( config.has( ScenarioTrack.CFG_METRIC_SNAPSHOT_FILE_SUFFIX ) )
+			this._metricSnapshotFileSuffix = config.getString( ScenarioTrack.CFG_METRIC_SNAPSHOT_FILE_SUFFIX );
 		// 11 Initialize the object pool - by default it remains empty unless one of the concrete operations
 		// uses it.
 		if( config.has( ScenarioTrack.CFG_OBJECT_POOL_MAX_SIZE ) )
