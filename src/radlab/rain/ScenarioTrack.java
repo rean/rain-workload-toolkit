@@ -40,6 +40,9 @@ import org.json.JSONObject;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import radlab.rain.util.MetricWriter;
+import radlab.rain.util.MetricWriterFactory;
+
 /**
  * The ScenarioTrack abstract class represents a single workload among
  * potentially many that are simultaneously run under a single
@@ -66,6 +69,7 @@ public abstract class ScenarioTrack
 	public static String CFG_METRIC_SNAPSHOT_INTERVAL       	= "metricSnapshotInterval";
 	public static String CFG_METRIC_SNAPSHOTS					= "metricSnapshots";
 	public static String CFG_METRIC_SNAPSHOT_FILE_SUFFIX		= "metricSnapshotsFileSuffix";
+	public static String CFG_METRIC_SNAPSHOT_CONFIG				= "metricSnapshotConfig";
 	public static String CFG_METRIC_DB							= "metricDB";
 	// Targets keys: hostname, port
 	public static String CFG_TARGET_HOSTNAME_KEY                = "hostname";
@@ -115,6 +119,7 @@ public abstract class ScenarioTrack
 	protected double _logSamplingProbability                    = 1.0; // Log every executed request seen by the Scoreboard
 	protected double _metricSnapshotInterval                    = 60.0; // (seconds)
 	protected boolean _useMetricSnapshots						= false;
+	protected MetricWriter _metricWriter						= null;
 	protected String _metricSnapshotFileSuffix					= "";
 	protected ObjectPool _objPool                               = null;
 	protected long _meanResponseTimeSamplingInterval            = DEFAULT_MEAN_RESPONSE_TIME_SAMPLE_INTERVAL;
@@ -209,6 +214,9 @@ public abstract class ScenarioTrack
 	
 	public double getMetricSnapshotInterval() { return this._metricSnapshotInterval; }
 	public void setMetricSnapshotInterval( double val ) { this._metricSnapshotInterval = val; }
+	
+	public MetricWriter getMetricWriter() { return this._metricWriter; }
+	public void setMetricWriter( MetricWriter val ) { this._metricWriter = val; }
 	
 	/**
 	 * Initializes a ScenarioTrack by reading the configurations set in the
@@ -318,10 +326,35 @@ public abstract class ScenarioTrack
 		{
 			this._metricSnapshotInterval = config.getDouble( ScenarioTrack.CFG_METRIC_SNAPSHOT_INTERVAL );
 		}
-		if( config.has( ScenarioTrack.CFG_METRIC_SNAPSHOTS ) )
-			this._useMetricSnapshots = config.getBoolean( ScenarioTrack.CFG_METRIC_SNAPSHOTS );	
+		
 		if( config.has( ScenarioTrack.CFG_METRIC_SNAPSHOT_FILE_SUFFIX ) )
 			this._metricSnapshotFileSuffix = config.getString( ScenarioTrack.CFG_METRIC_SNAPSHOT_FILE_SUFFIX );
+				
+		if( config.has( ScenarioTrack.CFG_METRIC_SNAPSHOTS ) )
+		{
+			this._useMetricSnapshots = config.getBoolean( ScenarioTrack.CFG_METRIC_SNAPSHOTS );
+			if( this._useMetricSnapshots )
+			{
+				// Extract the metricwriter config, create an instance and pass it to the scoreboard
+				if( config.has( ScenarioTrack.CFG_METRIC_SNAPSHOT_CONFIG ) )
+				{
+					JSONObject metricWriterConfig = config.getJSONObject( ScenarioTrack.CFG_METRIC_SNAPSHOT_CONFIG );
+					this._metricWriter = MetricWriterFactory.createMetricWriter( metricWriterConfig.getString( MetricWriter.CFG_TYPE_KEY ), metricWriterConfig );
+				}
+				else
+				{
+					// Default to file writer
+					StringBuffer buf = new StringBuffer();
+					buf.append( "metrics-snapshots-" ).append( this._name ).append( "-" ).append( this._metricSnapshotFileSuffix ).append( ".log" );
+					String metricSnapshotFileName = buf.toString();
+					
+					JSONObject metricWriterConfig = new JSONObject();
+					metricWriterConfig.put( MetricWriter.CFG_TYPE_KEY, MetricWriterFactory.FILE_WRITER_TYPE );
+					metricWriterConfig.put( MetricWriter.CFG_FILENAME_KEY, metricSnapshotFileName );
+					this._metricWriter = MetricWriterFactory.createMetricWriter( metricWriterConfig.getString( MetricWriter.CFG_TYPE_KEY ), metricWriterConfig );
+				}
+			}
+		}
 		// 11 Initialize the object pool - by default it remains empty unless one of the concrete operations
 		// uses it.
 		if( config.has( ScenarioTrack.CFG_OBJECT_POOL_MAX_SIZE ) )

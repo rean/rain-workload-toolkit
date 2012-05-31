@@ -34,6 +34,8 @@ package radlab.rain;
 import java.io.FileWriter;
 import java.io.PrintStream;
 
+import radlab.rain.util.MetricWriter;
+
 /**
  * The IScoreboard interface allows an implemented scoreboard to interface
  * with the benchmark architecture.<br />
@@ -153,4 +155,8 @@ public interface IScoreboard
 	void setTargetHost( String val );
 	
 	Scorecard getFinalScorecard();
+	
+	MetricWriter getMetricWriter();
+	void setMetricWriter( MetricWriter val );
+	
 }

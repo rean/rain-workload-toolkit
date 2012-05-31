@@ -38,13 +38,14 @@ import java.util.TreeMap;
 import java.util.Iterator;
 //import java.util.Enumeration;
 import java.util.Random;
-import java.io.File;
 import java.io.PrintStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.Thread.State;
 import java.text.NumberFormat;
 import java.text.DecimalFormat;
+
+import radlab.rain.util.MetricWriter;
 import radlab.rain.util.PoissonSamplingStrategy;
 
 import java.sql.Connection;
@@ -92,6 +93,7 @@ public class Scoreboard implements Runnable, IScoreboard
 	private long _maxDropOffWaitTime 	= 0;
 	private long _totalDropoffs 		= 0;
 	private boolean _usingMetricSnapshots = false;
+	private MetricWriter _metricWriter	= null;
 	
 	// Scorecards - per-interval scorecards plus the final scorecard
 	private TreeMap<String,Scorecard> _intervalScorecards = new TreeMap<String,Scorecard>();
@@ -186,6 +188,9 @@ public class Scoreboard implements Runnable, IScoreboard
 	
 	public boolean getUsingMetricSnapshots() { return this._usingMetricSnapshots; }
 	public void setUsingMetricSnapshots( boolean val ) { this._usingMetricSnapshots = val; }
+	
+	public MetricWriter getMetricWriter() { return this._metricWriter; }
+	public void setMetricWriter( MetricWriter val ) { this._metricWriter = val; }
 	
 	public String getTargetHost() { return this._trackTargetHost; }
 	public void setTargetHost( String val ) { this._trackTargetHost = val; }
@@ -619,8 +624,8 @@ public class Scoreboard implements Runnable, IScoreboard
 			out.println( this + " Little's Law Estimate (ops/sec)    : " + this._formatter.format( littlesEstimate ) );
 			out.println( this + " Variation from Little's Law (%)    : " + this._formatter.format( littlesDelta ) );
 		}
-		else
-			out.println( this + " Little's Law Estimate (ops/sec)    : 0" );
+		else out.println( this + " Little's Law Estimate (ops/sec)    : 0" );
+		
 		out.println( this + " Effective load (requests/sec)      : " + this._formatter.format( effectiveLoadRequests ) );
 		out.println( this + " Operations initiated               : " + this.finalCard._totalOpsInitiated );
 		out.println( this + " Operations successfully completed  : " + this.finalCard._totalOpsSuccessful );
@@ -799,6 +804,13 @@ public class Scoreboard implements Runnable, IScoreboard
 			if( this._usingMetricSnapshots )
 			{
 				this._snapshotThread = new SnapshotWriterThread( this );
+				if( this._metricWriter == null )
+					System.out.println( this + " Metric snapshots disabled - No metric writer instance provided" );
+				else 
+				{
+					System.out.println( this + " Metric snapshots enabled - " + this._metricWriter.getDetails() );
+					this._snapshotThread.setMetricWriter( this._metricWriter );
+				}
 				this._snapshotThread.setName( "Scoreboard-Snapshot-Writer" );
 				this._snapshotThread.start();
 			}
@@ -1106,6 +1118,8 @@ public class Scoreboard implements Runnable, IScoreboard
 		// Owning scoreboard
 		private Scoreboard _owner = null;
 		private boolean _done = false;
+		private MetricWriter _metricWriter = null;
+				
 		private boolean _jdbcDriverLoaded = false;
 		// Use JDBC to talk to the db
 		private Connection _conn = null;
@@ -1118,7 +1132,9 @@ public class Scoreboard implements Runnable, IScoreboard
 		
 		public boolean getDone() { return this._done; }
 		public void setDone( boolean val ) { this._done = val; }
-		
+		public MetricWriter getMetricWriter() { return this._metricWriter; }
+		public void setMetricWriter( MetricWriter val ) { this._metricWriter = val; }
+				
 		private LinkedList<ResponseTimeStat> _todoQ = new LinkedList<ResponseTimeStat>();
 		
 		public SnapshotWriterThread( Scoreboard owner )
@@ -1198,20 +1214,6 @@ public class Scoreboard implements Runnable, IScoreboard
 		
 		public void run()
 		{	
-			StringBuffer buf = new StringBuffer();
-			buf.append( "metrics-snapshots-" ).append( this._owner._trackName ).append( "-" ).append( this._owner._owner._metricSnapshotFileSuffix ).append( ".log" );
-			String metricSnapshotFileName = buf.toString();
-			
-			PrintStream out = null;
-			try
-			{
-				out = new PrintStream( new File( metricSnapshotFileName ) );
-			}
-			catch( Exception e )
-			{
-				System.out.println( this + " Unable to create metric snapshots file: " + metricSnapshotFileName );
-			}
-			
 			// Do the queue swap and then write until there's nothing left to write
 			while( !this._done || this._owner._responseTimeQ.size() > 0 )
 			{
@@ -1237,7 +1239,8 @@ public class Scoreboard implements Runnable, IScoreboard
 						
 						try
 						{
-							out.println( stat );
+							if( this._metricWriter != null )
+								this._metricWriter.write( stat );
 						}
 						catch( Exception e )
 						{}
@@ -1262,12 +1265,11 @@ public class Scoreboard implements Runnable, IScoreboard
 					{ 
 						System.out.println( this + " snapshot thread interrupted." );
 						// Close the log file if we're interrupted
-						if( out != null )
+						if( this._metricWriter != null )
 						{
 							try
 							{
-								out.flush();
-								out.close();
+								this._metricWriter.close();
 							}
 							catch( Exception e )
 							{}
@@ -1277,12 +1279,11 @@ public class Scoreboard implements Runnable, IScoreboard
 			}// end-while there's work to do
 			
 			// Close nicely if we're not interrupted
-			if( out != null )
+			if( this._metricWriter != null )
 			{
 				try
 				{
-					out.flush();
-					out.close();
+					this._metricWriter.close();
 				}
 				catch( Exception e )
 				{}

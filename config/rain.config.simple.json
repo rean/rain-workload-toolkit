@@ -1,0 +1,9 @@
+{
+    "profiles": "config/profiles.config.simple.json",
+    "timing": {
+        "rampUp": 10,
+        "duration": 100,
+        "rampDown": 10
+    },
+    "aggregateStats":true
+}

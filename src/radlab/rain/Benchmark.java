@@ -112,11 +112,12 @@ public class Benchmark
 		{
 			// Start the scoreboard. It needs to know the timings because we only
 			// want to retain metrics generated during the steady state interval.
-			IScoreboard scoreboard = track.createScoreboard( null ); 
+			IScoreboard scoreboard = track.createScoreboard( null );
 			if( scoreboard != null )
 			{
 				scoreboard.initialize( startSteadyState, endSteadyState );
 				scoreboard.setMetricSnapshotInterval( (long) (track.getMetricSnapshotInterval() * 1000) );
+				scoreboard.setMetricWriter( track.getMetricWriter() );
 				scoreboard.start();
 			}
 			track.setScoreboard(scoreboard);
