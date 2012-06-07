@@ -1,7 +1,10 @@
 package radlab.rain;
 
-public class ResponseTimeStat extends Poolable 
+import java.io.Serializable;
+
+public class ResponseTimeStat extends Poolable implements Serializable 
 {
+	private static final long serialVersionUID = 1L;
 	public static final String NAME = "ResponseTimeStat";
 	
 	public long _timestamp = -1;

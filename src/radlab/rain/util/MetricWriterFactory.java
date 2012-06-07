@@ -5,7 +5,8 @@ import org.json.JSONObject;
 public class MetricWriterFactory 
 {
 	public final static String FILE_WRITER_TYPE = "file";
-	public final static String SOCKET_WRITER_TYPE = "socket"; 
+	public final static String SOCKET_WRITER_TYPE = "socket";
+	public final static String SOCKET_OBJECT_WRITER_TYPE = "socketObj";
 	//public final static String DATABASE_WRITER_TYPE = "database";
 	
 	private MetricWriterFactory()
@@ -17,6 +18,8 @@ public class MetricWriterFactory
 			return new FileMetricWriter( config );
 		else if( writerType.equalsIgnoreCase( SOCKET_WRITER_TYPE ) )
 			return new SocketMetricWriter( config );
+		else if( writerType.equalsIgnoreCase( SOCKET_OBJECT_WRITER_TYPE ) )
+			return new SocketMetricObjectWriter( config );
 		else return null;
 	}
 }

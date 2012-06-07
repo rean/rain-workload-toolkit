@@ -9,8 +9,8 @@ import radlab.rain.ResponseTimeStat;
 
 public class SocketMetricWriter extends MetricWriter 
 {
-	private String _ipAddress = "";
-	private int _port = -1;
+	protected String _ipAddress = "";
+	protected int _port = -1;
 	private PrintStream _out = null;
 	
 	public SocketMetricWriter(JSONObject config) throws Exception 

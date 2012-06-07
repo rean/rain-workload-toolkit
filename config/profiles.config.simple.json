@@ -34,7 +34,7 @@
         "metricSnapshotInterval" : 60,
         "objectPoolMaxSize" : 50000,
         "metricSnapshots" : true,
-        "metricSnapshotConfig" : { "type" : "socket", "ipaddress": "127.0.0.1", "port": 10001 }, 
+        "metricSnapshotConfig" : { "type" : "socketObj", "ipaddress": "127.0.0.1", "port": 10001 }, 
         "metricSnapshotConfig1" : { "type" : "file", "filename": "metric-snapshots-mongo-001.log" },
         "meanResponseTimeSamplingInterval" : 1000
     }
