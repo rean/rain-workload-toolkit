@@ -38,4 +38,12 @@ public class SocketMetricObjectWriter extends SocketMetricWriter
 			this._out.close();
 		}
 	}
+	
+	@Override
+	public String getDetails() 
+	{
+		StringBuffer buf = new StringBuffer();
+		buf.append( "SOCKET [object writer]" ).append( this._ipAddress ).append( ":" ).append( this._port );
+		return buf.toString();
+	}
 }

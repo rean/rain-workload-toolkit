@@ -47,7 +47,7 @@ public class SocketMetricWriter extends MetricWriter
 	public String getDetails() 
 	{
 		StringBuffer buf = new StringBuffer();
-		buf.append( "SOCKET " ).append( this._ipAddress ).append( ":" ).append( this._port );
+		buf.append( "SOCKET [string writer]" ).append( this._ipAddress ).append( ":" ).append( this._port );
 		return buf.toString();
 	}
 }
