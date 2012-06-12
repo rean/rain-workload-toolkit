@@ -25,6 +25,7 @@ public class SocketMetricObjectWriter extends SocketMetricWriter
 		}
 		
 		this._out.writeObject( stat );
+		this._out.reset();
 		
 		return true;
 	}
