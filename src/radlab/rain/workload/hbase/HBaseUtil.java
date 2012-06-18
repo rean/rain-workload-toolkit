@@ -46,7 +46,7 @@ public class HBaseUtil
 		
 		HBaseTransport adminClient = new HBaseTransport( host, port );
 		// Before we start the load, delete the table and then re-create it
-		//adminClient.deleteTable( tableName );
+		adminClient.deleteTable( tableName );
 		adminClient.initialize( tableName, columnFamilyName, true );
 		
 		ArrayList<HBaseLoaderThread> threads = new ArrayList<HBaseLoaderThread>();
