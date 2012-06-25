@@ -42,12 +42,11 @@ public class HBaseTransport
 		this._config.set( "hbase.master", buf.toString() );
 		// Make these configurable
 		// Assume zookeeper is running on the same host as the master
-		this._config.set( "hbase.zookeeper.quorum", server );
+		//this._config.set( "hbase.zookeeper.quorum", server );
 		// Set the hbase root dir (is this really necessary?)
-		this._config.set( "hbase.rootdir", "file:////hbase" );
-		this._config.setBoolean( "hbase.cluster.distributed", false );
-		this._config.setInt( "hbase.zookeeper.property.clientPort", 2181 );
-		
+		//this._config.set( "hbase.rootdir", "file:////hbase" );
+		//this._config.setBoolean( "hbase.cluster.distributed", false );
+		//this._config.setInt( "hbase.zookeeper.property.clientPort", 2181 );
 	}
 	
 	public synchronized void initialize( String tableName, String columnFamilyName, boolean createTable ) throws IOException
@@ -81,7 +80,7 @@ public class HBaseTransport
 		catch( TableExistsException te )
 		{ 
 			/* If the table exists then no harm, no foul */ 
-			System.out.println( "Table exists: " + tableName );
+			//System.out.println( "Table exists: " + tableName );
 		}
 	}
 	

@@ -4,6 +4,8 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
+import org.apache.hadoop.hbase.TableNotFoundException;
+
 public class HBaseUtil 
 {
 	public static void main( String[] args ) throws Exception
@@ -46,7 +48,15 @@ public class HBaseUtil
 		
 		HBaseTransport adminClient = new HBaseTransport( host, port );
 		// Before we start the load, delete the table and then re-create it
-		adminClient.deleteTable( tableName );
+		try
+		{
+			adminClient.deleteTable( tableName );
+		}
+		catch( TableNotFoundException e )
+		{
+			// Table may not exists
+		}
+		
 		adminClient.initialize( tableName, columnFamilyName, true );
 		
 		ArrayList<HBaseLoaderThread> threads = new ArrayList<HBaseLoaderThread>();
