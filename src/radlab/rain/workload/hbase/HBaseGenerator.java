@@ -23,6 +23,10 @@ public class HBaseGenerator extends Generator
 	public static String CFG_RNG_SEED_KEY	 		= "rngSeed";
 	public static String CFG_TABLE_NAME_KEY	 		= "tableName";
 	public static String CFG_COLUMN_FAMILY_NAME_KEY	= "columnFamily";
+	public static String CFG_WRITE_BUFFER_MB_KEY	= "writeBufferMB";
+	public static String CFG_ZOOKEEPER_PORT_KEY		= "zooKeeperPort";
+	public static String CFG_TIMEOUT_KEY			= "timeout";
+	public static String CFG_AUTO_FLUSH_KEY			= "autoFlush";
 	
 	//public static String CFG_WRITE_SEQUENTIAL_BLOCK = "writeSequentialBlock";
 	
@@ -33,13 +37,14 @@ public class HBaseGenerator extends Generator
 	public static int WRITE 				= HBaseLoadProfile.WRITE;
 	public static int SCAN					= HBaseLoadProfile.SCAN;
 	public static int DEFAULT_OBJECT_SIZE	= 4096;
-	
-	
+	public static int DEFAULT_WRITE_BUFFER_MB = 2; // 2MB write buffer per thread by default 
+		
 	@SuppressWarnings("unused")
 	private HBaseRequest<String> _lastRequest 	= null;
 	private HBaseTransport _hbaseClient 		= null;
 	private boolean _usePooling					= true;
 	private boolean _debug 						= false;
+	private int _writeBufferMB					= DEFAULT_WRITE_BUFFER_MB;
 	// Fixed work per thread/generator debugging
 	//private boolean _writeSequentialBlock		= false;
 	//private boolean _done 						= false; // for block writes
@@ -82,7 +87,7 @@ public class HBaseGenerator extends Generator
 		
 		// Look for a random number seed
 		if( config.has( CFG_RNG_SEED_KEY ) )
-			this._random = new Random( config.getLong(CFG_RNG_SEED_KEY) );
+			this._random = new Random( config.getLong( CFG_RNG_SEED_KEY ) );
 		else this._random = new Random();
 	
 		if( config.has( CFG_TABLE_NAME_KEY ) )
@@ -91,14 +96,42 @@ public class HBaseGenerator extends Generator
 		if( config.has( CFG_COLUMN_FAMILY_NAME_KEY ) )
 			this._columnFamilyName = config.getString( CFG_COLUMN_FAMILY_NAME_KEY );
 		
+		// Set the per-thread write buffer size. If this value is large AND there are a large number of load generation threads
+		// the size of the heap may need to be increased accordingly. Think of write buffers as memory leaks - accumulating byte arrays
+		// until the buffer is full enough to trigger a flush to HBase. A workload of 100 threads, each with a 
+		// 2MB write buffer = 200 MB "sitting idle" and will require a heap size that accommodates this extra 200 MB it 
+		// above the typical memory usage for the driver/workload.		
+		if( config.has( CFG_WRITE_BUFFER_MB_KEY ) )
+			this._writeBufferMB = config.getInt( CFG_WRITE_BUFFER_MB_KEY );
+		
+		// Check that we got a valid writebuffer value.
+		if( this._writeBufferMB <= 0 )
+			this._writeBufferMB = HBaseGenerator.DEFAULT_WRITE_BUFFER_MB;
+		
+		int zooKeeperPort = HBaseTransport.DEFAULT_ZOOKEEPER_PORT;
+		if( config.has( CFG_ZOOKEEPER_PORT_KEY ) )
+			zooKeeperPort = config.getInt( CFG_ZOOKEEPER_PORT_KEY );
+		
+		int timeout = HBaseTransport.DEFAULT_TIMEOUT;
+		boolean autoFlush = HBaseTransport.DEFAULT_AUTO_FLUSH;
+		
+		if( config.has( CFG_TIMEOUT_KEY ) )
+			timeout = config.getInt( CFG_TIMEOUT_KEY );
+		
+		if( config.has( CFG_AUTO_FLUSH_KEY ) )
+			autoFlush = config.getBoolean( CFG_AUTO_FLUSH_KEY );
+		
 		//if( config.has( CFG_WRITE_SEQUENTIAL_BLOCK ) )
 		//	this._writeSequentialBlock = config.getBoolean( CFG_WRITE_SEQUENTIAL_BLOCK );
 		
 		try
 		{
-			this._hbaseClient = new HBaseTransport( this._loadTrack.getTargetHostName(), this._loadTrack.getTargetHostPort() );
+			this._hbaseClient = new HBaseTransport( this._loadTrack.getTargetHostName(), this._loadTrack.getTargetHostPort(), zooKeeperPort );
+			// Set the autoflush and timeout values
+			this._hbaseClient.setAutoFlush( autoFlush );
+			this._hbaseClient.setTimeout( timeout );
 			// Initialize the hbase transport, creating the table if it does not exist
-			this._hbaseClient.initialize( this._tableName, this._columnFamilyName, true );
+			this._hbaseClient.initialize( this._tableName, this._columnFamilyName, true, this._writeBufferMB );
 		}
 		catch( IOException ioe )
 		{

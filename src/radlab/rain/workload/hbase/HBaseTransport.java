@@ -16,7 +16,7 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
-import org.apache.hadoop.hbase.util.Bytes;
+//import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.HTableDescriptor;
 
@@ -24,32 +24,45 @@ import org.apache.hadoop.hbase.HTableDescriptor;
 public class HBaseTransport 
 {
 	public static int DEFAULT_HBASE_PORT = 60000;
+	public static int DEFAULT_ZOOKEEPER_PORT = 2181;
+	public static int DEFAULT_TIMEOUT = 10000;
+	public static boolean DEFAULT_AUTO_FLUSH = false;
 	
 	private String _server = "";
 	private int _port = DEFAULT_HBASE_PORT;
+	private int _zooKeeperPort = DEFAULT_ZOOKEEPER_PORT;
 	private boolean _initialized = false;
 	private Configuration _config = null;
 	private HTable _table = null;
+	private int _timeout = DEFAULT_TIMEOUT;
+	private boolean _autoFlush = DEFAULT_AUTO_FLUSH;
 	
-	public HBaseTransport( String server, int port )
+	public HBaseTransport( String server, int port, int zooKeeperPort )
 	{
 		this._server = server;
 		this._port = port;
+		this._zooKeeperPort = zooKeeperPort;
 		this._config = HBaseConfiguration.create();
 		StringBuffer buf = new StringBuffer();
 		buf.append( this._server ).append( ":" ).append( this._port );
 		// Configuring the transport to contact a specific hbase node/region server
 		this._config.set( "hbase.master", buf.toString() );
-		// Make these configurable
-		// Assume zookeeper is running on the same host as the master
-		//this._config.set( "hbase.zookeeper.quorum", server );
-		// Set the hbase root dir (is this really necessary?)
-		//this._config.set( "hbase.rootdir", "file:////hbase" );
-		//this._config.setBoolean( "hbase.cluster.distributed", false );
-		//this._config.setInt( "hbase.zookeeper.property.clientPort", 2181 );
+		this._config.set( "hbase.zookeeper.quorum", server );
+		this._config.setInt( "hbase.zookeeper.property.clientPort", this._zooKeeperPort );
 	}
 	
-	public synchronized void initialize( String tableName, String columnFamilyName, boolean createTable ) throws IOException
+	public String getServer() { return this._server; }
+	public int getPort() { return this._port; }
+	public int getZooKeeperPort() { return this._zooKeeperPort; }
+	
+	// A user can set the timeout before calling initialize
+	public int getTimeout() { return this._timeout; }
+	public void setTimeout( int val ) { this._timeout = val; }
+	
+	public boolean getAutoFlush() { return this._autoFlush; }
+	public void setAutoFlush( boolean val ) { this._autoFlush = val; }
+	
+	public synchronized void initialize( String tableName, String columnFamilyName, boolean createTable, int maxWriteBufferMB ) throws IOException
 	{
 		if( createTable )
 			this.createTable( tableName, columnFamilyName );
@@ -59,9 +72,11 @@ public class HBaseTransport
 			// Create the HTable instance here and do some optimizations for writes (disabling auto-flushing and setting the write buffer size)
 			// see (http://hbase.apache.org/book/perf.writing.html)
 			this._table = new HTable( this._config, tableName );
-			this._table.setAutoFlush( false );
-			this._table.setWriteBufferSize( 12*1024*1024 );
-		
+			this._table.setAutoFlush( this._autoFlush );
+			// Specify the size of the write buffer (this delays sending a write RPC to HBase until we have a full buffer)
+			this._table.setWriteBufferSize( maxWriteBufferMB * 1024 * 1024 );
+			this._table.setOperationTimeout( this._timeout ); // Set the operation timeout to 10 seconds (check units, neither the docs nor the code specify the units)
+			
 			this._initialized = true;
 		}
 	}
@@ -110,9 +125,9 @@ public class HBaseTransport
 	public byte[] get( String columnFamilyName, String key ) throws IOException
 	{
 		String qualifier = "";
-		Get get = new Get( Bytes.toBytes( key ) );
+		Get get = new Get( key.getBytes() );
 	    Result result = this._table.get( get );
-	    byte [] savedValue = result.getValue( Bytes.toBytes( columnFamilyName ), Bytes.toBytes(  qualifier  ) );
+	    byte [] savedValue = result.getValue( columnFamilyName.getBytes(), qualifier.getBytes() );
 	    return savedValue;
 	}
 	
@@ -120,9 +135,36 @@ public class HBaseTransport
 	{
 		String qualifier = "";
 		// Do write
-		Put put = new Put( Bytes.toBytes( key ) );
-		put.add( Bytes.toBytes( columnFamilyName ), Bytes.toBytes( qualifier ), value );
-		this._table.put( put );
+		Put put = new Put( key.getBytes() );
+		put.add( columnFamilyName.getBytes(), qualifier.getBytes(), value );
+		// Check the heapsize
+		// System.out.println( put.heapSize() );
+		// Create a list of puts. Under the covers a single put gets converted into a list anyway
+		ArrayList<Put> puts = new ArrayList<Put>();
+		puts.add( put );
+		this._table.put( puts );
+		puts.clear();
+	}
+	
+	// We can use this to do put-range (sorted keys) or multi-put writes (unsorted keys)
+	public void putMany( String columnFamilyName, String[] keys, byte[][] values ) throws IOException
+	{
+		String qualifier = "";
+		ArrayList<Put> puts = new ArrayList<Put>();
+		
+		// Collect all of the data to be written and create the list of puts
+		for( int i = 0; i < keys.length; i++ )
+		{
+			String key = keys[i];
+			// Do write
+			Put put = new Put( key.getBytes() );
+			put.add( columnFamilyName.getBytes(), qualifier.getBytes(), values[i] );
+			// Create a list of puts. Under the covers a single put gets converted into a list anyway	
+			puts.add( put );
+		}
+		
+		this._table.put( puts );
+		puts.clear();
 	}
 	
 	public ArrayList<byte[]> scan( String startKey, String columnFamilyName, int maxRows ) throws IOException
@@ -131,17 +173,16 @@ public class HBaseTransport
 		String qualifier = "";
 		
 		// Do scan
-		Scan scan = new Scan( Bytes.toBytes( startKey ) );
+		Scan scan = new Scan( startKey.getBytes() );
 	    // Try to cache the rows in the scan result (if maxRows is large this could be a problem)
 		scan.setCaching( maxRows );
-		scan.addColumn( Bytes.toBytes( columnFamilyName ), Bytes.toBytes( qualifier ) );
+		scan.addColumn( columnFamilyName.getBytes(), qualifier.getBytes() );
 	    ResultScanner scanner = this._table.getScanner( scan );
-	    
 	    
 	    int rowCount = 0;
 	    for( Result result : scanner )
 	    {
-	    	byte [] savedValue = result.getValue( Bytes.toBytes( columnFamilyName ), Bytes.toBytes(  qualifier  ) );
+	    	byte [] savedValue = result.getValue( columnFamilyName.getBytes(), qualifier.getBytes() );
 	    	results.add( savedValue );
 	    	
 	    	rowCount++;
@@ -231,9 +272,10 @@ public class HBaseTransport
 		
 		String tableName = "raintbl";
 		String columnFamilyName = "raincf";
-				
-		HBaseTransport client = new HBaseTransport( server, port );
-		client.initialize( tableName, columnFamilyName, true );
+		int writeBufferMB = 2;
+		
+		HBaseTransport client = new HBaseTransport( server, port, DEFAULT_ZOOKEEPER_PORT );
+		client.initialize( tableName, columnFamilyName, true, writeBufferMB );
 		
 		// Load 1000 rows, read a random subset of them, scan the table
 		int numRows = 1000;

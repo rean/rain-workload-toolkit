@@ -42,11 +42,11 @@ public class HBaseUtil
 	
 		// Do data loads in parallel, shoot for using 10 threads
 		int keyCount = (maxKey - minKey) + 1;
-		int loaderThreads = 1; //new Double( Math.ceil( (double) keyCount / (double) keyBlockSize ) ).intValue();
+		int loaderThreads = 10; //new Double( Math.ceil( (double) keyCount / (double) keyBlockSize ) ).intValue();
 		
 		int keyBlockSize = (int) Math.ceil( keyCount/loaderThreads );//10000;
 		
-		HBaseTransport adminClient = new HBaseTransport( host, port );
+		HBaseTransport adminClient = new HBaseTransport( host, port, HBaseTransport.DEFAULT_ZOOKEEPER_PORT );
 		// Before we start the load, delete the table and then re-create it
 		try
 		{
@@ -57,17 +57,17 @@ public class HBaseUtil
 			// Table may not exists
 		}
 		
-		adminClient.initialize( tableName, columnFamilyName, true );
+		int writeBufferMB = 2;
+		adminClient.initialize( tableName, columnFamilyName, true, writeBufferMB );
 		
 		ArrayList<HBaseLoaderThread> threads = new ArrayList<HBaseLoaderThread>();
 		for( int i = 0; i < loaderThreads; i++ )
 		{
-			HBaseTransport client = new HBaseTransport( host, port );
+			HBaseTransport client = new HBaseTransport( host, port, HBaseTransport.DEFAULT_ZOOKEEPER_PORT );
 			// Set the timeouts
-			//client.setConnectionTimeout( 60000 );
-			//client.setSocketIdleTimeout( 60000 );
+			client.setTimeout( 60000 );
 			// Explicitly initialize
-			client.initialize( tableName, columnFamilyName, false );
+			client.initialize( tableName, columnFamilyName, false, writeBufferMB );
 			int startKey = (i * keyBlockSize) + 1;
 			int endKey = (startKey + keyBlockSize) - 1;
 			System.out.println( "Start key: " + startKey + " end key: " + endKey );
