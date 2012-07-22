@@ -34,7 +34,7 @@ public class HBaseLoaderThread extends Thread
 		{
 			byte[] arrBytes = new byte[size];
 			random.nextBytes( arrBytes );
-			key = String.valueOf( i + minKey );
+			key = HBaseUtil.KEY_FORMATTER.format( i + minKey );
 			
 			try
 			{

@@ -90,7 +90,7 @@ public class MongoUtil
 			// Explicitly initialize
 			client.initialize();
 			int startKey = (i * keyBlockSize) + 1;
-			int endKey = (startKey + keyBlockSize) - 1;
+			int endKey = Math.min( (startKey + keyCount) -1 , (startKey + keyBlockSize) - 1 );//(startKey + keyBlockSize) - 1;
 			System.out.println( "Start key: " + startKey + " end key: " + endKey );
 			MongoLoaderThread thread = new MongoLoaderThread( dbName, dbCollection, startKey, endKey, size, client );
 			threads.add( thread );

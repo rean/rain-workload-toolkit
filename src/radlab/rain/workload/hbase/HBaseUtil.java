@@ -8,6 +8,8 @@ import org.apache.hadoop.hbase.TableNotFoundException;
 
 public class HBaseUtil 
 {
+	public static NumberFormat KEY_FORMATTER = new DecimalFormat( "000000000" );
+	
 	public static void main( String[] args ) throws Exception
 	{
 		int port = HBaseTransport.DEFAULT_HBASE_PORT;
@@ -16,7 +18,7 @@ public class HBaseUtil
 		String columnFamilyName = "raincf";
 		int minKey = 1;
 		int maxKey = 100000;
-		int size = 4096;
+		int size = 4096;//16384;//4096;
 		
 		// HBaseUtil <host> <port> <table> <column family> <min key> <max key> <size>
 		if( args.length == 7 )
@@ -69,8 +71,8 @@ public class HBaseUtil
 			// Explicitly initialize
 			client.initialize( tableName, columnFamilyName, false, writeBufferMB );
 			int startKey = (i * keyBlockSize) + 1;
-			int endKey = (startKey + keyBlockSize) - 1;
-			System.out.println( "Start key: " + startKey + " end key: " + endKey );
+			int endKey = Math.min( (startKey + keyCount) -1 , (startKey + keyBlockSize) - 1 );//(startKey + keyBlockSize) - 1;
+			System.out.println( "Start key: " + KEY_FORMATTER.format( startKey ) + " end key: " + KEY_FORMATTER.format( endKey ) );
 			HBaseLoaderThread thread = new HBaseLoaderThread( tableName, columnFamilyName, startKey, endKey, size, client );
 			threads.add( thread );
 		}

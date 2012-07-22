@@ -41,7 +41,7 @@ public class RedisUtil
 				
 		int minKey = 1;
 		int maxKey = 100000;
-		int size = 4096;
+		int size = 16384;//32768;//16384;//4096;
 		
 		// RiakUtil <host> <port> <min key> <max key>
 		if( args.length == 5 )
