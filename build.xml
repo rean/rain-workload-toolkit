@@ -41,6 +41,8 @@
     	<!--  HBase stuff  -->
     	<pathelement location="thirdparty/hbase-0.92.1/hbase-0.92.1.jar"/>
     	<fileset dir="thirdparty/hbase-0.92.1/lib/" includes="*.jar"/>
+    	<!-- Cassandra stuff -->
+    	<fileset dir="thirdparty/hector-core-1.0-1/" includes="*.jar"/>
     </path>
 	<path id="rain.classpath.with.mr">
         <pathelement location="bin"/>
@@ -79,6 +81,8 @@
 		<!--  HBase stuff  -->
     	<pathelement location="thirdparty/hbase-0.92.1/hbase-0.92.1.jar"/>
     	<pathelement location="thirdparty/hbase-0.92.1/lib/*.jar"/>
+    	<!-- Cassandra stuff -->
+    	<fileset dir="thirdparty/hector-core-1.0-1/" includes="*.jar"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>
@@ -242,11 +246,29 @@
 	</target>
 	<target depends="build" name="Benchmark-hbase">
 		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
-	    	<classpath refid="rain.classpath"/>
+	    	<classpath>
+	    	    <pathelement location="rain.jar"/>
+	    	    <pathelement location="workloads/hbase.jar"/>
+	    	    <pathelement location="thirdparty/hbase-0.92.1/hbase-0.92.1.jar"/>
+    			<fileset dir="thirdparty/hbase-0.92.1/lib/" includes="*.jar"/>
+	    	</classpath>
 	    	<jvmarg value="-Xmx1g" />
 	    	<jvmarg value="-Xms256m" />
 	    	<jvmarg value="-XX:+DisableExplicitGC"/>
 	        <arg file="config/rain.config.hbase.json"/>
+	    </java>
+	</target>
+	<target depends="build" name="Benchmark-cassandra">
+		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
+	    	<classpath>
+	    	    <pathelement location="rain.jar"/>
+	    	    <pathelement location="workloads/cassandra.jar"/>
+	    	    <fileset dir="thirdparty/hector-core-1.0-1/" includes="*.jar"/>
+	    	</classpath>
+	    	<jvmarg value="-Xmx1g" />
+	    	<jvmarg value="-Xms256m" />
+	    	<jvmarg value="-XX:+DisableExplicitGC"/>
+	        <arg file="config/rain.config.cassandra.json"/>
 	    </java>
 	</target>
     <target depends="build" name="package">
@@ -281,13 +303,6 @@
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/libs/commons-codec/commons-codec-1.3.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/libs/commons-httpclient/commons-httpclient-3.1.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/libs/commons-logging/commons-logging-1.1.1.jar"/>
-        	<!-- 
-        	 HBase stuff
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/hbase-0.92.1/hbase-0.92.1.jar"/>
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/hbase-0.92.1/lib/hadoop-core-1.0.0.jar"/>
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/hbase-0.92.1/lib/commons-configuration-1.6.jar"/>
-        	-->
-        		
         </jar>
     </target>
 	<target depends="build-with-mr" name="package-with-mr">
@@ -328,9 +343,6 @@
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/libs/commons-codec/commons-codec-1.3.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/libs/commons-httpclient/commons-httpclient-3.1.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/libs/commons-logging/commons-logging-1.1.1.jar"/>
-        	<!-- HBase stuff -->
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/hbase-0.92.1/hbase-0.92.1.jar"/>
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/hbase-0.92.1/lib/hadoop-core-1.0.0.jar"/>
         </jar>
     </target>
 	<target depends="build-with-mr" name="package-mapreduce">
@@ -450,6 +462,14 @@
             <fileset dir="bin" includes="radlab/rain/workload/hbase/**"/>
         	<!-- Bake the configuration files into the jar -->
         	<fileset dir="config" includes="*hbase*.json"/>
+        </jar>
+    </target>
+    <target depends="build" name="package-cassandra">
+        <mkdir dir="workloads"/>
+        <jar destfile="workloads/cassandra.jar" filesetmanifest="mergewithoutmain">
+            <fileset dir="bin" includes="radlab/rain/workload/cassandra/**"/>
+        	<!-- Bake the configuration files into the jar -->
+        	<fileset dir="config" includes="*cassandra*.json"/>
         </jar>
     </target>
 	<target depends="build" name="Benchmark-memprof">

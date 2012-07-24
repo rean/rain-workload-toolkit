@@ -1,0 +1,9 @@
+{
+    "profiles": "config/profiles.config.cassandra.json",
+    "timing": {
+        "rampUp": 10,
+        "duration": 300,
+        "rampDown": 10
+    },
+    "maxSharedThreads": 10
+}

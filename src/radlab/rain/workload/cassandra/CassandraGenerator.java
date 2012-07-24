@@ -1,4 +1,4 @@
-package radlab.rain.workload.hbase;
+package radlab.rain.workload.cassandra;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,44 +16,33 @@ import radlab.rain.ScenarioTrack;
 import radlab.rain.util.Histogram;
 import radlab.rain.util.storage.KeyGenerator;
 
-public class HBaseGenerator extends Generator 
+public class CassandraGenerator extends Generator 
 {
 	public static String CFG_USE_POOLING_KEY 		= "usePooling";
 	public static String CFG_DEBUG_KEY		 		= "debug";
 	public static String CFG_RNG_SEED_KEY	 		= "rngSeed";
-	public static String CFG_TABLE_NAME_KEY	 		= "tableName";
+	public static String CFG_CLUSTER_NAME_KEY		= "clusterName";
+	public static String CFG_KEYSPACE_NAME_KEY 		= "keyspaceName";
 	public static String CFG_COLUMN_FAMILY_NAME_KEY	= "columnFamilyName";
-	public static String CFG_WRITE_BUFFER_MB_KEY	= "writeBufferMB";
-	public static String CFG_ZOOKEEPER_PORT_KEY		= "zooKeeperPort";
-	public static String CFG_TIMEOUT_KEY			= "timeout";
-	public static String CFG_AUTO_FLUSH_KEY			= "autoFlush";
 	
-	//public static String CFG_WRITE_SEQUENTIAL_BLOCK = "writeSequentialBlock";
-	
-	public static final String DEFAULT_TABLE_NAME 			= "raintbl";
+	public static final String DEFAULT_CLUSTER_NAME			= "rainclstr";
+	public static final String DEFAULT_KEYSPACE_NAME		= "rainks";
 	public static final String DEFAULT_COLUMN_FAMILY_NAME 	= "raincf";
 		
-	public static int READ 					= HBaseLoadProfile.READ;
-	public static int WRITE 				= HBaseLoadProfile.WRITE;
-	public static int SCAN					= HBaseLoadProfile.SCAN;
+	public static int READ 					= CassandraLoadProfile.READ;
+	public static int WRITE 				= CassandraLoadProfile.WRITE;
+	public static int SCAN					= CassandraLoadProfile.SCAN;
 	public static int DEFAULT_OBJECT_SIZE	= 4096;
-	public static int DEFAULT_WRITE_BUFFER_MB = 2; // 2MB write buffer per thread by default 
-		
+	
 	@SuppressWarnings("unused")
-	private HBaseRequest<String> _lastRequest 	= null;
-	private HBaseTransport _hbaseClient 		= null;
-	private boolean _usePooling					= true;
-	private boolean _debug 						= false;
-	private int _writeBufferMB					= DEFAULT_WRITE_BUFFER_MB;
-	// Fixed work per thread/generator debugging
-	//private boolean _writeSequentialBlock		= false;
-	//private boolean _done 						= false; // for block writes
-	//private int _currentKeyToWrite				= -1;
-	//private long _blockWriteStart				= -1;
-	//private long _blockWriteEnd					= -1;
+	private CassandraRequest<String> _lastRequest 	= null;
+	private CassandraTransport _cassandraClient		= null;
+	private boolean _usePooling						= true;
+	private boolean _debug 							= false;
 	
 	private Random _random						= null;
-	String _tableName							= DEFAULT_TABLE_NAME;
+	String _clusterName							= DEFAULT_CLUSTER_NAME;
+	String _keyspaceName						= DEFAULT_KEYSPACE_NAME;
 	String _columnFamilyName					= DEFAULT_COLUMN_FAMILY_NAME;
 	// Debug key popularity
 	Histogram<String> _keyHist					= new Histogram<String>();
@@ -61,13 +50,13 @@ public class HBaseGenerator extends Generator
 	Histogram<String> _hotObjHist				= new Histogram<String>();
 	
 	
-	public HBaseGenerator(ScenarioTrack track) 
+	public CassandraGenerator(ScenarioTrack track) 
 	{
 		super(track);
 	}
-	
-	public HBaseTransport getHBaseTransport()
-	{ return this._hbaseClient; }
+
+	public CassandraTransport getCassandraTransport()
+	{ return this._cassandraClient; }
 	
 	public void setUsePooling( boolean value ) { this._usePooling = value; }
 	public boolean getUsePooling() { return this._usePooling; }
@@ -90,54 +79,36 @@ public class HBaseGenerator extends Generator
 			this._random = new Random( config.getLong( CFG_RNG_SEED_KEY ) );
 		else this._random = new Random();
 	
-		if( config.has( CFG_TABLE_NAME_KEY ) )
-			this._tableName = config.getString( CFG_TABLE_NAME_KEY );
+		if( config.has( CFG_CLUSTER_NAME_KEY ) )
+			this._clusterName = config.getString( CFG_CLUSTER_NAME_KEY );
+		
+		if( config.has( CFG_KEYSPACE_NAME_KEY ) )
+			this._keyspaceName = config.getString( CFG_KEYSPACE_NAME_KEY );
 		
 		if( config.has( CFG_COLUMN_FAMILY_NAME_KEY ) )
 			this._columnFamilyName = config.getString( CFG_COLUMN_FAMILY_NAME_KEY );
 		
-		// Set the per-thread write buffer size. If this value is large AND there are a large number of load generation threads
-		// the size of the heap may need to be increased accordingly. Think of write buffers as memory leaks - accumulating byte arrays
-		// until the buffer is full enough to trigger a flush to HBase. A workload of 100 threads, each with a 
-		// 2MB write buffer = 200 MB "sitting idle" and will require a heap size that accommodates this extra 200 MB it 
-		// above the typical memory usage for the driver/workload.		
-		if( config.has( CFG_WRITE_BUFFER_MB_KEY ) )
-			this._writeBufferMB = config.getInt( CFG_WRITE_BUFFER_MB_KEY );
-		
-		// Check that we got a valid writebuffer value.
-		if( this._writeBufferMB <= 0 )
-			this._writeBufferMB = HBaseGenerator.DEFAULT_WRITE_BUFFER_MB;
-		
-		int zooKeeperPort = HBaseTransport.DEFAULT_ZOOKEEPER_PORT;
-		if( config.has( CFG_ZOOKEEPER_PORT_KEY ) )
-			zooKeeperPort = config.getInt( CFG_ZOOKEEPER_PORT_KEY );
-		
-		int timeout = HBaseTransport.DEFAULT_TIMEOUT;
-		boolean autoFlush = HBaseTransport.DEFAULT_AUTO_FLUSH;
-		
+		/*int timeout = CassandraTransport.DEFAULT_TIMEOUT;
+				
 		if( config.has( CFG_TIMEOUT_KEY ) )
 			timeout = config.getInt( CFG_TIMEOUT_KEY );
-		
-		if( config.has( CFG_AUTO_FLUSH_KEY ) )
-			autoFlush = config.getBoolean( CFG_AUTO_FLUSH_KEY );
+		*/
 		
 		//if( config.has( CFG_WRITE_SEQUENTIAL_BLOCK ) )
 		//	this._writeSequentialBlock = config.getBoolean( CFG_WRITE_SEQUENTIAL_BLOCK );
 		
-		try
-		{
-			this._hbaseClient = new HBaseTransport( this._loadTrack.getTargetHostName(), this._loadTrack.getTargetHostPort(), zooKeeperPort );
-			// Set the autoflush and timeout values
-			this._hbaseClient.setAutoFlush( autoFlush );
-			this._hbaseClient.setTimeout( timeout );
-			// Initialize the hbase transport, creating the table if it does not exist
-			this._hbaseClient.initialize( this._tableName, this._columnFamilyName, true, this._writeBufferMB );
-		}
-		catch( IOException ioe )
-		{
-			throw new JSONException( ioe );
-		}
+		//try
+		//{
+			this._cassandraClient = new CassandraTransport( this._clusterName, this._loadTrack.getTargetHostName(), this._loadTrack.getTargetHostPort(), this._loadTrack.getMaxUsers() );
+			// Initialize the cassandra transport, creating the keyspace and column family if they do not exist
+			this._cassandraClient.initialize( this._keyspaceName, true, this._columnFamilyName, true );
+		//}
+		//catch( IOException ioe )
+		//{
+			//throw new JSONException( ioe );
+		//}
 	}
+	
 	
 	@Override
 	public long getThinkTime() 
@@ -150,7 +121,7 @@ public class HBaseGenerator extends Generator
 	{
 		return 0;
 	}
-	
+
 	@Override
 	public void dispose() 
 	{
@@ -167,28 +138,28 @@ public class HBaseGenerator extends Generator
 		}
 		
 		// Dispose of the client
-		this._hbaseClient.dispose();
+		this._cassandraClient.dispose();
 	}
 	
 	@Override
-	public Operation nextRequest( int lastOperation ) 
+	public Operation nextRequest(int lastOperation) 
 	{
 		LoadProfile currentLoad = this.getTrack().getCurrentLoadProfile();
 		this._latestLoadProfile = currentLoad;
 		int key = -1;
 		
-		HBaseLoadProfile hbaseProfile = (HBaseLoadProfile) this._latestLoadProfile; 
+		CassandraLoadProfile cassandraProfile = (CassandraLoadProfile) this._latestLoadProfile; 
 		
 		// Check whether we're sending traffic to hot objects or not
 		double rndVal = this._random.nextDouble();
-		ArrayList<Integer> hotObjectList = hbaseProfile.getHotObjectList();
-		HashSet<Integer> hotObjectSet = hbaseProfile.getHotObjectSet();
+		ArrayList<Integer> hotObjectList = cassandraProfile.getHotObjectList();
+		HashSet<Integer> hotObjectSet = cassandraProfile.getHotObjectSet();
 		
 		int numHotObjects = hotObjectList.size(); 
 		
 		/*
-		int minKey = hbaseProfile.getKeyGenerator().getMinKey();
-		int maxKey = hbaseProfile.getKeyGenerator().getMaxKey();
+		int minKey = cassandraProfile.getKeyGenerator().getMinKey();
+		int maxKey = cassandraProfile.getKeyGenerator().getMaxKey();
 		int keyCount = (maxKey - minKey) + 1;
 		int maxThreads = this.getTrack().getMaxUsers();
 		// Compute our block boundaries, e.g., our block size
@@ -197,7 +168,7 @@ public class HBaseGenerator extends Generator
 		int startKey = (int)((Thread.currentThread().getId()%maxThreads) * keyBlockSize) + 1;
 		int endKey = (startKey + keyBlockSize) - 1;
 		*/
-		if( rndVal < hbaseProfile.getHotTrafficFraction() &&  numHotObjects > 0 )
+		if( rndVal < cassandraProfile.getHotTrafficFraction() &&  numHotObjects > 0 )
 		{
 			// Choose a key from the hot set uniformly at random.
 			// Later we can use add skew within the hot object set
@@ -208,7 +179,7 @@ public class HBaseGenerator extends Generator
 		else
 		{	
 			// Pick a key using the regular keygen strategy
-			KeyGenerator keyGen = hbaseProfile.getKeyGenerator();
+			KeyGenerator keyGen = cassandraProfile.getKeyGenerator();
 			key = keyGen.generateKey();
 			// Check whether we picked a key that's in the hot set - if we did, try again
 			while( hotObjectSet.contains( key ) ) 
@@ -222,25 +193,25 @@ public class HBaseGenerator extends Generator
 		// Assume raw keys for now - we could use this to index into some other structure
 		// to produce the "real" key
 				
-		// All mongo requests have string keys (see Mongo's BasicDBObject)
-		HBaseRequest<String> nextRequest = new HBaseRequest<String>();
+		// All requests have string keys
+		CassandraRequest<String> nextRequest = new CassandraRequest<String>();
 		// Turn the integer key into a string
-		nextRequest.key = HBaseUtil.KEY_FORMATTER.format( key );
+		nextRequest.key = CassandraUtil.KEY_FORMATTER.format( key );
 		
 		rndVal = this._random.nextDouble();
 		int i = 0;
 		
 		// If we cared about access sequences we could check whether we just did a read or write
 		// before picking the next operation
-		for( i = 0; i < HBaseLoadProfile.MAX_OPERATIONS; i++ )
+		for( i = 0; i < CassandraLoadProfile.MAX_OPERATIONS; i++ )
 		{
-			if( rndVal <= hbaseProfile._opselect[i] )
+			if( rndVal <= cassandraProfile._opselect[i] )
 				break;
 		}
 		nextRequest.op = i;
 		
 		// If we're writing then we need to set the size
-		if( nextRequest.op == HBaseLoadProfile.WRITE || nextRequest.op == HBaseLoadProfile.UPDATE )
+		if( nextRequest.op == CassandraLoadProfile.WRITE || nextRequest.op == CassandraLoadProfile.UPDATE )
 		{
 			/*
 			// If we're going to write and we're supposed to write sequentially, swap in the "right" key in the next request
@@ -270,18 +241,18 @@ public class HBaseGenerator extends Generator
 				nextRequest.key = String.valueOf( this._currentKeyToWrite );
 			*/
 			// We could also get the size cdf if we want to support size histograms
-			nextRequest.size = hbaseProfile.getSize();
+			nextRequest.size = cassandraProfile.getSize();
 		}
 
-		if( nextRequest.op == HBaseLoadProfile.SCAN )
+		if( nextRequest.op == CassandraLoadProfile.SCAN )
 			nextRequest.maxScanRows = 1000; // Use a fixed value for now, but expand it later with a distribution, randomized or deterministic value
 		
 		// Update the last request
 		this._lastRequest = nextRequest;
-		return this.getHBaseOperation( nextRequest );
+		return this.getCassandraOperation( nextRequest );
 	}
-	
-	private HBaseOperation getHBaseOperation( HBaseRequest<String> request )
+
+	private CassandraOperation getCassandraOperation( CassandraRequest<String> request )
 	{
 		if( request.op == READ )
 			return this.createGetOperation( request );
@@ -292,18 +263,18 @@ public class HBaseGenerator extends Generator
 		else return null; // We don't support updates/deletes explicitly, if an existing key gets re-written then so be it
 	}
 	
-	public HBaseGetOperation createGetOperation( HBaseRequest<String> request )
+	public CassandraGetOperation createGetOperation( CassandraRequest<String> request )
 	{
-		HBaseGetOperation op = null;
+		CassandraGetOperation op = null;
 		
 		if( this._usePooling )
 		{
 			ObjectPool pool = this.getTrack().getObjectPool();
-			op = (HBaseGetOperation) pool.rentObject( HBaseGetOperation.NAME );	
+			op = (CassandraGetOperation) pool.rentObject( CassandraGetOperation.NAME );	
 		}
 		
 		if( op == null )
-			op = new HBaseGetOperation( this.getTrack().getInteractive(), this.getScoreboard() );
+			op = new CassandraGetOperation( this.getTrack().getInteractive(), this.getScoreboard() );
 		
 		// Set the specific fields
 		op._key = request.key;
@@ -312,18 +283,18 @@ public class HBaseGenerator extends Generator
 		return op;
 	}
 	
-	public HBaseScanOperation createScanOperation( HBaseRequest<String> request )
+	public CassandraScanOperation createScanOperation( CassandraRequest<String> request )
 	{
-		HBaseScanOperation op = null;
+		CassandraScanOperation op = null;
 		
 		if( this._usePooling )
 		{
 			ObjectPool pool = this.getTrack().getObjectPool();
-			op = (HBaseScanOperation) pool.rentObject( HBaseScanOperation.NAME );	
+			op = (CassandraScanOperation) pool.rentObject( CassandraScanOperation.NAME );	
 		}
 		
 		if( op == null )
-			op = new HBaseScanOperation( this.getTrack().getInteractive(), this.getScoreboard() );
+			op = new CassandraScanOperation( this.getTrack().getInteractive(), this.getScoreboard() );
 		
 		// Set the specific fields
 		op._key = request.key;
@@ -333,18 +304,18 @@ public class HBaseGenerator extends Generator
 		return op;
 	}
 		
-	public HBasePutOperation createPutOperation( HBaseRequest<String> request )
+	public CassandraPutOperation createPutOperation( CassandraRequest<String> request )
 	{
-		HBasePutOperation op = null;
+		CassandraPutOperation op = null;
 		
 		if( this._usePooling )
 		{
 			ObjectPool pool = this.getTrack().getObjectPool();
-			op = (HBasePutOperation) pool.rentObject( HBasePutOperation.NAME );	
+			op = (CassandraPutOperation) pool.rentObject( CassandraPutOperation.NAME );	
 		}
 		
 		if( op == null )
-			op = new HBasePutOperation( this.getTrack().getInteractive(), this.getScoreboard() );
+			op = new CassandraPutOperation( this.getTrack().getInteractive(), this.getScoreboard() );
 		
 		// Set the specific fields
 		op._key = request.key;
