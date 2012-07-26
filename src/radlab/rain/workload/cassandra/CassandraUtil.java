@@ -19,15 +19,16 @@ public class CassandraUtil
 		int maxKey = 100000;
 		int size = 4096;
 		
-		if( args.length == 7 )
+		if( args.length == 8 )
 		{
 			host = args[0];
 			port = Integer.parseInt( args[1] );
 			clusterName = args[2];
 			keyspaceName = args[3];
-			minKey = Integer.parseInt( args[4] );
-			maxKey = Integer.parseInt( args[5] );
-			size = Integer.parseInt( args[6] );
+			columnFamilyName = args[4];
+			minKey = Integer.parseInt( args[5] );
+			maxKey = Integer.parseInt( args[6] );
+			size = Integer.parseInt( args[7] );
 		}
 		else if( args.length == 0 )
 		{
@@ -35,8 +36,8 @@ public class CassandraUtil
 		}
 		else
 		{
-			System.out.println( "Usage   : CassandraUtil <host> <port> <clusterName> <keyspace> <min key> <max key> <size>" );
-			System.out.println( "Example : CassandraUtil localhost 9160 test test-ns 1 100000 4096" );
+			System.out.println( "Usage   : CassandraUtil <host> <port> <clustername> <keyspace> <columnfamily> <min key> <max key> <size>" );
+			System.out.println( "Example : CassandraUtil localhost 9160 rainclstr rainks raincf 1 100000 4096" );
 			System.exit( -1 );
 		}
 	
