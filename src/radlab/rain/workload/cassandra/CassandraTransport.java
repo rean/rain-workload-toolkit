@@ -2,16 +2,19 @@ package radlab.rain.workload.cassandra;
 
 //import java.util.HashMap;
 //import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import me.prettyprint.cassandra.serializers.BytesArraySerializer;
 import me.prettyprint.cassandra.serializers.StringSerializer;
 import me.prettyprint.cassandra.service.CassandraHostConfigurator;
+import me.prettyprint.cassandra.service.ThriftKsDef;
 import me.prettyprint.hector.api.Cluster;
 import me.prettyprint.hector.api.Keyspace;
 import me.prettyprint.hector.api.beans.HColumn;
 import me.prettyprint.hector.api.ddl.ColumnFamilyDefinition;
+import me.prettyprint.hector.api.ddl.KeyspaceDefinition;
 import me.prettyprint.hector.api.factory.HFactory;
 import me.prettyprint.hector.api.mutation.Mutator;
 import me.prettyprint.hector.api.query.ColumnQuery;
@@ -31,6 +34,7 @@ public class CassandraTransport
 	private int _socketTimeout = 10000;
 	private Keyspace _keyspace = null;
 	private CassandraHostConfigurator _config = null;
+	private int _replicationFactor = 1;
 	//private boolean _debug = true;
 	//private HashMap<String,Integer> _failMap = new HashMap<String,Integer>();
 	
@@ -68,10 +72,13 @@ public class CassandraTransport
 		this._cluster = HFactory.getOrCreateCluster( this._clusterName, this._config );
 	}
 	
+	public int getReplicationFactor() { return this._replicationFactor; }
+	public void setReplicationFactor( int value ) { this._replicationFactor = value; }
+	
 	public synchronized void initialize( String keyspaceName, boolean createKeyspace, String columnFamilyName, boolean createColumnFamily )
 	{	
 		if( createKeyspace )
-			this.createKeyspace( keyspaceName );
+			this.createKeyspace( keyspaceName, this._replicationFactor );
 		
 		this._keyspace = HFactory.createKeyspace( keyspaceName, this._cluster );
 		
@@ -81,11 +88,14 @@ public class CassandraTransport
 		this._initialized = true;
 	}
 	
-	public void createKeyspace( String keyspaceName )
+	public void createKeyspace( String keyspaceName, int replicationFactor )
 	{
 		// If the keyspace definition does not already exist then create it
 		if( this._cluster.describeKeyspace( keyspaceName ) == null )
-			this._cluster.addKeyspace( HFactory.createKeyspaceDefinition( keyspaceName ) );
+		{
+			KeyspaceDefinition ksDefn = HFactory.createKeyspaceDefinition( keyspaceName, ThriftKsDef.DEF_STRATEGY_CLASS, replicationFactor, new ArrayList<ColumnFamilyDefinition>() );//HFactory.createKeyspaceDefinition( keyspaceName );
+			this._cluster.addKeyspace( ksDefn );
+		}
 	}
 	
 	public void deleteKeyspace( String keyspaceName )

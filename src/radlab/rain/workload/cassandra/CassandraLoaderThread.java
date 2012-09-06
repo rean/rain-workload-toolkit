@@ -33,8 +33,6 @@ public class CassandraLoaderThread extends Thread
 			random.nextBytes( arrBytes );
 			
 			int myKey = i + minKey;
-			if( myKey == 75592 || myKey == 37093 )
-				System.out.println( "Loaded missing key" );
 			
 			String key = CassandraUtil.KEY_FORMATTER.format( i + minKey );
 			this.cassandraClient.put( this.columnFamilyName, key, arrBytes );

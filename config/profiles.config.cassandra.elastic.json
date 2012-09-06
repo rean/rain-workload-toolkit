@@ -1,0 +1,51 @@
+{
+	"cassandra-001": {
+		"generator": "radlab.rain.workload.cassandra.CassandraGenerator",
+		"generatorParameters":{
+        	"usePooling": "true",
+        	"rngSeed": 67510,
+        	"clusterName": "rainclstr",
+        	"keyspaceName": "rainks",
+			"columnFamilyName": "raincf",
+			"debug":"false"
+        },
+		"track": "radlab.rain.DefaultScenarioTrack",
+		"loadProfileClass": "radlab.rain.workload.cassandra.CassandraLoadProfile",
+		"resourcePath": "resources/",
+		"behavior": {
+			
+		},
+		"loadProfile": [
+		{
+			"interval": 20,
+			"users": 100,
+			"mix": "uniform50r/50w",
+			"keyGenerator": "radlab.rain.util.storage.UniformKeyGenerator",
+			"keyGeneratorConfig": {
+				"rngSeed": 1,
+				"minKey": 1,
+				"maxKey": 6291456,
+				"a": 1.001,
+				"r": 3.456
+			},
+			"size": 1024,
+			"readPct": 0.5,
+			"writePct": 0.5,
+			"numHotObjects" : 10,
+			"hotTrafficFraction": 0.0
+		}
+		],
+		"target": {
+		  "hostname": "localhost",
+		  "port": 9160
+		},
+		"pLogSampling": 0.0,
+		"pOpenLoop": 0.0,
+		"meanCycleTime": 0,
+		"meanThinkTime": 0,
+		"interactive": true,
+		"meanResponseTimeSamplingInterval" : 100,
+		"metricSnapshots" : false,
+        "metricSnapshotsFileSuffix": "cassandra-metrics"
+	}
+}

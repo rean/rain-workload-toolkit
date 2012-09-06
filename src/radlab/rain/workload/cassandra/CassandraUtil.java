@@ -15,6 +15,7 @@ public class CassandraUtil
 		String clusterName = "rainclstr";
 		String keyspaceName = "rainks";
 		String columnFamilyName = "raincf";
+		int replicationFactor = 1;
 		int minKey = 1;
 		int maxKey = 100000;
 		int size = 4096;
@@ -30,6 +31,18 @@ public class CassandraUtil
 			maxKey = Integer.parseInt( args[6] );
 			size = Integer.parseInt( args[7] );
 		}
+		else if( args.length == 9 )
+		{
+			host = args[0];
+			port = Integer.parseInt( args[1] );
+			clusterName = args[2];
+			keyspaceName = args[3];
+			columnFamilyName = args[4];
+			minKey = Integer.parseInt( args[5] );
+			maxKey = Integer.parseInt( args[6] );
+			size = Integer.parseInt( args[7] );
+			replicationFactor = Integer.parseInt( args[8] );
+		}
 		else if( args.length == 0 )
 		{
 			
@@ -37,7 +50,9 @@ public class CassandraUtil
 		else
 		{
 			System.out.println( "Usage   : CassandraUtil <host> <port> <clustername> <keyspace> <columnfamily> <min key> <max key> <size>" );
+			System.out.println( "Usage   : CassandraUtil <host> <port> <clustername> <keyspace> <columnfamily> <min key> <max key> <size> <replication factor>" );
 			System.out.println( "Example : CassandraUtil localhost 9160 rainclstr rainks raincf 1 100000 4096" );
+			System.out.println( "Example : CassandraUtil localhost 9160 rainclstr rainks raincf 1 100000 4096 2" );
 			System.exit( -1 );
 		}
 	
@@ -51,8 +66,10 @@ public class CassandraUtil
 		//if( true )
 		//	return;
 		
+		// Set the replication factor explicitly
+		adminClient.setReplicationFactor( replicationFactor );
 		adminClient.initialize( keyspaceName, true, columnFamilyName, true );
-		
+				
 		ArrayList<CassandraLoaderThread> threads = new ArrayList<CassandraLoaderThread>();
 		for( int i = 0; i < loaderThreads; i++ )
 		{
