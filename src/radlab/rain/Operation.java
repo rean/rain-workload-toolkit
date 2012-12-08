@@ -57,7 +57,7 @@ public abstract class Operation implements Runnable
 	private long _timeQueued            = 0;
 	private long _timeStarted           = 0;
 	private long _timeFinished          = 0;
-	
+		
 	private long _thinkTimeUsed			= 0; // Track how much thinktime we used
 	private long _cycleTimeUsed			= 0; // Track how much cycle delays we took advantage of
 		
@@ -194,8 +194,8 @@ public abstract class Operation implements Runnable
 		// Invoke the pre-execute hook here before we start the clock to time the
 		// operation's execution
 		this.preExecute();
-		
 		this.setTimeStarted( System.currentTimeMillis() );
+		long startNanos = System.nanoTime();
 		try
 		{
 			this.execute();
@@ -207,7 +207,10 @@ public abstract class Operation implements Runnable
 		}
 		finally
 		{
+			long endNanos = System.nanoTime();
 			this.setTimeFinished( System.currentTimeMillis() );
+			//System.out.println( this + " " + ( this.getTimeFinished() - this.getTimeStarted() ) + " ns" );
+			
 			// Invoke the post-execute hook here after we stop the clock to time the
 			// operation's execution
 			this.postExecute();
@@ -215,6 +218,8 @@ public abstract class Operation implements Runnable
 			if ( this._scoreboard != null )
 			{
 				OperationExecution result = new OperationExecution(this);
+				//System.out.println( "[EXEC-RESULT]" + this + " " + result.getExecutionTime() + " ns" );
+				result.setExecutionTimeNanos( endNanos - startNanos );
 				this._scoreboard.dropOff(result);
 			}
 		}

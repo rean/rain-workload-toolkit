@@ -107,7 +107,7 @@ public class Scorecard
 		out.println( this + " Operations successfully completed  : " + this._totalOpsSuccessful );
 		// Avg response time per operation
 		if( this._totalOpsSuccessful > 0 )
-			out.println( this + " Average operation response time (s): " + this._formatter.format( ( (double)this._totalOpResponseTime/(double)this._totalOpsSuccessful)/1000.0 ) );
+			out.println( this + " Average operation response time (s): " + this._formatter.format( ( (double)this._totalOpResponseTime/(double)this._totalOpsSuccessful)/1000000000.0 ) );
 		else out.println( this + " Average operation response time (s): 0.0000" );
 		out.println( this + " Operations late                    : " + this._totalOpsLate );
 		out.println( this + " Operations failed                  : " + this._totalOpsFailed );
@@ -167,11 +167,11 @@ public class Scorecard
 							this._formatter.format( ( ( (double) ( summary.succeeded + summary.failed ) / (double) totalOperations ) * 100 ) ) + "% ",
 							summary.succeeded,
 							summary.failed,
-							this._formatter.format( summary.getAverageResponseTime() / 1000.0 ),
-							this._formatter.format( summary.minResponseTime / 1000.0 ),
-							this._formatter.format( summary.maxResponseTime / 1000.0 ),
-							this._formatter.format( summary.getNthPercentileResponseTime( 90 ) / 1000.0 ),
-							this._formatter.format( summary.getNthPercentileResponseTime( 99 ) / 1000.0 ),
+							this._formatter.format( summary.getAverageResponseTime() / 1000000000.0 ),
+							this._formatter.format( summary.minResponseTime / 1000000000.0 ),
+							this._formatter.format( summary.maxResponseTime / 1000000000.0 ),
+							this._formatter.format( summary.getNthPercentileResponseTime( 90 ) / 1000000000.0 ),
+							this._formatter.format( summary.getNthPercentileResponseTime( 99 ) / 1000000000.0 ),
 							summary.getSamplesCollected() + "/" + summary.getSamplesSeen()
 							) 
 						);

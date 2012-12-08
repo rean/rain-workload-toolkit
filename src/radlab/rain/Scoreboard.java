@@ -518,7 +518,7 @@ public class Scoreboard implements Runnable, IScoreboard
 	public void printStatistics( PrintStream out )
 	{
 		double runDuration = (double) ( this._endTime - this._startTime ) / 1000.0;
-			
+		
 		long totalOperations = this.finalCard._totalOpsSuccessful + this.finalCard._totalOpsFailed;
 			
 		double offeredLoadOps = 0.0;
@@ -594,7 +594,7 @@ public class Scoreboard implements Runnable, IScoreboard
 		double averageOpResponseTimeSecs = 0.0;
 				
 		if( this.finalCard._totalOpsSuccessful > 0 )
-			averageOpResponseTimeSecs = ((double)this.finalCard._totalOpResponseTime/(double)this.finalCard._totalOpsSuccessful)/1000.0;
+			averageOpResponseTimeSecs = ((double)this.finalCard._totalOpResponseTime/(double)this.finalCard._totalOpsSuccessful)/1000000000.0;
 		
 		ScenarioTrack track = this.getScenarioTrack();
 		// Rough averaging of the additional time spent in the system due to think times/cycle times.
@@ -698,12 +698,12 @@ public class Scoreboard implements Runnable, IScoreboard
 							//this._formatter.format( ( ( (double) ( summary.succeeded + summary.failed ) / (double) totalOperations ) * 100 ) ) + "% ",
 							//summary.succeeded,
 							//summary.failed,
-							this._formatter.format( summary.getAverageWaitTime() / 1000.0 ),
-							this._formatter.format( summary.minWaitTime / 1000.0 ),
-							this._formatter.format( summary.maxWaitTime / 1000.0 ),
-							this._formatter.format( summary.getNthPercentileResponseTime( 90 ) / 1000.0 ),
-							this._formatter.format( summary.getNthPercentileResponseTime( 99 ) / 1000.0 ),
-							summary.getSamplesCollected() + "/" + summary.getSamplesSeen() + " (mu: " + this._formatter.format( summary.getSampleMean()/1000.0 ) + ", sd: " + this._formatter.format( summary.getSampleStandardDeviation()/1000.0 ) + " t: " + this._formatter.format( summary.getTvalue( summary.getAverageWaitTime() ) ) + ")"
+							this._formatter.format( summary.getAverageWaitTime() / 1000000000.0 ),
+							this._formatter.format( summary.minWaitTime / 1000000000.0 ),
+							this._formatter.format( summary.maxWaitTime / 1000000000.0 ),
+							this._formatter.format( summary.getNthPercentileResponseTime( 90 ) / 1000000000.0 ),
+							this._formatter.format( summary.getNthPercentileResponseTime( 99 ) / 1000000000.0 ),
+							summary.getSamplesCollected() + "/" + summary.getSamplesSeen() + " (mu: " + this._formatter.format( summary.getSampleMean()/1000000000.0 ) + ", sd: " + this._formatter.format( summary.getSampleStandardDeviation()/1000000000.0 ) + " t: " + this._formatter.format( summary.getTvalue( summary.getAverageWaitTime() ) ) + ")"
 							) 
 						);
 										
@@ -764,12 +764,12 @@ public class Scoreboard implements Runnable, IScoreboard
 							this._formatter.format( ( ( (double) ( summary.succeeded + summary.failed ) / (double) totalOperations ) * 100 ) ) + "% ",
 							summary.succeeded,
 							summary.failed,
-							this._formatter.format( summary.getAverageResponseTime() / 1000.0 ),
-							this._formatter.format( summary.minResponseTime / 1000.0 ),
-							this._formatter.format( summary.maxResponseTime / 1000.0 ),
-							this._formatter.format( summary.getNthPercentileResponseTime( 90 ) / 1000.0 ),
-							this._formatter.format( summary.getNthPercentileResponseTime( 99 ) / 1000.0 ),
-							summary.getSamplesCollected() + "/" + summary.getSamplesSeen() + " (mu: " + this._formatter.format( summary.getSampleMean()/1000.0 ) + ", sd: " + this._formatter.format( summary.getSampleStandardDeviation()/1000.0 ) + " t: " + this._formatter.format( summary.getTvalue( summary.getAverageResponseTime() ) ) + ")"
+							this._formatter.format( summary.getAverageResponseTime() / 1000000000.0 ),
+							this._formatter.format( summary.minResponseTime / 1000000000.0 ),
+							this._formatter.format( summary.maxResponseTime / 1000000000.0 ),
+							this._formatter.format( summary.getNthPercentileResponseTime( 90 ) / 1000000000.0 ),
+							this._formatter.format( summary.getNthPercentileResponseTime( 99 ) / 1000000000.0 ),
+							summary.getSamplesCollected() + "/" + summary.getSamplesSeen() + " (mu: " + this._formatter.format( summary.getSampleMean()/1000000000.0 ) + ", sd: " + this._formatter.format( summary.getSampleStandardDeviation()/1000000000.0 ) + " t: " + this._formatter.format( summary.getTvalue( summary.getAverageResponseTime() ) ) + ")"
 							) 
 						);
 										
@@ -997,7 +997,7 @@ public class Scoreboard implements Runnable, IScoreboard
 					// If interactive, look at the total response time.
 					if ( result.isInteractive() )
 					{
-						long responseTime = result.getExecutionTime();
+						long responseTime = result.getExecutionTimeNanos();
 						intervalSummary.acceptSample( responseTime );
 						
 						intervalSummary.totalResponseTime += responseTime;
@@ -1058,7 +1058,7 @@ public class Scoreboard implements Runnable, IScoreboard
 			// If interactive, look at the total response time.
 			if ( result.isInteractive() )
 			{
-				long responseTime = result.getExecutionTime();
+				long responseTime = result.getExecutionTimeNanos();
 				// Save the response time
 				summary.acceptSample( responseTime );
 				// Update the total response time

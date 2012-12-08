@@ -44,6 +44,7 @@ public class OperationExecution implements Comparable<OperationExecution>
 	private String _traceLabel = Scoreboard.NO_TRACE_LABEL;
 	private long _timeStarted = 0;
 	private long _timeFinished = 0;
+	private long _executionTimeNanos = 0;
 	public String _operationName;
 	public String _operationRequest;
 	public LoadProfile _generatedDuring = null;
@@ -101,7 +102,11 @@ public class OperationExecution implements Comparable<OperationExecution>
 	public boolean isInteractive() { return this._interactive; }
 	
 	//public long getWaitTime()      { return this.getTimeStarted()  - this.getTimeQueued(); }
-	public long getExecutionTime() { return this.getTimeFinished() - this.getTimeStarted(); }
+	// Return nanos instead
+	public long getExecutionTimeMsecs() { return this.getTimeFinished() - this.getTimeStarted(); }
+	public long getExecutionTimeNanos() { return this._executionTimeNanos; }
+	public void setExecutionTimeNanos( long val ) { this._executionTimeNanos = val; }
+	
 	//public long getTotalTime()     { return this.getWaitTime()     + this.getExecutionTime() + this.getDelayTime(); }
 	
 	/**
