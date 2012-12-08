@@ -18,7 +18,7 @@ public class CassandraUtil
 		int replicationFactor = 1;
 		int minKey = 1;
 		int maxKey = 100000;
-		int size = 4096;
+		int size = 1024;
 		
 		if( args.length == 8 )
 		{
