@@ -26,7 +26,7 @@ public class HBaseTransport
 	public static int DEFAULT_HBASE_PORT = 60000;
 	public static int DEFAULT_ZOOKEEPER_PORT = 2181;
 	public static int DEFAULT_TIMEOUT = 10000;
-	public static boolean DEFAULT_AUTO_FLUSH = false;
+	public static boolean DEFAULT_AUTO_FLUSH = false; // Default is false = buffer writes
 	
 	private String _server = "";
 	private int _port = DEFAULT_HBASE_PORT;

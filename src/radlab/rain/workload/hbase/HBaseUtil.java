@@ -18,7 +18,7 @@ public class HBaseUtil
 		String columnFamilyName = "raincf";
 		int minKey = 1;
 		int maxKey = 100000;
-		int size = 4096;//16384;//4096;
+		int size = 1024;//16384;//4096;
 		
 		// HBaseUtil <host> <port> <table> <column family> <min key> <max key> <size>
 		if( args.length == 7 )
