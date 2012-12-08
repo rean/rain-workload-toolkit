@@ -4,8 +4,8 @@
 		"generatorParameters":{
         	"usePooling": "true",
         	"rngSeed": 67510,
-        	"dbName": "test",
-			"collectionName": "test-ns",
+        	"dbName": "rain",
+			"collectionName": "rain-ns",
 			"debug":"false"
         },
 		"track": "radlab.rain.DefaultScenarioTrack",
@@ -27,7 +27,7 @@
 				"a": 1.001,
 				"r": 3.456
 			},
-			"size": 4096,
+			"size": 1024,
 			"readPct": 0.5,
 			"writePct": 0.5,
 			"numHotObjects" : 10,
@@ -44,7 +44,7 @@
 		"meanThinkTime": 0,
 		"interactive": true,
 		"meanResponseTimeSamplingInterval" : 100,
-		"metricSnapshots" : true,
+		"metricSnapshots" : false,
         "metricSnapshotsFileSuffix": "mongodb-metrics"
 	}
 }

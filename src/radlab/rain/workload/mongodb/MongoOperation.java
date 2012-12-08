@@ -51,7 +51,8 @@ public abstract class MongoOperation extends Operation
 	public DBCursor doGet( String key ) throws Exception
 	{
 		BasicDBObject query = new BasicDBObject();
-		query.put( "key", key );
+		//query.put( "key", key );
+		query.put( "_id", key );
 		this._operationRequest = key; // save a record of which key we're getting
 		DBCursor cursor = this._mongoClient.get( this._dbName, this._collectionName, query );
 		return cursor;
@@ -63,11 +64,13 @@ public abstract class MongoOperation extends Operation
 		BasicDBObject obj = new BasicDBObject();
 		this._operationRequest = key; // save a record of which key we're updating
 		
-		obj.put( "key", key );
+		//obj.put( "key", key );
+		obj.put( "_id", key );
 		obj.put( "value", value );
 		
 		BasicDBObject query = new BasicDBObject();
-		query.put( "key", key );
+		//query.put( "key", key );
+		query.put( "_id", key );
 		
 		WriteResult res = this._mongoClient.updateOne( this._dbName, this._collectionName, query, obj );
 		CommandResult cmdRes = res.getLastError();

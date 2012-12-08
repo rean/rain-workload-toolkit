@@ -5,6 +5,7 @@ import java.util.ArrayList;
 //import java.util.Hashtable;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBAddress;
 import com.mongodb.DBCursor;
 import com.mongodb.Mongo;
 import com.mongodb.DB;
@@ -31,18 +32,19 @@ public class MongoTransport
 	private int _socketIdleTimeout	= 10000;
 	private boolean _initialized 	= false;
 	private int _maxConnectionsPerServer = DEFAULT_MAX_CONNECTIONS_PER_HOST;
+	private String _host			= "";
+	private int _port				= DEFAULT_MONGO_PORT;
 	
 	
-	
-	private ArrayList<ServerAddress> _servers = new ArrayList<ServerAddress>();
+	//private ArrayList<ServerAddress> _servers = new ArrayList<ServerAddress>();
 	
 	//private static Object lock		= new Object();
 	//private static volatile Hashtable<String,MongoTransport> instanceMap = new Hashtable<String,MongoTransport>();
 	
-	public MongoTransport( ArrayList<ServerAddress> servers ) throws UnknownHostException
+	/*public MongoTransport( ArrayList<ServerAddress> servers ) throws UnknownHostException
 	{
 		this._servers = servers;
-	}
+	}*/
 	
 	public MongoTransport( String host, int port ) throws UnknownHostException
 	{
@@ -51,7 +53,9 @@ public class MongoTransport
 	
 	public MongoTransport( String host, int port, int maxConnectionsPerServer ) throws UnknownHostException
 	{
-		this._servers.add( new ServerAddress( host, port ) );
+		//this._servers.add( new ServerAddress( host, port ) );
+		this._host = host;
+		this._port = port;
 		this._maxConnectionsPerServer = maxConnectionsPerServer;
 	}
 	/*
@@ -79,7 +83,7 @@ public class MongoTransport
 		}
 	}
 	*/
-	public synchronized void initialize()
+	public synchronized void initialize() //throws UnknownHostException
 	{
 		MongoOptions options = new MongoOptions();
 		// Haven't figured out whether there's a way to change these post-connection creation
@@ -97,8 +101,16 @@ public class MongoTransport
 		options.connectionsPerHost = this._maxConnectionsPerServer;
 		options.threadsAllowedToBlockForConnectionMultiplier = 50;
 		
-		this._conn = new Mongo( this._servers, options );
-		this._initialized = true;
+		//this._conn = new Mongo( this._servers );//, options );
+		try
+		{
+			StringBuffer connectionString = new StringBuffer();
+			connectionString.append( this._host ).append( ":" ).append( this._port );
+			this._conn = new Mongo( new DBAddress( connectionString.toString() ), options );
+			this._initialized = true;
+		}
+		catch( UnknownHostException uhe )
+		{}
 	}
 
 	public synchronized void close()
@@ -121,8 +133,21 @@ public class MongoTransport
 		// Make any per-request changes
 		this.configure();
 		DB db = this._conn.getDB( dbName );
-		DBCollection collection = db.getCollection( collectionName );
-		return collection.find( query );
+		DBCursor result = null;
+		db.requestStart();
+		try
+		{
+			DBCollection collection = db.getCollection( collectionName );
+			result = collection.find( query );
+		}
+		catch( Exception e )
+		{
+		}
+		finally
+		{
+			db.requestDone();
+		}
+		return result;
 	}
 	
 	public WriteResult insert( String dbName, String collectionName, DBObject obj )
@@ -132,10 +157,23 @@ public class MongoTransport
 		
 		// Make any per-request changes
 		this.configure();
+		WriteResult result = null;
 		
-		DB db = this._conn.getDB( dbName );
-		DBCollection collection = db.getCollection( collectionName );
-		return collection.insert( obj, WriteConcern.SAFE );
+		DB db = null;
+		try
+		{
+			db = this._conn.getDB( dbName );
+			DBCollection collection = db.getCollection( collectionName );
+			result = collection.insert( obj, WriteConcern.SAFE );
+		}
+		catch( Exception e )
+		{}
+		finally
+		{
+			if( db != null )
+				db.requestDone();
+		}
+		return result;
 	}	
 	
 	public WriteResult updateOne( String dbName, String collectionName, DBObject query, DBObject obj )
@@ -145,10 +183,25 @@ public class MongoTransport
 		
 		// Make any per-request changes
 		this.configure();
-		
-		DB db = this._conn.getDB( dbName );
-		DBCollection collection = db.getCollection( collectionName );
-		return collection.update( query, obj, true, false, WriteConcern.SAFE );
+		WriteResult result = null;
+		DB db = null;
+		try
+		{
+			db = this._conn.getDB( dbName );
+			db.requestStart(); // use the same underlying connection until we call requestDone
+			DBCollection collection = db.getCollection( collectionName );
+			//result = collection.update( query, obj, true, false, WriteConcern.SAFE );
+			// No upsert, no multi
+			result = collection.update( query, obj, false, false, WriteConcern.SAFE );
+		}
+		catch( Exception e )
+		{}
+		finally
+		{
+			if( db != null )
+				db.requestDone();
+		}
+		return result;
 	}
 	
 	public WriteResult updateAll( String dbName, String collectionName, DBObject query, DBObject obj )
@@ -158,10 +211,26 @@ public class MongoTransport
 		
 		// Make any per-request changes
 		this.configure();
+		WriteResult result = null;
 		
-		DB db = this._conn.getDB( dbName );
-		DBCollection collection = db.getCollection( collectionName );
-		return collection.update( query, obj, true, true, WriteConcern.SAFE );
+		DB db = null;
+		try
+		{
+			db = this._conn.getDB( dbName );
+			db.requestStart(); // use the same underlying connection until we call requestDone
+			DBCollection collection = db.getCollection( collectionName );
+			// return collection.update( query, obj, true, true, WriteConcern.SAFE );
+			// No upsert, multi
+			result = collection.update( query, obj, false, true, WriteConcern.SAFE );
+		}
+		catch( Exception e )
+		{}
+		finally
+		{
+			if( db != null )
+				db.requestDone();
+		}
+		return result;
 	}
 	
 	public WriteResult delete( String dbName, String collectionName, DBObject match )
@@ -171,10 +240,24 @@ public class MongoTransport
 		
 		// Make any per-request changes
 		this.configure();
+		WriteResult result = null;
 		
-		DB db = this._conn.getDB( dbName );
-		DBCollection collection = db.getCollection( collectionName );
-		return collection.remove( match, WriteConcern.SAFE );
+		DB db = null;
+		try
+		{
+			db = this._conn.getDB( dbName );
+			db.requestStart();
+			DBCollection collection = db.getCollection( collectionName );
+			result = collection.remove( match, WriteConcern.SAFE );
+		}
+		catch( Exception e )
+		{}
+		finally
+		{
+			if( db != null )
+				db.requestDone();
+		}
+		return result;
 	}
 	
 	public void createIndex( String dbName, String collectionName, int keyField )
@@ -217,8 +300,8 @@ public class MongoTransport
 	
 	public boolean dropIndex( String dbName, String collectionName, int keyField )
 	{
-		if( !this._initialized )
-			this.initialize();
+		//if( !this._initialized )
+		//	this.initialize();
 		
 		// Make any per-request changes
 		this.configure();

@@ -38,7 +38,8 @@ public class MongoLoaderThread extends Thread
 			BasicDBObject kv = new BasicDBObject();
 			random.nextBytes( arrBytes );
 			
-			kv.put( "key", String.valueOf( i + minKey ) );
+			//kv.put( "key", String.valueOf( i + minKey ) );
+			kv.put( "_id", String.valueOf( i + minKey ) );
 			kv.put( "value", arrBytes );
 			
 			WriteResult res = this.mongoClient.insert( dbName, collectionName, kv );

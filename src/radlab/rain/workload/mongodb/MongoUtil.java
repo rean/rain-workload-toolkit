@@ -1,5 +1,7 @@
 package radlab.rain.workload.mongodb;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -46,11 +48,11 @@ public class MongoUtil
 		// Need the name of a server, a db to use and a collection
 		int port = MongoTransport.DEFAULT_MONGO_PORT;
 		String host = "localhost";
-		String dbName = "test";
-		String dbCollection = "test-ns";
+		String dbName = "rain";
+		String dbCollection = "rain-ns";
 		int minKey = 1;
 		int maxKey = 100000;
-		int size = 4096;
+		int size = 1024;
 		
 		// MongoUtil <host> <port> <db> <col>
 		if( args.length == 7 )
@@ -120,10 +122,17 @@ public class MongoUtil
 		
 		//MongoUtil.loadDbCollection( mongoClient, dbName, dbCollection, minKey, maxKey, size );
 		long end = System.currentTimeMillis();
+		double durationSecs = (end-start)/1000.0; 
+		double avgResponseTimeSecs = durationSecs/keyCount;
+		
 		System.out.println( "Load finished: " + (end-start)/1000.0 + " seconds" );
-		System.out.println( "Creating index on collection: " + dbCollection + " index field: " + indexField );
+		System.out.println( "Rate [" + size + "]    : " +  keyCount/durationSecs + " puts/sec" );
+		NumberFormat formatter = new DecimalFormat( "#0.0000" );
+		System.out.println( "Avg resp time [" + size + "]: " +  formatter.format( avgResponseTimeSecs ) + "secs" );
+		
+		//System.out.println( "Creating index on collection: " + dbCollection + " index field: " + indexField );
 		// Create the index
-		mongoClient.createIndex( dbName, dbCollection, indexField );
-		System.out.println( "Finished creating index on collection: " + dbCollection + " index field: " + indexField );
+		//mongoClient.createIndex( dbName, dbCollection, indexField );
+		//System.out.println( "Finished creating index on collection: " + dbCollection + " index field: " + indexField );
 	}
 }
