@@ -104,9 +104,7 @@ public class MongoTransport
 		//this._conn = new Mongo( this._servers );//, options );
 		try
 		{
-			StringBuffer connectionString = new StringBuffer();
-			connectionString.append( this._host ).append( ":" ).append( this._port );
-			this._conn = new Mongo( new DBAddress( connectionString.toString() ), options );
+			this._conn = new Mongo( new ServerAddress( this._host, this._port ), options );
 			this._initialized = true;
 		}
 		catch( UnknownHostException uhe )
