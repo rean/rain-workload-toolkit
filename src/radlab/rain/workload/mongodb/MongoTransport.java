@@ -91,12 +91,7 @@ public class MongoTransport
 		// minds. The same goes for changing connection and socket idle timeouts.
 		options.slaveOk = this._slaveOk;
 		options.connectTimeout = this._connectTimeout;
-		options.socketTimeout = this._socketIdleTimeout;
-		//System.out.println( "Default connections per host: " + options.connectionsPerHost );
-		//System.out.println( "Default connection multiplier: " + options.threadsAllowedToBlockForConnectionMultiplier );
-		
-		//options.connectionsPerHost = 100;
-		//options.threadsAllowedToBlockForConnectionMultiplier = 50;
+		//options.socketTimeout = this._socketIdleTimeout;
 		
 		options.connectionsPerHost = this._maxConnectionsPerServer;
 		options.threadsAllowedToBlockForConnectionMultiplier = 50;
