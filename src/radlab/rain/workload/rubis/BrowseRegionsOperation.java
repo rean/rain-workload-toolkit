@@ -35,54 +35,34 @@ package radlab.rain.workload.rubis;
 
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import org.apache.http.client.methods.HttpGet;
 import radlab.rain.IScoreboard;
-import radlab.rain.workload.rubis.model.RubisCategory;
-import radlab.rain.workload.rubis.model.RubisUser;
 
 
 /**
- * Browse-Categories operation.
+ * Browse-Regions operation.
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
-public class BrowseCategoriesOperation extends RubisOperation 
+public class BrowseRegionsOperation extends RubisOperation 
 {
-	public BrowseCategoriesOperation(boolean interactive, IScoreboard scoreboard) 
+	public BrowseRegionsOperation(boolean interactive, IScoreboard scoreboard) 
 	{
 		super(interactive, scoreboard);
 
-		this._operationName = "Browse Categories";
-		this._operationIndex = RubisGenerator.BROWSE_CATEGORIES_OP;
+		this._operationName = "Browse Regions";
+		this._operationIndex = RubisGenerator.BROWSE_REGIONS_OP;
 	}
 
 	@Override
 	public void execute() throws Throwable
 	{
-		RubisCategory category = this.getGenerator().generateCategory();
-
-		Map<String,String> headers = new HashMap<String,String>();
-		headers.put("category", Integer.toString(category.id));
-		headers.put("categoryName", category.name);
-		headers.put("page", "1");
-		headers.put("nbOfItems", Integer.toString(this.getGenerator().getNumItemsPerPage()));
-		if (this.getGenerator().isUserLoggedIn())
-		{
-			RubisUser user = this.getGenerator().getLoggedUser();
-			headers.put("nickname", user.nickname);
-			headers.put("password", user.password);
-		}
-
-		HttpGet request = new HttpGet(this.getGenerator().getBrowseCategoriesURL());
-		StringBuilder response = this.getHttpTransport().fetch(request, headers);
-		this.trace(this.getGenerator().getBrowseCategoriesURL());
+		StringBuilder response = this.getHttpTransport().fetchUrl(this.getGenerator().getBrowseRegionsURL());
+		this.trace(this.getGenerator().getBrowseRegionsURL());
 		if (response.length() == 0)
 		{
 			throw new IOException("Received empty response");
 		}
-
+		
 		this.setFailed(false);
 	}
 }

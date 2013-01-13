@@ -27,70 +27,77 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Author: Marco Guazzone (marco.guazzone@gmail.com), 2013.
  */
 
 package radlab.rain.workload.rubis;
 
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.HttpStatus;
 import java.io.IOException;
-
 import radlab.rain.IScoreboard;
+import radlab.rain.workload.rubis.model.RubisUser;
+
 
 /**
  * Register operation.
+ *
+ * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
 public class RegisterOperation extends RubisOperation 
 {
-
 	public RegisterOperation( boolean interactive, IScoreboard scoreboard ) 
 	{
 		super( interactive, scoreboard );
 		this._operationName = "Register";
-		this._operationIndex = RubisGenerator.REGISTER;
+		this._operationIndex = RubisGenerator.REGISTER_OP;
 		this._mustBeSync = true;
 	}
-	
+
 	@Override
 	public void execute() throws Throwable
 	{
-		StringBuilder response = this._http.fetchUrl( this.getGenerator().registerURL );
-		this.trace( this.getGenerator().registerURL );
+		StringBuilder response = null;
+
+		response = this.getHttpTransport().fetchUrl( this.getGenerator().getRegisterURL() );
+		this.trace( this.getGenerator().getRegisterURL() );
 		if ( response.length() == 0 )
 		{
 			throw new IOException( "Received empty response" );
 		}
-		
-		// Decide on the username and password; parse the authenticity token.
-//		String firstname = "cercs_" + counter;
-//		String lastname = "cercs_" + counter;
-//		String nickname = "cercs_" + counter;
-//		String password = "cercs";
-//		String email = "cercs@gatech.edu";
-//		String region = "GA--Atlanta";
-		
-		// Make the POST request to log in.
-//		StringBuilder postBody = new StringBuilder();
-//		postBody.append( "firstname=" ).append( firstname );
-//		postBody.append( "&lastname=" ).append( lastname );
-//		postBody.append( "&nickname=" ).append( nickname );
-//		postBody.append( "&password=" ).append( password );
-//		postBody.append( "&email=" ).append( email );
-//		postBody.append( "&region=" ).append( region );
-//
-//		System.out.println( "Counter - " + counter );
-//
-//		StringBuilder postResponse = this._http.fetchUrl( this.getGenerator().postRegisterURL, postBody.toString());
-//		this.trace(this.getGenerator().postRegisterURL);
-//		
-//		counter += 1;
 
-		
+		// Generate a user
+		RubisUser user = this.getGenerator().newUser();
+
+		// Construct the POST request
+		HttpPost httpPost = new HttpPost(this.getGenerator().getPostRegisterURL());
+		MultipartEntity entity = new MultipartEntity();
+		entity.addPart("firstname", new StringBody(user.firstname));
+		entity.addPart("lastname", new StringBody(user.lastname));
+		entity.addPart("nickname", new StringBody(user.nickname));
+		entity.addPart("email", new StringBody(user.email));
+		entity.addPart("password", new StringBody(user.password));
+		entity.addPart("region", new StringBody(user.region.name));
+		//entity.addPart("Submit", new StringBody("Register now!"));
+		httpPost.setEntity(entity);
+
+        response = this.getHttpTransport().fetch(httpPost);
+		this.trace(this.getGenerator().getPostRegisterURL());
+
 		// Check that the user was successfully register in.
-//		if ( postResponse.indexOf( "Your registration has been processed successfully" ) < 0 ) {
-//			System.out.println( "Did not register properly." );
-//			throw new Exception( "Registration did not happen for unknown reason" );
-//		}
-		
-		this.setFailed( false );
+		int status = this.getHttpTransport().getStatusCode();
+		if (HttpStatus.SC_OK != status)
+		{
+			throw new IOException("Multipart POST did not work for URL: " + this.getGenerator().getPostRegisterURL() + ". Resturned status code: " + status + "!");
+		}
+		if (-1 != response.indexOf("ERROR"))
+		{
+			throw new IOException("Registration did not happen due to errors");
+		}
+
+		this.setFailed(false);
 	}
-	
 }

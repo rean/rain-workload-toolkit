@@ -27,59 +27,50 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Author: Marco Guazzone (marco.guazzone@gmail.com), 2013.
  */
 
 package radlab.rain.workload.rubis;
 
-import java.util.logging.Logger;
 
 import radlab.rain.Generator;
 import radlab.rain.IScoreboard;
 import radlab.rain.Operation;
 import radlab.rain.util.HttpTransport;
-import radlab.rain.workload.olio.Random;
 
 
 /**
- * The SampleOperation class contains common static methods for use by the
- * operations that inherit from this abstract class.
+ * Base class for RUBiS operations.
+ *
+ * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
 public abstract class RubisOperation extends Operation 
 {
-	// These references will be set by the Generator.
-	protected HttpTransport _http;
-	protected Random _random;
-	protected Logger _logger;
-	protected static int counter = 0;
-	
-	/**
-	 * Returns the SampleGenerator that created this operation.
-	 * 
-	 * @return      The SampleGenerator that created this operation.
-	 */
-	public RubisGenerator getGenerator()
+	public RubisOperation(boolean interactive, IScoreboard scoreboard)
 	{
-		return (RubisGenerator) this._generator;
+		super(interactive, scoreboard);
 	}
-	
-	public RubisOperation( boolean interactive, IScoreboard scoreboard )
-	{
-		super( interactive, scoreboard );
-	}
-	
+
 	@Override
 	public void prepare(Generator generator) 
 	{
 		this._generator = generator;
-		RubisGenerator rubisGenerator = (RubisGenerator) generator;
-		
-		this._http = rubisGenerator.getHttpTransport();
 	}
-	
+
 	@Override
 	public void cleanup()
 	{
-		
+		// Empty
 	}
-	
+
+	public RubisGenerator getGenerator()
+	{
+		return (RubisGenerator) this._generator;
+	}
+
+	public HttpTransport getHttpTransport()
+	{
+		return this.getGenerator().getHttpTransport();
+	}
 }

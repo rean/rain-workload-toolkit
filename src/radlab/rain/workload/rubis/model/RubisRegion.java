@@ -31,58 +31,16 @@
  * Author: Marco Guazzone (marco.guazzone@gmail.com), 2013.
  */
 
-package radlab.rain.workload.rubis;
-
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import org.apache.http.client.methods.HttpGet;
-import radlab.rain.IScoreboard;
-import radlab.rain.workload.rubis.model.RubisCategory;
-import radlab.rain.workload.rubis.model.RubisUser;
+package radlab.rain.workload.rubis.model;
 
 
 /**
- * Browse-Categories operation.
+ * Models a RUBiS region entity.
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
-public class BrowseCategoriesOperation extends RubisOperation 
+public class RubisRegion
 {
-	public BrowseCategoriesOperation(boolean interactive, IScoreboard scoreboard) 
-	{
-		super(interactive, scoreboard);
-
-		this._operationName = "Browse Categories";
-		this._operationIndex = RubisGenerator.BROWSE_CATEGORIES_OP;
-	}
-
-	@Override
-	public void execute() throws Throwable
-	{
-		RubisCategory category = this.getGenerator().generateCategory();
-
-		Map<String,String> headers = new HashMap<String,String>();
-		headers.put("category", Integer.toString(category.id));
-		headers.put("categoryName", category.name);
-		headers.put("page", "1");
-		headers.put("nbOfItems", Integer.toString(this.getGenerator().getNumItemsPerPage()));
-		if (this.getGenerator().isUserLoggedIn())
-		{
-			RubisUser user = this.getGenerator().getLoggedUser();
-			headers.put("nickname", user.nickname);
-			headers.put("password", user.password);
-		}
-
-		HttpGet request = new HttpGet(this.getGenerator().getBrowseCategoriesURL());
-		StringBuilder response = this.getHttpTransport().fetch(request, headers);
-		this.trace(this.getGenerator().getBrowseCategoriesURL());
-		if (response.length() == 0)
-		{
-			throw new IOException("Received empty response");
-		}
-
-		this.setFailed(false);
-	}
+	public int id;
+	public String name;
 }

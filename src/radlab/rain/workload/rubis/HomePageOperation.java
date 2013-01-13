@@ -27,41 +27,40 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Author: Marco Guazzone (marco.guazzone@gmail.com), 2013.
  */
 
 package radlab.rain.workload.rubis;
 
-import java.io.IOException;
 
+import java.io.IOException;
 import radlab.rain.IScoreboard;
+
 
 /**
  * The Home Page operation is a sample operation.
  */
 public class HomePageOperation extends RubisOperation 
 {
-	public HomePageOperation( boolean interactive, IScoreboard scoreboard ) 
+	public HomePageOperation(boolean interactive, IScoreboard scoreboard) 
 	{
-		super( interactive, scoreboard );
+		super(interactive, scoreboard);
+
 		this._operationName = "Home Page";
-		this._operationIndex = RubisGenerator.HOME_PAGE;
+		this._operationIndex = RubisGenerator.HOME_PAGE_OP;
 	}
-	
+
 	@Override
 	public void execute() throws Throwable
 	{
-		// TODO: Make a request.
-		//this.trace( "Log a retraceable string for the request." );
-		
-		// TODO: Fill me in.
-		StringBuilder homeResponse = this._http.fetchUrl( this.getGenerator().homepageURL );
-		this.trace( this.getGenerator().homepageURL );
-		if( homeResponse.length() == 0 )
+		StringBuilder response = this.getHttpTransport().fetchUrl(this.getGenerator().getHomepageURL());
+		this.trace(this.getGenerator().getHomepageURL());
+		if (response.length() == 0)
 		{
-			throw new IOException( "Received empty response" );
+			throw new IOException("Received empty response");
 		}
-		
-		this.setFailed( false );
+
+		this.setFailed(false);
 	}
-	
 }
