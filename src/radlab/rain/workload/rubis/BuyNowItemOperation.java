@@ -73,9 +73,9 @@ public class BuyNowItemOperation extends RubisOperation
 		headers.put("itemId", Integer.toString(item.id));
 		response = this.getHttpTransport().fetch(reqGet, headers);
 		this.trace(this.getGenerator().getBuyNowAuthURL());
-		if (response.length() == 0)
+		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			throw new IOException("Received empty response");
+			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getBuyNowAuthURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		// Perform a Buy-Now operation. Need a logged user
