@@ -37,6 +37,7 @@ package radlab.rain.workload.rubis;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.http.client.methods.HttpGet;
 import radlab.rain.IScoreboard;
 import radlab.rain.workload.rubis.model.RubisUser;
 
@@ -64,7 +65,8 @@ public class ViewUserInfoOperation extends RubisOperation
 
 			Map<String,String> headers = new HashMap<String,String>();
 			headers.put("userId", Integer.toString(user.id));
-			StringBuilder response = this.getHttpTransport().fetchUrl(this.getGenerator().getViewUserInfoURL());
+			HttpGet request = new HttpGet(this.getGenerator().getViewUserInfoURL());
+			StringBuilder response = this.getHttpTransport().fetch(request, headers);
 			this.trace(this.getGenerator().getViewUserInfoURL());
 			if (!this.getGenerator().checkHttpResponse(response.toString()))
 			{

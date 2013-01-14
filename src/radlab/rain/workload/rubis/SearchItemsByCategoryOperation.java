@@ -37,6 +37,7 @@ package radlab.rain.workload.rubis;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.http.client.methods.HttpGet;
 import radlab.rain.IScoreboard;
 import radlab.rain.workload.rubis.model.RubisCategory;
 
@@ -66,7 +67,8 @@ public class SearchItemsByCategoryOperation extends RubisOperation
 		//headers.put("page", Integer.toString(this.getUtility.extractPageFromHTML(this.getLastHTML())));
 		headers.put("page", Integer.toString(1));
 		headers.put("nbOfItems", Integer.toString(this.getGenerator().getNumItemsPerPage()));
-		StringBuilder response = this.getHttpTransport().fetchUrl(this.getGenerator().getSearchItemsByCategoryURL());
+		HttpGet request = new HttpGet(this.getGenerator().getSearchItemsByCategoryURL());
+		StringBuilder response = this.getHttpTransport().fetch(request, headers);
 		this.trace(this.getGenerator().getSearchItemsByCategoryURL());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
