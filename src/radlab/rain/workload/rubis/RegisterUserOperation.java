@@ -65,9 +65,9 @@ public class RegisterUserOperation extends RubisOperation
 
 		response = this.getHttpTransport().fetchUrl( this.getGenerator().getRegisterUserURL() );
 		this.trace( this.getGenerator().getRegisterUserURL() );
-		if ( response.length() == 0 )
+		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			throw new IOException( "Received empty response" );
+			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getRegisterUserURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		// Generate a user
@@ -87,16 +87,9 @@ public class RegisterUserOperation extends RubisOperation
 
         response = this.getHttpTransport().fetch(httpPost);
 		this.trace(this.getGenerator().getPostRegisterUserURL());
-
-		// Check that the user was successfully register in.
-		int status = this.getHttpTransport().getStatusCode();
-		if (HttpStatus.SC_OK != status)
+		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			throw new IOException("Multipart POST did not work for URL: " + this.getGenerator().getPostRegisterUserURL() + ". Resturned status code: " + status + "!");
-		}
-		if (-1 != response.indexOf("ERROR"))
-		{
-			throw new IOException("Registration did not happen due to errors");
+			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getPostRegisterUserURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		this.setFailed(false);

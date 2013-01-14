@@ -96,7 +96,7 @@ public class BuyNowItemOperation extends RubisOperation
 			this.trace(this.getGenerator().getBuyNowURL());
 			if (!this.getGenerator().checkHttpResponse(response.toString()))
 			{
-				throw new IOException("Multipart POST did not work for URL: " + this.getGenerator().getBuyNowURL() + " (status code: " + this.getHttpTransport().getStatusCode() + ")");
+				throw new IOException("Problems in performing request to URL: " + this.getGenerator().getBuyNowURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 			}
 
 			// Perform a Store-Buy-Now operation.
@@ -112,7 +112,7 @@ public class BuyNowItemOperation extends RubisOperation
 			this.trace(this.getGenerator().getStoreBuyNowURL());
 			if (!this.getGenerator().checkHttpResponse(response.toString()))
 			{
-				throw new IOException("Multipart POST did not work for URL: " + this.getGenerator().getStoreBuyNowURL() + " (status code: " + this.getHttpTransport().getStatusCode() + ")");
+				throw new IOException("Problems in performing request to URL: " + this.getGenerator().getStoreBuyNowURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 			}
 		}
 		else

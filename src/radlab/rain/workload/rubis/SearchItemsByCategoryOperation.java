@@ -68,9 +68,9 @@ public class SearchItemsByCategoryOperation extends RubisOperation
 		headers.put("nbOfItems", Integer.toString(this.getGenerator().getNumItemsPerPage()));
 		StringBuilder response = this.getHttpTransport().fetchUrl(this.getGenerator().getSearchItemsByCategoryURL());
 		this.trace(this.getGenerator().getSearchItemsByCategoryURL());
-		if (response.length() == 0)
+		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			throw new IOException("Received empty response");
+			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getSearchItemsByCategoryURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		this.setFailed(false);

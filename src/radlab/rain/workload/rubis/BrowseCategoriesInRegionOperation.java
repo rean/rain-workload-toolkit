@@ -75,9 +75,9 @@ public class BrowseCategoriesInRegionOperation extends RubisOperation
 		HttpGet request = new HttpGet(this.getGenerator().getBrowseCategoriesURL());
 		StringBuilder response = this.getHttpTransport().fetch(request, headers);
 		this.trace(this.getGenerator().getBrowseCategoriesURL());
-		if (response.length() == 0)
+		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			throw new IOException("Received empty response");
+			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getBrowseCategoriesURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		this.setFailed(false);

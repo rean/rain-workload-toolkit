@@ -58,11 +58,11 @@ public class BrowseRegionsOperation extends RubisOperation
 	{
 		StringBuilder response = this.getHttpTransport().fetchUrl(this.getGenerator().getBrowseRegionsURL());
 		this.trace(this.getGenerator().getBrowseRegionsURL());
-		if (response.length() == 0)
+		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			throw new IOException("Received empty response");
+			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getBrowseRegionsURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
-		
+
 		this.setFailed(false);
 	}
 }

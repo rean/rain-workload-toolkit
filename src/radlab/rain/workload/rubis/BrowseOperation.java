@@ -58,9 +58,9 @@ public class BrowseOperation extends RubisOperation
 	{
 		StringBuilder response = this.getHttpTransport().fetchUrl(this.getGenerator().getBrowseURL());
 		this.trace(this.getGenerator().getBrowseURL());
-		if (response.length() == 0)
+		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			throw new IOException("Received empty response");
+			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getBrowseURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		this.setFailed(false);

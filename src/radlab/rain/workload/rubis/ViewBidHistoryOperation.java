@@ -64,9 +64,9 @@ public class ViewBidHistoryOperation extends RubisOperation
 		headers.put("itemId", Integer.toString(item.id));
 		StringBuilder response = this.getHttpTransport().fetchUrl(this.getGenerator().getViewBidHistoryURL());
 		this.trace(this.getGenerator().getViewBidHistoryURL());
-		if (response.length() == 0)
+		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			throw new IOException("Received empty response");
+			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getViewBidHistoryURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		this.setFailed(false);
