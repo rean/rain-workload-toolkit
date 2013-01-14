@@ -33,6 +33,7 @@
 
 package radlab.rain.workload.rubis;
 
+
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.StringBody;
@@ -43,17 +44,17 @@ import radlab.rain.workload.rubis.model.RubisUser;
 
 
 /**
- * Register operation.
+ * Register User operation.
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
-public class RegisterOperation extends RubisOperation 
+public class RegisterUserOperation extends RubisOperation 
 {
-	public RegisterOperation( boolean interactive, IScoreboard scoreboard ) 
+	public RegisterUserOperation(boolean interactive, IScoreboard scoreboard)
 	{
 		super( interactive, scoreboard );
-		this._operationName = "Register";
-		this._operationIndex = RubisGenerator.REGISTER_OP;
+		this._operationName = "Register User";
+		this._operationIndex = RubisGenerator.REGISTER_USER_OP;
 		this._mustBeSync = true;
 	}
 
@@ -62,8 +63,8 @@ public class RegisterOperation extends RubisOperation
 	{
 		StringBuilder response = null;
 
-		response = this.getHttpTransport().fetchUrl( this.getGenerator().getRegisterURL() );
-		this.trace( this.getGenerator().getRegisterURL() );
+		response = this.getHttpTransport().fetchUrl( this.getGenerator().getRegisterUserURL() );
+		this.trace( this.getGenerator().getRegisterUserURL() );
 		if ( response.length() == 0 )
 		{
 			throw new IOException( "Received empty response" );
@@ -73,7 +74,7 @@ public class RegisterOperation extends RubisOperation
 		RubisUser user = this.getGenerator().newUser();
 
 		// Construct the POST request
-		HttpPost httpPost = new HttpPost(this.getGenerator().getPostRegisterURL());
+		HttpPost httpPost = new HttpPost(this.getGenerator().getPostRegisterUserURL());
 		MultipartEntity entity = new MultipartEntity();
 		entity.addPart("firstname", new StringBody(user.firstname));
 		entity.addPart("lastname", new StringBody(user.lastname));
@@ -85,13 +86,13 @@ public class RegisterOperation extends RubisOperation
 		httpPost.setEntity(entity);
 
         response = this.getHttpTransport().fetch(httpPost);
-		this.trace(this.getGenerator().getPostRegisterURL());
+		this.trace(this.getGenerator().getPostRegisterUserURL());
 
 		// Check that the user was successfully register in.
 		int status = this.getHttpTransport().getStatusCode();
 		if (HttpStatus.SC_OK != status)
 		{
-			throw new IOException("Multipart POST did not work for URL: " + this.getGenerator().getPostRegisterURL() + ". Resturned status code: " + status + "!");
+			throw new IOException("Multipart POST did not work for URL: " + this.getGenerator().getPostRegisterUserURL() + ". Resturned status code: " + status + "!");
 		}
 		if (-1 != response.indexOf("ERROR"))
 		{
