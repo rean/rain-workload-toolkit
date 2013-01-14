@@ -36,6 +36,7 @@ package radlab.rain.workload.rubis;
 
 import java.util.Calendar;
 import java.util.Random;
+import org.apache.http.HttpStatus;
 import radlab.rain.Generator;
 import radlab.rain.LoadProfile;
 import radlab.rain.Operation;
@@ -67,6 +68,7 @@ public class RubisGenerator extends Generator
 	public static final int VIEW_ITEM_OP = 8;
 	public static final int VIEW_USER_INFO_OP = 9;
 	public static final int VIEW_BID_HISTORY_OP = 10;
+	public static final int BUY_NOW_ITEM_OP = 11;
 //	public static final int SELL_OP = 3;
 //	public static final int BID_OP = 4;
 //	public static final int COMMENT_OP = 5;
@@ -75,7 +77,6 @@ public class RubisGenerator extends Generator
 //	public static final int VIEW_ITEM_OP = 9999;
 //	public static final int VIEW_BID_HISTORY_OP = 9999;
 //	public static final int BUY_NOW_AUTH_OP = 9999;
-//	public static final int BUY_NOW_OP = 9999;
 
 	/// The set of alphanumeric characters
 	private static final char[] ALNUM_CHARS = { '0', '1', '2', '3', '4', '5',
@@ -227,6 +228,9 @@ public class RubisGenerator extends Generator
 	private String _viewItemURL;
 	private String _viewUserInfoURL;
 	private String _viewBidHistoryURL;
+	private String _buyNowAuthURL;
+	private String _buyNowURL;
+	private String _storeBuyNowURL;
 //	private String _sellURL;
 //	private String _sellItemFormURL;
 //	private String _postRegisterItemURL;
@@ -399,6 +403,18 @@ public class RubisGenerator extends Generator
 		return this.getUser(this.getLoggedUserId());
 	}
 
+	public boolean checkHttpResponse(String response)
+	{
+		if (response.length() == 0
+			|| HttpStatus.SC_OK != this.getHttpTransport().getStatusCode()
+			|| -1 != response.indexOf("ERROR"))
+		{
+			return false;
+		}
+
+		return true;
+	}
+
 	public String getBaseURL()
 	{
 		return this._baseURL;
@@ -462,6 +478,21 @@ public class RubisGenerator extends Generator
 	public String getViewBidHistoryURL()
 	{
 		return this._viewBidHistoryURL;
+	}
+
+	public String getBuyNowAuthURL()
+	{
+		return this._buyNowAuthURL;
+	}
+
+	public String getBuyNowURL()
+	{
+		return this._buyNowURL;
+	}
+
+	public String getStoreBuyNowURL()
+	{
+		return this._storeBuyNowURL;
 	}
 
 //	public String getSellURL()
@@ -536,6 +567,7 @@ public class RubisGenerator extends Generator
 			case VIEW_ITEM_OP: return this.createViewItemOperation();
 			case VIEW_USER_INFO_OP: return this.createViewUserInfoOperation();
 			case VIEW_BID_HISTORY_OP: return this.createViewBidHistoryOperation();
+			case BUY_NOW_ITEM_OP: return this.createBuyNowItemOperation();
 //			case SELL_OP: return this.createSellOperation();
 //			case BID_OP: return this.createBidOperation();
 //			case COMMENT_OP: return this.createCommentOperation();
@@ -666,11 +698,23 @@ public class RubisGenerator extends Generator
 	/**
 	 * Factory method.
 	 * 
-	 * @return  A prepared ViewBidHistoryInfoOperation.
+	 * @return  A prepared ViewBidHistoryOperation.
 	 */
 	public ViewBidHistoryOperation createViewBidHistoryOperation()
 	{
 		ViewBidHistoryOperation op = new ViewBidHistoryOperation(this.getTrack().getInteractive(), this.getScoreboard());
+		op.prepare(this);
+		return op;
+	}
+
+	/**
+	 * Factory method.
+	 * 
+	 * @return  A prepared BuyNowItemOperation.
+	 */
+	public BuyNowItemOperation createBuyNowItemOperation()
+	{
+		BuyNowItemOperation op = new BuyNowItemOperation(this.getTrack().getInteractive(), this.getScoreboard());
 		op.prepare(this);
 		return op;
 	}
@@ -951,6 +995,9 @@ public class RubisGenerator extends Generator
 		this._viewItemURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.ViewItem";
 		this._viewUserInfoURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.ViewUserInfo";
 		this._viewBidHistoryURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.ViewBidHistory";
+		this._buyNowAuthURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.BuyNowAuth";
+		this._buyNowURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.BuyNow";
+		this._storeBuyNowURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.StoreBuyNow";
 //		this._sellURL = this._baseURL + "/rubis_servlets/sell.html";
 //		this._sellItemFormURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.SellItemForm";
 //		this._postRegisterItemURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.RegisterItem";

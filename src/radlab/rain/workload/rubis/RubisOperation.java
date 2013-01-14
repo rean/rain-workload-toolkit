@@ -34,6 +34,7 @@
 package radlab.rain.workload.rubis;
 
 
+import java.util.Random;
 import radlab.rain.Generator;
 import radlab.rain.IScoreboard;
 import radlab.rain.Operation;
@@ -72,5 +73,10 @@ public abstract class RubisOperation extends Operation
 	public HttpTransport getHttpTransport()
 	{
 		return this.getGenerator().getHttpTransport();
+	}
+
+	public Random getRandomGenerator()
+	{
+		return this.getGenerator().getRandomGenerator();
 	}
 }
