@@ -857,6 +857,7 @@ public class RubisGenerator extends Generator
 
 		return (idx1 < idx2) ? idx1 : idx2;
 	}
+
 	/**
 	 * Initialize the roots/anchors of the URLs.
 	 */
@@ -871,6 +872,7 @@ public class RubisGenerator extends Generator
 		this._searchItemsByCategoryURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.SearchItemsByCategory";
 		this._browseRegionsURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.BrowseRegions";
 		this._browseCategoriesInRegionURL = this._browseCategoriesURL;
+		this._searchItemsByRegionURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.SearchItemsByRegion";
 //		this._sellURL = this._baseURL + "/rubis_servlets/sell.html";
 //		this._sellItemFormURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.SellItemForm";
 //		this._postRegisterItemURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.RegisterItem";
