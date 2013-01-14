@@ -63,7 +63,7 @@ public class RubisGenerator extends Generator
 	public static final int SEARCH_ITEMS_BY_CATEGORY_OP = 4;
 	public static final int BROWSE_REGIONS_OP = 5;
 	public static final int BROWSE_CATEGORIES_IN_REGION_OP = 6;
-//	public static final int SEARCH_ITEMS_BY_REGION_OP = 6;
+	public static final int SEARCH_ITEMS_BY_REGION_OP = 7;
 //	public static final int SELL_OP = 3;
 //	public static final int BID_OP = 4;
 //	public static final int COMMENT_OP = 5;
@@ -220,6 +220,7 @@ public class RubisGenerator extends Generator
 	private String _searchItemsByCategoryURL;
 	private String _browseRegionsURL; 
 	private String _browseCategoriesInRegionURL; 
+	private String _searchItemsByRegionURL;
 	private String _sellURL;
 	private String _sellItemFormURL;
 	private String _postRegisterItemURL;
@@ -428,6 +429,11 @@ public class RubisGenerator extends Generator
 		return this._browseCategoriesInRegionURL; 
 	}
 
+	public String getSearchItemsByRegionURL()
+	{
+		return this._searchItemsByRegionURL;
+	}
+
 //	public String getSellURL()
 //	{
 //		return this._sellURL;
@@ -501,6 +507,7 @@ public class RubisGenerator extends Generator
 			case SEARCH_ITEMS_BY_CATEGORY_OP: return this.createSearchItemsByCategoryOperation();
 			case BROWSE_REGIONS_OP: return this.createBrowseRegionsOperation();
 			case BROWSE_CATEGORIES_IN_REGION_OP: return this.createBrowseCategoriesInRegionOperation();
+			case SEARCH_ITEMS_BY_REGION_OP: return this.createSearchItemsByRegionOperation();
 //			case SELL_OP: return this.createSellOperation();
 //			case BID_OP: return this.createBidOperation();
 //			case COMMENT_OP: return this.createCommentOperation();
@@ -588,6 +595,18 @@ public class RubisGenerator extends Generator
 	public BrowseCategoriesInRegionOperation createBrowseCategoriesInRegionOperation()
 	{
 		BrowseCategoriesInRegionOperation op = new BrowseCategoriesInRegionOperation(this.getTrack().getInteractive(), this.getScoreboard());
+		op.prepare(this);
+		return op;
+	}
+
+	/**
+	 * Factory method.
+	 * 
+	 * @return  A prepared SearchItemsByRegionOperation.
+	 */
+	public SearchItemsByRegionOperation createSearchItemsByRegionOperation()
+	{
+		SearchItemsByRegionOperation op = new SearchItemsByRegionOperation(this.getTrack().getInteractive(), this.getScoreboard());
 		op.prepare(this);
 		return op;
 	}
