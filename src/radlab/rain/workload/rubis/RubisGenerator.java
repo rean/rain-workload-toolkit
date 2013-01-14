@@ -66,6 +66,7 @@ public class RubisGenerator extends Generator
 	public static final int SEARCH_ITEMS_BY_REGION_OP = 7;
 	public static final int VIEW_ITEM_OP = 8;
 	public static final int VIEW_USER_INFO_OP = 9;
+	public static final int VIEW_BID_HISTORY_OP = 10;
 //	public static final int SELL_OP = 3;
 //	public static final int BID_OP = 4;
 //	public static final int COMMENT_OP = 5;
@@ -225,6 +226,7 @@ public class RubisGenerator extends Generator
 	private String _searchItemsByRegionURL;
 	private String _viewItemURL;
 	private String _viewUserInfoURL;
+	private String _viewBidHistoryURL;
 //	private String _sellURL;
 //	private String _sellItemFormURL;
 //	private String _postRegisterItemURL;
@@ -457,6 +459,11 @@ public class RubisGenerator extends Generator
 		return this._viewUserInfoURL;
 	}
 
+	public String getViewBidHistoryURL()
+	{
+		return this._viewBidHistoryURL;
+	}
+
 //	public String getSellURL()
 //	{
 //		return this._sellURL;
@@ -528,6 +535,7 @@ public class RubisGenerator extends Generator
 			case SEARCH_ITEMS_BY_REGION_OP: return this.createSearchItemsByRegionOperation();
 			case VIEW_ITEM_OP: return this.createViewItemOperation();
 			case VIEW_USER_INFO_OP: return this.createViewUserInfoOperation();
+			case VIEW_BID_HISTORY_OP: return this.createViewBidHistoryOperation();
 //			case SELL_OP: return this.createSellOperation();
 //			case BID_OP: return this.createBidOperation();
 //			case COMMENT_OP: return this.createCommentOperation();
@@ -651,6 +659,18 @@ public class RubisGenerator extends Generator
 	public ViewUserInfoOperation createViewUserInfoOperation()
 	{
 		ViewUserInfoOperation op = new ViewUserInfoOperation(this.getTrack().getInteractive(), this.getScoreboard());
+		op.prepare(this);
+		return op;
+	}
+
+	/**
+	 * Factory method.
+	 * 
+	 * @return  A prepared ViewBidHistoryInfoOperation.
+	 */
+	public ViewBidHistoryOperation createViewBidHistoryOperation()
+	{
+		ViewBidHistoryOperation op = new ViewBidHistoryOperation(this.getTrack().getInteractive(), this.getScoreboard());
 		op.prepare(this);
 		return op;
 	}
@@ -930,6 +950,7 @@ public class RubisGenerator extends Generator
 		this._searchItemsByRegionURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.SearchItemsByRegion";
 		this._viewItemURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.ViewItem";
 		this._viewUserInfoURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.ViewUserInfo";
+		this._viewBidHistoryURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.ViewBidHistory";
 //		this._sellURL = this._baseURL + "/rubis_servlets/sell.html";
 //		this._sellItemFormURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.SellItemForm";
 //		this._postRegisterItemURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.RegisterItem";
