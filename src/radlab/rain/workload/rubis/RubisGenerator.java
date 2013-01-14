@@ -65,13 +65,13 @@ public class RubisGenerator extends Generator
 	public static final int BROWSE_CATEGORIES_IN_REGION_OP = 6;
 	public static final int SEARCH_ITEMS_BY_REGION_OP = 7;
 	public static final int VIEW_ITEM_OP = 8;
+	public static final int VIEW_USER_INFO_OP = 9;
 //	public static final int SELL_OP = 3;
 //	public static final int BID_OP = 4;
 //	public static final int COMMENT_OP = 5;
 //	public static final int BROWSE_CATEGORIES_IN_REGIONS_OP = 9999;
 //	public static final int BROWSE_ITEMS_IN_REGIONS_OP = 9999;
 //	public static final int VIEW_ITEM_OP = 9999;
-//	public static final int VIEW_USER_OP = 9999;
 //	public static final int VIEW_BID_HISTORY_OP = 9999;
 //	public static final int BUY_NOW_AUTH_OP = 9999;
 //	public static final int BUY_NOW_OP = 9999;
@@ -224,16 +224,17 @@ public class RubisGenerator extends Generator
 	private String _browseCategoriesInRegionURL; 
 	private String _searchItemsByRegionURL;
 	private String _viewItemURL;
-	private String _sellURL;
-	private String _sellItemFormURL;
-	private String _postRegisterItemURL;
-	private String _putBidAuthURL;
-	private String _postPutBidURL;
-	private String _postStoreBidURL;
-	private String _postAboutMeURL;
-	private String _putCommentAuthURL;
-	private String _postPutCommentURL;
-	private String _postStoreCommentURL;
+	private String _viewUserInfoURL;
+//	private String _sellURL;
+//	private String _sellItemFormURL;
+//	private String _postRegisterItemURL;
+//	private String _putBidAuthURL;
+//	private String _postPutBidURL;
+//	private String _postStoreBidURL;
+//	private String _postAboutMeURL;
+//	private String _putCommentAuthURL;
+//	private String _postPutCommentURL;
+//	private String _postStoreCommentURL;
 
 
 	public static synchronized int nextUserId()
@@ -451,6 +452,11 @@ public class RubisGenerator extends Generator
 		return this._viewItemURL;
 	}
 
+	public String getViewUserInfoURL()
+	{
+		return this._viewUserInfoURL;
+	}
+
 //	public String getSellURL()
 //	{
 //		return this._sellURL;
@@ -521,6 +527,7 @@ public class RubisGenerator extends Generator
 			case BROWSE_CATEGORIES_IN_REGION_OP: return this.createBrowseCategoriesInRegionOperation();
 			case SEARCH_ITEMS_BY_REGION_OP: return this.createSearchItemsByRegionOperation();
 			case VIEW_ITEM_OP: return this.createViewItemOperation();
+			case VIEW_USER_INFO_OP: return this.createViewUserInfoOperation();
 //			case SELL_OP: return this.createSellOperation();
 //			case BID_OP: return this.createBidOperation();
 //			case COMMENT_OP: return this.createCommentOperation();
@@ -632,6 +639,18 @@ public class RubisGenerator extends Generator
 	public ViewItemOperation createViewItemOperation()
 	{
 		ViewItemOperation op = new ViewItemOperation(this.getTrack().getInteractive(), this.getScoreboard());
+		op.prepare(this);
+		return op;
+	}
+
+	/**
+	 * Factory method.
+	 * 
+	 * @return  A prepared ViewUserInfoOperation.
+	 */
+	public ViewUserInfoOperation createViewUserInfoOperation()
+	{
+		ViewUserInfoOperation op = new ViewUserInfoOperation(this.getTrack().getInteractive(), this.getScoreboard());
 		op.prepare(this);
 		return op;
 	}
@@ -910,6 +929,7 @@ public class RubisGenerator extends Generator
 		this._browseCategoriesInRegionURL = this._browseCategoriesURL;
 		this._searchItemsByRegionURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.SearchItemsByRegion";
 		this._viewItemURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.ViewItem";
+		this._viewUserInfoURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.ViewUserInfo";
 //		this._sellURL = this._baseURL + "/rubis_servlets/sell.html";
 //		this._sellItemFormURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.SellItemForm";
 //		this._postRegisterItemURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.RegisterItem";
