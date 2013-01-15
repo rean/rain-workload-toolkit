@@ -69,8 +69,8 @@ public class RubisGenerator extends Generator
 	public static final int VIEW_USER_INFO_OP = 9;
 	public static final int VIEW_BID_HISTORY_OP = 10;
 	public static final int BUY_NOW_ITEM_OP = 11;
+	public static final int BID_OP = 12;
 //	public static final int SELL_OP = 3;
-//	public static final int BID_OP = 4;
 //	public static final int COMMENT_OP = 5;
 //	public static final int BROWSE_CATEGORIES_IN_REGIONS_OP = 9999;
 //	public static final int BROWSE_ITEMS_IN_REGIONS_OP = 9999;
@@ -177,25 +177,13 @@ public class RubisGenerator extends Generator
 												"Toys & Hobbies",
 												"Everything Else"};
 
-//	private static final String ITEM_DESCR =  "This incredible item is exactly what you need !<br>It has a lot of very nice features including "
-//											+ "a coffee option.<br>It comes with a free license for the free RUBiS software, that's really cool. But RUBiS even if it "
-//											+ "is free, is <B>(C) Rice University/INRIA 2001</B>. It is really hard to write an interesting generic description for "
-//											+ "automatically generated items, but who will really read this <br>You can also check some cool software available on "
-//											+ "http://sci-serv.inrialpes.fr. There is a very cool DSM system called SciFS for SCI clusters, but you will need some "
-//											+ "SCI adapters to be able to run it ! Else you can still try CART, the amazing 'Cluster Administration and Reservation "
-//											+ "Tool'. All those software are open source, so don't hesitate ! If you have a SCI Cluster you can also try the Whoops! "
-//											+ "clustered web server. Actually Whoops! stands for something ! Yes, it is a Web cache with tcp Handoff, On the fly "
-//											+ "cOmpression, parallel Pull-based lru for Sci clusters !! Ok, that was a lot of fun but now it is starting to be quite late "
-//											+ "and I'll have to go to bed very soon, so I think if you need more information, just go on <h1>http://sci-serv.inrialpes.fr</h1> "
-//											+ "or you can even try http://www.cs.rice.edu and try to find where Emmanuel Cecchet or Julie Marguerite are and you will "
-//											+ "maybe get fresh news about all that !!<br>";
-
 	private static final int TOTAL_ACTIVE_ITEMS = 1374+2691+259+2874+538+7521+664+586+1077+976+2325+1051+1420+170+1069+3029+305+242+3671+825;
 	private static final int NUM_OLD_ITEMS = 100000;
 	private static final int PERCENT_UNIQUE_ITEMS = 80;
 	private static final int PERCENT_ITEMS_RESERVE_PRICE = 40;
 	private static final int PERCENT_ITEMS_BUY_NOW_PRICE = 10;
 	private static final int MAX_ITEM_QUANTITY = 10;
+	private static final int MAX_ADD_BID = 10;
 	private static final int MAX_ITEM_DESCR_LEN = 8192;
 	private static final int MAX_WORD_LEN = 12;
 	private static final int MAX_ITEM_INIT_PRICE = 5000;
@@ -231,6 +219,9 @@ public class RubisGenerator extends Generator
 	private String _buyNowAuthURL;
 	private String _buyNowURL;
 	private String _storeBuyNowURL;
+	private String _putBidAuthURL;
+	private String _putBidURL;
+	private String _storeBidURL;
 //	private String _sellURL;
 //	private String _sellItemFormURL;
 //	private String _postRegisterItemURL;
@@ -495,6 +486,21 @@ public class RubisGenerator extends Generator
 		return this._storeBuyNowURL;
 	}
 
+	public String getPutBidAuthURL()
+	{
+		return this._putBidAuthURL;
+	}
+
+	public String getPutBidURL()
+	{
+		return this._putBidURL;
+	}
+
+	public String getStoreBidURL()
+	{
+		return this._storeBidURL;
+	}
+
 //	public String getSellURL()
 //	{
 //		return this._sellURL;
@@ -568,6 +574,7 @@ public class RubisGenerator extends Generator
 			case VIEW_USER_INFO_OP: return this.createViewUserInfoOperation();
 			case VIEW_BID_HISTORY_OP: return this.createViewBidHistoryOperation();
 			case BUY_NOW_ITEM_OP: return this.createBuyNowItemOperation();
+			case BID_OP: return this.createBidOperation();
 //			case SELL_OP: return this.createSellOperation();
 //			case BID_OP: return this.createBidOperation();
 //			case COMMENT_OP: return this.createCommentOperation();
@@ -722,6 +729,18 @@ public class RubisGenerator extends Generator
 	/**
 	 * Factory method.
 	 * 
+	 * @return  A prepared BidOperation.
+	 */
+	public BidOperation createBidOperation()
+	{
+		BidOperation op = new BidOperation(this.getTrack().getInteractive(), this.getScoreboard());
+		op.prepare(this);
+		return op;
+	}
+
+	/**
+	 * Factory method.
+	 * 
 	 * @return  A prepared SellOperation.
 	 */
 //	public SellOperation createSellOperation()
@@ -823,13 +842,13 @@ public class RubisGenerator extends Generator
 		{
 			item.buyNow = 0;
 		}
-		//item.nbOfBids = ;
-		//item.maxBid = ;
+		item.nbOfBids = 0;
+		item.maxBid = 0;
 		Calendar cal = Calendar.getInstance();
 		item.startDate = cal.getTime();
 		cal.add(Calendar.DAY_OF_MONTH, this._rng.nextInt(MAX_ITEM_DURATION)+1);
 		item.endDate = cal.getTime();
-		//item.seller = ;
+		item.seller = this.getLoggedUserId();
 		item.category = this.generateCategory();
 
 		return item;
@@ -868,6 +887,11 @@ public class RubisGenerator extends Generator
 	public int getNumItemsPerPage()
 	{
 		return NUM_ITEMS_PER_PAGE;
+	}
+
+	public int getMaxAddBid()
+	{
+		return MAX_ADD_BID;
 	}
 
 	private String generateText(int minLen, int maxLen)
@@ -911,72 +935,6 @@ public class RubisGenerator extends Generator
 		return new String(buf);
 	}
 
-/*
-	public int extractPageFrommHTML(String html)
-	{
-		if (html == null || html.isEmpty())
-		{
-			return 0;
-		}
-
-		int firstPageIdx = html.indexOf("&page=");
-		if (firstPageIdx == -1)
-		{
-			return 0;
-		}
-		int lastPageIdx = html.indexOf("&page=", firstPageIdx+6); // 6 == length("&page=")
-		int pageIdx = 0;
-		if (lastPageIdx == -1)
-		{
-			// First or last page => go to next or previous page
-			pageIdx = firstPageIdx;
-		}
-		else
-		{
-			// Choose randomly a page (previous or next)
-			if (this._rng.nextInt(100000) < 50000)
-			{
-				pageIdx = firstPageIdx;
-			}
-			else
-			{
-				pageIdx = lastPageIdx;
-			}
-		}
-		int pageValIdx = pageIdx+6;
-		int idx = 0;
-		idx = minIndex(Integer.MAX_VALUE, html.indexOf('\"', pageValIdx+6));
-		idx = minIndex(idx, html.indexOf('?', pageValIdx+6));
-		idx = minIndex(idx, html.indexOf('&', pageValIdx+6));
-		idx = minIndex(idx, html.indexOf('>', pageValIdx+6));
-		int pageNum = 0;
-		try
-		{
-			pageNum = Integer.parseInt(html.substring(pageValIdx, idx));
-		}
-		catch (Exception e)
-		{
-			pageNum = 0;
-		}
-
-		return pageNum;
-	}
-*/
-
-	private static int minIndex(int idx1, int idx2)
-	{
-		if (idx1 < 0)
-		{
-			return idx2;
-		}
-		if (idx2 < 0)
-		{
-			return idx1;
-		}
-
-		return (idx1 < idx2) ? idx1 : idx2;
-	}
-
 	/**
 	 * Initialize the roots/anchors of the URLs.
 	 */
@@ -998,6 +956,9 @@ public class RubisGenerator extends Generator
 		this._buyNowAuthURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.BuyNowAuth";
 		this._buyNowURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.BuyNow";
 		this._storeBuyNowURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.StoreBuyNow";
+		this._putBidAuthURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.PutBidAuth";
+		this._putBidURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.PutBid";
+		this._storeBidURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.StoreBid";
 //		this._sellURL = this._baseURL + "/rubis_servlets/sell.html";
 //		this._sellItemFormURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.SellItemForm";
 //		this._postRegisterItemURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.RegisterItem";
