@@ -53,5 +53,5 @@ public class RubisUser
 	public int rating;
 	public double balance;
 	public Date creationDate;
-	public RubisRegion region;
+	public int region;
 }

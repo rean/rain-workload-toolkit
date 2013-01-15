@@ -81,7 +81,7 @@ public class RegisterUserOperation extends RubisOperation
 		entity.addPart("nickname", new StringBody(user.nickname));
 		entity.addPart("email", new StringBody(user.email));
 		entity.addPart("password", new StringBody(user.password));
-		entity.addPart("region", new StringBody(user.region.name));
+		entity.addPart("region", new StringBody(this.getGenerator().getRegion(user.region).name));
 		//entity.addPart("Submit", new StringBody("Register now!"));
 		httpPost.setEntity(entity);
 
