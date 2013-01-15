@@ -61,20 +61,19 @@ public class RubisGenerator extends Generator
 	// Use the same order of the native RUBiS mix matrix
 	public static final int HOME_PAGE_OP = 0;
 	public static final int REGISTER_USER_OP = 1;
-	public static final int BROWSE_OP = 2;
-	public static final int BROWSE_CATEGORIES_OP = 3;
-	public static final int SEARCH_ITEMS_BY_CATEGORY_OP = 4;
-	public static final int BROWSE_REGIONS_OP = 5;
-	public static final int BROWSE_CATEGORIES_IN_REGION_OP = 6;
-	public static final int SEARCH_ITEMS_BY_REGION_OP = 7;
-	public static final int VIEW_ITEM_OP = 8;
-	public static final int VIEW_USER_INFO_OP = 9;
-	public static final int VIEW_BID_HISTORY_OP = 10;
-	public static final int BUY_NOW_ITEM_OP = 11;
-	public static final int BID_OP = 12;
-	public static final int COMMENT_ITEM_OP = 13;
-	public static final int SELL_ITEM_OP = 14;
-	public static final int ABOUT_ME_OP = 15;
+	public static final int BROWSE_CATEGORIES_OP = 2;
+	public static final int SEARCH_ITEMS_BY_CATEGORY_OP = 3;
+	public static final int BROWSE_REGIONS_OP = 4;
+	public static final int BROWSE_CATEGORIES_IN_REGION_OP = 5;
+	public static final int SEARCH_ITEMS_BY_REGION_OP = 6;
+	public static final int VIEW_ITEM_OP = 7;
+	public static final int VIEW_USER_INFO_OP = 8;
+	public static final int VIEW_BID_HISTORY_OP = 9;
+	public static final int BUY_NOW_ITEM_OP = 10;
+	public static final int BID_OP = 11;
+	public static final int COMMENT_ITEM_OP = 12;
+	public static final int SELL_ITEM_OP = 13;
+	public static final int ABOUT_ME_OP = 14;
 
 	/// The set of alphanumeric characters
 	private static final char[] ALNUM_CHARS = { '0', '1', '2', '3', '4', '5',
@@ -557,7 +556,6 @@ public class RubisGenerator extends Generator
 			//case DO_NOTHING_OP: return this.createDoNothingOperation();
 			case HOME_PAGE_OP: return this.createHomePageOperation();
 			case REGISTER_USER_OP: return this.createRegisterUserOperation();
-			case BROWSE_OP: return this.createBrowseOperation();
 			case BROWSE_CATEGORIES_OP: return this.createBrowseCategoriesOperation();
 			case SEARCH_ITEMS_BY_CATEGORY_OP: return this.createSearchItemsByCategoryOperation();
 			case BROWSE_REGIONS_OP: return this.createBrowseRegionsOperation();
@@ -595,18 +593,6 @@ public class RubisGenerator extends Generator
 	public RegisterUserOperation createRegisterUserOperation()
 	{
 		RegisterUserOperation op = new RegisterUserOperation(this.getTrack().getInteractive(), this.getScoreboard());
-		op.prepare(this);
-		return op;
-	}
-
-	/**
-	 * Factory method.
-	 * 
-	 * @return  A prepared BrowseOperation.
-	 */
-	public BrowseOperation createBrowseOperation()
-	{
-		BrowseOperation op = new BrowseOperation(this.getTrack().getInteractive(), this.getScoreboard());
 		op.prepare(this);
 		return op;
 	}
