@@ -63,18 +63,18 @@ public class RegisterUserOperation extends RubisOperation
 	{
 		StringBuilder response = null;
 
-		response = this.getHttpTransport().fetchUrl( this.getGenerator().getRegisterUserURL() );
-		this.trace( this.getGenerator().getRegisterUserURL() );
+		response = this.getHttpTransport().fetchUrl( this.getGenerator().getRegisterURL() );
+		this.trace( this.getGenerator().getRegisterURL() );
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getRegisterUserURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getRegisterURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		// Generate a user
 		RubisUser user = this.getGenerator().newUser();
 
 		// Construct the POST request
-		HttpPost httpPost = new HttpPost(this.getGenerator().getPostRegisterUserURL());
+		HttpPost httpPost = new HttpPost(this.getGenerator().getRegisterUserURL());
 		MultipartEntity entity = new MultipartEntity();
 		entity.addPart("firstname", new StringBody(user.firstname));
 		entity.addPart("lastname", new StringBody(user.lastname));
@@ -86,10 +86,10 @@ public class RegisterUserOperation extends RubisOperation
 		httpPost.setEntity(entity);
 
         response = this.getHttpTransport().fetch(httpPost);
-		this.trace(this.getGenerator().getPostRegisterUserURL());
+		this.trace(this.getGenerator().getRegisterUserURL());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getPostRegisterUserURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getRegisterUserURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		this.setFailed(false);

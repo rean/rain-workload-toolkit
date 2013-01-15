@@ -73,12 +73,7 @@ public class RubisGenerator extends Generator
 	public static final int BUY_NOW_ITEM_OP = 11;
 	public static final int BID_OP = 12;
 	public static final int COMMENT_ITEM_OP = 13;
-//	public static final int SELL_OP = 3;
-//	public static final int BROWSE_CATEGORIES_IN_REGIONS_OP = 9999;
-//	public static final int BROWSE_ITEMS_IN_REGIONS_OP = 9999;
-//	public static final int VIEW_ITEM_OP = 9999;
-//	public static final int VIEW_BID_HISTORY_OP = 9999;
-//	public static final int BUY_NOW_AUTH_OP = 9999;
+	public static final int SELL_ITEM_OP = 14;
 
 	/// The set of alphanumeric characters
 	private static final char[] ALNUM_CHARS = { '0', '1', '2', '3', '4', '5',
@@ -220,8 +215,8 @@ public class RubisGenerator extends Generator
 	private int _loggedUserId;
 	private String _baseURL;
 	private String _homepageURL; 
+	private String _registerURL;
 	private String _registerUserURL;
-	private String _postRegisterUserURL;
 	private String _browseURL;
 	private String _browseCategoriesURL; 
 	private String _searchItemsByCategoryURL;
@@ -240,9 +235,9 @@ public class RubisGenerator extends Generator
 	private String _putCommentAuthURL;
 	private String _putCommentURL;
 	private String _storeCommentURL;
-//	private String _sellURL;
-//	private String _sellItemFormURL;
-//	private String _postRegisterItemURL;
+	private String _sellURL;
+	private String _sellItemFormURL;
+	private String _registerItemURL;
 //	private String _putBidAuthURL;
 //	private String _postPutBidURL;
 //	private String _postStoreBidURL;
@@ -425,14 +420,14 @@ public class RubisGenerator extends Generator
 		return this._homepageURL; 
 	}
 
+	public String getRegisterURL()
+	{
+		return this._registerURL;
+	}
+
 	public String getRegisterUserURL()
 	{
 		return this._registerUserURL;
-	}
-
-	public String getPostRegisterUserURL()
-	{
-		return this._postRegisterUserURL;
 	}
 
 	public String getBrowseURL()
@@ -992,8 +987,8 @@ public class RubisGenerator extends Generator
 	{
 		this._baseURL = "http://" + this.getTrack().getTargetHostName() + ":" + this.getTrack().getTargetHostPort();
 		this._homepageURL = this._baseURL + "/rubis_servlest/";
-		this._registerUserURL = this._baseURL + "/rubis_servlets/register.html";
-		this._postRegisterUserURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.RegisterUser";
+		this._registerURL = this._baseURL + "/rubis_servlets/register.html";
+		this._registerUserURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.RegisterUser";
 		this._browseURL = this._baseURL + "/rubis_servlets/browse.html";
 		this._browseCategoriesURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.BrowseCategories";
 		this._searchItemsByCategoryURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.SearchItemsByCategory";
