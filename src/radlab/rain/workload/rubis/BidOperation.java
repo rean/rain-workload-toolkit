@@ -81,7 +81,7 @@ public class BidOperation extends RubisOperation
 			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getPutBidAuthURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
-		// Perform a Buy-Now operation. Need a logged user
+		// Perform a Put-Bid operation. Need a logged user
 		// This is the page the user can access when it has been successfully authenticated.
 		// You must provide the item id, user name and password.
 		//headers.put("itemId", Integer.toString(item.id));
