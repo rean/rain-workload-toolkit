@@ -74,6 +74,7 @@ public class RubisGenerator extends Generator
 	public static final int BID_OP = 12;
 	public static final int COMMENT_ITEM_OP = 13;
 	public static final int SELL_ITEM_OP = 14;
+	public static final int ABOUT_ME_OP = 15;
 
 	/// The set of alphanumeric characters
 	private static final char[] ALNUM_CHARS = { '0', '1', '2', '3', '4', '5',
@@ -238,10 +239,8 @@ public class RubisGenerator extends Generator
 	private String _sellURL;
 	private String _sellItemFormURL;
 	private String _registerItemURL;
-//	private String _putBidAuthURL;
-//	private String _postPutBidURL;
-//	private String _postStoreBidURL;
-//	private String _postAboutMeURL;
+	private String _aboutMeURL;
+	private String _aboutMePostURL;
 
 
 	public static synchronized int nextUserId()
@@ -535,10 +534,15 @@ public class RubisGenerator extends Generator
 		return this._registerItemURL;
 	}
 
-//	public String getPostAboutMeURL()
-//	{
-//		return this._postAboutMeURL;
-//	}
+	public String getAboutMeURL()
+	{
+		return this._aboutMeURL;
+	}
+
+	public String getAboutMePostURL()
+	{
+		return this._aboutMePostURL;
+	}
 
 	/**
 	 * Creates a newly instantiated, prepared operation.
@@ -566,6 +570,7 @@ public class RubisGenerator extends Generator
 			case BID_OP: return this.createBidOperation();
 			case COMMENT_ITEM_OP: return this.createCommentItemOperation();
 			case SELL_ITEM_OP: return this.createSellItemOperation();
+			case ABOUT_ME_OP: return this.createAboutMeOperation();
 			default: return null;
 		}
 	}
@@ -746,6 +751,18 @@ public class RubisGenerator extends Generator
 	public SellItemOperation createSellItemOperation()
 	{
 		SellItemOperation op = new SellItemOperation(this.getTrack().getInteractive(), this.getScoreboard());
+		op.prepare(this);
+		return op;
+	}
+
+	/**
+	 * Factory method.
+	 * 
+	 * @return  A prepared AboutMeOperation.
+	 */
+	public AboutMeOperation createAboutMeOperation()
+	{
+		AboutMeOperation op = new AboutMeOperation(this.getTrack().getInteractive(), this.getScoreboard());
 		op.prepare(this);
 		return op;
 	}
@@ -981,6 +998,7 @@ public class RubisGenerator extends Generator
 		this._sellURL = this._baseURL + "/rubis_servlets/sell.html";
 		this._sellItemFormURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.SellItemForm";
 		this._registerItemURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.RegisterItem";
-//		this._postAboutMeURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.AboutMe";
+		this._aboutMeURL = this._baseURL + "/rubis_servlets/about_me.html";
+		this._aboutMePostURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.AboutMe";
 	}
 }
