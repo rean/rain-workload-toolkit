@@ -34,6 +34,7 @@
 package radlab.rain.workload.rubis;
 
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Random;
 import org.apache.http.HttpStatus;
@@ -43,6 +44,7 @@ import radlab.rain.Operation;
 import radlab.rain.ScenarioTrack;
 import radlab.rain.util.HttpTransport;
 import radlab.rain.workload.rubis.model.RubisCategory;
+import radlab.rain.workload.rubis.model.RubisComment;
 import radlab.rain.workload.rubis.model.RubisItem;
 import radlab.rain.workload.rubis.model.RubisRegion;
 import radlab.rain.workload.rubis.model.RubisUser;
@@ -70,8 +72,8 @@ public class RubisGenerator extends Generator
 	public static final int VIEW_BID_HISTORY_OP = 10;
 	public static final int BUY_NOW_ITEM_OP = 11;
 	public static final int BID_OP = 12;
+	public static final int COMMENT_ITEM_OP = 13;
 //	public static final int SELL_OP = 3;
-//	public static final int COMMENT_OP = 5;
 //	public static final int BROWSE_CATEGORIES_IN_REGIONS_OP = 9999;
 //	public static final int BROWSE_ITEMS_IN_REGIONS_OP = 9999;
 //	public static final int VIEW_ITEM_OP = 9999;
@@ -177,6 +179,18 @@ public class RubisGenerator extends Generator
 												"Toys & Hobbies",
 												"Everything Else"};
 
+	private static final String[] COMMENTS = {"This is a very bad comment. Stay away from this seller!!",
+											  "This is a comment below average. I don't recommend this user!!",
+											  "This is a neutral comment. It is neither a good or a bad seller!!",
+											  "This is a comment above average. You can trust this seller even if it is not the best deal!!",
+											  "This is an excellent comment. You can make really great deals with this seller!!"};
+
+	private static final int[] COMMENT_RATINGS = {-5, // Bad
+												  -3, // Below average
+												   0, // Neutral
+												   3, // Average
+												   5}; // Excellent
+
 	private static final int TOTAL_ACTIVE_ITEMS = 1374+2691+259+2874+538+7521+664+586+1077+976+2325+1051+1420+170+1069+3029+305+242+3671+825;
 	private static final int NUM_OLD_ITEMS = 100000;
 	private static final int PERCENT_UNIQUE_ITEMS = 80;
@@ -191,7 +205,9 @@ public class RubisGenerator extends Generator
 	private static final int MIN_ITEM_BUY_NOW_PRICE = 1000;
 	private static final int MAX_ITEM_DURATION = 7;
 	private static final int NUM_ITEMS_PER_PAGE = 20;
+	private static final int MAX_COMMENT_LEN = 2048;
 	private static final int ANONYMOUS_USER_ID = -1;
+	private static final int INVALID_USER_ID = ANONYMOUS_USER_ID;
 	private static final int INVALID_ITEM_ID = -1;
 
 
@@ -201,7 +217,6 @@ public class RubisGenerator extends Generator
 
 	private Random _rng;
 	private HttpTransport _http;
-	private boolean _userLoggedIn;
 	private int _loggedUserId;
 	private String _baseURL;
 	private String _homepageURL; 
@@ -222,6 +237,9 @@ public class RubisGenerator extends Generator
 	private String _putBidAuthURL;
 	private String _putBidURL;
 	private String _storeBidURL;
+	private String _putCommentAuthURL;
+	private String _putCommentURL;
+	private String _storeCommentURL;
 //	private String _sellURL;
 //	private String _sellItemFormURL;
 //	private String _postRegisterItemURL;
@@ -229,9 +247,6 @@ public class RubisGenerator extends Generator
 //	private String _postPutBidURL;
 //	private String _postStoreBidURL;
 //	private String _postAboutMeURL;
-//	private String _putCommentAuthURL;
-//	private String _postPutCommentURL;
-//	private String _postStoreCommentURL;
 
 
 	public static synchronized int nextUserId()
@@ -270,7 +285,6 @@ public class RubisGenerator extends Generator
 
 		this._rng = new Random();
 		this._http = new HttpTransport();
-		this._userLoggedIn = false;
 		this._loggedUserId = ANONYMOUS_USER_ID;
 
 		this.initializeUrlAnchors();
@@ -366,12 +380,7 @@ public class RubisGenerator extends Generator
 
 	public boolean isUserLoggedIn()
 	{
-		return _userLoggedIn;
-	}
-
-	public void setIsUserLoggedIn(boolean val)
-	{
-		this._userLoggedIn = val;
+		return ANONYMOUS_USER_ID != this.getLoggedUserId();
 	}
 
 	public int getLoggedUserId()
@@ -501,6 +510,21 @@ public class RubisGenerator extends Generator
 		return this._storeBidURL;
 	}
 
+	public String getPutCommentAuthURL()
+	{
+		return this._putCommentAuthURL;
+	}
+
+	public String getPutCommentURL()
+	{
+		return this._putCommentURL;
+	}
+
+	public String getStoreCommentURL()
+	{
+		return this._storeCommentURL;
+	}
+
 //	public String getSellURL()
 //	{
 //		return this._sellURL;
@@ -536,21 +560,6 @@ public class RubisGenerator extends Generator
 //		return this._postAboutMeURL;
 //	}
 
-//	public String getPutCommentAuthURL()
-//	{
-//		return this._putCommentAuthURL;
-//	}
-
-//	public String getPostPutCommentURL()
-//	{
-//		return this._postPutCommentURL;
-//	}
-
-//	public String getPostStoreCommentURL()
-//	{
-//		return this._postStoreCommentURL;
-//	}
-
 	/**
 	 * Creates a newly instantiated, prepared operation.
 	 * 
@@ -575,6 +584,7 @@ public class RubisGenerator extends Generator
 			case VIEW_BID_HISTORY_OP: return this.createViewBidHistoryOperation();
 			case BUY_NOW_ITEM_OP: return this.createBuyNowItemOperation();
 			case BID_OP: return this.createBidOperation();
+			case COMMENT_ITEM_OP: return this.createCommentItemOperation();
 //			case SELL_OP: return this.createSellOperation();
 //			case BID_OP: return this.createBidOperation();
 //			case COMMENT_OP: return this.createCommentOperation();
@@ -741,6 +751,18 @@ public class RubisGenerator extends Generator
 	/**
 	 * Factory method.
 	 * 
+	 * @return  A prepared CommentItemOperation.
+	 */
+	public CommentItemOperation createCommentItemOperation()
+	{
+		CommentItemOperation op = new CommentItemOperation(this.getTrack().getInteractive(), this.getScoreboard());
+		op.prepare(this);
+		return op;
+	}
+
+	/**
+	 * Factory method.
+	 * 
 	 * @return  A prepared SellOperation.
 	 */
 //	public SellOperation createSellOperation()
@@ -762,21 +784,20 @@ public class RubisGenerator extends Generator
 //		return op;
 //	}
 
-	/**
-	 * Factory method.
-	 * 
-	 * @return  A prepared CommentOperation.
-	 */
-//	public CommentOperation createCommentOperation()
-//	{
-//		CommentOperation op = new CommentOperation(this.getTrack().getInteractive(), this.getScoreboard());
-//		op.prepare(this);
-//		return op;
-//	}
-
 	public RubisUser newUser()
 	{
 		return this.getUser(RubisGenerator.nextUserId());
+	}
+
+	public RubisUser generateUser()
+	{
+		int userId = INVALID_USER_ID;
+		int lastUserId = RubisGenerator.lastUserId();
+		if (lastUserId != INVALID_USER_ID)
+		{
+			userId = this._rng.nextInt(lastUserId+1);
+		}
+		return this.getUser(userId);
 	}
 
 	public RubisUser getUser(int id)
@@ -894,6 +915,35 @@ public class RubisGenerator extends Generator
 		return MAX_ADD_BID;
 	}
 
+	public int getMaxCommentLength()
+	{
+		return MAX_COMMENT_LEN;
+	}
+
+	public RubisComment generateComment(int fromUserId, int toUserId, int itemId)
+	{
+		return getComment(fromUserId,
+						  toUserId,
+						  itemId,
+						  COMMENT_RATINGS[this._rng.nextInt(COMMENT_RATINGS.length)]);
+	}
+
+	public RubisComment getComment(int fromUserId, int toUserId, int itemId, int rating)
+	{
+		RubisComment comment = new RubisComment();
+
+		comment.fromUserId = fromUserId;
+		comment.toUserId = toUserId;
+		comment.itemId = itemId;
+		int rateIdx = Arrays.binarySearch(COMMENT_RATINGS, rating);
+		comment.rating = COMMENT_RATINGS[rateIdx];
+		comment.comment = COMMENTS[rateIdx];
+		Calendar cal = Calendar.getInstance();
+		comment.date = cal.getTime();
+
+		return comment;
+	}
+
 	private String generateText(int minLen, int maxLen)
 	{
 		int len = minLen+this._rng.nextInt(maxLen-minLen+1);
@@ -959,6 +1009,9 @@ public class RubisGenerator extends Generator
 		this._putBidAuthURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.PutBidAuth";
 		this._putBidURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.PutBid";
 		this._storeBidURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.StoreBid";
+		this._putCommentAuthURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.PutCommentAuth";
+		this._putCommentURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.PutComment";	
+		this._storeCommentURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.StoreComment";
 //		this._sellURL = this._baseURL + "/rubis_servlets/sell.html";
 //		this._sellItemFormURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.SellItemForm";
 //		this._postRegisterItemURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.RegisterItem";
@@ -966,8 +1019,5 @@ public class RubisGenerator extends Generator
 //		this._postPutBidURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.PutBid";
 //		this._postStoreBidURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.StoreBid";
 //		this._postAboutMeURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.AboutMe";
-//		this._putCommentAuthURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.PutCommentAuth";
-//		this._postPutCommentURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.PutComment";	
-//		this._postStoreCommentURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.StoreComment";
 	}
 }
