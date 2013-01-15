@@ -520,35 +520,20 @@ public class RubisGenerator extends Generator
 		return this._storeCommentURL;
 	}
 
-//	public String getSellURL()
-//	{
-//		return this._sellURL;
-//	}
+	public String getSellURL()
+	{
+		return this._sellURL;
+	}
 
-//	public String getSellItemFormURL()
-//	{
-//		return this._sellItemFormURL;
-//	}
+	public String getSellItemFormURL()
+	{
+		return this._sellItemFormURL;
+	}
 
-//	public String getPostRegisterItemURL()
-//	{
-//		return this._postRegisterItemURL;
-//	}
-
-//	public String getPutBidAuthURL()
-//	{
-//		return this._putBidAuthURL;
-//	}
-
-//	public String getPostPutBidURL()
-//	{
-//		return this._postPutBidURL;
-//	}
-
-//	public String getPostStoreBidURL()
-//	{
-//		return this._postStoreBidURL;
-//	}
+	public String getRegisterItemURL()
+	{
+		return this._registerItemURL;
+	}
 
 //	public String getPostAboutMeURL()
 //	{
@@ -580,9 +565,7 @@ public class RubisGenerator extends Generator
 			case BUY_NOW_ITEM_OP: return this.createBuyNowItemOperation();
 			case BID_OP: return this.createBidOperation();
 			case COMMENT_ITEM_OP: return this.createCommentItemOperation();
-//			case SELL_OP: return this.createSellOperation();
-//			case BID_OP: return this.createBidOperation();
-//			case COMMENT_OP: return this.createCommentOperation();
+			case SELL_ITEM_OP: return this.createSellItemOperation();
 			default: return null;
 		}
 	}
@@ -758,26 +741,14 @@ public class RubisGenerator extends Generator
 	/**
 	 * Factory method.
 	 * 
-	 * @return  A prepared SellOperation.
+	 * @return  A prepared SellItemOperation.
 	 */
-//	public SellOperation createSellOperation()
-//	{
-//		SellOperation op = new SellOperation(this.getTrack().getInteractive(), this.getScoreboard());
-//		op.prepare(this);
-//		return op;
-//	}
-
-	/**
-	 * Factory method.
-	 * 
-	 * @return  A prepared BidOperation.
-	 */
-//	public BidOperation createBidOperation()
-//	{
-//		BidOperation op = new BidOperation(this.getTrack().getInteractive(), this.getScoreboard());
-//		op.prepare(this);
-//		return op;
-//	}
+	public SellItemOperation createSellItemOperation()
+	{
+		SellItemOperation op = new SellItemOperation(this.getTrack().getInteractive(), this.getScoreboard());
+		op.prepare(this);
+		return op;
+	}
 
 	public RubisUser newUser()
 	{
@@ -805,7 +776,7 @@ public class RubisGenerator extends Generator
 		user.nickname = "user" + user.id;
 		user.email = user.firstname + "." + user.lastname + "@rubis.com";
 		user.password = "password" + user.id;
-		user.region = this.generateRegion();
+		user.region = this.generateRegion().id;
 
 		return user;
 	}
@@ -865,7 +836,7 @@ public class RubisGenerator extends Generator
 		cal.add(Calendar.DAY_OF_MONTH, this._rng.nextInt(MAX_ITEM_DURATION)+1);
 		item.endDate = cal.getTime();
 		item.seller = this.getLoggedUserId();
-		item.category = this.generateCategory();
+		item.category = this.generateCategory().id;
 
 		return item;
 	}
@@ -1007,12 +978,9 @@ public class RubisGenerator extends Generator
 		this._putCommentAuthURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.PutCommentAuth";
 		this._putCommentURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.PutComment";	
 		this._storeCommentURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.StoreComment";
-//		this._sellURL = this._baseURL + "/rubis_servlets/sell.html";
-//		this._sellItemFormURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.SellItemForm";
-//		this._postRegisterItemURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.RegisterItem";
-//		this._putBidAuthURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.PutBidAuth";
-//		this._postPutBidURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.PutBid";
-//		this._postStoreBidURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.StoreBid";
+		this._sellURL = this._baseURL + "/rubis_servlets/sell.html";
+		this._sellItemFormURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.SellItemForm";
+		this._registerItemURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.RegisterItem";
 //		this._postAboutMeURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.AboutMe";
 	}
 }

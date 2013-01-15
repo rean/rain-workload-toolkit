@@ -56,5 +56,5 @@ public class RubisItem
 	public Date startDate;
 	public Date endDate;
 	public int seller;
-	public RubisCategory category;
+	public int category;
 }
