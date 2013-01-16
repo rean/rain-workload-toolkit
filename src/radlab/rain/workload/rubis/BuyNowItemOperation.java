@@ -49,6 +49,11 @@ import radlab.rain.workload.rubis.model.RubisUser;
 /**
  * Buy-Now-Item operation.
  *
+ * Emulates the following requests:
+ * 1. Click on the 'Buy-Now' link located in the item detail page
+ * 2. Send user authentication (login name and password)
+ * 3. Fill-in the form and click on the 'Buy now!' button, to buy the item
+ *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
 public class BuyNowItemOperation extends RubisOperation 
@@ -68,6 +73,8 @@ public class BuyNowItemOperation extends RubisOperation
 
 		// Generate a random item and perform a Buy-Now-Auth operation
 		RubisItem item = this.getGenerator().generateItem();
+
+		// Click on the 'Buy-Now' link located in the item detail page
 		HttpGet reqGet = new HttpGet(this.getGenerator().getBuyNowAuthURL());
 		headers = new HashMap<String,String>();
 		headers.put("itemId", Integer.toString(item.id));
@@ -78,48 +85,49 @@ public class BuyNowItemOperation extends RubisOperation
 			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getBuyNowAuthURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
-		// Perform a Buy-Now operation. Need a logged user
-		//headers.put("itemId", Integer.toString(item.id));
+		// Need a logged user
+		RubisUser loggedUser = null;
 		if (this.getGenerator().isUserLoggedIn())
 		{
-			HttpPost reqPost = null;
-			MultipartEntity entity = null;
-			RubisUser user = this.getGenerator().getLoggedUser();
-
-			reqPost = new HttpPost(this.getGenerator().getBuyNowURL());
-			entity = new MultipartEntity();
-			entity.addPart("itemId", new StringBody(Integer.toString(item.id)));
-			entity.addPart("nickname", new StringBody(user.nickname));
-			entity.addPart("password", new StringBody(user.password));
-			reqPost.setEntity(entity);
-			response = this.getHttpTransport().fetch(reqPost);
-			this.trace(this.getGenerator().getBuyNowURL());
-			if (!this.getGenerator().checkHttpResponse(response.toString()))
-			{
-				throw new IOException("Problems in performing request to URL: " + this.getGenerator().getBuyNowURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
-			}
-
-			// Perform a Store-Buy-Now operation.
-			reqPost = new HttpPost(this.getGenerator().getStoreBuyNowURL());
-			entity = new MultipartEntity();
-			entity.addPart("itemId", new StringBody(Integer.toString(item.id)));
-			entity.addPart("userId", new StringBody(Integer.toString(user.id)));
-			int maxQty = Math.min(item.quantity, 1);
-			entity.addPart("maxQty", new StringBody(Integer.toString(maxQty)));
-			entity.addPart("qty", new StringBody(Integer.toString(this.getRandomGenerator().nextInt(maxQty)+1)));
-			reqPost.setEntity(entity);
-			response = this.getHttpTransport().fetch(reqPost);
-			this.trace(this.getGenerator().getStoreBuyNowURL());
-			if (!this.getGenerator().checkHttpResponse(response.toString()))
-			{
-				throw new IOException("Problems in performing request to URL: " + this.getGenerator().getStoreBuyNowURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
-			}
+			loggedUser = this.getGenerator().getLoggedUser();
 		}
 		else
 		{
-			//FIXME: What's the best way to handle this case?
-			//NOTE: We do not throw any exception since this isn't a RAIN error
-			System.err.println("Login required for " + this._operationName);
+			loggedUser = this.getGenerator().generateUser();
+			this.getGenerator().setLoggedUserId(loggedUser.id);
+		}
+
+		HttpPost reqPost = null;
+		MultipartEntity entity = null;
+
+		// Send user authentication (login name and password)
+		reqPost = new HttpPost(this.getGenerator().getBuyNowURL());
+		entity = new MultipartEntity();
+		entity.addPart("itemId", new StringBody(Integer.toString(item.id)));
+		entity.addPart("nickname", new StringBody(loggedUser.nickname));
+		entity.addPart("password", new StringBody(loggedUser.password));
+		reqPost.setEntity(entity);
+		response = this.getHttpTransport().fetch(reqPost);
+		this.trace(this.getGenerator().getBuyNowURL());
+		if (!this.getGenerator().checkHttpResponse(response.toString()))
+		{
+			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getBuyNowURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+		}
+
+		// Fill-in the form and click on the 'Buy now!' button, to buy the item
+		reqPost = new HttpPost(this.getGenerator().getStoreBuyNowURL());
+		entity = new MultipartEntity();
+		entity.addPart("itemId", new StringBody(Integer.toString(item.id)));
+		entity.addPart("userId", new StringBody(Integer.toString(loggedUser.id)));
+		int maxQty = Math.min(item.quantity, 1);
+		entity.addPart("maxQty", new StringBody(Integer.toString(maxQty)));
+		entity.addPart("qty", new StringBody(Integer.toString(this.getRandomGenerator().nextInt(maxQty)+1)));
+		reqPost.setEntity(entity);
+		response = this.getHttpTransport().fetch(reqPost);
+		this.trace(this.getGenerator().getStoreBuyNowURL());
+		if (!this.getGenerator().checkHttpResponse(response.toString()))
+		{
+			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getStoreBuyNowURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		this.setFailed(false);
