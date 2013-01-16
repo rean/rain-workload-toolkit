@@ -51,6 +51,10 @@ import radlab.rain.workload.rubis.model.RubisUser;
  * Comment operation.
  *
  * This emulates the operation of commenting on another user for a certain item.
+ * Emulates the following requests:
+ * 1. Click on the 'Leave a comment on this user' for a certain item and user
+ * 2. Send authentication data (login name and password)
+ * 3. Fill-in the form anc click on the 'Post this comment now!' button 
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
@@ -70,11 +74,12 @@ public class CommentItemOperation extends RubisOperation
 		StringBuilder response = null;
 		Map<String,String> headers = null;
 
-		// Perform a Put-Comment-Auth operation
-		// This will lead to a user authentification.
-		// Since an item id and a user id must be provided, generate a random ones.
+		// Generate a random item and user to which post the comment
 		RubisItem item = this.getGenerator().generateItem();
 		RubisUser toUser = this.getGenerator().generateUser();
+
+		// Click on the 'Leave a comment on this user' for a certain item and user
+		// This will lead to a user authentification.
 		HttpGet reqGet = new HttpGet(this.getGenerator().getPutCommentAuthURL());
 		headers = new HashMap<String,String>();
 		headers.put("itemId", Integer.toString(item.id));
@@ -86,9 +91,7 @@ public class CommentItemOperation extends RubisOperation
 			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getPutCommentAuthURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
-		// Perform a Put-Comment operation. Need a logged user
-		// This is the page the user can access when it has been successfully authenticated.
-		// You must provide the item id, user name and password.
+		// Need a logged user
 		RubisUser loggedUser = null;
 		if (this.getGenerator().isUserLoggedIn())
 		{
@@ -104,6 +107,8 @@ public class CommentItemOperation extends RubisOperation
 		HttpPost reqPost = null;
 		MultipartEntity entity = null;
 
+		// Send authentication data (login name and password)
+		// This is the page the user can access when it has been successfully authenticated.
 		reqPost = new HttpPost(this.getGenerator().getPutCommentURL());
 		entity = new MultipartEntity();
 		entity.addPart("itemId", new StringBody(Integer.toString(item.id)));
@@ -118,7 +123,8 @@ public class CommentItemOperation extends RubisOperation
 			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getPutCommentURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
-		// Perform a Store-Comment operation to really store the comment on the DB.
+ 		// Fill-in the form anc click on the 'Post this comment now!' button 
+		// This will really store the comment on the DB.
 		RubisComment comment = this.getGenerator().generateComment(loggedUser.id, toUser.id, item.id);
 		reqPost = new HttpPost(this.getGenerator().getStoreCommentURL());
 		entity = new MultipartEntity();
