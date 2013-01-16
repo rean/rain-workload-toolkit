@@ -49,6 +49,11 @@ import radlab.rain.workload.rubis.model.RubisUser;
 /**
  * Bid operation.
  *
+ * Emulates the following requests:
+ * 1. Click on the 'Bid Now' image for a certain item
+ * 2. Provide authentication data (login name and password)
+ * 3. Fill-in the form anc click on the 'Bid now!' button
+ *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
 public class BidOperation extends RubisOperation 
@@ -58,7 +63,6 @@ public class BidOperation extends RubisOperation
 		super(interactive, scoreboard);
 		this._operationName = "Bid";
 		this._operationIndex = RubisGenerator.BID_OP;
-		//this._mustBeSync = true;
 	}
 
 	@Override
@@ -67,10 +71,11 @@ public class BidOperation extends RubisOperation
 		StringBuilder response = null;
 		Map<String,String> headers = null;
 
-		// Perform a Put-Bid-Auth operation
-		// This will lead to a user authentification.
-		// Since an item id must be provided, generate a random item.
+		// Since an item id must be provided, generate a random one
 		RubisItem item = this.getGenerator().generateItem();
+
+		// Click on the 'Bid Now' image for a certain item
+		// This will lead to a user authentification.
 		HttpGet reqGet = new HttpGet(this.getGenerator().getPutBidAuthURL());
 		headers = new HashMap<String,String>();
 		headers.put("itemId", Integer.toString(item.id));
@@ -81,69 +86,70 @@ public class BidOperation extends RubisOperation
 			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getPutBidAuthURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
-		// Perform a Put-Bid operation. Need a logged user
-		// This is the page the user can access when it has been successfully authenticated.
-		// You must provide the item id, user name and password.
-		//headers.put("itemId", Integer.toString(item.id));
+		// Need a logged user
+		RubisUser loggedUser = null;
 		if (this.getGenerator().isUserLoggedIn())
 		{
-			HttpPost reqPost = null;
-			MultipartEntity entity = null;
-			RubisUser user = this.getGenerator().getLoggedUser();
-
-			reqPost = new HttpPost(this.getGenerator().getPutBidURL());
-			entity = new MultipartEntity();
-			entity.addPart("itemId", new StringBody(Integer.toString(item.id)));
-			entity.addPart("nickname", new StringBody(user.nickname));
-			entity.addPart("password", new StringBody(user.password));
-			reqPost.setEntity(entity);
-			response = this.getHttpTransport().fetch(reqPost);
-			this.trace(this.getGenerator().getPutBidURL());
-			if (!this.getGenerator().checkHttpResponse(response.toString()))
-			{
-				throw new IOException("Problems in performing request to URL: " + this.getGenerator().getPutBidURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
-			}
-
-			// Perform a Store-Bid operation to really store the bid on the DB.
-			String str = null;
-			str = RubisUtility.extractFormParamFromHtml(response.toString(), "maxQty");
-			int maxQty = 1;
-			if (str != null)
-			{
-				maxQty = Integer.parseInt(str);
-			}
-			int qty = this.getRandomGenerator().nextInt(maxQty)+1;
-			str = RubisUtility.extractFormParamFromHtml(response.toString(), "minBid");
-			float minBid = 0;
-			if (str != null)
-			{
-				minBid = Float.parseFloat(str);
-			}
-			int addBid = this.getRandomGenerator().nextInt(this.getGenerator().getMaxAddBid())+1;
-			float bid = minBid+addBid;
-			float maxBid = minBid+addBid*2;
-			reqPost = new HttpPost(this.getGenerator().getStoreBidURL());
-			entity = new MultipartEntity();
-			entity.addPart("itemId", new StringBody(Integer.toString(item.id)));
-			entity.addPart("userId", new StringBody(Integer.toString(user.id)));
-			entity.addPart("minBid", new StringBody(Float.toString(minBid)));
-			entity.addPart("bid", new StringBody(Float.toString(bid)));
-			entity.addPart("maxBid", new StringBody(Float.toString(maxBid)));
-			entity.addPart("maxQty", new StringBody(Integer.toString(maxQty)));
-			entity.addPart("qty", new StringBody(Integer.toString(qty)));
-			reqPost.setEntity(entity);
-			response = this.getHttpTransport().fetch(reqPost);
-			this.trace(this.getGenerator().getStoreBidURL());
-			if (!this.getGenerator().checkHttpResponse(response.toString()))
-			{
-				throw new IOException("Problems in performing request to URL: " + this.getGenerator().getStoreBidURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
-			}
+			loggedUser = this.getGenerator().getLoggedUser();
 		}
 		else
 		{
-			//FIXME: What's the best way to handle this case?
-			//NOTE: We do not throw any exception since this isn't a RAIN error
-			System.err.println("Login required for " + this._operationName);
+			loggedUser = this.getGenerator().generateUser();
+			this.getGenerator().setLoggedUserId(loggedUser.id);
+		}
+
+		HttpPost reqPost = null;
+		MultipartEntity entity = null;
+
+		// Provide authentication data (login name and password)
+		// This is the page the user can access when it has been successfully authenticated.
+		reqPost = new HttpPost(this.getGenerator().getPutBidURL());
+		entity = new MultipartEntity();
+		entity.addPart("itemId", new StringBody(Integer.toString(item.id)));
+		entity.addPart("nickname", new StringBody(loggedUser.nickname));
+		entity.addPart("password", new StringBody(loggedUser.password));
+		reqPost.setEntity(entity);
+		response = this.getHttpTransport().fetch(reqPost);
+		this.trace(this.getGenerator().getPutBidURL());
+		if (!this.getGenerator().checkHttpResponse(response.toString()))
+		{
+			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getPutBidURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+		}
+
+		// Fill-in the form anc click on the 'Bid now!' button
+		// This will really store the bid on the DB.
+		String str = null;
+		str = RubisUtility.extractFormParamFromHtml(response.toString(), "maxQty");
+		int maxQty = 1;
+		if (str != null)
+		{
+			maxQty = Integer.parseInt(str);
+		}
+		int qty = this.getRandomGenerator().nextInt(maxQty)+1;
+		str = RubisUtility.extractFormParamFromHtml(response.toString(), "minBid");
+		float minBid = 0;
+		if (str != null)
+		{
+			minBid = Float.parseFloat(str);
+		}
+		int addBid = this.getRandomGenerator().nextInt(this.getGenerator().getMaxAddBid())+1;
+		float bid = minBid+addBid;
+		float maxBid = minBid+addBid*2;
+		reqPost = new HttpPost(this.getGenerator().getStoreBidURL());
+		entity = new MultipartEntity();
+		entity.addPart("itemId", new StringBody(Integer.toString(item.id)));
+		entity.addPart("userId", new StringBody(Integer.toString(loggedUser.id)));
+		entity.addPart("minBid", new StringBody(Float.toString(minBid)));
+		entity.addPart("bid", new StringBody(Float.toString(bid)));
+		entity.addPart("maxBid", new StringBody(Float.toString(maxBid)));
+		entity.addPart("maxQty", new StringBody(Integer.toString(maxQty)));
+		entity.addPart("qty", new StringBody(Integer.toString(qty)));
+		reqPost.setEntity(entity);
+		response = this.getHttpTransport().fetch(reqPost);
+		this.trace(this.getGenerator().getStoreBidURL());
+		if (!this.getGenerator().checkHttpResponse(response.toString()))
+		{
+			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getStoreBidURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		this.setFailed(false);
