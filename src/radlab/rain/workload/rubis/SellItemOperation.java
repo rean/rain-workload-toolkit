@@ -51,7 +51,13 @@ import radlab.rain.workload.rubis.model.RubisUser;
 /**
  * Sell operation.
  *
- * This emulates the operation of selling a certain item.
+ * This is the operation of selling a certain item.
+ *
+ * Emulates the following requests:
+ * 1. Go to the sell page
+ * 2. Send authentication data (login name and password) and click on the 'Log In!' link
+ * 3. Select the category of the item to sell
+ * 4. Fill-in the form and click on the 'Register item!' button
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
@@ -78,10 +84,7 @@ public class SellItemOperation extends RubisOperation
 			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getSellURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
-		// Select the category of the item to sell
-		// You must provide the user name and password.
-		HttpPost reqPost = null;
-		MultipartEntity entity = null;
+		// Need a logged user
 		RubisUser loggedUser = null;
 		if (this.getGenerator().isUserLoggedIn())
 		{
@@ -93,6 +96,11 @@ public class SellItemOperation extends RubisOperation
 			loggedUser = this.getGenerator().generateUser();
 			this.getGenerator().setLoggedUserId(loggedUser.id);
 		}
+
+		HttpPost reqPost = null;
+		MultipartEntity entity = null;
+
+		// Send authentication data (login name and password) and click on the 'Log In!' link
 		reqPost = new HttpPost(this.getGenerator().getBrowseCategoriesURL());
 		entity = new MultipartEntity();
 		entity.addPart("nickname", new StringBody(loggedUser.nickname));
@@ -108,7 +116,7 @@ public class SellItemOperation extends RubisOperation
 		// Generate a new item
 		RubisItem item = this.getGenerator().newItem();
 
-		// Sell the item
+		// Select the category of the item to sell
 		Map<String,String> headers = null;
 		HttpGet reqGet = null;
 		reqGet = new HttpGet(this.getGenerator().getSellItemFormURL());
@@ -121,7 +129,7 @@ public class SellItemOperation extends RubisOperation
 			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getSellItemFormURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
-		// Register the item
+		// Fill-in the form and click on the 'Register item!' button
 		reqPost = new HttpPost(this.getGenerator().getRegisterItemURL());
 		entity = new MultipartEntity();
 		entity.addPart("name", new StringBody(item.name));
@@ -144,6 +152,7 @@ public class SellItemOperation extends RubisOperation
 		this.setFailed(false);
 	}
 
+	/// Returns the number of days between the two dates.
 	private static int getDuration(Date from, Date to)
 	{
 		final int DAY_MILLISECS = 1000*60*60*24;
