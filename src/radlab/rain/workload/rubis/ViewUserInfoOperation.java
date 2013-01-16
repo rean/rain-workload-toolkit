@@ -45,6 +45,9 @@ import radlab.rain.workload.rubis.model.RubisUser;
 /**
  * View-User-Information operation.
  *
+ * Emulates the following requests:
+ * 1. Click on the user name link (representing the seller of an item)
+ *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
 public class ViewUserInfoOperation extends RubisOperation 
@@ -59,25 +62,27 @@ public class ViewUserInfoOperation extends RubisOperation
 	@Override
 	public void execute() throws Throwable
 	{
+		// Need a logged user
+		RubisUser loggedUser = null;
 		if (this.getGenerator().isUserLoggedIn())
 		{
-			RubisUser user = this.getGenerator().getLoggedUser();
-
-			Map<String,String> headers = new HashMap<String,String>();
-			headers.put("userId", Integer.toString(user.id));
-			HttpGet request = new HttpGet(this.getGenerator().getViewUserInfoURL());
-			StringBuilder response = this.getHttpTransport().fetch(request, headers);
-			this.trace(this.getGenerator().getViewUserInfoURL());
-			if (!this.getGenerator().checkHttpResponse(response.toString()))
-			{
-				throw new IOException("Problems in performing request to URL: " + this.getGenerator().getViewUserInfoURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
-			}
+			loggedUser = this.getGenerator().getLoggedUser();
 		}
 		else
 		{
-			//FIXME: What's the best way to handle this case?
-			//NOTE: We do not throw any exception since this isn't a RAIN error
-			System.err.println("Login required for " + this._operationName);
+			loggedUser = this.getGenerator().generateUser();
+			this.getGenerator().setLoggedUserId(loggedUser.id);
+		}
+
+		// Click on the user name link (representing the seller of an item)
+		Map<String,String> headers = new HashMap<String,String>();
+		headers.put("userId", Integer.toString(loggedUser.id));
+		HttpGet reqGet = new HttpGet(this.getGenerator().getViewUserInfoURL());
+		StringBuilder response = this.getHttpTransport().fetch(reqGet, headers);
+		this.trace(this.getGenerator().getViewUserInfoURL());
+		if (!this.getGenerator().checkHttpResponse(response.toString()))
+		{
+			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getViewUserInfoURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		this.setFailed(false);
