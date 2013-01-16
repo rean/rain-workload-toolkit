@@ -37,14 +37,17 @@ package radlab.rain.workload.rubis;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.StringBody;
-import org.apache.http.HttpStatus;
 import java.io.IOException;
 import radlab.rain.IScoreboard;
 import radlab.rain.workload.rubis.model.RubisUser;
 
 
 /**
- * Register User operation.
+ * Register-User operation.
+ *
+ * Emulates the following operations:
+ * 1. Go the the user registration page
+ * 2. Fill-in the form and click on the 'Register now!' button
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
@@ -63,6 +66,7 @@ public class RegisterUserOperation extends RubisOperation
 	{
 		StringBuilder response = null;
 
+		// Go the the user registration page
 		response = this.getHttpTransport().fetchUrl( this.getGenerator().getRegisterURL() );
 		this.trace( this.getGenerator().getRegisterURL() );
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
@@ -70,10 +74,10 @@ public class RegisterUserOperation extends RubisOperation
 			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getRegisterURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
-		// Generate a user
+		// Generate a new user
 		RubisUser user = this.getGenerator().newUser();
 
-		// Construct the POST request
+		// Fill-in the form and click on the 'Register now!' button
 		HttpPost httpPost = new HttpPost(this.getGenerator().getRegisterUserURL());
 		MultipartEntity entity = new MultipartEntity();
 		entity.addPart("firstname", new StringBody(user.firstname));
@@ -82,9 +86,7 @@ public class RegisterUserOperation extends RubisOperation
 		entity.addPart("email", new StringBody(user.email));
 		entity.addPart("password", new StringBody(user.password));
 		entity.addPart("region", new StringBody(this.getGenerator().getRegion(user.region).name));
-		//entity.addPart("Submit", new StringBody("Register now!"));
 		httpPost.setEntity(entity);
-
         response = this.getHttpTransport().fetch(httpPost);
 		this.trace(this.getGenerator().getRegisterUserURL());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
