@@ -63,7 +63,8 @@ public class RubisUtility
 		}
 
 		// Look for the key
-		Pattern rePatt = Pattern.compile("<input\\s+[^>]*?name\\s*=\\s*(?:'|\")"+Pattern.quote(paramName)+"(?:'|\")[^>]*?value\\s*=\\s*(?:'|\")?(\\.*)(?:'|\")", Pattern.CASE_INSENSITIVE);
+		Pattern rePatt = Pattern.compile("<input\\s+[^>]*?name\\s*=\\s*(?:'|\")" + Pattern.quote(paramName) + "(?:'|\")[^>]*?value\\s*=\\s*(?:'|\")?(\\.*)(?:'|\")",
+										 Pattern.CASE_INSENSITIVE);
 		Matcher reMatch = rePatt.matcher(html);
 
 		return reMatch.group(1);
@@ -87,7 +88,8 @@ public class RubisUtility
 		}
 
 		// Look for the key
-		Pattern rePatt = Pattern.compile("<a\\s+[^>]*?href\\s*=\\s*(?:'|\")[^'\"&>]*?"+Pattern.quote(paramName)+"\\s*=\\s*([^'\"&>]*?)", Pattern.CASE_INSENSITIVE);
+		Pattern rePatt = Pattern.compile("<a\\s+[^>]*?href\\s*=\\s*(?:'|\")[^'\"&>]*?" + Pattern.quote(paramName) + "\\s*=\\s*([^'\"&>]*?)",
+										 Pattern.CASE_INSENSITIVE);
 		Matcher reMatch = rePatt.matcher(html);
 
 		return reMatch.group(1);
