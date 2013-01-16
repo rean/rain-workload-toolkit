@@ -35,16 +35,15 @@ package radlab.rain.workload.rubis;
 
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import org.apache.http.client.methods.HttpGet;
 import radlab.rain.IScoreboard;
-import radlab.rain.workload.rubis.model.RubisCategory;
-import radlab.rain.workload.rubis.model.RubisUser;
 
 
 /**
  * Browse-Categories operation.
+ *
+ * Emulates the following requests:
+ * 1. Go to the browse page
+ * 2. Click on the 'Browse all items in a category'
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
@@ -61,22 +60,18 @@ public class BrowseCategoriesOperation extends RubisOperation
 	@Override
 	public void execute() throws Throwable
 	{
-		RubisCategory category = this.getGenerator().generateCategory();
+		StringBuilder response = null;
 
-		Map<String,String> headers = new HashMap<String,String>();
-		headers.put("category", Integer.toString(category.id));
-		headers.put("categoryName", category.name);
-		headers.put("page", "1");
-		headers.put("nbOfItems", Integer.toString(this.getGenerator().getNumItemsPerPage()));
-		if (this.getGenerator().isUserLoggedIn())
-		{
-			RubisUser user = this.getGenerator().getLoggedUser();
-			headers.put("nickname", user.nickname);
-			headers.put("password", user.password);
+		// Go to the browse page
+		response = this.getHttpTransport().fetchUrl(this.getGenerator().getBrowseURL());
+		this.trace(this.getGenerator().getBrowseURL());
+		if (!this.getGenerator().checkHttpResponse(response.toString()))
+		{   
+			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getBrowseURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
-		HttpGet request = new HttpGet(this.getGenerator().getBrowseCategoriesURL());
-		StringBuilder response = this.getHttpTransport().fetch(request, headers);
+		// Emulate a click on the "Browse all items in a category" link
+		response = this.getHttpTransport().fetchUrl(this.getGenerator().getBrowseCategoriesURL());
 		this.trace(this.getGenerator().getBrowseCategoriesURL());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
