@@ -35,11 +35,20 @@ package radlab.rain.workload.rubis;
 
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import org.apache.http.client.methods.HttpGet;
 import radlab.rain.IScoreboard;
+import radlab.rain.workload.rubis.model.RubisRegion;
 
 
 /**
  * Browse-Regions operation.
+ *
+ * Emulates the following requests:
+ * 1. Go to the browse page
+ * 2. Click on the "Browse all in a region"
+ * 3. Click on a region name to browse all categories in that region
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
@@ -56,11 +65,36 @@ public class BrowseRegionsOperation extends RubisOperation
 	@Override
 	public void execute() throws Throwable
 	{
-		StringBuilder response = this.getHttpTransport().fetchUrl(this.getGenerator().getBrowseRegionsURL());
+		StringBuilder response = null;
+
+		// Go to the browse home page
+		response = this.getHttpTransport().fetchUrl(this.getGenerator().getBrowseURL());
+		this.trace(this.getGenerator().getBrowseURL());
+		if (!this.getGenerator().checkHttpResponse(response.toString()))
+		{   
+			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getBrowseURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+		}
+
+		// Emulate a click on the "Browse all in a region" link
+		response = this.getHttpTransport().fetchUrl(this.getGenerator().getBrowseRegionsURL());
 		this.trace(this.getGenerator().getBrowseRegionsURL());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
 			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getBrowseRegionsURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+		}
+
+		// Emulate a click on a region name to browse all related categories
+		// Generate a random region
+		RubisRegion region = this.getGenerator().generateRegion();
+		// Send a request with the region as parameter
+		Map<String,String> headers = new HashMap<String,String>();
+		headers.put("region", region.name);
+		HttpGet reqGet = new HttpGet(this.getGenerator().getBrowseCategoriesInRegionURL());
+		response = this.getHttpTransport().fetch(reqGet, headers);
+		this.trace(this.getGenerator().getBrowseCategoriesInRegionURL());
+		if (!this.getGenerator().checkHttpResponse(response.toString()))
+		{
+			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getBrowseCategoriesInRegionURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		this.setFailed(false);
