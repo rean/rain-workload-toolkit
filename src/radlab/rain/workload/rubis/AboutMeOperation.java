@@ -48,7 +48,11 @@ import radlab.rain.workload.rubis.model.RubisUser;
 
 
 /**
- * About-Me operation.
+ * The About-Me operation.
+ *
+ * Emulates the following requests:
+ * 1. Go to the 'About Me' page
+ * 2. Send authentication data (login name and password)
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
@@ -59,7 +63,6 @@ public class AboutMeOperation extends RubisOperation
 		super(interactive, scoreboard);
 		this._operationName = "About Me";
 		this._operationIndex = RubisGenerator.ABOUT_ME_OP;
-		//this._mustBeSync = true;
 	}
 
 	@Override
@@ -76,7 +79,7 @@ public class AboutMeOperation extends RubisOperation
 			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getAboutMeURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
-		// Provide the user name and password
+		// Need a logged user
 		RubisUser loggedUser = null;
 		if (this.getGenerator().isUserLoggedIn())
 		{
@@ -92,6 +95,7 @@ public class AboutMeOperation extends RubisOperation
 		HttpPost reqPost = null;
 		MultipartEntity entity = null;
 
+		// Send authentication data (login name and password)
 		reqPost = new HttpPost(this.getGenerator().getAboutMePostURL());
 		entity = new MultipartEntity();
 		entity.addPart("nickname", new StringBody(loggedUser.nickname));
