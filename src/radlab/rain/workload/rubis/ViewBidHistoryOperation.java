@@ -45,6 +45,9 @@ import radlab.rain.workload.rubis.model.RubisItem;
 /**
  * View-Bid-History operation.
  *
+ * Emulates the following requests:
+ * 1. Click on the 'bid history' link
+ *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
 public class ViewBidHistoryOperation extends RubisOperation 
@@ -59,8 +62,10 @@ public class ViewBidHistoryOperation extends RubisOperation
 	@Override
 	public void execute() throws Throwable
 	{
+		// Generate a random item
 		RubisItem item = this.getGenerator().generateItem();
 
+		// Click on the 'bid history' link
 		Map<String,String> headers = new HashMap<String,String>();
 		headers.put("itemId", Integer.toString(item.id));
 		HttpGet request = new HttpGet(this.getGenerator().getViewBidHistoryURL());
