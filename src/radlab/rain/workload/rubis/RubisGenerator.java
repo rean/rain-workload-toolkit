@@ -64,16 +64,15 @@ public class RubisGenerator extends Generator
 	public static final int BROWSE_CATEGORIES_OP = 2;
 	public static final int SEARCH_ITEMS_BY_CATEGORY_OP = 3;
 	public static final int BROWSE_REGIONS_OP = 4;
-	public static final int BROWSE_CATEGORIES_IN_REGION_OP = 5;
-	public static final int SEARCH_ITEMS_BY_REGION_OP = 6;
-	public static final int VIEW_ITEM_OP = 7;
-	public static final int VIEW_USER_INFO_OP = 8;
-	public static final int VIEW_BID_HISTORY_OP = 9;
-	public static final int BUY_NOW_ITEM_OP = 10;
-	public static final int BID_OP = 11;
-	public static final int COMMENT_ITEM_OP = 12;
-	public static final int SELL_ITEM_OP = 13;
-	public static final int ABOUT_ME_OP = 14;
+	public static final int SEARCH_ITEMS_BY_REGION_OP = 5;
+	public static final int VIEW_ITEM_OP = 6;
+	public static final int VIEW_USER_INFO_OP = 7;
+	public static final int VIEW_BID_HISTORY_OP = 8;
+	public static final int BUY_NOW_ITEM_OP = 9;
+	public static final int BID_OP = 10;
+	public static final int COMMENT_ITEM_OP = 11;
+	public static final int SELL_ITEM_OP = 12;
+	public static final int ABOUT_ME_OP = 13;
 
 	/// The set of alphanumeric characters
 	private static final char[] ALNUM_CHARS = { '0', '1', '2', '3', '4', '5',
@@ -559,7 +558,6 @@ public class RubisGenerator extends Generator
 			case BROWSE_CATEGORIES_OP: return this.createBrowseCategoriesOperation();
 			case SEARCH_ITEMS_BY_CATEGORY_OP: return this.createSearchItemsByCategoryOperation();
 			case BROWSE_REGIONS_OP: return this.createBrowseRegionsOperation();
-			case BROWSE_CATEGORIES_IN_REGION_OP: return this.createBrowseCategoriesInRegionOperation();
 			case SEARCH_ITEMS_BY_REGION_OP: return this.createSearchItemsByRegionOperation();
 			case VIEW_ITEM_OP: return this.createViewItemOperation();
 			case VIEW_USER_INFO_OP: return this.createViewUserInfoOperation();
@@ -629,18 +627,6 @@ public class RubisGenerator extends Generator
 	public BrowseRegionsOperation createBrowseRegionsOperation()
 	{
 		BrowseRegionsOperation op = new BrowseRegionsOperation(this.getTrack().getInteractive(), this.getScoreboard());
-		op.prepare(this);
-		return op;
-	}
-
-	/**
-	 * Factory method.
-	 * 
-	 * @return  A prepared BrowseCategoriesOperation.
-	 */
-	public BrowseCategoriesInRegionOperation createBrowseCategoriesInRegionOperation()
-	{
-		BrowseCategoriesInRegionOperation op = new BrowseCategoriesInRegionOperation(this.getTrack().getInteractive(), this.getScoreboard());
 		op.prepare(this);
 		return op;
 	}
