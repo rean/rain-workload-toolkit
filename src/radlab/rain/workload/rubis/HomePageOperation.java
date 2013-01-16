@@ -39,7 +39,12 @@ import radlab.rain.IScoreboard;
 
 
 /**
- * The Home Page operation is a sample operation.
+ * The 'Home-Page' operation.
+ *
+ * Emulates the following requests:
+ * 1. Request the 'Home Page' page
+ *
+ * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
 public class HomePageOperation extends RubisOperation 
 {
