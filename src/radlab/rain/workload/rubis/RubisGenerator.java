@@ -36,6 +36,7 @@ package radlab.rain.workload.rubis;
 
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.logging.Logger;
 import java.util.Random;
 import org.apache.http.HttpStatus;
 import radlab.rain.Generator;
@@ -211,6 +212,7 @@ public class RubisGenerator extends Generator
 
 	private Random _rng;
 	private HttpTransport _http;
+	private Logger _logger;
 	private int _loggedUserId;
 	private String _baseURL;
 	private String _homepageURL; 
@@ -277,6 +279,7 @@ public class RubisGenerator extends Generator
 
 		this._rng = new Random();
 		this._http = new HttpTransport();
+		this._logger = Logger.getLogger(this.getName());
 		this._loggedUserId = ANONYMOUS_USER_ID;
 
 		this.initializeUrlAnchors();
@@ -368,6 +371,16 @@ public class RubisGenerator extends Generator
 	public HttpTransport getHttpTransport()
 	{
 		return this._http;
+	}
+
+	/**
+	 * Returns the logger.
+	 * 
+	 * @return A logger.
+	 */
+	public Logger getLogger()
+	{
+		return this._logger;
 	}
 
 	public boolean isUserLoggedIn()
