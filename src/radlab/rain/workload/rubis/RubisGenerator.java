@@ -64,15 +64,14 @@ public class RubisGenerator extends Generator
 	public static final int REGISTER_USER_OP = 1;
 	public static final int BROWSE_CATEGORIES_OP = 2;
 	public static final int BROWSE_REGIONS_OP = 3;
-	public static final int SEARCH_ITEMS_BY_REGION_OP = 4;
-	public static final int VIEW_ITEM_OP = 5;
-	public static final int VIEW_USER_INFO_OP = 6;
-	public static final int VIEW_BID_HISTORY_OP = 7;
-	public static final int BUY_NOW_ITEM_OP = 8;
-	public static final int BID_OP = 9;
-	public static final int COMMENT_ITEM_OP = 10;
-	public static final int SELL_ITEM_OP = 11;
-	public static final int ABOUT_ME_OP = 12;
+	public static final int VIEW_ITEM_OP = 4;
+	public static final int VIEW_USER_INFO_OP = 5;
+	public static final int VIEW_BID_HISTORY_OP = 6;
+	public static final int BUY_NOW_ITEM_OP = 7;
+	public static final int BID_OP = 8;
+	public static final int COMMENT_ITEM_OP = 9;
+	public static final int SELL_ITEM_OP = 10;
+	public static final int ABOUT_ME_OP = 11;
 
 	/// The set of alphanumeric characters
 	private static final char[] ALNUM_CHARS = { '0', '1', '2', '3', '4', '5',
@@ -569,7 +568,6 @@ public class RubisGenerator extends Generator
 			case REGISTER_USER_OP: return this.createRegisterUserOperation();
 			case BROWSE_CATEGORIES_OP: return this.createBrowseCategoriesOperation();
 			case BROWSE_REGIONS_OP: return this.createBrowseRegionsOperation();
-			case SEARCH_ITEMS_BY_REGION_OP: return this.createSearchItemsByRegionOperation();
 			case VIEW_ITEM_OP: return this.createViewItemOperation();
 			case VIEW_USER_INFO_OP: return this.createViewUserInfoOperation();
 			case VIEW_BID_HISTORY_OP: return this.createViewBidHistoryOperation();
@@ -626,18 +624,6 @@ public class RubisGenerator extends Generator
 	public BrowseRegionsOperation createBrowseRegionsOperation()
 	{
 		BrowseRegionsOperation op = new BrowseRegionsOperation(this.getTrack().getInteractive(), this.getScoreboard());
-		op.prepare(this);
-		return op;
-	}
-
-	/**
-	 * Factory method.
-	 * 
-	 * @return  A prepared SearchItemsByRegionOperation.
-	 */
-	public SearchItemsByRegionOperation createSearchItemsByRegionOperation()
-	{
-		SearchItemsByRegionOperation op = new SearchItemsByRegionOperation(this.getTrack().getInteractive(), this.getScoreboard());
 		op.prepare(this);
 		return op;
 	}
