@@ -66,9 +66,12 @@ public class AboutMeOperation extends RubisOperation
 	@Override
 	public void execute() throws Throwable
 	{
+		this.getLogger().finest("Begin AboutMe execution");
+
 		StringBuilder response = null;
 
 		// Go to the About-Me home page
+		this.getLogger().finest("Send GET " + this.getGenerator().getAboutMeURL());
 		response = this.getHttpTransport().fetchUrl(this.getGenerator().getAboutMeURL());
 		this.trace(this.getGenerator().getAboutMeURL());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
@@ -100,6 +103,7 @@ public class AboutMeOperation extends RubisOperation
 		form.add(new BasicNameValuePair("password", loggedUser.password));
 		entity = new UrlEncodedFormEntity(form, "UTF-8");
 		reqPost.setEntity(entity);
+		this.getLogger().finest("Send POST " + reqPost.getURI());
 		response = this.getHttpTransport().fetch(reqPost);
 		this.trace(reqPost.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
@@ -108,5 +112,7 @@ public class AboutMeOperation extends RubisOperation
 		}
 
 		this.setFailed(false);
+
+		this.getLogger().finest("End AboutMe execution");
 	}
 }

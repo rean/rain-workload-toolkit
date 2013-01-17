@@ -70,6 +70,8 @@ public class BidOperation extends RubisOperation
 	@Override
 	public void execute() throws Throwable
 	{
+		this.getLogger().finest("Begin Bid execution");
+
 		StringBuilder response = null;
 
 		// Since an item id must be provided, generate a random one
@@ -80,6 +82,7 @@ public class BidOperation extends RubisOperation
 		URIBuilder uri = new URIBuilder(this.getGenerator().getPutBidAuthURL());
 		uri.setParameter("itemId", Integer.toString(item.id));
 		HttpGet reqGet = new HttpGet(uri.build());
+		this.getLogger().finest("Send GET " + reqGet.getURI().toString());
 		response = this.getHttpTransport().fetch(reqGet);
 		this.trace(reqGet.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
@@ -113,6 +116,7 @@ public class BidOperation extends RubisOperation
 		entity = new UrlEncodedFormEntity(form, "UTF-8");
 		reqPost.setEntity(entity);
 		response = this.getHttpTransport().fetch(reqPost);
+		this.getLogger().finest("Send POST " + reqPost.getURI().toString());
 		this.trace(reqPost.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
@@ -149,6 +153,7 @@ public class BidOperation extends RubisOperation
 		form.add(new BasicNameValuePair("qty", Integer.toString(qty)));
 		entity = new UrlEncodedFormEntity(form, "UTF-8");
 		reqPost.setEntity(entity);
+		this.getLogger().finest("Send POST " + reqPost.getURI().toString());
 		response = this.getHttpTransport().fetch(reqPost);
 		this.trace(reqPost.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
@@ -157,5 +162,7 @@ public class BidOperation extends RubisOperation
 		}
 
 		this.setFailed(false);
+
+		this.getLogger().finest("End Bid execution");
 	}
 }
