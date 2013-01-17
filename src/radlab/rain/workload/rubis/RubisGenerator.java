@@ -280,7 +280,7 @@ public class RubisGenerator extends Generator
 		this._logger = Logger.getLogger(this.getName());
 		this._loggedUserId = ANONYMOUS_USER_ID;
 
-		this.initializeUrlAnchors();
+		this.initializeUrls();
 	}
 
 	/**
@@ -551,33 +551,6 @@ public class RubisGenerator extends Generator
 	public String getAboutMePostURL()
 	{
 		return this._aboutMePostURL;
-	}
-
-	/**
-	 * Creates a newly instantiated, prepared operation.
-	 * 
-	 * @param opIndex The type of operation to instantiate.
-	 * @return A prepared operation.
-	 */
-	public Operation getOperation(int opIndex)
-	{
-		switch (opIndex)
-		{
-			//case DO_NOTHING_OP: return this.createDoNothingOperation();
-			case HOME_PAGE_OP: return this.createHomePageOperation();
-			case REGISTER_USER_OP: return this.createRegisterUserOperation();
-			case BROWSE_CATEGORIES_OP: return this.createBrowseCategoriesOperation();
-			case BROWSE_REGIONS_OP: return this.createBrowseRegionsOperation();
-			case VIEW_ITEM_OP: return this.createViewItemOperation();
-			case VIEW_USER_INFO_OP: return this.createViewUserInfoOperation();
-			case VIEW_BID_HISTORY_OP: return this.createViewBidHistoryOperation();
-			case BUY_NOW_ITEM_OP: return this.createBuyNowItemOperation();
-			case BID_OP: return this.createBidOperation();
-			case COMMENT_ITEM_OP: return this.createCommentItemOperation();
-			case SELL_ITEM_OP: return this.createSellItemOperation();
-			case ABOUT_ME_OP: return this.createAboutMeOperation();
-			default: return null;
-		}
 	}
 
 	/**
@@ -884,6 +857,53 @@ public class RubisGenerator extends Generator
 		return comment;
 	}
 
+	/**
+	 * Creates a newly instantiated, prepared operation.
+	 * 
+	 * @param opIndex The type of operation to instantiate.
+	 * @return A prepared operation.
+	 */
+	private Operation getOperation(int opIndex)
+	{
+		switch (opIndex)
+		{
+			case HOME_PAGE_OP:
+				return this.createHomePageOperation();
+			case REGISTER_USER_OP:
+				return this.createRegisterUserOperation();
+			case BROWSE_CATEGORIES_OP:
+				return this.createBrowseCategoriesOperation();
+			case BROWSE_REGIONS_OP:
+				return this.createBrowseRegionsOperation();
+			case VIEW_ITEM_OP:
+				return this.createViewItemOperation();
+			case VIEW_USER_INFO_OP:
+				return this.createViewUserInfoOperation();
+			case VIEW_BID_HISTORY_OP:
+				return this.createViewBidHistoryOperation();
+			case BUY_NOW_ITEM_OP:
+				return this.createBuyNowItemOperation();
+			case BID_OP:
+				return this.createBidOperation();
+			case COMMENT_ITEM_OP:
+				return this.createCommentItemOperation();
+			case SELL_ITEM_OP:
+				return this.createSellItemOperation();
+			case ABOUT_ME_OP:
+				return this.createAboutMeOperation();
+			default:
+		}
+
+		return null;
+	}
+
+	/**
+	 * Generates a random text.
+	 *
+	 * @param minLen The minimum length of the text.
+	 * @param maxLen The maximum length of the text.
+	 * @return The generated text.
+	 */
 	private String generateText(int minLen, int maxLen)
 	{
 		int len = minLen+this._rng.nextInt(maxLen-minLen+1);
@@ -905,6 +925,13 @@ public class RubisGenerator extends Generator
 		return buf.toString();
 	}
 
+	/**
+	 * Generates a random word.
+	 *
+	 * @param minLen The minimum length of the word.
+	 * @param maxLen The maximum length of the word.
+	 * @return The generated word.
+	 */
 	private String generateWord(int minLen, int maxLen)
 	{
 		if (minLen > maxLen)
@@ -928,7 +955,7 @@ public class RubisGenerator extends Generator
 	/**
 	 * Initialize the roots/anchors of the URLs.
 	 */
-	private void initializeUrlAnchors()
+	private void initializeUrls()
 	{
 		this._baseURL = "http://" + this.getTrack().getTargetHostName() + ":" + this.getTrack().getTargetHostPort();
 		this._homepageURL = this._baseURL + "/rubis_servlest/";
