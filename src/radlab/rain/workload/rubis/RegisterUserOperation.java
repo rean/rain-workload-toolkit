@@ -34,9 +34,12 @@
 package radlab.rain.workload.rubis;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.NameValuePair;
 import java.io.IOException;
 import radlab.rain.IScoreboard;
 import radlab.rain.workload.rubis.model.RubisUser;
@@ -78,20 +81,21 @@ public class RegisterUserOperation extends RubisOperation
 		RubisUser user = this.getGenerator().newUser();
 
 		// Fill-in the form and click on the 'Register now!' button
-		HttpPost httpPost = new HttpPost(this.getGenerator().getRegisterUserURL());
-		MultipartEntity entity = new MultipartEntity();
-		entity.addPart("firstname", new StringBody(user.firstname));
-		entity.addPart("lastname", new StringBody(user.lastname));
-		entity.addPart("nickname", new StringBody(user.nickname));
-		entity.addPart("email", new StringBody(user.email));
-		entity.addPart("password", new StringBody(user.password));
-		entity.addPart("region", new StringBody(this.getGenerator().getRegion(user.region).name));
-		httpPost.setEntity(entity);
-        response = this.getHttpTransport().fetch(httpPost);
-		this.trace(this.getGenerator().getRegisterUserURL());
+		HttpPost reqPost = new HttpPost(this.getGenerator().getRegisterUserURL());
+		List<NameValuePair> form = new ArrayList<NameValuePair>();
+		form.add(new BasicNameValuePair("firstname", user.firstname));
+		form.add(new BasicNameValuePair("lastname", user.lastname));
+		form.add(new BasicNameValuePair("nickname", user.nickname));
+		form.add(new BasicNameValuePair("email", user.email));
+		form.add(new BasicNameValuePair("password", user.password));
+		form.add(new BasicNameValuePair("region", this.getGenerator().getRegion(user.region).name));
+		UrlEncodedFormEntity entity = new UrlEncodedFormEntity(form, "UTF-8");
+		reqPost.setEntity(entity);
+        response = this.getHttpTransport().fetch(reqPost);
+		this.trace(reqPost.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getRegisterUserURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		this.setFailed(false);

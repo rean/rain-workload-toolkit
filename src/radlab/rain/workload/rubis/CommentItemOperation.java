@@ -35,13 +35,15 @@ package radlab.rain.workload.rubis;
 
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import radlab.rain.IScoreboard;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.NameValuePair;
 import radlab.rain.workload.rubis.model.RubisComment;
 import radlab.rain.workload.rubis.model.RubisItem;
 import radlab.rain.workload.rubis.model.RubisUser;
@@ -72,7 +74,6 @@ public class CommentItemOperation extends RubisOperation
 	public void execute() throws Throwable
 	{
 		StringBuilder response = null;
-		Map<String,String> headers = null;
 
 		// Generate a random item and user to which post the comment
 		RubisItem item = this.getGenerator().generateItem();
@@ -80,15 +81,15 @@ public class CommentItemOperation extends RubisOperation
 
 		// Click on the 'Leave a comment on this user' for a certain item and user
 		// This will lead to a user authentification.
-		HttpGet reqGet = new HttpGet(this.getGenerator().getPutCommentAuthURL());
-		headers = new HashMap<String,String>();
-		headers.put("itemId", Integer.toString(item.id));
-		headers.put("to", Integer.toString(toUser.id));
-		response = this.getHttpTransport().fetch(reqGet, headers);
-		this.trace(this.getGenerator().getPutCommentAuthURL());
+		URIBuilder uri = new URIBuilder(this.getGenerator().getPutCommentAuthURL());
+		uri.setParameter("itemId", Integer.toString(item.id));
+		uri.setParameter("to", Integer.toString(toUser.id));
+		HttpGet reqGet = new HttpGet(uri.build());
+		response = this.getHttpTransport().fetch(reqGet);
+		this.trace(reqGet.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getPutCommentAuthURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			throw new IOException("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		// Need a logged user
@@ -105,40 +106,43 @@ public class CommentItemOperation extends RubisOperation
 		}
 
 		HttpPost reqPost = null;
-		MultipartEntity entity = null;
+		List<NameValuePair> form = null;
+		UrlEncodedFormEntity entity = null;
 
 		// Send authentication data (login name and password)
 		// This is the page the user can access when it has been successfully authenticated.
 		reqPost = new HttpPost(this.getGenerator().getPutCommentURL());
-		entity = new MultipartEntity();
-		entity.addPart("itemId", new StringBody(Integer.toString(item.id)));
-		entity.addPart("to", new StringBody(Integer.toString(toUser.id)));
-		entity.addPart("nickname", new StringBody(loggedUser.nickname));
-		entity.addPart("password", new StringBody(loggedUser.password));
+		form = new ArrayList<NameValuePair>();
+		form.add(new BasicNameValuePair("itemId", Integer.toString(item.id)));
+		form.add(new BasicNameValuePair("to", Integer.toString(toUser.id)));
+		form.add(new BasicNameValuePair("nickname", loggedUser.nickname));
+		form.add(new BasicNameValuePair("password", loggedUser.password));
+		entity = new UrlEncodedFormEntity(form, "UTF-8");
 		reqPost.setEntity(entity);
 		response = this.getHttpTransport().fetch(reqPost);
-		this.trace(this.getGenerator().getPutCommentURL());
+		this.trace(reqPost.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getPutCommentURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
  		// Fill-in the form anc click on the 'Post this comment now!' button 
 		// This will really store the comment on the DB.
 		RubisComment comment = this.getGenerator().generateComment(loggedUser.id, toUser.id, item.id);
 		reqPost = new HttpPost(this.getGenerator().getStoreCommentURL());
-		entity = new MultipartEntity();
-		entity.addPart("from", new StringBody(Integer.toString(comment.fromUserId)));
-		entity.addPart("to", new StringBody(Integer.toString(comment.toUserId)));
-		entity.addPart("itemId", new StringBody(Integer.toString(comment.itemId)));
-		entity.addPart("rating", new StringBody(Integer.toString(comment.rating)));
-		entity.addPart("comment", new StringBody(comment.comment));
+		form = new ArrayList<NameValuePair>();
+		form.add(new BasicNameValuePair("from", Integer.toString(comment.fromUserId)));
+		form.add(new BasicNameValuePair("to", Integer.toString(comment.toUserId)));
+		form.add(new BasicNameValuePair("itemId", Integer.toString(comment.itemId)));
+		form.add(new BasicNameValuePair("rating", Integer.toString(comment.rating)));
+		form.add(new BasicNameValuePair("comment", comment.comment));
 		reqPost.setEntity(entity);
+		entity = new UrlEncodedFormEntity(form, "UTF-8");
 		response = this.getHttpTransport().fetch(reqPost);
-		this.trace(this.getGenerator().getStoreCommentURL());
+		this.trace(reqPost.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getStoreCommentURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		this.setFailed(false);

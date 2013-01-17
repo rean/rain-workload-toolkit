@@ -35,13 +35,15 @@ package radlab.rain.workload.rubis;
 
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import radlab.rain.IScoreboard;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.NameValuePair;
 import radlab.rain.workload.rubis.model.RubisItem;
 import radlab.rain.workload.rubis.model.RubisUser;
 
@@ -69,20 +71,19 @@ public class BuyNowItemOperation extends RubisOperation
 	public void execute() throws Throwable
 	{
 		StringBuilder response = null;
-		Map<String,String> headers = null;
 
 		// Generate a random item and perform a Buy-Now-Auth operation
 		RubisItem item = this.getGenerator().generateItem();
 
 		// Click on the 'Buy-Now' link located in the item detail page
-		HttpGet reqGet = new HttpGet(this.getGenerator().getBuyNowAuthURL());
-		headers = new HashMap<String,String>();
-		headers.put("itemId", Integer.toString(item.id));
-		response = this.getHttpTransport().fetch(reqGet, headers);
-		this.trace(this.getGenerator().getBuyNowAuthURL());
+		URIBuilder uri = new URIBuilder(this.getGenerator().getBuyNowAuthURL());
+		uri.setParameter("itemId", Integer.toString(item.id));
+		HttpGet reqGet = new HttpGet(uri.build());
+		response = this.getHttpTransport().fetch(reqGet);
+		this.trace(reqGet.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getBuyNowAuthURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			throw new IOException("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		// Need a logged user
@@ -98,36 +99,39 @@ public class BuyNowItemOperation extends RubisOperation
 		}
 
 		HttpPost reqPost = null;
-		MultipartEntity entity = null;
+		List<NameValuePair> form = null;
+		UrlEncodedFormEntity entity = null;
 
 		// Send user authentication (login name and password)
 		reqPost = new HttpPost(this.getGenerator().getBuyNowURL());
-		entity = new MultipartEntity();
-		entity.addPart("itemId", new StringBody(Integer.toString(item.id)));
-		entity.addPart("nickname", new StringBody(loggedUser.nickname));
-		entity.addPart("password", new StringBody(loggedUser.password));
+		form = new ArrayList<NameValuePair>();
+		form.add(new BasicNameValuePair("itemId", Integer.toString(item.id)));
+		form.add(new BasicNameValuePair("nickname", loggedUser.nickname));
+		form.add(new BasicNameValuePair("password", loggedUser.password));
+		entity = new UrlEncodedFormEntity(form, "UTF-8");
 		reqPost.setEntity(entity);
 		response = this.getHttpTransport().fetch(reqPost);
-		this.trace(this.getGenerator().getBuyNowURL());
+		this.trace(reqPost.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getBuyNowURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		// Fill-in the form and click on the 'Buy now!' button, to buy the item
 		reqPost = new HttpPost(this.getGenerator().getStoreBuyNowURL());
-		entity = new MultipartEntity();
-		entity.addPart("itemId", new StringBody(Integer.toString(item.id)));
-		entity.addPart("userId", new StringBody(Integer.toString(loggedUser.id)));
+		form = new ArrayList<NameValuePair>();
+		form.add(new BasicNameValuePair("itemId", Integer.toString(item.id)));
+		form.add(new BasicNameValuePair("userId", Integer.toString(loggedUser.id)));
 		int maxQty = Math.min(item.quantity, 1);
-		entity.addPart("maxQty", new StringBody(Integer.toString(maxQty)));
-		entity.addPart("qty", new StringBody(Integer.toString(this.getRandomGenerator().nextInt(maxQty)+1)));
+		form.add(new BasicNameValuePair("maxQty", Integer.toString(maxQty)));
+		form.add(new BasicNameValuePair("qty", Integer.toString(this.getRandomGenerator().nextInt(maxQty)+1)));
+		entity = new UrlEncodedFormEntity(form, "UTF-8");
 		reqPost.setEntity(entity);
 		response = this.getHttpTransport().fetch(reqPost);
-		this.trace(this.getGenerator().getStoreBuyNowURL());
+		this.trace(reqPost.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getStoreBuyNowURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		this.setFailed(false);

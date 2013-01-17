@@ -35,13 +35,15 @@ package radlab.rain.workload.rubis;
 
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import radlab.rain.IScoreboard;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.NameValuePair;
 import radlab.rain.workload.rubis.model.RubisItem;
 import radlab.rain.workload.rubis.model.RubisUser;
 
@@ -69,21 +71,20 @@ public class BidOperation extends RubisOperation
 	public void execute() throws Throwable
 	{
 		StringBuilder response = null;
-		Map<String,String> headers = null;
 
 		// Since an item id must be provided, generate a random one
 		RubisItem item = this.getGenerator().generateItem();
 
 		// Click on the 'Bid Now' image for a certain item
 		// This will lead to a user authentification.
-		HttpGet reqGet = new HttpGet(this.getGenerator().getPutBidAuthURL());
-		headers = new HashMap<String,String>();
-		headers.put("itemId", Integer.toString(item.id));
-		response = this.getHttpTransport().fetch(reqGet, headers);
-		this.trace(this.getGenerator().getPutBidAuthURL());
+		URIBuilder uri = new URIBuilder(this.getGenerator().getPutBidAuthURL());
+		uri.setParameter("itemId", Integer.toString(item.id));
+		HttpGet reqGet = new HttpGet(uri.build());
+		response = this.getHttpTransport().fetch(reqGet);
+		this.trace(reqGet.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getPutBidAuthURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			throw new IOException("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		// Need a logged user
@@ -99,21 +100,23 @@ public class BidOperation extends RubisOperation
 		}
 
 		HttpPost reqPost = null;
-		MultipartEntity entity = null;
+		List<NameValuePair> form = null;
+		UrlEncodedFormEntity entity = null;
 
 		// Provide authentication data (login name and password)
 		// This is the page the user can access when it has been successfully authenticated.
 		reqPost = new HttpPost(this.getGenerator().getPutBidURL());
-		entity = new MultipartEntity();
-		entity.addPart("itemId", new StringBody(Integer.toString(item.id)));
-		entity.addPart("nickname", new StringBody(loggedUser.nickname));
-		entity.addPart("password", new StringBody(loggedUser.password));
+		form = new ArrayList<NameValuePair>();
+		form.add(new BasicNameValuePair("itemId", Integer.toString(item.id)));
+		form.add(new BasicNameValuePair("nickname", loggedUser.nickname));
+		form.add(new BasicNameValuePair("password", loggedUser.password));
+		entity = new UrlEncodedFormEntity(form, "UTF-8");
 		reqPost.setEntity(entity);
 		response = this.getHttpTransport().fetch(reqPost);
-		this.trace(this.getGenerator().getPutBidURL());
+		this.trace(reqPost.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getPutBidURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		// Fill-in the form anc click on the 'Bid now!' button
@@ -136,20 +139,21 @@ public class BidOperation extends RubisOperation
 		float bid = minBid+addBid;
 		float maxBid = minBid+addBid*2;
 		reqPost = new HttpPost(this.getGenerator().getStoreBidURL());
-		entity = new MultipartEntity();
-		entity.addPart("itemId", new StringBody(Integer.toString(item.id)));
-		entity.addPart("userId", new StringBody(Integer.toString(loggedUser.id)));
-		entity.addPart("minBid", new StringBody(Float.toString(minBid)));
-		entity.addPart("bid", new StringBody(Float.toString(bid)));
-		entity.addPart("maxBid", new StringBody(Float.toString(maxBid)));
-		entity.addPart("maxQty", new StringBody(Integer.toString(maxQty)));
-		entity.addPart("qty", new StringBody(Integer.toString(qty)));
+		form = new ArrayList<NameValuePair>();
+		form.add(new BasicNameValuePair("itemId", Integer.toString(item.id)));
+		form.add(new BasicNameValuePair("userId", Integer.toString(loggedUser.id)));
+		form.add(new BasicNameValuePair("minBid", Float.toString(minBid)));
+		form.add(new BasicNameValuePair("bid", Float.toString(bid)));
+		form.add(new BasicNameValuePair("maxBid", Float.toString(maxBid)));
+		form.add(new BasicNameValuePair("maxQty", Integer.toString(maxQty)));
+		form.add(new BasicNameValuePair("qty", Integer.toString(qty)));
+		entity = new UrlEncodedFormEntity(form, "UTF-8");
 		reqPost.setEntity(entity);
 		response = this.getHttpTransport().fetch(reqPost);
-		this.trace(this.getGenerator().getStoreBidURL());
+		this.trace(reqPost.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getStoreBidURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		this.setFailed(false);

@@ -35,15 +35,17 @@ package radlab.rain.workload.rubis;
 
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import radlab.rain.IScoreboard;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.NameValuePair;
 import radlab.rain.workload.rubis.model.RubisItem;
 import radlab.rain.workload.rubis.model.RubisUser;
 
@@ -98,55 +100,57 @@ public class SellItemOperation extends RubisOperation
 		}
 
 		HttpPost reqPost = null;
-		MultipartEntity entity = null;
+		List<NameValuePair> form = null;
+		UrlEncodedFormEntity entity = null;
 
 		// Send authentication data (login name and password) and click on the 'Log In!' link
 		reqPost = new HttpPost(this.getGenerator().getBrowseCategoriesURL());
-		entity = new MultipartEntity();
-		entity.addPart("nickname", new StringBody(loggedUser.nickname));
-		entity.addPart("password", new StringBody(loggedUser.password));
+		form = new ArrayList<NameValuePair>();
+		form.add(new BasicNameValuePair("nickname", loggedUser.nickname));
+		form.add(new BasicNameValuePair("password", loggedUser.password));
+		entity = new UrlEncodedFormEntity(form, "UTF-8");
 		reqPost.setEntity(entity);
 		response = this.getHttpTransport().fetch(reqPost);
-		this.trace(this.getGenerator().getBrowseCategoriesURL());
+		this.trace(reqPost.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getBrowseCategoriesURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		// Generate a new item
 		RubisItem item = this.getGenerator().newItem();
 
 		// Select the category of the item to sell
-		Map<String,String> headers = null;
-		HttpGet reqGet = null;
-		reqGet = new HttpGet(this.getGenerator().getSellItemFormURL());
-		headers = new HashMap<String,String>();
-		headers.put("user", Integer.toString(loggedUser.id));
-		headers.put("category", Integer.toString(item.category));
-		response = this.getHttpTransport().fetch(reqGet, headers);
+		URIBuilder uri = new URIBuilder(this.getGenerator().getSellItemFormURL());
+		uri.setParameter("user", Integer.toString(loggedUser.id));
+		uri.setParameter("category", Integer.toString(item.category));
+		HttpGet reqGet = new HttpGet(uri.build());
+		response = this.getHttpTransport().fetch(reqGet);
+		this.trace(reqGet.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getSellItemFormURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			throw new IOException("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		// Fill-in the form and click on the 'Register item!' button
 		reqPost = new HttpPost(this.getGenerator().getRegisterItemURL());
-		entity = new MultipartEntity();
-		entity.addPart("name", new StringBody(item.name));
-		entity.addPart("description", new StringBody(item.description));
-		entity.addPart("initialPrice", new StringBody(Float.toString(item.initialPrice)));
-		entity.addPart("reservePrice", new StringBody(Float.toString(item.reservePrice)));
-		entity.addPart("buyNow", new StringBody(Float.toString(item.buyNow)));
-		entity.addPart("duration", new StringBody(Integer.toString(this.getDuration(item.startDate, item.endDate))));
-		entity.addPart("quantity", new StringBody(Integer.toString(item.quantity)));
-		entity.addPart("userId", new StringBody(Integer.toString(loggedUser.id)));
-		entity.addPart("categoryId", new StringBody(Integer.toString(this.getGenerator().getCategory(item.category).id)));
+		form = new ArrayList<NameValuePair>();
+		form.add(new BasicNameValuePair("name", item.name));
+		form.add(new BasicNameValuePair("description", item.description));
+		form.add(new BasicNameValuePair("initialPrice", Float.toString(item.initialPrice)));
+		form.add(new BasicNameValuePair("reservePrice", Float.toString(item.reservePrice)));
+		form.add(new BasicNameValuePair("buyNow", Float.toString(item.buyNow)));
+		form.add(new BasicNameValuePair("duration", Integer.toString(this.getDuration(item.startDate, item.endDate))));
+		form.add(new BasicNameValuePair("quantity", Integer.toString(item.quantity)));
+		form.add(new BasicNameValuePair("userId", Integer.toString(loggedUser.id)));
+		form.add(new BasicNameValuePair("categoryId", Integer.toString(this.getGenerator().getCategory(item.category).id)));
+		entity = new UrlEncodedFormEntity(form, "UTF-8");
 		reqPost.setEntity(entity);
 		response = this.getHttpTransport().fetch(reqPost);
-		this.trace(this.getGenerator().getRegisterItemURL());
+		this.trace(reqPost.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getRegisterItemURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		this.setFailed(false);

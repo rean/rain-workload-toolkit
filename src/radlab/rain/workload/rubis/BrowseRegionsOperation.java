@@ -35,9 +35,8 @@ package radlab.rain.workload.rubis;
 
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
 import radlab.rain.IScoreboard;
 import radlab.rain.workload.rubis.model.RubisRegion;
 
@@ -87,14 +86,14 @@ public class BrowseRegionsOperation extends RubisOperation
 		// Generate a random region
 		RubisRegion region = this.getGenerator().generateRegion();
 		// Send a request with the region as parameter
-		Map<String,String> headers = new HashMap<String,String>();
-		headers.put("region", region.name);
-		HttpGet reqGet = new HttpGet(this.getGenerator().getBrowseCategoriesInRegionURL());
-		response = this.getHttpTransport().fetch(reqGet, headers);
-		this.trace(this.getGenerator().getBrowseCategoriesInRegionURL());
+		URIBuilder uri = new URIBuilder(this.getGenerator().getBrowseCategoriesInRegionURL());
+		uri.setParameter("region", region.name);
+		HttpGet reqGet = new HttpGet(uri.build());
+		response = this.getHttpTransport().fetch(reqGet);
+		this.trace(reqGet.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getBrowseCategoriesInRegionURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			throw new IOException("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		this.setFailed(false);

@@ -35,9 +35,8 @@ package radlab.rain.workload.rubis;
 
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
 import radlab.rain.IScoreboard;
 import radlab.rain.workload.rubis.model.RubisCategory;
 
@@ -61,18 +60,18 @@ public class SearchItemsByCategoryOperation extends RubisOperation
 	{
 		RubisCategory category = this.getGenerator().generateCategory();
 
-		Map<String,String> headers = new HashMap<String,String>();
-		headers.put("category", Integer.toString(category.id));
-		headers.put("categoryName", category.name);
-		//headers.put("page", Integer.toString(this.getUtility.extractPageFromHTML(this.getLastHTML())));
-		headers.put("page", Integer.toString(1));
-		headers.put("nbOfItems", Integer.toString(this.getGenerator().getNumItemsPerPage()));
-		HttpGet request = new HttpGet(this.getGenerator().getSearchItemsByCategoryURL());
-		StringBuilder response = this.getHttpTransport().fetch(request, headers);
-		this.trace(this.getGenerator().getSearchItemsByCategoryURL());
+		URIBuilder uri = new URIBuilder(this.getGenerator().getSearchItemsByCategoryURL());
+		uri.setParameter("category", Integer.toString(category.id));
+		uri.setParameter("categoryName", category.name);
+		//uri.setParameter("page", Integer.toString(this.getUtility.extractPageFromHTML(this.getLastHTML())));
+		uri.setParameter("page", Integer.toString(1));
+		uri.setParameter("nbOfItems", Integer.toString(this.getGenerator().getNumItemsPerPage()));
+		HttpGet reqGet = new HttpGet(uri.build());
+		StringBuilder response = this.getHttpTransport().fetch(reqGet);
+		this.trace(reqGet.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getSearchItemsByCategoryURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			throw new IOException("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		this.setFailed(false);

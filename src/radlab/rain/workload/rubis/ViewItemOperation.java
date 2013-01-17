@@ -35,9 +35,8 @@ package radlab.rain.workload.rubis;
 
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
 import radlab.rain.IScoreboard;
 import radlab.rain.workload.rubis.model.RubisItem;
 
@@ -66,14 +65,14 @@ public class ViewItemOperation extends RubisOperation
 		RubisItem item = this.getGenerator().generateItem();
 
 		// Click on the item name link
-		Map<String,String> headers = new HashMap<String,String>();
-		headers.put("itemId", Integer.toString(item.id));
-		HttpGet request = new HttpGet(this.getGenerator().getViewItemURL());
-		StringBuilder response = this.getHttpTransport().fetch(request, headers);
-		this.trace(this.getGenerator().getViewItemURL());
+		URIBuilder uri = new URIBuilder(this.getGenerator().getViewItemURL());
+		uri.setParameter("itemId", Integer.toString(item.id));
+		HttpGet reqGet = new HttpGet(uri.build());
+		StringBuilder response = this.getHttpTransport().fetch(reqGet);
+		this.trace(reqGet.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getViewItemURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			throw new IOException("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		this.setFailed(false);
