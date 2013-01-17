@@ -12,11 +12,13 @@
     <path id="rain.classpath">
     	<pathelement location="."/>
     	<pathelement location="bin"/>
+<!--
         <pathelement location="thirdparty/httpcomponents-client-4.2.3/lib/commons-codec-1.6.jar"/>
         <pathelement location="thirdparty/httpcomponents-client-4.2.3/lib/commons-logging-1.1.1.jar"/>
         <pathelement location="thirdparty/httpcomponents-client-4.2.3/lib/fluent-hc-4.2.3.jar"/>
-        <pathelement location="thirdparty/httpcomponents-client-4.2.3/lib/httpclient-4.2.3.jar"/>
         <pathelement location="thirdparty/httpcomponents-client-4.2.3/lib/httpclient-cache-4.2.3.jar"/>
+-->
+        <pathelement location="thirdparty/httpcomponents-client-4.2.3/lib/httpclient-4.2.3.jar"/>
         <pathelement location="thirdparty/httpcomponents-client-4.2.3/lib/httpcore-4.2.2.jar"/>
         <pathelement location="thirdparty/httpcomponents-client-4.2.3/lib/httpmime-4.2.3.jar"/>
         <pathelement location="thirdparty/json-20090211.jar"/>
@@ -47,11 +49,13 @@
     </path>
 	<path id="rain.classpath.with.mr">
         <pathelement location="bin"/>
+<!--
         <pathelement location="thirdparty/httpcomponents-client-4.2.3/lib/commons-codec-1.6.jar"/>
         <pathelement location="thirdparty/httpcomponents-client-4.2.3/lib/commons-logging-1.1.1.jar"/>
         <pathelement location="thirdparty/httpcomponents-client-4.2.3/lib/fluent-hc-4.2.3.jar"/>
-        <pathelement location="thirdparty/httpcomponents-client-4.2.3/lib/httpclient-4.2.3.jar"/>
         <pathelement location="thirdparty/httpcomponents-client-4.2.3/lib/httpclient-cache-4.2.3.jar"/>
+-->
+        <pathelement location="thirdparty/httpcomponents-client-4.2.3/lib/httpclient-4.2.3.jar"/>
         <pathelement location="thirdparty/httpcomponents-client-4.2.3/lib/httpcore-4.2.2.jar"/>
         <pathelement location="thirdparty/httpcomponents-client-4.2.3/lib/httpmime-4.2.3.jar"/>
         <pathelement location="thirdparty/json-20090211.jar"/>
@@ -279,11 +283,13 @@
                 <attribute name="Main-Class" value="radlab.rain.Benchmark"/>
             </manifest>
             <fileset dir="bin" excludes="radlab/rain/workload/** radlab/rain/test/**"/>
+<!--
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/commons-codec-1.6.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/commons-logging-1.1.1.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/fluent-hc-4.2.3.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/httpclient-4.2.3.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/httpclient-cache-4.2.3.jar"/>
+-->
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/httpclient-4.2.3.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/httpcore-4.2.2.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/httpmime-4.2.3.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/json-20090211.jar"/>
@@ -294,18 +300,6 @@
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/zookeeper-3.3.2/lib/log4j-1.2.15.jar"/>
         	<!-- MySQL stuff -->
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/mysql-connector-java-5.1.14/mysql-connector-java-5.1.14-bin.jar"/>
-        	<!-- Mongo stuff -->
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/mongo-2.5.3/mongo-2.5.3.jar"/>
-        	<!-- Riak stuff -->
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/riak-java-client/target/riak-client-1.0.6-SNAPSHOT-jar-with-dependencies.jar"/>
-        	<!-- Redis stuff -->
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jedis/target/jedis-1.5.3-SNAPSHOT.jar"/>
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/commons-pool-1.5.6/commons-pool-1.5.6.jar"/>
-        	<!-- S3 stuff -->
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/jars/jets3t-0.8.1.jar"/>
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/libs/commons-codec/commons-codec-1.3.jar"/>
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/libs/commons-httpclient/commons-httpclient-3.1.jar"/>
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/libs/commons-logging/commons-logging-1.1.1.jar"/>
         </jar>
     </target>
 	<target depends="build-with-mr" name="package-with-mr">
@@ -314,11 +308,13 @@
                 <attribute name="Main-Class" value="radlab.rain.Benchmark"/>
             </manifest>
             <fileset dir="bin" excludes="radlab/rain/workload/** radlab/rain/test/**"/>
+<!--
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/commons-codec-1.6.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/commons-logging-1.1.1.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/fluent-hc-4.2.3.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/httpclient-4.2.3.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/httpclient-cache-4.2.3.jar"/>
+-->
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/httpclient-4.2.3.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/httpcore-4.2.2.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/httpmime-4.2.3.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/json-20090211.jar"/>
@@ -335,18 +331,6 @@
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/hadoop-0.20.2/lib/commons-httpclient-3.0.1.jar"/>
         	<!-- mysql stuff -->
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/mysql-connector-java-5.1.14/mysql-connector-java-5.1.14-bin.jar"/>
-        	<!-- Mongo stuff -->
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/mongo-2.5.3/mongo-2.5.3.jar"/>
-        	<!-- Riak stuff -->
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/riak-java-client/target/riak-client-1.0.6-SNAPSHOT-jar-with-dependencies.jar"/>
-        	<!-- Redis stuff -->
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jedis/target/jedis-1.5.3-SNAPSHOT.jar"/>
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/commons-pool-1.5.6/commons-pool-1.5.6.jar"/>
-        	<!-- S3 stuff -->
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/jars/jets3t-0.8.1.jar"/>
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/libs/commons-codec/commons-codec-1.3.jar"/>
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/libs/commons-httpclient/commons-httpclient-3.1.jar"/>
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/libs/commons-logging/commons-logging-1.1.1.jar"/>
         </jar>
     </target>
 	<target depends="build-with-mr" name="package-mapreduce">
@@ -434,6 +418,8 @@
             <fileset dir="bin" includes="radlab/rain/workload/mongodb/**"/>
         	<!-- Bake the configuration files into the jar -->
         	<fileset dir="config" includes="*mongo*.json"/>
+			<!-- Mongo stuff -->
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/mongo-2.5.3/mongo-2.5.3.jar"/>
         </jar>
     </target>
 	<target depends="build" name="package-riak">
@@ -442,6 +428,8 @@
             <fileset dir="bin" includes="radlab/rain/workload/riak/**"/>
         	<!-- Bake the configuration files into the jar -->
         	<fileset dir="config" includes="*riak*.json"/>
+        	<!-- Riak stuff -->
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/riak-java-client/target/riak-client-1.0.6-SNAPSHOT-jar-with-dependencies.jar"/>
         </jar>
     </target>
 	<target depends="build" name="package-redis">
@@ -450,6 +438,9 @@
             <fileset dir="bin" includes="radlab/rain/workload/redis/**"/>
         	<!-- Bake the configuration files into the jar -->
         	<fileset dir="config" includes="*redis*.json"/>
+        	<!-- Redis stuff -->
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jedis/target/jedis-1.5.3-SNAPSHOT.jar"/>
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/commons-pool-1.5.6/commons-pool-1.5.6.jar"/>
         </jar>
     </target>
 	<target depends="build" name="package-s3">
@@ -474,6 +465,11 @@
             <fileset dir="bin" includes="radlab/rain/workload/cassandra/**"/>
         	<!-- Bake the configuration files into the jar -->
         	<fileset dir="config" includes="*cassandra*.json"/>
+        	<!-- S3 stuff -->
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/jars/jets3t-0.8.1.jar"/>
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/libs/commons-codec/commons-codec-1.3.jar"/>
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/libs/commons-httpclient/commons-httpclient-3.1.jar"/>
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/libs/commons-logging/commons-logging-1.1.1.jar"/>
         </jar>
     </target>
 	<target depends="build" name="Benchmark-memprof">
