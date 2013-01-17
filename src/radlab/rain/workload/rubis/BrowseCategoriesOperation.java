@@ -35,7 +35,10 @@ package radlab.rain.workload.rubis;
 
 
 import java.io.IOException;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
 import radlab.rain.IScoreboard;
+import radlab.rain.workload.rubis.model.RubisCategory;
 
 
 /**
@@ -44,6 +47,7 @@ import radlab.rain.IScoreboard;
  * Emulates the following requests:
  * 1. Go to the browse page
  * 2. Click on the 'Browse all items in a category'
+ * 3. Emulate a click on a category
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
@@ -76,6 +80,24 @@ public class BrowseCategoriesOperation extends RubisOperation
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
 			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getBrowseCategoriesURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+		}
+
+		// Generate a random category
+		RubisCategory category = this.getGenerator().generateCategory();
+
+		// Emulate a click on a category
+		URIBuilder uri = new URIBuilder(this.getGenerator().getSearchItemsByCategoryURL());
+		uri.setParameter("category", Integer.toString(category.id));
+		uri.setParameter("categoryName", category.name);
+		//uri.setParameter("page", Integer.toString(this.getUtility.extractPageFromHTML(this.getLastHTML())));
+		uri.setParameter("page", Integer.toString(1));
+		uri.setParameter("nbOfItems", Integer.toString(this.getGenerator().getNumItemsPerPage()));
+		HttpGet reqGet = new HttpGet(uri.build());
+		response = this.getHttpTransport().fetch(reqGet);
+		this.trace(reqGet.getURI().toString());
+		if (!this.getGenerator().checkHttpResponse(response.toString()))
+		{
+			throw new IOException("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		this.setFailed(false);
