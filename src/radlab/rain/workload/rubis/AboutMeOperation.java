@@ -35,14 +35,13 @@ package radlab.rain.workload.rubis;
 
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import radlab.rain.IScoreboard;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.StringBody;
-import radlab.rain.workload.rubis.model.RubisComment;
-import radlab.rain.workload.rubis.model.RubisItem;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.NameValuePair;
 import radlab.rain.workload.rubis.model.RubisUser;
 
 
@@ -68,7 +67,6 @@ public class AboutMeOperation extends RubisOperation
 	public void execute() throws Throwable
 	{
 		StringBuilder response = null;
-		Map<String,String> headers = null;
 
 		// Go to the About-Me home page
 		response = this.getHttpTransport().fetchUrl(this.getGenerator().getAboutMeURL());
@@ -92,19 +90,21 @@ public class AboutMeOperation extends RubisOperation
 		}
 
 		HttpPost reqPost = null;
-		MultipartEntity entity = null;
+		List<NameValuePair> form = null;
+		UrlEncodedFormEntity entity = null;
 
 		// Send authentication data (login name and password)
 		reqPost = new HttpPost(this.getGenerator().getAboutMePostURL());
-		entity = new MultipartEntity();
-		entity.addPart("nickname", new StringBody(loggedUser.nickname));
-		entity.addPart("password", new StringBody(loggedUser.password));
+		form = new ArrayList<NameValuePair>();
+		form.add(new BasicNameValuePair("nickname", loggedUser.nickname));
+		form.add(new BasicNameValuePair("password", loggedUser.password));
+		entity = new UrlEncodedFormEntity(form, "UTF-8");
 		reqPost.setEntity(entity);
 		response = this.getHttpTransport().fetch(reqPost);
-		this.trace(this.getGenerator().getAboutMePostURL());
+		this.trace(reqPost.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getAboutMePostURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		this.setFailed(false);
