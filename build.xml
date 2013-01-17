@@ -281,7 +281,7 @@
             <fileset dir="bin" excludes="radlab/rain/workload/** radlab/rain/test/**"/>
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/commons-codec-1.6.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/commons-logging-1.1.1.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/fluent-fc-4.2.3.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/fluent-hc-4.2.3.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/httpclient-4.2.3.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/httpclient-cache-4.2.3.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/httpcore-4.2.2.jar"/>
@@ -316,7 +316,7 @@
             <fileset dir="bin" excludes="radlab/rain/workload/** radlab/rain/test/**"/>
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/commons-codec-1.6.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/commons-logging-1.1.1.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/fluent-fc-4.2.3.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/fluent-hc-4.2.3.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/httpclient-4.2.3.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/httpclient-cache-4.2.3.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/httpcore-4.2.2.jar"/>
