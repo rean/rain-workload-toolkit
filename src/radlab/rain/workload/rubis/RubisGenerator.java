@@ -980,7 +980,7 @@ public class RubisGenerator extends Generator
 	private void initializeUrls()
 	{
 		this._baseURL = "http://" + this.getTrack().getTargetHostName() + ":" + this.getTrack().getTargetHostPort();
-		this._homepageURL = this._baseURL + "/rubis_servlest/";
+		this._homepageURL = this._baseURL + "/rubis_servlets/";
 		this._registerURL = this._baseURL + "/rubis_servlets/register.html";
 		this._registerUserURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.RegisterUser";
 		this._browseURL = this._baseURL + "/rubis_servlets/browse.html";
