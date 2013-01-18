@@ -79,6 +79,13 @@ public class RegisterUserOperation extends RubisOperation
 
 		// Generate a new user
 		RubisUser user = this.getGenerator().newUser();
+		if (!this.getGenerator().isValidUser(user))
+		{
+			// Just print a warning, but do not set the operation as failed
+			this.getLogger().warning("No valid user has been found. Operation interrupted.");
+			this.setFailed(false);
+			return;
+		}
 
 		// Fill-in the form and click on the 'Register now!' button
 		HttpPost reqPost = new HttpPost(this.getGenerator().getRegisterUserURL());

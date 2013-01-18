@@ -74,6 +74,13 @@ public class BuyNowItemOperation extends RubisOperation
 
 		// Generate a random item and perform a Buy-Now-Auth operation
 		RubisItem item = this.getGenerator().generateItem();
+		if (!this.getGenerator().isValidItem(item))
+		{
+			// Just print a warning, but do not set the operation as failed
+			this.getLogger().warning("No valid item has been found. Operation interrupted.");
+			this.setFailed(false);
+			return;
+		}
 
 		// Click on the 'Buy-Now' link located in the item detail page
 		URIBuilder uri = new URIBuilder(this.getGenerator().getBuyNowAuthURL());
@@ -96,6 +103,13 @@ public class BuyNowItemOperation extends RubisOperation
 		{
 			loggedUser = this.getGenerator().generateUser();
 			this.getGenerator().setLoggedUserId(loggedUser.id);
+		}
+		if (!this.getGenerator().isValidUser(loggedUser))
+		{
+			// Just print a warning, but do not set the operation as failed
+			this.getLogger().warning("No valid user has been found. Operation interrupted.");
+			this.setFailed(false);
+			return;
 		}
 
 		HttpPost reqPost = null;

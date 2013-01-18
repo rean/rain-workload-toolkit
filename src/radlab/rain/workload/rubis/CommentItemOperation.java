@@ -77,7 +77,21 @@ public class CommentItemOperation extends RubisOperation
 
 		// Generate a random item and user to which post the comment
 		RubisItem item = this.getGenerator().generateItem();
+		if (!this.getGenerator().isValidItem(item))
+		{
+			// Just print a warning, but do not set the operation as failed
+			this.getLogger().warning("No valid item has been found. Operation interrupted.");
+			this.setFailed(false);
+			return;
+		}
 		RubisUser toUser = this.getGenerator().generateUser();
+		if (!this.getGenerator().isValidUser(toUser))
+		{
+			// Just print a warning, but do not set the operation as failed
+			this.getLogger().warning("No valid user has been found. Operation interrupted.");
+			this.setFailed(false);
+			return;
+		}
 
 		// Click on the 'Leave a comment on this user' for a certain item and user
 		// This will lead to a user authentification.
@@ -103,6 +117,13 @@ public class CommentItemOperation extends RubisOperation
 			// Randomly generate a user
 			loggedUser = this.getGenerator().generateUser();
 			this.getGenerator().setLoggedUserId(loggedUser.id);
+		}
+		if (!this.getGenerator().isValidUser(loggedUser))
+		{
+			// Just print a warning, but do not set the operation as failed
+			this.getLogger().warning("Need a logged user; got an anonymous one. Operation interrupted.");
+			this.setFailed(false);
+			return;
 		}
 
 		HttpPost reqPost = null;

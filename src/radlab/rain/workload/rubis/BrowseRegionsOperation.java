@@ -86,6 +86,13 @@ public class BrowseRegionsOperation extends RubisOperation
 
 		// Generate a random region
 		RubisRegion region = this.getGenerator().generateRegion();
+		if (!this.getGenerator().isValidRegion(region))
+		{
+			// Just print a warning, but do not set the operation as failed
+			this.getLogger().warning("No valid region has been found. Operation interrupted.");
+			this.setFailed(false);
+			return;
+		}
 
 		URIBuilder uri = null;
 		HttpGet reqGet = null;
@@ -104,6 +111,13 @@ public class BrowseRegionsOperation extends RubisOperation
 
 		// Generate a random category
 		RubisCategory category = this.getGenerator().generateCategory();
+		if (!this.getGenerator().isValidCategory(category))
+		{
+			// Just print a warning, but do not set the operation as failed
+			this.getLogger().warning("No valid category has been found. Operation interrupted.");
+			this.setFailed(false);
+			return;
+		}
 
 		// Emulate a click on a category name to browse all items in that category and region
 		uri = new URIBuilder(this.getGenerator().getSearchItemsByRegionURL());

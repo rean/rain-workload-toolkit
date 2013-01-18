@@ -76,6 +76,13 @@ public class BidOperation extends RubisOperation
 
 		// Since an item id must be provided, generate a random one
 		RubisItem item = this.getGenerator().generateItem();
+		if (!this.getGenerator().isValidItem(item))
+		{
+			// Just print a warning, but do not set the operation as failed
+			this.getLogger().warning("No valid item has been found. Operation interrupted.");
+			this.setFailed(false);
+			return;
+		}
 
 		// Click on the 'Bid Now' image for a certain item
 		// This will lead to a user authentification.
@@ -98,8 +105,17 @@ public class BidOperation extends RubisOperation
 		}
 		else
 		{
+			// Randomly generate a user
 			loggedUser = this.getGenerator().generateUser();
 			this.getGenerator().setLoggedUserId(loggedUser.id);
+		}
+		// If no user has been already registered, we still get an anonymous user.
+		if (!this.getGenerator().isValidUser(loggedUser))
+		{
+			// Just print a warning, but do not set the operation as failed
+			this.getLogger().warning("Need a logged user; got an anonymous one. Operation interrupted.");
+			this.setFailed(false);
+			return;
 		}
 
 		HttpPost reqPost = null;

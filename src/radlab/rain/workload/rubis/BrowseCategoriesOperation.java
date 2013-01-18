@@ -84,6 +84,13 @@ public class BrowseCategoriesOperation extends RubisOperation
 
 		// Generate a random category
 		RubisCategory category = this.getGenerator().generateCategory();
+		if (!this.getGenerator().isValidCategory(category))
+		{
+			// Just print a warning, but do not set the operation as failed
+			this.getLogger().warning("No valid category has been found. Operation interrupted.");
+			this.setFailed(false);
+			return;
+		}
 
 		// Emulate a click on a category
 		URIBuilder uri = new URIBuilder(this.getGenerator().getSearchItemsByCategoryURL());

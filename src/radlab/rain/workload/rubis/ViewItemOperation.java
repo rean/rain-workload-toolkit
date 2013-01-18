@@ -63,6 +63,13 @@ public class ViewItemOperation extends RubisOperation
 	{
 		// Generate a random item
 		RubisItem item = this.getGenerator().generateItem();
+		if (!this.getGenerator().isValidItem(item))
+		{
+			// Just print a warning, but do not set the operation as failed
+			this.getLogger().warning("No valid item has been found. Operation interrupted.");
+			this.setFailed(false);
+			return;
+		}
 
 		// Click on the item name link
 		URIBuilder uri = new URIBuilder(this.getGenerator().getViewItemURL());

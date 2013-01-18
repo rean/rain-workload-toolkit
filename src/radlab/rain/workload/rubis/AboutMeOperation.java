@@ -91,6 +91,14 @@ public class AboutMeOperation extends RubisOperation
 			loggedUser = this.getGenerator().generateUser();
 			this.getGenerator().setLoggedUserId(loggedUser.id);
 		}
+		// If no user has been already registered, we still get an anonymous user
+		if (!this.getGenerator().isValidUser(loggedUser))
+		{
+			// Just print a warning, but do not set the operation as failed
+			this.getLogger().warning("Need a logged user; got an anonymous one. Operation interrupted.");
+			this.setFailed(false);
+			return;
+		}
 
 		HttpPost reqPost = null;
 		List<NameValuePair> form = null;

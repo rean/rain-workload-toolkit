@@ -202,6 +202,8 @@ public class RubisGenerator extends Generator
 	private static final int ANONYMOUS_USER_ID = -1;
 	private static final int INVALID_USER_ID = ANONYMOUS_USER_ID;
 	private static final int INVALID_ITEM_ID = -1;
+	private static final int INVALID_CATEGORY_ID = -1;
+	private static final int INVALID_REGION_ID = -1;
 
 
 	private static int _userId = 0;
@@ -404,6 +406,26 @@ public class RubisGenerator extends Generator
 		}
 
 		return this.getUser(this.getLoggedUserId());
+	}
+
+	public boolean isValidUser(RubisUser user)
+	{
+		return user.id != INVALID_USER_ID && user.id != ANONYMOUS_USER_ID;
+	}
+
+	public boolean isValidItem(RubisItem item)
+	{
+		return item.id != INVALID_ITEM_ID;
+	}
+
+	public boolean isValidCategory(RubisCategory category)
+	{
+		return category.id != INVALID_CATEGORY_ID;
+	}
+
+	public boolean isValidRegion(RubisRegion region)
+	{
+		return region.id != INVALID_REGION_ID;
 	}
 
 	public boolean checkHttpResponse(String response)
