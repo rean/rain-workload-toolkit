@@ -46,6 +46,7 @@ import radlab.rain.LoadProfile;
 import radlab.rain.Operation;
 import radlab.rain.ScenarioTrack;
 import radlab.rain.util.HttpTransport;
+import radlab.rain.util.NegativeExponential;
 import radlab.rain.workload.rubis.model.RubisCategory;
 import radlab.rain.workload.rubis.model.RubisComment;
 import radlab.rain.workload.rubis.model.RubisItem;
@@ -223,6 +224,10 @@ public class RubisGenerator extends Generator
 	private HttpTransport _http;
 	private Logger _logger;
 	private int _loggedUserId;
+	private double _thinkTime;
+	private NegativeExponential _thinkTimeRng;
+	private double _cycleTime;
+	private NegativeExponential _cycleTimeRng;
 	private String _baseURL;
 	private String _homepageURL; 
 	private String _registerURL;
@@ -284,11 +289,11 @@ public class RubisGenerator extends Generator
 	@Override
 	public void initialize()
 	{
-		//TODO: add a config param to set RNG seed
-
 		this._http = new HttpTransport();
 		this._logger = Logger.getLogger(this.getName());
 		this._loggedUserId = ANONYMOUS_USER_ID;
+		this._thinkTime = this.getTrack().getMeanThinkTime();
+		this._cycleTime = this.getTrack().getMeanCycleTime();
 
 		this.initializeUrls();
 	}
@@ -305,6 +310,14 @@ public class RubisGenerator extends Generator
 			this._rng = new Random();
 		}
 
+		if (this._thinkTime > 0)
+		{
+			this._thinkTimeRng = new NegativeExponential(this._thinkTime, this._rng);
+		}
+		if (this._cycleTime > 0)
+		{
+			this._cycleTimeRng = new NegativeExponential(this._cycleTime, this._rng);
+		}
 	}
 
 	/**
@@ -359,8 +372,12 @@ public class RubisGenerator extends Generator
 	@Override
 	public long getThinkTime()
 	{
-		//FIXME
-		return 0;
+		if (this._thinkTime <= 0)
+		{
+			return 0;
+		}
+
+		return Math.round(this._thinkTimeRng.nextDouble());
 	}
 
 	/**
@@ -371,8 +388,12 @@ public class RubisGenerator extends Generator
 	@Override
 	public long getCycleTime()
 	{
-		//FIXME
-		return 0;
+		if (this._cycleTime <= 0)
+		{
+			return 0;
+		}
+
+		return Math.round(this._cycleTimeRng.nextDouble());
 	}
 
 	/**
