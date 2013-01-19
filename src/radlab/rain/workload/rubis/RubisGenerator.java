@@ -200,14 +200,16 @@ public class RubisGenerator extends Generator
 	private static final int NUM_ITEMS_PER_PAGE = 20;
 	private static final int MAX_COMMENT_LEN = 2048;
 	private static final int ANONYMOUS_USER_ID = -1;
-	private static final int INVALID_USER_ID = ANONYMOUS_USER_ID;
-	private static final int INVALID_ITEM_ID = -1;
-	private static final int INVALID_CATEGORY_ID = -1;
-	private static final int INVALID_REGION_ID = -1;
+	private static final int INVALID_USER_ID = 0;
+	private static final int INVALID_ITEM_ID = 0;
+	private static final int INVALID_CATEGORY_ID = 0;
+	private static final int INVALID_REGION_ID = 0;
+	private static final int MIN_USER_ID = 1;
+	private static final int MIN_ITEM_ID = 1;
 
 
-	private static int _userId = 0;
-	private static int _itemId = 0;
+	private static int _userId = MIN_USER_ID;
+	private static int _itemId = MIN_ITEM_ID;
 
 
 	private Random _rng;
@@ -245,22 +247,22 @@ public class RubisGenerator extends Generator
 
 	public static synchronized int nextUserId()
 	{
-		return _userId++;
+		return ++_userId;
 	}
 
 	public static synchronized int lastUserId()
 	{
-		return _userId-1;
+		return _userId;
 	}
 
 	public static synchronized int nextItemId()
 	{
-		return _itemId++;
+		return ++_itemId;
 	}
 
 	public static synchronized int lastItemId()
 	{
-		return _itemId-1;
+		return _itemId;
 	}
 
 
