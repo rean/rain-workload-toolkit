@@ -39,6 +39,8 @@ import java.util.Calendar;
 import java.util.logging.Logger;
 import java.util.Random;
 import org.apache.http.HttpStatus;
+import org.json.JSONObject;
+import org.json.JSONException;
 import radlab.rain.Generator;
 import radlab.rain.LoadProfile;
 import radlab.rain.Operation;
@@ -72,6 +74,9 @@ public class RubisGenerator extends Generator
 	public static final int COMMENT_ITEM_OP = 9;
 	public static final int SELL_ITEM_OP = 10;
 	public static final int ABOUT_ME_OP = 11;
+
+	// Configuration keys
+	public static final String CFG_RNG_SEED_KEY = "rngSeed";
 
 	/// The set of alphanumeric characters
 	private static final char[] ALNUM_CHARS = { '0', '1', '2', '3', '4', '5',
@@ -279,12 +284,25 @@ public class RubisGenerator extends Generator
 	{
 		//TODO: add a config param to set RNG seed
 
-		this._rng = new Random();
 		this._http = new HttpTransport();
 		this._logger = Logger.getLogger(this.getName());
 		this._loggedUserId = ANONYMOUS_USER_ID;
 
 		this.initializeUrls();
+	}
+
+	@Override
+	public void configure(JSONObject config) throws JSONException
+	{
+		if (config.has(CFG_RNG_SEED_KEY))
+		{
+			this._rng = new Random(config.getLong(CFG_RNG_SEED_KEY));
+		}
+		else
+		{
+			this._rng = new Random();
+		}
+
 	}
 
 	/**
