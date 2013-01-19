@@ -157,8 +157,8 @@ public class CommentItemOperation extends RubisOperation
 		form.add(new BasicNameValuePair("itemId", Integer.toString(comment.itemId)));
 		form.add(new BasicNameValuePair("rating", Integer.toString(comment.rating)));
 		form.add(new BasicNameValuePair("comment", comment.comment));
-		reqPost.setEntity(entity);
 		entity = new UrlEncodedFormEntity(form, "UTF-8");
+		reqPost.setEntity(entity);
 		response = this.getHttpTransport().fetch(reqPost);
 		this.trace(reqPost.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
