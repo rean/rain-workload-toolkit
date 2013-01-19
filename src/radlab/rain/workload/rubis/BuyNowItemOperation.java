@@ -136,9 +136,16 @@ public class BuyNowItemOperation extends RubisOperation
 		form = new ArrayList<NameValuePair>();
 		form.add(new BasicNameValuePair("itemId", Integer.toString(item.id)));
 		form.add(new BasicNameValuePair("userId", Integer.toString(loggedUser.id)));
-		int maxQty = Math.min(item.quantity, 1);
+		String str = null;
+		int maxQty = 1;
+		str = RubisUtility.extractFormParamFromHtml(response.toString(), "maxQty");
+		if (str != null && !str.isEmpty())
+		{
+			maxQty = Math.max(Integer.parseInt(str), maxQty);
+		}
 		form.add(new BasicNameValuePair("maxQty", Integer.toString(maxQty)));
-		form.add(new BasicNameValuePair("qty", Integer.toString(this.getRandomGenerator().nextInt(maxQty)+1)));
+		int qty = this.getRandomGenerator().nextInt(maxQty)+1;
+		form.add(new BasicNameValuePair("qty", Integer.toString(qty)));
 		entity = new UrlEncodedFormEntity(form, "UTF-8");
 		reqPost.setEntity(entity);
 		response = this.getHttpTransport().fetch(reqPost);
