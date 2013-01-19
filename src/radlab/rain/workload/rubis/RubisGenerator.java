@@ -205,16 +205,18 @@ public class RubisGenerator extends Generator
 	private static final int NUM_ITEMS_PER_PAGE = 20;
 	private static final int MAX_COMMENT_LEN = 2048;
 	private static final int ANONYMOUS_USER_ID = -1;
-	private static final int INVALID_USER_ID = 0;
-	private static final int INVALID_ITEM_ID = 0;
-	private static final int INVALID_CATEGORY_ID = 0;
-	private static final int INVALID_REGION_ID = 0;
 	private static final int MIN_USER_ID = 1;
 	private static final int MIN_ITEM_ID = 1;
+	private static final int MIN_REGION_ID = 1;
+	private static final int MIN_CATEGORY_ID = 1;
+	private static final int MIN_FREE_USER_ID = 1;
+	private static final int MIN_FREE_ITEM_ID = 1;
+	private static final int MIN_FREE_REGION_ID = 1;
+	private static final int MIN_FREE_CATEGORY_ID = 1;
 
 
-	private static int _userId = MIN_USER_ID;
-	private static int _itemId = MIN_ITEM_ID;
+	private static int _userId = MIN_FREE_USER_ID-1;
+	private static int _itemId = MIN_FREE_ITEM_ID-1;
 
 
 	private Random _rng;
@@ -430,22 +432,22 @@ public class RubisGenerator extends Generator
 
 	public boolean isValidUser(RubisUser user)
 	{
-		return user.id != INVALID_USER_ID && user.id != ANONYMOUS_USER_ID;
+		return user.id >= MIN_USER_ID;
 	}
 
 	public boolean isValidItem(RubisItem item)
 	{
-		return item.id != INVALID_ITEM_ID;
+		return item.id >= MIN_ITEM_ID;
 	}
 
 	public boolean isValidCategory(RubisCategory category)
 	{
-		return category.id != INVALID_CATEGORY_ID;
+		return category.id >= MIN_CATEGORY_ID;
 	}
 
 	public boolean isValidRegion(RubisRegion region)
 	{
-		return region.id != INVALID_REGION_ID;
+		return region.id >= MIN_REGION_ID;
 	}
 
 	public boolean checkHttpResponse(String response)
@@ -746,11 +748,11 @@ public class RubisGenerator extends Generator
 
 	public RubisUser generateUser()
 	{
-		int userId = INVALID_USER_ID;
+		int userId = MIN_USER_ID-1;;
 		int lastUserId = RubisGenerator.lastUserId();
-		if (lastUserId != INVALID_USER_ID)
+		if (lastUserId >= MIN_USER_ID)
 		{
-			userId = this._rng.nextInt(lastUserId+1);
+			userId = this._rng.nextInt(lastUserId+1-MIN_USER_ID)+MIN_USER_ID;
 		}
 		return this.getUser(userId);
 	}
@@ -777,11 +779,11 @@ public class RubisGenerator extends Generator
 
 	public RubisItem generateItem()
 	{
-		int itemId = INVALID_ITEM_ID;
+		int itemId = MIN_ITEM_ID-1;
 		int lastItemId = RubisGenerator.lastItemId();
-		if (lastItemId != INVALID_ITEM_ID)
+		if (lastItemId >= MIN_ITEM_ID)
 		{
-			itemId = this._rng.nextInt(lastItemId+1);
+			itemId = this._rng.nextInt(lastItemId+1-MIN_ITEM_ID)+MIN_ITEM_ID;
 		}
 		return this.getItem(itemId);
 	}
@@ -832,12 +834,12 @@ public class RubisGenerator extends Generator
 
 	public RubisCategory generateCategory()
 	{
-		return this.getCategory(this._rng.nextInt(CATEGORIES.length));
+		return this.getCategory(this._rng.nextInt(CATEGORIES.length-MIN_CATEGORY_ID)+MIN_CATEGORY_ID);
 	}
 
 	public RubisRegion generateRegion()
 	{
-		return this.getRegion(this._rng.nextInt(REGIONS.length));
+		return this.getRegion(this._rng.nextInt(REGIONS.length-MIN_REGION_ID)+MIN_REGION_ID);
 	}
 
 	public RubisCategory getCategory(int id)
