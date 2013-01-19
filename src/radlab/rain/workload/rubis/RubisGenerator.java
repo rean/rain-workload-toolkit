@@ -220,13 +220,14 @@ public class RubisGenerator extends Generator
 	private static int _itemId = MIN_FREE_ITEM_ID-1;
 
 
-	private Random _rng;
+	private Random _rng; ///< The Random Number Generator
+	private long _rngSeed = -1; ///< The seed used for the Random Number Generator; a value <= 0 means that no special seed is used.
 	private HttpTransport _http;
 	private Logger _logger;
 	private int _loggedUserId;
-	private double _thinkTime;
+	private double _thinkTime = -1; ///< The mean think time; a value <= 0 means that no think time is used.
 	private NegativeExponential _thinkTimeRng;
-	private double _cycleTime;
+	private double _cycleTime = -1; ///< The mean cycle time; a value <= 0 means that no cycle time is used.
 	private NegativeExponential _cycleTimeRng;
 	private String _baseURL;
 	private String _homepageURL; 
@@ -290,10 +291,26 @@ public class RubisGenerator extends Generator
 	public void initialize()
 	{
 		this._http = new HttpTransport();
+		if (this._rngSeed >= 0)
+		{
+			this._rng = new Random(this._rngSeed);
+		}
+		else
+		{
+			this._rng = new Random();
+		}
 		this._logger = Logger.getLogger(this.getName());
 		this._loggedUserId = ANONYMOUS_USER_ID;
 		this._thinkTime = this.getTrack().getMeanThinkTime();
+		if (this._thinkTime > 0)
+		{
+			this._thinkTimeRng = new NegativeExponential(this._thinkTime, this._rng);
+		}
 		this._cycleTime = this.getTrack().getMeanCycleTime();
+		if (this._cycleTime > 0)
+		{
+			this._cycleTimeRng = new NegativeExponential(this._cycleTime, this._rng);
+		}
 
 		this.initializeUrls();
 	}
@@ -303,20 +320,7 @@ public class RubisGenerator extends Generator
 	{
 		if (config.has(CFG_RNG_SEED_KEY))
 		{
-			this._rng = new Random(config.getLong(CFG_RNG_SEED_KEY));
-		}
-		else
-		{
-			this._rng = new Random();
-		}
-
-		if (this._thinkTime > 0)
-		{
-			this._thinkTimeRng = new NegativeExponential(this._thinkTime, this._rng);
-		}
-		if (this._cycleTime > 0)
-		{
-			this._cycleTimeRng = new NegativeExponential(this._cycleTime, this._rng);
+			this._rngSeed = config.getLong(CFG_RNG_SEED_KEY);
 		}
 	}
 
