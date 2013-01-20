@@ -99,7 +99,7 @@ public class BuyNowItemOperation extends RubisOperation
 		{
 			loggedUser = this.getGenerator().getLoggedUser();
 		}
-		else
+		else if (this.getGenerator().isUserAvailable())
 		{
 			loggedUser = this.getGenerator().generateUser();
 			this.getGenerator().setLoggedUserId(loggedUser.id);
@@ -107,7 +107,7 @@ public class BuyNowItemOperation extends RubisOperation
 		if (!this.getGenerator().isValidUser(loggedUser))
 		{
 			// Just print a warning, but do not set the operation as failed
-			this.getLogger().warning("No valid user has been found. Operation interrupted.");
+			this.getLogger().warning("No valid user has been found to log-in. Operation interrupted.");
 			this.setFailed(false);
 			return;
 		}

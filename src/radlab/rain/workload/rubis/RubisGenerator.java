@@ -487,22 +487,22 @@ public class RubisGenerator extends Generator
 
 	public boolean isValidUser(RubisUser user)
 	{
-		return user.id >= MIN_USER_ID;
+		return null != user && MIN_USER_ID <= user.id;
 	}
 
 	public boolean isValidItem(RubisItem item)
 	{
-		return item.id >= MIN_ITEM_ID;
+		return null != item && MIN_ITEM_ID <= item.id;
 	}
 
 	public boolean isValidCategory(RubisCategory category)
 	{
-		return category.id >= MIN_CATEGORY_ID;
+		return null != category && MIN_CATEGORY_ID <= category.id;
 	}
 
 	public boolean isValidRegion(RubisRegion region)
 	{
-		return region.id >= MIN_REGION_ID;
+		return null != region && MIN_REGION_ID <= region.id;
 	}
 
 	public boolean checkHttpResponse(String response)

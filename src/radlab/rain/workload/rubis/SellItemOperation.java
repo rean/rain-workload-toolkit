@@ -92,7 +92,7 @@ public class SellItemOperation extends RubisOperation
 		{
 			loggedUser = this.getGenerator().getLoggedUser();
 		}
-		else
+		else if (this.getGenerator().isUserAvailable())
 		{
 			// Randomly generate a user
 			loggedUser = this.getGenerator().generateUser();
@@ -101,7 +101,7 @@ public class SellItemOperation extends RubisOperation
 		if (!this.getGenerator().isValidUser(loggedUser))
 		{
 			// Just print a warning, but do not set the operation as failed
-			this.getLogger().warning("Need a logged user; got an anonymous one. Operation interrupted.");
+			this.getLogger().warning("No valid user has been found. Operation interrupted.");
 			this.setFailed(false);
 			return;
 		}
