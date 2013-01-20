@@ -81,19 +81,16 @@ public class AboutMeOperation extends RubisOperation
 
 		// Need a logged user
 		RubisUser loggedUser = null;
-		if (this.getGenerator().isUserLoggedIn())
-		{
-			loggedUser = this.getGenerator().getLoggedUser();
-		}
-		else if (this.getGenerator().isUserAvailable())
+		// Get a registered user, if available
+		if (this.getGenerator().isUserAvailable())
 		{
 			// Randomly generate a user
 			loggedUser = this.getGenerator().generateUser();
 			this.getGenerator().setLoggedUserId(loggedUser.id);
 		}
-		// If no user has been already registered, we still get an anonymous user
-		if (!this.getGenerator().isValidUser(loggedUser))
+		else
 		{
+			// No user has been already registered
 			// Just print a warning, but do not set the operation as failed
 			this.getLogger().warning("No valid user has been found to log-in. Operation interrupted.");
 			this.setFailed(false);
