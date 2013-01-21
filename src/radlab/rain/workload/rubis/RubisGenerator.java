@@ -36,6 +36,7 @@ package radlab.rain.workload.rubis;
 
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 import java.util.Random;
 import org.apache.http.HttpStatus;
@@ -218,8 +219,8 @@ public class RubisGenerator extends Generator
 	//END FIXME: get from configuration file
 
 
-	private static int _userId = MIN_FREE_USER_ID-1;
-	private static int _itemId = MIN_FREE_ITEM_ID-1;
+	private static AtomicInteger _userId = new AtomicInteger(MIN_FREE_USER_ID-1);
+	private static AtomicInteger _itemId = new AtomicInteger(MIN_FREE_ITEM_ID-1);
 
 
 	private Random _rng; ///< The Random Number Generator
@@ -260,24 +261,24 @@ public class RubisGenerator extends Generator
 	private String _aboutMePostURL;
 
 
-	public static synchronized int nextUserId()
+	public static int nextUserId()
 	{
-		return ++_userId;
+		return _userId.incrementAndGet();
 	}
 
-	public static synchronized int lastUserId()
+	public static int lastUserId()
 	{
-		return _userId;
+		return _userId.get();
 	}
 
-	public static synchronized int nextItemId()
+	public static int nextItemId()
 	{
-		return ++_itemId;
+		return _itemId.incrementAndGet();
 	}
 
-	public static synchronized int lastItemId()
+	public static int lastItemId()
 	{
-		return _itemId;
+		return _itemId.get();
 	}
 
 
