@@ -90,6 +90,7 @@ public class BuyNowItemOperation extends RubisOperation
 		this.trace(reqGet.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
+			this.getLogger().severe("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
 			throw new IOException("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
@@ -128,6 +129,7 @@ public class BuyNowItemOperation extends RubisOperation
 		this.trace(reqPost.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
+			this.getLogger().severe("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
 			throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
@@ -152,6 +154,7 @@ public class BuyNowItemOperation extends RubisOperation
 		this.trace(reqPost.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
+			this.getLogger().severe("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
 			throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 

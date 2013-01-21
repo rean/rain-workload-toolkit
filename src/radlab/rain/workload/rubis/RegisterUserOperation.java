@@ -34,13 +34,13 @@
 package radlab.rain.workload.rubis;
 
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.NameValuePair;
-import java.io.IOException;
 import radlab.rain.IScoreboard;
 import radlab.rain.workload.rubis.model.RubisUser;
 
@@ -74,6 +74,7 @@ public class RegisterUserOperation extends RubisOperation
 		this.trace( this.getGenerator().getRegisterURL() );
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
+			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getRegisterURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
 			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getRegisterURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
@@ -102,6 +103,7 @@ public class RegisterUserOperation extends RubisOperation
 		this.trace(reqPost.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
+			this.getLogger().severe("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
 			throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 

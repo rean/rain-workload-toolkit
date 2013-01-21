@@ -73,6 +73,7 @@ public class BrowseRegionsOperation extends RubisOperation
 		this.trace(this.getGenerator().getBrowseURL());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{   
+			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getBrowseURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
 			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getBrowseURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
@@ -81,6 +82,7 @@ public class BrowseRegionsOperation extends RubisOperation
 		this.trace(this.getGenerator().getBrowseRegionsURL());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
+			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getBrowseRegionsURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
 			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getBrowseRegionsURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
@@ -106,6 +108,7 @@ public class BrowseRegionsOperation extends RubisOperation
 		this.trace(reqGet.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
+			this.getLogger().severe("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
 			throw new IOException("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
@@ -132,6 +135,7 @@ public class BrowseRegionsOperation extends RubisOperation
 		this.trace(reqGet.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
+			this.getLogger().severe("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
 			throw new IOException("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
