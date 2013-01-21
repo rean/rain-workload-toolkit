@@ -949,7 +949,7 @@ public class RubisGenerator extends Generator
 		comment.itemId = itemId;
 		int rateIdx = Arrays.binarySearch(COMMENT_RATINGS, rating);
 		comment.rating = COMMENT_RATINGS[rateIdx];
-		comment.comment = COMMENTS[rateIdx];
+		comment.comment = this.generateText(1, MAX_COMMENT_LEN-COMMENTS[rateIdx].length()-System.lineSeparator().length()) + System.lineSeparator() + COMMENTS[rateIdx];
 		Calendar cal = Calendar.getInstance();
 		comment.date = cal.getTime();
 
