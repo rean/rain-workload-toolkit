@@ -76,7 +76,16 @@ public class CommentItemOperation extends RubisOperation
 		StringBuilder response = null;
 
 		// Generate a random item and user to which post the comment
-		RubisItem item = this.getGenerator().generateItem();
+		RubisItem item = null;
+		try
+		{
+			RubisGenerator.lockItems();
+			item = this.getGenerator().generateItem();
+		}
+		finally
+		{
+			RubisGenerator.unlockItems();
+		}
 		if (!this.getGenerator().isValidItem(item))
 		{
 			// Just print a warning, but do not set the operation as failed
@@ -84,7 +93,16 @@ public class CommentItemOperation extends RubisOperation
 			this.setFailed(false);
 			return;
 		}
-		RubisUser toUser = this.getGenerator().generateUser();
+		RubisUser toUser = null;
+		try
+		{
+			RubisGenerator.lockUsers();
+			toUser = this.getGenerator().generateUser();
+		}
+		finally
+		{
+			RubisGenerator.unlockUsers();
+		}
 		if (!this.getGenerator().isValidUser(toUser))
 		{
 			// Just print a warning, but do not set the operation as failed
@@ -116,7 +134,15 @@ public class CommentItemOperation extends RubisOperation
 		else
 		{
 			// Randomly generate a user
-			loggedUser = this.getGenerator().generateUser();
+			try
+			{
+				RubisGenerator.lockUsers();
+				loggedUser = this.getGenerator().generateUser();
+			}
+			finally
+			{
+				RubisGenerator.unlockUsers();
+			}
 			this.getGenerator().setLoggedUserId(loggedUser.id);
 		}
 		if (!this.getGenerator().isValidUser(loggedUser))

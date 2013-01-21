@@ -76,99 +76,116 @@ public class SellItemOperation extends RubisOperation
 	@Override
 	public void execute() throws Throwable
 	{
-		StringBuilder response = null;
+		try
+		{
+			RubisGenerator.lockItems();
 
-		// Go to the sell home page
-		response = this.getHttpTransport().fetchUrl(this.getGenerator().getSellURL());
-		this.trace(this.getGenerator().getSellURL());
-		if (!this.getGenerator().checkHttpResponse(response.toString()))
-		{
-			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getSellURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getSellURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
-		}
+			StringBuilder response = null;
 
-		// Need a logged user
-		RubisUser loggedUser = null;
-		if (this.getGenerator().isUserLoggedIn())
-		{
-			loggedUser = this.getGenerator().getLoggedUser();
-		}
-		else if (this.getGenerator().isUserAvailable())
-		{
-			// Randomly generate a user
-			loggedUser = this.getGenerator().generateUser();
-			this.getGenerator().setLoggedUserId(loggedUser.id);
-		}
-		if (!this.getGenerator().isValidUser(loggedUser))
-		{
-			// Just print a warning, but do not set the operation as failed
-			this.getLogger().warning("No valid user has been found. Operation interrupted.");
-			this.setFailed(false);
-			return;
-		}
+			// Go to the sell home page
+			response = this.getHttpTransport().fetchUrl(this.getGenerator().getSellURL());
+			this.trace(this.getGenerator().getSellURL());
+			if (!this.getGenerator().checkHttpResponse(response.toString()))
+			{
+				this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getSellURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+				throw new IOException("Problems in performing request to URL: " + this.getGenerator().getSellURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			}
 
-		HttpPost reqPost = null;
-		List<NameValuePair> form = null;
-		UrlEncodedFormEntity entity = null;
+			// Need a logged user
+			RubisUser loggedUser = null;
+			if (this.getGenerator().isUserLoggedIn())
+			{
+				loggedUser = this.getGenerator().getLoggedUser();
+			}
+			else if (this.getGenerator().isUserAvailable())
+			{
+				// Randomly generate a user
+				try
+				{
+					RubisGenerator.lockUsers();
+					loggedUser = this.getGenerator().generateUser();
+				}
+				finally
+				{
+					RubisGenerator.unlockUsers();
+				}
+				this.getGenerator().setLoggedUserId(loggedUser.id);
+			}
+			if (!this.getGenerator().isValidUser(loggedUser))
+			{
+				// Just print a warning, but do not set the operation as failed
+				this.getLogger().warning("No valid user has been found. Operation interrupted.");
+				this.setFailed(false);
+				return;
+			}
 
-		// Send authentication data (login name and password) and click on the 'Log In!' link
-		reqPost = new HttpPost(this.getGenerator().getBrowseCategoriesURL());
-		form = new ArrayList<NameValuePair>();
-		form.add(new BasicNameValuePair("nickname", loggedUser.nickname));
-		form.add(new BasicNameValuePair("password", loggedUser.password));
-		entity = new UrlEncodedFormEntity(form, "UTF-8");
-		reqPost.setEntity(entity);
-		response = this.getHttpTransport().fetch(reqPost);
-		this.trace(reqPost.getURI().toString());
-		if (!this.getGenerator().checkHttpResponse(response.toString()))
-		{
-			this.getLogger().severe("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
-			throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			HttpPost reqPost = null;
+			List<NameValuePair> form = null;
+			UrlEncodedFormEntity entity = null;
+
+			// Send authentication data (login name and password) and click on the 'Log In!' link
+			reqPost = new HttpPost(this.getGenerator().getBrowseCategoriesURL());
+			form = new ArrayList<NameValuePair>();
+			form.add(new BasicNameValuePair("nickname", loggedUser.nickname));
+			form.add(new BasicNameValuePair("password", loggedUser.password));
+			entity = new UrlEncodedFormEntity(form, "UTF-8");
+			reqPost.setEntity(entity);
+			response = this.getHttpTransport().fetch(reqPost);
+			this.trace(reqPost.getURI().toString());
+			if (!this.getGenerator().checkHttpResponse(response.toString()))
+			{
+				this.getLogger().severe("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+				throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			}
+
+			// Generate a new item
+			RubisItem item = this.getGenerator().newItem();
+			if (!this.getGenerator().isValidItem(item))
+			{
+				// Just print a warning, but do not set the operation as failed
+				this.getLogger().warning("No valid item has been found. Operation interrupted.");
+				this.setFailed(false);
+				return;
+			}
+
+			// Select the category of the item to sell
+			URIBuilder uri = new URIBuilder(this.getGenerator().getSellItemFormURL());
+			uri.setParameter("user", Integer.toString(loggedUser.id));
+			uri.setParameter("category", Integer.toString(item.category));
+			HttpGet reqGet = new HttpGet(uri.build());
+			response = this.getHttpTransport().fetch(reqGet);
+			this.trace(reqGet.getURI().toString());
+			if (!this.getGenerator().checkHttpResponse(response.toString()))
+			{
+				this.getLogger().severe("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+				throw new IOException("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			}
+
+			// Fill-in the form and click on the 'Register item!' button
+			reqPost = new HttpPost(this.getGenerator().getRegisterItemURL());
+			form = new ArrayList<NameValuePair>();
+			form.add(new BasicNameValuePair("name", item.name));
+			form.add(new BasicNameValuePair("description", item.description));
+			form.add(new BasicNameValuePair("initialPrice", Float.toString(item.initialPrice)));
+			form.add(new BasicNameValuePair("reservePrice", Float.toString(item.reservePrice)));
+			form.add(new BasicNameValuePair("buyNow", Float.toString(item.buyNow)));
+			form.add(new BasicNameValuePair("duration", Integer.toString(this.getDuration(item.startDate, item.endDate))));
+			form.add(new BasicNameValuePair("quantity", Integer.toString(item.quantity)));
+			form.add(new BasicNameValuePair("userId", Integer.toString(loggedUser.id)));
+			form.add(new BasicNameValuePair("categoryId", Integer.toString(this.getGenerator().getCategory(item.category).id)));
+			entity = new UrlEncodedFormEntity(form, "UTF-8");
+			reqPost.setEntity(entity);
+			response = this.getHttpTransport().fetch(reqPost);
+			this.trace(reqPost.getURI().toString());
+			if (!this.getGenerator().checkHttpResponse(response.toString()))
+			{
+				this.getLogger().severe("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+				throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			}
 		}
-
-		// Generate a new item
-		RubisItem item = this.getGenerator().newItem();
-		if (!this.getGenerator().isValidItem(item))
+		finally
 		{
-			// Just print a warning, but do not set the operation as failed
-			this.getLogger().warning("No valid item has been found. Operation interrupted.");
-			this.setFailed(false);
-			return;
-		}
-
-		// Select the category of the item to sell
-		URIBuilder uri = new URIBuilder(this.getGenerator().getSellItemFormURL());
-		uri.setParameter("user", Integer.toString(loggedUser.id));
-		uri.setParameter("category", Integer.toString(item.category));
-		HttpGet reqGet = new HttpGet(uri.build());
-		response = this.getHttpTransport().fetch(reqGet);
-		this.trace(reqGet.getURI().toString());
-		if (!this.getGenerator().checkHttpResponse(response.toString()))
-		{
-			this.getLogger().severe("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
-			throw new IOException("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
-		}
-
-		// Fill-in the form and click on the 'Register item!' button
-		reqPost = new HttpPost(this.getGenerator().getRegisterItemURL());
-		form = new ArrayList<NameValuePair>();
-		form.add(new BasicNameValuePair("name", item.name));
-		form.add(new BasicNameValuePair("description", item.description));
-		form.add(new BasicNameValuePair("initialPrice", Float.toString(item.initialPrice)));
-		form.add(new BasicNameValuePair("reservePrice", Float.toString(item.reservePrice)));
-		form.add(new BasicNameValuePair("buyNow", Float.toString(item.buyNow)));
-		form.add(new BasicNameValuePair("duration", Integer.toString(this.getDuration(item.startDate, item.endDate))));
-		form.add(new BasicNameValuePair("quantity", Integer.toString(item.quantity)));
-		form.add(new BasicNameValuePair("userId", Integer.toString(loggedUser.id)));
-		form.add(new BasicNameValuePair("categoryId", Integer.toString(this.getGenerator().getCategory(item.category).id)));
-		entity = new UrlEncodedFormEntity(form, "UTF-8");
-		reqPost.setEntity(entity);
-		response = this.getHttpTransport().fetch(reqPost);
-		this.trace(reqPost.getURI().toString());
-		if (!this.getGenerator().checkHttpResponse(response.toString()))
-		{
-			this.getLogger().severe("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
-			throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			RubisGenerator.unlockItems();
 		}
 
 		this.setFailed(false);

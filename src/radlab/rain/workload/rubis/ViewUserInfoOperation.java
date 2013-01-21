@@ -69,7 +69,15 @@ public class ViewUserInfoOperation extends RubisOperation
 		}
 		else if (this.getGenerator().isUserAvailable())
 		{
-			loggedUser = this.getGenerator().generateUser();
+			try
+			{
+				RubisGenerator.lockUsers();
+				loggedUser = this.getGenerator().generateUser();
+			}
+			finally
+			{
+				RubisGenerator.unlockUsers();
+			}
 			this.getGenerator().setLoggedUserId(loggedUser.id);
 		}
 		if (!this.getGenerator().isValidUser(loggedUser))

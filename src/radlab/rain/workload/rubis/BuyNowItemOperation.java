@@ -73,7 +73,16 @@ public class BuyNowItemOperation extends RubisOperation
 		StringBuilder response = null;
 
 		// Generate a random item and perform a Buy-Now-Auth operation
-		RubisItem item = this.getGenerator().generateItem();
+		RubisItem item = null;
+		try
+		{
+			RubisGenerator.lockItems();
+			item = this.getGenerator().generateItem();
+		}
+		finally
+		{
+			RubisGenerator.unlockItems();
+		}
 		if (!this.getGenerator().isValidItem(item))
 		{
 			// Just print a warning, but do not set the operation as failed
@@ -102,7 +111,15 @@ public class BuyNowItemOperation extends RubisOperation
 		}
 		else if (this.getGenerator().isUserAvailable())
 		{
-			loggedUser = this.getGenerator().generateUser();
+			try
+			{
+				RubisGenerator.lockUsers();
+				loggedUser = this.getGenerator().generateUser();
+			}
+			finally
+			{
+				RubisGenerator.unlockUsers();
+			}
 			this.getGenerator().setLoggedUserId(loggedUser.id);
 		}
 		if (!this.getGenerator().isValidUser(loggedUser))

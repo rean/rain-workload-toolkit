@@ -37,6 +37,7 @@ package radlab.rain.workload.rubis;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.Semaphore;
 import java.util.logging.Logger;
 import java.util.Random;
 import org.apache.http.HttpStatus;
@@ -221,6 +222,8 @@ public class RubisGenerator extends Generator
 
 	private static AtomicInteger _userId = new AtomicInteger(MIN_FREE_USER_ID-1);
 	private static AtomicInteger _itemId = new AtomicInteger(MIN_FREE_ITEM_ID-1);
+	private static Semaphore _userLock = new Semaphore(1, true);
+	private static Semaphore _itemLock = new Semaphore(1, true);
 
 
 	private Random _rng; ///< The Random Number Generator
@@ -279,6 +282,26 @@ public class RubisGenerator extends Generator
 	public static int lastItemId()
 	{
 		return _itemId.get();
+	}
+
+	public static void lockUsers() throws InterruptedException
+	{
+		_userLock.acquire();
+	}
+
+	public static void unlockUsers()
+	{
+		_userLock.release();
+	}
+
+	public static void lockItems() throws InterruptedException
+	{
+		_itemLock.acquire();
+	}
+
+	public static void unlockItems()
+	{
+		_itemLock.release();
 	}
 
 

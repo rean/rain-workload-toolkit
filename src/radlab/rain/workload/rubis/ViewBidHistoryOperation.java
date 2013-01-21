@@ -62,7 +62,16 @@ public class ViewBidHistoryOperation extends RubisOperation
 	public void execute() throws Throwable
 	{
 		// Generate a random item
-		RubisItem item = this.getGenerator().generateItem();
+		RubisItem item = null;
+		try
+		{
+			RubisGenerator.lockItems();
+			item = this.getGenerator().generateItem();
+		}
+		finally
+		{
+			RubisGenerator.unlockItems();
+		}
 		if (!this.getGenerator().isValidItem(item))
 		{
 			// Just print a warning, but do not set the operation as failed

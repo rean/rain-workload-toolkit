@@ -83,7 +83,15 @@ public class AboutMeOperation extends RubisOperation
 		if (this.getGenerator().isUserAvailable())
 		{
 			// Randomly generate a user
-			loggedUser = this.getGenerator().generateUser();
+			try
+			{
+				RubisGenerator.lockUsers();
+				loggedUser = this.getGenerator().generateUser();
+			}
+			finally
+			{
+				RubisGenerator.unlockUsers();
+			}
 			this.getGenerator().setLoggedUserId(loggedUser.id);
 		}
 		else

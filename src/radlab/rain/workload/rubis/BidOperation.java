@@ -75,7 +75,16 @@ public class BidOperation extends RubisOperation
 		StringBuilder response = null;
 
 		// Since an item id must be provided, generate a random one
-		RubisItem item = this.getGenerator().generateItem();
+		RubisItem item = null;
+		try
+		{
+			RubisGenerator.lockItems();
+			item = this.getGenerator().generateItem();
+		}
+		finally
+		{
+			RubisGenerator.unlockItems();
+		}
 		if (!this.getGenerator().isValidItem(item))
 		{
 			// Just print a warning, but do not set the operation as failed
@@ -107,7 +116,15 @@ public class BidOperation extends RubisOperation
 		else if (this.getGenerator().isUserAvailable())
 		{
 			// Randomly generate a user
-			loggedUser = this.getGenerator().generateUser();
+			try
+			{
+				RubisGenerator.lockUsers();
+				loggedUser = this.getGenerator().generateUser();
+			}
+			finally
+			{
+				RubisGenerator.unlockUsers();
+			}
 			this.getGenerator().setLoggedUserId(loggedUser.id);
 		}
 		// If no user has been already registered, we still get an anonymous user.
