@@ -57,7 +57,7 @@ public class BrowseCategoriesOperation extends RubisOperation
 	{
 		super(interactive, scoreboard);
 
-		this._operationName = "Browse Categories";
+		this._operationName = "Browse-Categories";
 		this._operationIndex = RubisGenerator.BROWSE_CATEGORIES_OP;
 	}
 

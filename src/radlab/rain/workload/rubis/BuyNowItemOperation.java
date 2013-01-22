@@ -63,7 +63,7 @@ public class BuyNowItemOperation extends RubisOperation
 	public BuyNowItemOperation(boolean interactive, IScoreboard scoreboard) 
 	{
 		super(interactive, scoreboard);
-		this._operationName = "Buy Now Item";
+		this._operationName = "Buy-Now-Item";
 		this._operationIndex = RubisGenerator.BUY_NOW_ITEM_OP;
 	}
 

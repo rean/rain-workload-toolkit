@@ -54,7 +54,7 @@ public class ViewItemOperation extends RubisOperation
 	public ViewItemOperation(boolean interactive, IScoreboard scoreboard) 
 	{
 		super(interactive, scoreboard);
-		this._operationName = "View Item";
+		this._operationName = "View-Item";
 		this._operationIndex = RubisGenerator.VIEW_ITEM_OP;
 	}
 

@@ -54,7 +54,7 @@ public class ViewBidHistoryOperation extends RubisOperation
 	public ViewBidHistoryOperation(boolean interactive, IScoreboard scoreboard) 
 	{
 		super(interactive, scoreboard);
-		this._operationName = "View Bid History";
+		this._operationName = "View-Bid-History";
 		this._operationIndex = RubisGenerator.VIEW_BID_HISTORY_OP;
 	}
 

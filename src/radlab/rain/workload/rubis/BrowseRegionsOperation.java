@@ -59,7 +59,7 @@ public class BrowseRegionsOperation extends RubisOperation
 	{
 		super(interactive, scoreboard);
 
-		this._operationName = "Browse Regions";
+		this._operationName = "Browse-Regions";
 		this._operationIndex = RubisGenerator.BROWSE_REGIONS_OP;
 	}
 

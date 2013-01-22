@@ -52,7 +52,7 @@ public class HomePageOperation extends RubisOperation
 	{
 		super(interactive, scoreboard);
 
-		this._operationName = "Home Page";
+		this._operationName = "Home-Page";
 		this._operationIndex = RubisGenerator.HOME_PAGE_OP;
 	}
 

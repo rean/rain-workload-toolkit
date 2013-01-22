@@ -59,7 +59,7 @@ public class RegisterUserOperation extends RubisOperation
 	public RegisterUserOperation(boolean interactive, IScoreboard scoreboard)
 	{
 		super( interactive, scoreboard );
-		this._operationName = "Register User";
+		this._operationName = "Register-User";
 		this._operationIndex = RubisGenerator.REGISTER_USER_OP;
 		this._mustBeSync = true;
 	}

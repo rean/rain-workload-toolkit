@@ -54,7 +54,7 @@ public class ViewUserInfoOperation extends RubisOperation
 	public ViewUserInfoOperation(boolean interactive, IScoreboard scoreboard) 
 	{
 		super(interactive, scoreboard);
-		this._operationName = "View User Information";
+		this._operationName = "View-User-Information";
 		this._operationIndex = RubisGenerator.VIEW_USER_INFO_OP;
 	}
 

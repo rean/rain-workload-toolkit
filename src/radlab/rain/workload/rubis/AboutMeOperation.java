@@ -59,7 +59,7 @@ public class AboutMeOperation extends RubisOperation
 	public AboutMeOperation(boolean interactive, IScoreboard scoreboard) 
 	{
 		super(interactive, scoreboard);
-		this._operationName = "About Me";
+		this._operationName = "About-Me";
 		this._operationIndex = RubisGenerator.ABOUT_ME_OP;
 	}
 
