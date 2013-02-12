@@ -99,7 +99,7 @@ public class AboutMeOperation extends RubisOperation
 			// No user has been already registered
 			// Just print a warning, but do not set the operation as failed
 			this.getLogger().warning("No valid user has been found to log-in. Operation interrupted.");
-			this.setFailed(false);
+			this.setFailed(true);
 			return;
 		}
 
