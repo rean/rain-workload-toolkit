@@ -37,6 +37,10 @@ public class HBaseTransport
 	private int _timeout = DEFAULT_TIMEOUT;
 	private boolean _autoFlush = DEFAULT_AUTO_FLUSH;
 	
+	private byte[] _minKey = null;
+	private byte[] _maxKey = null;
+	private int _numRegions = -1;
+	
 	public HBaseTransport( String server, int port, int zooKeeperPort )
 	{
 		this._server = server;
@@ -49,6 +53,17 @@ public class HBaseTransport
 		this._config.set( "hbase.master", buf.toString() );
 		this._config.set( "hbase.zookeeper.quorum", server );
 		this._config.setInt( "hbase.zookeeper.property.clientPort", this._zooKeeperPort );
+	}
+	
+	public HBaseTransport( String server, int port, int zooKeeperPort, byte[] minKey, byte[] maxKey, int numRegions )
+	{
+		this( server, port, zooKeeperPort );
+		if( ( minKey != null &&  maxKey != null ) && numRegions > 0 )
+		{
+			this._minKey = minKey;
+			this._maxKey = maxKey;
+			this._numRegions = numRegions;
+		}
 	}
 	
 	public String getServer() { return this._server; }
@@ -90,7 +105,14 @@ public class HBaseTransport
 		tableDesc.addFamily( columnDesc );
 		try
 		{
-			admin.createTable( tableDesc );
+			if( ( this._minKey != null &&  this._maxKey != null ) && this._numRegions > 0 )
+			{
+				admin.createTable( tableDesc, this._minKey, this._maxKey, this._numRegions );
+			}
+			else
+			{
+				admin.createTable( tableDesc );
+			}
 		}
 		catch( TableExistsException te )
 		{ 
