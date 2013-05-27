@@ -32,14 +32,14 @@ public class S3Generator extends Generator
 	public static final int GET 					= 0;
 	public static final int PUT 					= 1;
 	public static final int HEAD					= 2;
-	public static final int DELETE					= 3;
+	public static final int DELETE				= 3;
 	public static final int CREATE_BUCKET			= 4;
-	public static final int LIST_BUCKET				= 5;
+	public static final int LIST_BUCKET			= 5;
 	public static final int DELETE_BUCKET			= 6;
 	public static final int LIST_ALL_BUCKETS		= 7;
-	public static final int RENAME					= 8;
+	public static final int RENAME				= 8;
 	public static final int MOVE					= 9;
-	public static final int MAX_OPERATIONS 			= 10;
+	public static final int MAX_OPERATIONS 		= 10;
 		
 	public static int DEFAULT_OBJECT_SIZE			= 4096;
 	
@@ -174,6 +174,7 @@ public class S3Generator extends Generator
 		
 		StringBuffer bucket = new StringBuffer();
 		StringBuffer key = new StringBuffer();
+		int bucketVal = -1;
 		for( int i = 0; i < this._objectKeys.length; i++ )
 		{
 			// Pick a random number between 0 and the number of items at this level of 
@@ -181,15 +182,21 @@ public class S3Generator extends Generator
 			int val = this._random.nextInt( this._objectKeys[i] );
 			if( i == 0 )
 			{
+				bucketVal = val;
 				bucket.append( this._objectKeyPrefixes.get( i ) );
-				bucket.append( this._formatter.format( val ) );
+				bucket.append( this._formatter.format( bucketVal ) );
 				nextRequest.bucket = bucket.toString();
 			}
 			else 
 			{
+				// This is fine for up to 2-levels of hierarchy
+				int offset = bucketVal;
+				for( int k = 1; k < this._objectKeys.length; k++ )
+					offset *= this._objectKeys[k];
+				
 				key.append( this._objectKeyPrefixes.get( i ) );
 				// Add the suffix - the formatted random number we generated
-				key.append( this._formatter.format( val ) );
+				key.append( this._formatter.format( val + offset ) );
 				if( i+1 < this._objectKeys.length )
 					key.append( DEFAULT_LEVEL_SEPARATOR );
 			}
