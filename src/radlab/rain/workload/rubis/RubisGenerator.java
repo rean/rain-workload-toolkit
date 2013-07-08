@@ -65,22 +65,38 @@ public class RubisGenerator extends Generator
 {
 	// Operation indices used in the mix matrix.
 	// Use the same order of the native RUBiS mix matrix
-	public static final int HOME_PAGE_OP = 0;
-	public static final int REGISTER_USER_OP = 1;
-	public static final int BROWSE_CATEGORIES_OP = 2;
-	public static final int BROWSE_REGIONS_OP = 3;
-	public static final int VIEW_ITEM_OP = 4;
-	public static final int VIEW_USER_INFO_OP = 5;
-	public static final int VIEW_BID_HISTORY_OP = 6;
-	public static final int BUY_NOW_ITEM_OP = 7;
-	public static final int BID_OP = 8;
-	public static final int COMMENT_ITEM_OP = 9;
-	public static final int SELL_ITEM_OP = 10;
-	public static final int ABOUT_ME_OP = 11;
+	public static final int HOME_OP = 0;
+	public static final int REGISTER_OP = 1;
+	public static final int REGISTER_USER_OP = 2;
+	public static final int BROWSE_OP = 3;
+	public static final int BROWSE_CATEGORIES_OP = 4;
+	public static final int SEARCH_ITEMS_BY_CATEGORY_OP = 5;
+	public static final int BROWSE_REGIONS_OP = 6;
+	public static final int BROWSE_CATEGORIES_BY_REGION_OP = 7;
+	public static final int SEARCH_ITEMS_BY_REGION_OP = 8;
+	public static final int VIEW_ITEM_OP = 9;
+	public static final int VIEW_USER_INFO_OP = 10;
+	public static final int VIEW_BID_HISTORY_OP = 11;
+	public static final int BUY_NOW_AUTH_OP = 12;
+	public static final int BUY_NOW_OP = 13;
+	public static final int STORE_BUY_NOW_OP = 14;
+	public static final int PUT_BID_AUTH_OP = 15;
+	public static final int PUT_BID_OP = 16;
+	public static final int STORE_BID_OP = 17;
+	public static final int PUT_COMMENT_AUTH_OP = 18;
+	public static final int PUT_COMMENT_OP = 19;
+	public static final int STORE_COMMENT_OP = 20;
+	public static final int SELL_OP = 21;
+	public static final int SELECT_CATEGORY_TO_SELL_ITEM_OP = 22;
+	public static final int SELL_ITEM_FORM_OP = 23;
+	public static final int REGISTER_ITEM_OP = 24;
+	public static final int ABOUT_ME_AUTH_OP = 25;
+	public static final int ABOUT_ME_OP = 26;
 
 	// Configuration keys
 	public static final String CFG_RNG_SEED_KEY = "rngSeed";
 
+/*
 	/// The set of alphanumeric characters
 	private static final char[] ALNUM_CHARS = { '0', '1', '2', '3', '4', '5',
 												'6', '7', '8', '9', 'A', 'B',
@@ -218,10 +234,11 @@ public class RubisGenerator extends Generator
 	private static final int MIN_FREE_REGION_ID = MIN_REGION_ID;
 	private static final int MIN_FREE_CATEGORY_ID = MIN_CATEGORY_ID;
 	//END FIXME: get from configuration file
+*/
 
 
-	private static AtomicInteger _userId = new AtomicInteger(MIN_FREE_USER_ID-1);
-	private static AtomicInteger _itemId = new AtomicInteger(MIN_FREE_ITEM_ID-1);
+	private static AtomicInteger _userId = new AtomicInteger(RubisConstants.MIN_FREE_USER_ID-1);
+	private static AtomicInteger _itemId = new AtomicInteger(RubisConstants.MIN_FREE_ITEM_ID-1);
 	private static Semaphore _userLock = new Semaphore(1, true);
 	private static Semaphore _itemLock = new Semaphore(1, true);
 
@@ -230,20 +247,22 @@ public class RubisGenerator extends Generator
 	private long _rngSeed = -1; ///< The seed used for the Random Number Generator; a value <= 0 means that no special seed is used.
 	private HttpTransport _http;
 	private Logger _logger;
-	private int _loggedUserId;
+//	private int _loggedUserId;
+	private RubisSessionState _sessionState; ///< Holds session data
+	private RubisUtility _utility;
 	private double _thinkTime = -1; ///< The mean think time; a value <= 0 means that no think time is used.
 	private NegativeExponential _thinkTimeRng;
 	private double _cycleTime = -1; ///< The mean cycle time; a value <= 0 means that no cycle time is used.
 	private NegativeExponential _cycleTimeRng;
 	private String _baseURL;
-	private String _homepageURL; 
+	private String _homeURL; 
 	private String _registerURL;
 	private String _registerUserURL;
 	private String _browseURL;
 	private String _browseCategoriesURL; 
 	private String _searchItemsByCategoryURL;
 	private String _browseRegionsURL; 
-	private String _browseCategoriesInRegionURL; 
+	private String _browseCategoriesByRegionURL; 
 	private String _searchItemsByRegionURL;
 	private String _viewItemURL;
 	private String _viewUserInfoURL;
@@ -258,10 +277,13 @@ public class RubisGenerator extends Generator
 	private String _putCommentURL;
 	private String _storeCommentURL;
 	private String _sellURL;
+	private String _selectCategoryToSellItemURL;
 	private String _sellItemFormURL;
 	private String _registerItemURL;
+	private String _aboutMeAuthURL;
 	private String _aboutMeURL;
 	private String _aboutMePostURL;
+	private RubisSessionState _userSession;
 
 
 	public static int nextUserId()
@@ -326,7 +348,9 @@ public class RubisGenerator extends Generator
 			this._rng = new Random();
 		}
 		this._logger = Logger.getLogger(this.getName());
-		this._loggedUserId = ANONYMOUS_USER_ID;
+		this._sessionState = new RubisSessionState();
+//		this._loggedUserId = ANONYMOUS_USER_ID;
+		this._utility = new RubisUtility();
 		this._thinkTime = this.getTrack().getMeanThinkTime();
 		if (this._thinkTime > 0)
 		{
@@ -456,20 +480,40 @@ public class RubisGenerator extends Generator
 		return this._logger;
 	}
 
+	public RubisSessionState getSessionState()
+	{
+		return this._sessionState;
+	}
+
+	protected void setSessionState(RubisSessionState value)
+	{
+		this._sessionState = value;
+	}
+
+	public RubisUtility getUtility()
+	{
+		return this._utility;
+	}
+
+	protected void setUtility(RubisUtility value)
+	{
+		this._utility = value;
+	}
+
 	public boolean isUserLoggedIn()
 	{
-		return ANONYMOUS_USER_ID != this.getLoggedUserId() && MIN_USER_ID <= this.getLoggedUserId();
+		return RubisConstants.ANONYMOUS_USER_ID != this._sessionState.getLoggedUserId() && RubisConstants.MIN_USER_ID <= this._sessionState.getLoggedUserId();
 	}
 
-	public int getLoggedUserId()
-	{
-		return this._loggedUserId;
-	}
-
-	public void setLoggedUserId(int val)
-	{
-		this._loggedUserId = val;
-	}
+//	public int getLoggedUserId()
+//	{
+//		return this._loggedUserId;
+//	}
+//
+//	public void setLoggedUserId(int val)
+//	{
+//		this._loggedUserId = val;
+//	}
 
 	public RubisUser getLoggedUser()
 	{
@@ -478,7 +522,7 @@ public class RubisGenerator extends Generator
 			return null;
 		}
 
-		return this.getUser(this.getLoggedUserId());
+		return this.getUser(this._sessionState.getLoggedUserId());
 	}
 
 	/**
@@ -492,7 +536,7 @@ public class RubisGenerator extends Generator
  	 */
 	public boolean isUserAvailable()
 	{
-		return MIN_USER_ID <= RubisGenerator.lastUserId();
+		return RubisConstants.MIN_USER_ID <= RubisGenerator.lastUserId();
 	}
 
 	/**
@@ -506,27 +550,27 @@ public class RubisGenerator extends Generator
  	 */
 	public boolean isItemAvailable()
 	{
-		return MIN_ITEM_ID <= RubisGenerator.lastItemId();
+		return RubisConstants.MIN_ITEM_ID <= RubisGenerator.lastItemId();
 	}
 
 	public boolean isValidUser(RubisUser user)
 	{
-		return null != user && MIN_USER_ID <= user.id;
+		return null != user && RubisConstants.MIN_USER_ID <= user.id;
 	}
 
 	public boolean isValidItem(RubisItem item)
 	{
-		return null != item && MIN_ITEM_ID <= item.id;
+		return null != item && RubisConstants.MIN_ITEM_ID <= item.id;
 	}
 
 	public boolean isValidCategory(RubisCategory category)
 	{
-		return null != category && MIN_CATEGORY_ID <= category.id;
+		return null != category && RubisConstants.MIN_CATEGORY_ID <= category.id;
 	}
 
 	public boolean isValidRegion(RubisRegion region)
 	{
-		return null != region && MIN_REGION_ID <= region.id;
+		return null != region && RubisConstants.MIN_REGION_ID <= region.id;
 	}
 
 	public boolean checkHttpResponse(String response)
@@ -546,9 +590,9 @@ public class RubisGenerator extends Generator
 		return this._baseURL;
 	}
 
-	public String getHomepageURL()
+	public String getHomeURL()
 	{
-		return this._homepageURL; 
+		return this._homeURL; 
 	}
 
 	public String getRegisterURL()
@@ -581,9 +625,9 @@ public class RubisGenerator extends Generator
 		return this._browseRegionsURL; 
 	}
 
-	public String getBrowseCategoriesInRegionURL()
+	public String getBrowseCategoriesByRegionURL()
 	{
-		return this._browseCategoriesInRegionURL; 
+		return this._browseCategoriesByRegionURL; 
 	}
 
 	public String getSearchItemsByRegionURL()
@@ -656,6 +700,11 @@ public class RubisGenerator extends Generator
 		return this._sellURL;
 	}
 
+	public String getSelectCategoryToSellItemURL()
+	{
+		return this._selectCategoryToSellItemURL;
+	}
+
 	public String getSellItemFormURL()
 	{
 		return this._sellItemFormURL;
@@ -664,6 +713,11 @@ public class RubisGenerator extends Generator
 	public String getRegisterItemURL()
 	{
 		return this._registerItemURL;
+	}
+
+	public String getAboutMeAuthURL()
+	{
+		return this._aboutMeAuthURL;
 	}
 
 	public String getAboutMeURL()
@@ -681,9 +735,21 @@ public class RubisGenerator extends Generator
 	 * 
 	 * @return  A prepared Homepage.
 	 */
-	public HomePageOperation createHomePageOperation()
+	public HomeOperation createHomeOperation()
 	{
-		HomePageOperation op = new HomePageOperation(this.getTrack().getInteractive(), this.getScoreboard());
+		HomeOperation op = new HomeOperation(this.getTrack().getInteractive(), this.getScoreboard());
+		op.prepare(this);
+		return op;
+	}
+
+	/**
+	 * Factory method.
+	 * 
+	 * @return  A prepared RegisterOperation.
+	 */
+	public RegisterOperation createRegisterOperation()
+	{
+		RegisterOperation op = new RegisterOperation(this.getTrack().getInteractive(), this.getScoreboard());
 		op.prepare(this);
 		return op;
 	}
@@ -703,6 +769,18 @@ public class RubisGenerator extends Generator
 	/**
 	 * Factory method.
 	 * 
+	 * @return  A prepared BrowseOperation.
+	 */
+	public BrowseOperation createBrowseOperation()
+	{
+		BrowseOperation op = new BrowseOperation(this.getTrack().getInteractive(), this.getScoreboard());
+		op.prepare(this);
+		return op;
+	}
+
+	/**
+	 * Factory method.
+	 * 
 	 * @return  A prepared BrowseCategoriesOperation.
 	 */
 	public BrowseCategoriesOperation createBrowseCategoriesOperation()
@@ -715,11 +793,47 @@ public class RubisGenerator extends Generator
 	/**
 	 * Factory method.
 	 * 
+	 * @return  A prepared SearchItemsByCategoryOperation.
+	 */
+	public SearchItemsByCategoryOperation createSearchItemsByCategoryOperation()
+	{
+		SearchItemsByCategoryOperation op = new SearchItemsByCategoryOperation(this.getTrack().getInteractive(), this.getScoreboard());
+		op.prepare(this);
+		return op;
+	}
+
+	/**
+	 * Factory method.
+	 * 
 	 * @return  A prepared BrowseRegionsOperation.
 	 */
 	public BrowseRegionsOperation createBrowseRegionsOperation()
 	{
 		BrowseRegionsOperation op = new BrowseRegionsOperation(this.getTrack().getInteractive(), this.getScoreboard());
+		op.prepare(this);
+		return op;
+	}
+
+	/**
+	 * Factory method.
+	 * 
+	 * @return  A prepared BrowseCategoriesByRegionOperation.
+	 */
+	public BrowseCategoriesByRegionOperation createBrowseCategoriesByRegionOperation()
+	{
+		BrowseCategoriesByRegionOperation op = new BrowseCategoriesByRegionOperation(this.getTrack().getInteractive(), this.getScoreboard());
+		op.prepare(this);
+		return op;
+	}
+
+	/**
+	 * Factory method.
+	 * 
+	 * @return  A prepared SearchItemsByRegionOperation.
+	 */
+	public SearchItemsByRegionOperation createSearchItemsByRegionOperation()
+	{
+		SearchItemsByRegionOperation op = new SearchItemsByRegionOperation(this.getTrack().getInteractive(), this.getScoreboard());
 		op.prepare(this);
 		return op;
 	}
@@ -763,11 +877,11 @@ public class RubisGenerator extends Generator
 	/**
 	 * Factory method.
 	 * 
-	 * @return  A prepared BuyNowItemOperation.
+	 * @return  A prepared BuyNowAuthOperation.
 	 */
-	public BuyNowItemOperation createBuyNowItemOperation()
+	public BuyNowAuthOperation createBuyNowAuthOperation()
 	{
-		BuyNowItemOperation op = new BuyNowItemOperation(this.getTrack().getInteractive(), this.getScoreboard());
+		BuyNowAuthOperation op = new BuyNowAuthOperation(this.getTrack().getInteractive(), this.getScoreboard());
 		op.prepare(this);
 		return op;
 	}
@@ -775,11 +889,11 @@ public class RubisGenerator extends Generator
 	/**
 	 * Factory method.
 	 * 
-	 * @return  A prepared BidOperation.
+	 * @return  A prepared BuyNowOperation.
 	 */
-	public BidOperation createBidOperation()
+	public BuyNowOperation createBuyNowOperation()
 	{
-		BidOperation op = new BidOperation(this.getTrack().getInteractive(), this.getScoreboard());
+		BuyNowOperation op = new BuyNowOperation(this.getTrack().getInteractive(), this.getScoreboard());
 		op.prepare(this);
 		return op;
 	}
@@ -787,11 +901,11 @@ public class RubisGenerator extends Generator
 	/**
 	 * Factory method.
 	 * 
-	 * @return  A prepared CommentItemOperation.
+	 * @return  A prepared StoreBuyNowOperation.
 	 */
-	public CommentItemOperation createCommentItemOperation()
+	public StoreBuyNowOperation createStoreBuyNowOperation()
 	{
-		CommentItemOperation op = new CommentItemOperation(this.getTrack().getInteractive(), this.getScoreboard());
+		StoreBuyNowOperation op = new StoreBuyNowOperation(this.getTrack().getInteractive(), this.getScoreboard());
 		op.prepare(this);
 		return op;
 	}
@@ -799,11 +913,131 @@ public class RubisGenerator extends Generator
 	/**
 	 * Factory method.
 	 * 
-	 * @return  A prepared SellItemOperation.
+	 * @return  A prepared PutBidAuthOperation.
 	 */
-	public SellItemOperation createSellItemOperation()
+	public PutBidAuthOperation createPutBidAuthOperation()
 	{
-		SellItemOperation op = new SellItemOperation(this.getTrack().getInteractive(), this.getScoreboard());
+		PutBidAuthOperation op = new PutBidAuthOperation(this.getTrack().getInteractive(), this.getScoreboard());
+		op.prepare(this);
+		return op;
+	}
+
+	/**
+	 * Factory method.
+	 * 
+	 * @return  A prepared PutBidOperation.
+	 */
+	public PutBidOperation createPutBidOperation()
+	{
+		PutBidOperation op = new PutBidOperation(this.getTrack().getInteractive(), this.getScoreboard());
+		op.prepare(this);
+		return op;
+	}
+
+	/**
+	 * Factory method.
+	 * 
+	 * @return  A prepared StoreBidOperation.
+	 */
+	public StoreBidOperation createStoreBidOperation()
+	{
+		StoreBidOperation op = new StoreBidOperation(this.getTrack().getInteractive(), this.getScoreboard());
+		op.prepare(this);
+		return op;
+	}
+
+	/**
+	 * Factory method.
+	 * 
+	 * @return  A prepared PutCommentAuthOperation.
+	 */
+	public PutCommentAuthOperation createPutCommentAuthOperation()
+	{
+		PutCommentAuthOperation op = new PutCommentAuthOperation(this.getTrack().getInteractive(), this.getScoreboard());
+		op.prepare(this);
+		return op;
+	}
+
+	/**
+	 * Factory method.
+	 * 
+	 * @return  A prepared PutCommentOperation.
+	 */
+	public PutCommentOperation createPutCommentOperation()
+	{
+		PutCommentOperation op = new PutCommentOperation(this.getTrack().getInteractive(), this.getScoreboard());
+		op.prepare(this);
+		return op;
+	}
+
+	/**
+	 * Factory method.
+	 * 
+	 * @return  A prepared StoreCommentOperation.
+	 */
+	public StoreCommentOperation createStoreCommentOperation()
+	{
+		StoreCommentOperation op = new StoreCommentOperation(this.getTrack().getInteractive(), this.getScoreboard());
+		op.prepare(this);
+		return op;
+	}
+
+	/**
+	 * Factory method.
+	 * 
+	 * @return  A prepared SellOperation.
+	 */
+	public SellOperation createSellOperation()
+	{
+		SellOperation op = new SellOperation(this.getTrack().getInteractive(), this.getScoreboard());
+		op.prepare(this);
+		return op;
+	}
+
+	/**
+	 * Factory method.
+	 * 
+	 * @return  A prepared SelectCategoryToSellItemOperation.
+	 */
+	public SelectCategoryToSellItemOperation createSelectCategoryToSellItemOperation()
+	{
+		SelectCategoryToSellItemOperation op = new SelectCategoryToSellItemOperation(this.getTrack().getInteractive(), this.getScoreboard());
+		op.prepare(this);
+		return op;
+	}
+
+	/**
+	 * Factory method.
+	 * 
+	 * @return  A prepared SellItemFormOperation.
+	 */
+	public SellItemFormOperation createSellItemFormOperation()
+	{
+		SellItemFormOperation op = new SellItemFormOperation(this.getTrack().getInteractive(), this.getScoreboard());
+		op.prepare(this);
+		return op;
+	}
+
+	/**
+	 * Factory method.
+	 * 
+	 * @return  A prepared RegisterItemOperation.
+	 */
+	public RegisterItemOperation createRegisterItemOperation()
+	{
+		RegisterItemOperation op = new RegisterItemOperation(this.getTrack().getInteractive(), this.getScoreboard());
+		op.prepare(this);
+		return op;
+	}
+
+	/**
+	 * Factory method.
+	 * 
+	 * @return  A prepared AboutMeAuthOperation.
+	 */
+	public AboutMeAuthOperation createAboutMeAuthOperation()
+	{
+		AboutMeAuthOperation op = new AboutMeAuthOperation(this.getTrack().getInteractive(), this.getScoreboard());
 		op.prepare(this);
 		return op;
 	}
@@ -827,11 +1061,11 @@ public class RubisGenerator extends Generator
 
 	public RubisUser generateUser()
 	{
-		int userId = MIN_USER_ID-1;;
+		int userId = RubisConstants.MIN_USER_ID-1;;
 		int lastUserId = RubisGenerator.lastUserId();
-		if (lastUserId >= MIN_USER_ID)
+		if (lastUserId >= RubisConstants.MIN_USER_ID)
 		{
-			userId = this._rng.nextInt(lastUserId+1-MIN_USER_ID)+MIN_USER_ID;
+			userId = this._rng.nextInt(lastUserId+1-RubisConstants.MIN_USER_ID)+RubisConstants.MIN_USER_ID;
 		}
 		return this.getUser(userId);
 	}
@@ -858,11 +1092,11 @@ public class RubisGenerator extends Generator
 
 	public RubisItem generateItem()
 	{
-		int itemId = MIN_ITEM_ID-1;
+		int itemId = RubisConstants.MIN_ITEM_ID-1;
 		int lastItemId = RubisGenerator.lastItemId();
-		if (lastItemId >= MIN_ITEM_ID)
+		if (lastItemId >= RubisConstants.MIN_ITEM_ID)
 		{
-			itemId = this._rng.nextInt(lastItemId+1-MIN_ITEM_ID)+MIN_ITEM_ID;
+			itemId = this._rng.nextInt(lastItemId+1-RubisConstants.MIN_ITEM_ID)+RubisConstants.MIN_ITEM_ID;
 		}
 		return this.getItem(itemId);
 	}
@@ -873,27 +1107,27 @@ public class RubisGenerator extends Generator
 
 		item.id = id;
 		item.name = "RUBiS automatically generated item #" + item.id;
-		item.description = this.generateText(1, MAX_ITEM_DESCR_LEN);
-		item.initialPrice = this._rng.nextInt(MAX_ITEM_INIT_PRICE)+1;
-		if (this._rng.nextInt(TOTAL_ACTIVE_ITEMS) < (PERCENT_UNIQUE_ITEMS*TOTAL_ACTIVE_ITEMS/100))
+		item.description = this.generateText(1, RubisConstants.MAX_ITEM_DESCR_LEN);
+		item.initialPrice = this._rng.nextInt(RubisConstants.MAX_ITEM_INIT_PRICE)+1;
+		if (this._rng.nextInt(RubisConstants.TOTAL_ACTIVE_ITEMS) < (RubisConstants.PERCENT_UNIQUE_ITEMS*RubisConstants.TOTAL_ACTIVE_ITEMS/100))
 		{
 			item.quantity = 1;
 		}
 		else
 		{
-			item.quantity = this._rng.nextInt(MAX_ITEM_QUANTITY)+1;
+			item.quantity = this._rng.nextInt(RubisConstants.MAX_ITEM_QUANTITY)+1;
 		}
-		if (this._rng.nextInt(TOTAL_ACTIVE_ITEMS) < (PERCENT_ITEMS_RESERVE_PRICE*TOTAL_ACTIVE_ITEMS/100))
+		if (this._rng.nextInt(RubisConstants.TOTAL_ACTIVE_ITEMS) < (RubisConstants.PERCENT_ITEMS_RESERVE_PRICE*RubisConstants.TOTAL_ACTIVE_ITEMS/100))
 		{
-			item.reservePrice = this._rng.nextInt(MIN_ITEM_RESERVE_PRICE)+item.initialPrice;
+			item.reservePrice = this._rng.nextInt(RubisConstants.MIN_ITEM_RESERVE_PRICE)+item.initialPrice;
 		}
 		else
 		{
 			item.reservePrice = 0;
 		}
-		if (this._rng.nextInt(TOTAL_ACTIVE_ITEMS) < (PERCENT_ITEMS_BUY_NOW_PRICE*TOTAL_ACTIVE_ITEMS/100))
+		if (this._rng.nextInt(RubisConstants.TOTAL_ACTIVE_ITEMS) < (RubisConstants.PERCENT_ITEMS_BUY_NOW_PRICE*RubisConstants.TOTAL_ACTIVE_ITEMS/100))
 		{
-			item.buyNow = this._rng.nextInt(MIN_ITEM_BUY_NOW_PRICE)+item.initialPrice+item.reservePrice;
+			item.buyNow = this._rng.nextInt(RubisConstants.MIN_ITEM_BUY_NOW_PRICE)+item.initialPrice+item.reservePrice;
 		}
 		else
 		{
@@ -903,9 +1137,9 @@ public class RubisGenerator extends Generator
 		item.maxBid = 0;
 		Calendar cal = Calendar.getInstance();
 		item.startDate = cal.getTime();
-		cal.add(Calendar.DAY_OF_MONTH, this._rng.nextInt(MAX_ITEM_DURATION)+1);
+		cal.add(Calendar.DAY_OF_MONTH, this._rng.nextInt(RubisConstants.MAX_ITEM_DURATION)+1);
 		item.endDate = cal.getTime();
-		item.seller = this.getLoggedUserId();
+		item.seller = this._sessionState.getLoggedUserId();
 		item.category = this.generateCategory().id;
 
 		return item;
@@ -913,12 +1147,12 @@ public class RubisGenerator extends Generator
 
 	public RubisCategory generateCategory()
 	{
-		return this.getCategory(this._rng.nextInt(CATEGORIES.length-MIN_CATEGORY_ID)+MIN_CATEGORY_ID);
+		return this.getCategory(this._rng.nextInt(RubisConstants.CATEGORIES.length-RubisConstants.MIN_CATEGORY_ID)+RubisConstants.MIN_CATEGORY_ID);
 	}
 
 	public RubisRegion generateRegion()
 	{
-		return this.getRegion(this._rng.nextInt(REGIONS.length-MIN_REGION_ID)+MIN_REGION_ID);
+		return this.getRegion(this._rng.nextInt(RubisConstants.REGIONS.length-RubisConstants.MIN_REGION_ID)+RubisConstants.MIN_REGION_ID);
 	}
 
 	public RubisCategory getCategory(int id)
@@ -926,7 +1160,7 @@ public class RubisGenerator extends Generator
 		RubisCategory category = new RubisCategory();
 
 		category.id = id;
-		category.name = CATEGORIES[category.id];
+		category.name = RubisConstants.CATEGORIES[category.id];
 
 		return category;
 	}
@@ -936,24 +1170,24 @@ public class RubisGenerator extends Generator
 		RubisRegion region = new RubisRegion();
 
 		region.id = id;
-		region.name = REGIONS[region.id];
+		region.name = RubisConstants.REGIONS[region.id];
 
 		return region;
 	}
 
 	public int getNumItemsPerPage()
 	{
-		return NUM_ITEMS_PER_PAGE;
+		return RubisConstants.NUM_ITEMS_PER_PAGE;
 	}
 
 	public int getMaxAddBid()
 	{
-		return MAX_ADD_BID;
+		return RubisConstants.MAX_ADD_BID;
 	}
 
 	public int getMaxCommentLength()
 	{
-		return MAX_COMMENT_LEN;
+		return RubisConstants.MAX_COMMENT_LEN;
 	}
 
 	public RubisComment generateComment(int fromUserId, int toUserId, int itemId)
@@ -961,7 +1195,7 @@ public class RubisGenerator extends Generator
 		return getComment(fromUserId,
 						  toUserId,
 						  itemId,
-						  COMMENT_RATINGS[this._rng.nextInt(COMMENT_RATINGS.length)]);
+						  RubisConstants.COMMENT_RATINGS[this._rng.nextInt(RubisConstants.COMMENT_RATINGS.length)]);
 	}
 
 	public RubisComment getComment(int fromUserId, int toUserId, int itemId, int rating)
@@ -971,9 +1205,9 @@ public class RubisGenerator extends Generator
 		comment.fromUserId = fromUserId;
 		comment.toUserId = toUserId;
 		comment.itemId = itemId;
-		int rateIdx = Arrays.binarySearch(COMMENT_RATINGS, rating);
-		comment.rating = COMMENT_RATINGS[rateIdx];
-		comment.comment = this.generateText(1, MAX_COMMENT_LEN-COMMENTS[rateIdx].length()-System.lineSeparator().length()) + System.lineSeparator() + COMMENTS[rateIdx];
+		int rateIdx = Arrays.binarySearch(RubisConstants.COMMENT_RATINGS, rating);
+		comment.rating = RubisConstants.COMMENT_RATINGS[rateIdx];
+		comment.comment = this.generateText(1, RubisConstants.MAX_COMMENT_LEN-RubisConstants.COMMENTS[rateIdx].length()-System.lineSeparator().length()) + System.lineSeparator() + RubisConstants.COMMENTS[rateIdx];
 		Calendar cal = Calendar.getInstance();
 		comment.date = cal.getTime();
 
@@ -990,28 +1224,58 @@ public class RubisGenerator extends Generator
 	{
 		switch (opIndex)
 		{
-			case HOME_PAGE_OP:
-				return this.createHomePageOperation();
+			case HOME_OP:
+				return this.createHomeOperation();
+			case REGISTER_OP:
+				return this.createRegisterOperation();
 			case REGISTER_USER_OP:
 				return this.createRegisterUserOperation();
+			case BROWSE_OP:
+				return this.createBrowseOperation();
 			case BROWSE_CATEGORIES_OP:
 				return this.createBrowseCategoriesOperation();
+			case SEARCH_ITEMS_BY_CATEGORY_OP:
+				return this.createSearchItemsByCategoryOperation();
 			case BROWSE_REGIONS_OP:
 				return this.createBrowseRegionsOperation();
+			case BROWSE_CATEGORIES_BY_REGION_OP:
+				return this.createBrowseCategoriesByRegionOperation();
+			case SEARCH_ITEMS_BY_REGION_OP:
+				return this.createSearchItemsByRegionOperation();
 			case VIEW_ITEM_OP:
 				return this.createViewItemOperation();
 			case VIEW_USER_INFO_OP:
 				return this.createViewUserInfoOperation();
 			case VIEW_BID_HISTORY_OP:
 				return this.createViewBidHistoryOperation();
-			case BUY_NOW_ITEM_OP:
-				return this.createBuyNowItemOperation();
-			case BID_OP:
-				return this.createBidOperation();
-			case COMMENT_ITEM_OP:
-				return this.createCommentItemOperation();
-			case SELL_ITEM_OP:
-				return this.createSellItemOperation();
+			case BUY_NOW_AUTH_OP:
+				return this.createBuyNowAuthOperation();
+			case BUY_NOW_OP:
+				return this.createBuyNowOperation();
+			case STORE_BUY_NOW_OP:
+				return this.createStoreBuyNowOperation();
+			case PUT_BID_AUTH_OP:
+				return this.createPutBidAuthOperation();
+			case PUT_BID_OP:
+				return this.createPutBidOperation();
+			case STORE_BID_OP:
+				return this.createStoreBidOperation();
+			case PUT_COMMENT_AUTH_OP:
+				return this.createPutCommentAuthOperation();
+			case PUT_COMMENT_OP:
+				return this.createPutCommentOperation();
+			case STORE_COMMENT_OP:
+				return this.createStoreCommentOperation();
+			case SELL_OP:
+				return this.createSellOperation();
+			case SELECT_CATEGORY_TO_SELL_ITEM_OP:
+				return this.createSelectCategoryToSellItemOperation();
+			case SELL_ITEM_FORM_OP:
+				return this.createSellItemFormOperation();
+			case REGISTER_ITEM_OP:
+				return this.createRegisterItemOperation();
+			case ABOUT_ME_AUTH_OP:
+				return this.createAboutMeAuthOperation();
 			case ABOUT_ME_OP:
 				return this.createAboutMeOperation();
 			default:
@@ -1040,7 +1304,7 @@ public class RubisGenerator extends Generator
 				--left;
 			}
 
-			String word = this.generateWord(1, left < MAX_WORD_LEN ? left : MAX_WORD_LEN);
+			String word = this.generateWord(1, left < RubisConstants.MAX_WORD_LEN ? left : RubisConstants.MAX_WORD_LEN);
 			buf.append(word);
 			left -= word.length();
 		}
@@ -1068,8 +1332,8 @@ public class RubisGenerator extends Generator
 
 		for (int i = 0; i < len; ++i)
 		{
-			int j = this._rng.nextInt(ALNUM_CHARS.length);
-			buf[i] = ALNUM_CHARS[j];
+			int j = this._rng.nextInt(RubisConstants.ALNUM_CHARS.length);
+			buf[i] = RubisConstants.ALNUM_CHARS[j];
 		}
 
 		return new String(buf);
@@ -1081,14 +1345,14 @@ public class RubisGenerator extends Generator
 	private void initializeUrls()
 	{
 		this._baseURL = "http://" + this.getTrack().getTargetHostName() + ":" + this.getTrack().getTargetHostPort();
-		this._homepageURL = this._baseURL + "/rubis_servlets/";
+		this._homeURL = this._baseURL + "/rubis_servlets/";
 		this._registerURL = this._baseURL + "/rubis_servlets/register.html";
 		this._registerUserURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.RegisterUser";
 		this._browseURL = this._baseURL + "/rubis_servlets/browse.html";
 		this._browseCategoriesURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.BrowseCategories";
 		this._searchItemsByCategoryURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.SearchItemsByCategory";
 		this._browseRegionsURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.BrowseRegions";
-		this._browseCategoriesInRegionURL = this._browseCategoriesURL;
+		this._browseCategoriesByRegionURL = this._browseCategoriesURL;
 		this._searchItemsByRegionURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.SearchItemsByRegion";
 		this._viewItemURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.ViewItem";
 		this._viewUserInfoURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.ViewUserInfo";
@@ -1103,8 +1367,10 @@ public class RubisGenerator extends Generator
 		this._putCommentURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.PutComment";	
 		this._storeCommentURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.StoreComment";
 		this._sellURL = this._baseURL + "/rubis_servlets/sell.html";
+		this._selectCategoryToSellItemURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.BrowseCategories";
 		this._sellItemFormURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.SellItemForm";
 		this._registerItemURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.RegisterItem";
+		this._aboutMeAuthURL = this._baseURL + "/rubis_servlets/about_me.html";
 		this._aboutMeURL = this._baseURL + "/rubis_servlets/about_me.html";
 		this._aboutMePostURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.AboutMe";
 	}

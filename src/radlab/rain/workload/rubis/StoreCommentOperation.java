@@ -39,28 +39,32 @@ import java.util.ArrayList;
 import java.util.List;
 import radlab.rain.IScoreboard;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.NameValuePair;
+import radlab.rain.workload.rubis.model.RubisComment;
+import radlab.rain.workload.rubis.model.RubisItem;
 import radlab.rain.workload.rubis.model.RubisUser;
 
 
 /**
- * The About-Me operation.
+ * Store-Comment operation.
  *
+ * This emulates the operation of commenting on another user for a certain item.
  * Emulates the following requests:
- * 1. Go to the 'About Me' page
- * 2. Send authentication data (login name and password)
+ * 1. Fill-in the form anc click on the 'Post this comment now!' button 
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
-public class AboutMeOperation extends RubisOperation 
+public class StoreCommentOperation extends RubisOperation 
 {
-	public AboutMeOperation(boolean interactive, IScoreboard scoreboard) 
+	public StoreCommentOperation(boolean interactive, IScoreboard scoreboard) 
 	{
 		super(interactive, scoreboard);
-		this._operationName = "About-Me";
-		this._operationIndex = RubisGenerator.ABOUT_ME_OP;
+		this._operationName = "Store-Comment";
+		this._operationIndex = RubisGenerator.STORE_COMMENT_OP;
+		//this._mustBeSync = true;
 	}
 
 	@Override
@@ -68,15 +72,38 @@ public class AboutMeOperation extends RubisOperation
 	{
 		StringBuilder response = null;
 
+		// Get an item (from last response or from session)
+		int itemId = this.getUtility().findItemIdInHtml(this.getSessionState().getLastResponse());
+		RubisItem item = this.getGenerator().getItem(itemId);
+		if (!this.getGenerator().isValidItem(item))
+		{
+			// Try to see if there an item in session
+			item = this.getGenerator().getItem(this.getSessionState().getItemId());
+			if (!this.getGenerator().isValidItem(item))
+			{
+				this.getLogger().warning("No valid item has been found. Operation interrupted.");
+				this.setFailed(true);
+				return;
+			}
+		}
+		// Get a user from last response
+		int toUserId = Integer.parseInt(this.getUtility().findParamInHtml(this.getSessionState().getLastResponse(), "to"));
+		RubisUser toUser = this.getGenerator().getUser(toUserId);
+		if (!this.getGenerator().isValidUser(toUser))
+		{
+			this.getLogger().warning("No valid user has been found. Operation interrupted.");
+			this.setFailed(true);
+			return;
+		}
+
 		// Need a logged user
 		RubisUser loggedUser = this.getGenerator().getUser(this.getSessionState().getLoggedUserId());
-		if (!this.getGenerator().isValidUser(loggedUser) || this.getUtility().isAnonymousUser(loggedUser))
+		if (!this.getGenerator().isValidUser(loggedUser))
 		{
 			loggedUser = this.getGenerator().generateUser();
 			if (!this.getGenerator().isValidUser(loggedUser) || this.getUtility().isAnonymousUser(loggedUser))
 			{
-				// No user has been already registered
-				this.getLogger().warning("No valid user has been found to log-in. Operation interrupted.");
+				this.getLogger().warning("Need a logged user; got an anonymous one. Operation interrupted.");
 				this.setFailed(true);
 				return;
 			}
@@ -86,11 +113,16 @@ public class AboutMeOperation extends RubisOperation
 		List<NameValuePair> form = null;
 		UrlEncodedFormEntity entity = null;
 
-		// Send authentication data (login name and password)
-		reqPost = new HttpPost(this.getGenerator().getAboutMePostURL());
+ 		// Fill-in the form anc click on the 'Post this comment now!' button 
+		// This will really store the comment on the DB.
+		RubisComment comment = this.getGenerator().generateComment(loggedUser.id, toUser.id, item.id);
+		reqPost = new HttpPost(this.getGenerator().getStoreCommentURL());
 		form = new ArrayList<NameValuePair>();
-		form.add(new BasicNameValuePair("nickname", loggedUser.nickname));
-		form.add(new BasicNameValuePair("password", loggedUser.password));
+		form.add(new BasicNameValuePair("from", Integer.toString(comment.fromUserId)));
+		form.add(new BasicNameValuePair("to", Integer.toString(comment.toUserId)));
+		form.add(new BasicNameValuePair("itemId", Integer.toString(comment.itemId)));
+		form.add(new BasicNameValuePair("rating", Integer.toString(comment.rating)));
+		form.add(new BasicNameValuePair("comment", comment.comment));
 		entity = new UrlEncodedFormEntity(form, "UTF-8");
 		reqPost.setEntity(entity);
 		response = this.getHttpTransport().fetch(reqPost);
@@ -102,8 +134,9 @@ public class AboutMeOperation extends RubisOperation
 		}
 
 		// Save session data
-		this.getSessionState().setLoggedUserId(loggedUser.id);
 		this.getSessionState().setLastResponse(response.toString());
+		this.getSessionState().setItemId(item.id);
+		this.getSessionState().setLoggedUserId(loggedUser.id);
 
 		this.setFailed(false);
 	}

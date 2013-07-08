@@ -35,32 +35,42 @@ package radlab.rain.workload.rubis;
 
 
 import java.io.IOException;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
+import java.util.ArrayList;
+import java.util.List;
 import radlab.rain.IScoreboard;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.NameValuePair;
 import radlab.rain.workload.rubis.model.RubisItem;
+import radlab.rain.workload.rubis.model.RubisUser;
 
 
 /**
- * View-Bid-History operation.
+ * Buy-Now operation.
  *
  * Emulates the following requests:
- * 1. Click on the 'bid history' link
+ * 1. Click on the 'Buy-Now' link located in the item detail page
+ * 2. Send user authentication (login name and password)
+ * 3. Fill-in the form and click on the 'Buy now!' button, to buy the item
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
-public class ViewBidHistoryOperation extends RubisOperation 
+public class BuyNowOperation extends RubisOperation 
 {
-	public ViewBidHistoryOperation(boolean interactive, IScoreboard scoreboard) 
+	public BuyNowOperation(boolean interactive, IScoreboard scoreboard) 
 	{
 		super(interactive, scoreboard);
-		this._operationName = "View-Bid-History";
-		this._operationIndex = RubisGenerator.VIEW_BID_HISTORY_OP;
+		this._operationName = "Buy-Now";
+		this._operationIndex = RubisGenerator.BUY_NOW_OP;
 	}
 
 	@Override
 	public void execute() throws Throwable
 	{
+		StringBuilder response = null;
+
 		// Get an item (from last response or from session)
 		int itemId = this.getUtility().findItemIdInHtml(this.getSessionState().getLastResponse());
 		RubisItem item = this.getGenerator().getItem(itemId);
@@ -76,21 +86,43 @@ public class ViewBidHistoryOperation extends RubisOperation
 			}
 		}
 
-		// Click on the 'bid history' link
-		URIBuilder uri = new URIBuilder(this.getGenerator().getViewBidHistoryURL());
-		uri.setParameter("itemId", Integer.toString(item.id));
-		HttpGet reqGet = new HttpGet(uri.build());
-		StringBuilder response = this.getHttpTransport().fetch(reqGet);
-		this.trace(reqGet.getURI().toString());
+		// Need a logged user
+		RubisUser loggedUser = this.getGenerator().getUser(this.getSessionState().getLoggedUserId());
+		if (!this.getGenerator().isValidUser(loggedUser) || this.getUtility().isAnonymousUser(loggedUser))
+		{
+			loggedUser = this.getGenerator().generateUser();
+			if (!this.getGenerator().isValidUser(loggedUser) || this.getUtility().isAnonymousUser(loggedUser))
+			{
+				this.getLogger().warning("No valid user has been found to log-in. Operation interrupted.");
+				this.setFailed(true);
+				return;
+			}
+		}
+
+		HttpPost reqPost = null;
+		List<NameValuePair> form = null;
+		UrlEncodedFormEntity entity = null;
+
+		// Send user authentication (login name and password)
+		reqPost = new HttpPost(this.getGenerator().getBuyNowURL());
+		form = new ArrayList<NameValuePair>();
+		form.add(new BasicNameValuePair("itemId", Integer.toString(item.id)));
+		form.add(new BasicNameValuePair("nickname", loggedUser.nickname));
+		form.add(new BasicNameValuePair("password", loggedUser.password));
+		entity = new UrlEncodedFormEntity(form, "UTF-8");
+		reqPost.setEntity(entity);
+		response = this.getHttpTransport().fetch(reqPost);
+		this.trace(reqPost.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			this.getLogger().severe("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
-			throw new IOException("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			this.getLogger().severe("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+			throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		// Save session data
 		this.getSessionState().setLastResponse(response.toString());
 		this.getSessionState().setItemId(item.id);
+		this.getSessionState().setLoggedUserId(loggedUser.id);
 
 		this.setFailed(false);
 	}

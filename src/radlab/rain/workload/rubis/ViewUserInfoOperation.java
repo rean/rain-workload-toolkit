@@ -61,36 +61,21 @@ public class ViewUserInfoOperation extends RubisOperation
 	@Override
 	public void execute() throws Throwable
 	{
-		// Need a logged user
-		RubisUser loggedUser = null;
-		if (this.getGenerator().isUserLoggedIn())
+//		// Need a logged user
+		int userId = Integer.parseInt(this.getUtility().findParamInHtml(this.getSessionState().getLastResponse(), "userId"));
+		RubisUser user = this.getGenerator().getUser(userId);
+		if (!this.getGenerator().isValidUser(user) || this.getUtility().isAnonymousUser(user))
 		{
-			loggedUser = this.getGenerator().getLoggedUser();
-		}
-		else if (this.getGenerator().isUserAvailable())
-		{
-			try
-			{
-				RubisGenerator.lockUsers();
-				loggedUser = this.getGenerator().generateUser();
-			}
-			finally
-			{
-				RubisGenerator.unlockUsers();
-			}
-			this.getGenerator().setLoggedUserId(loggedUser.id);
-		}
-		if (!this.getGenerator().isValidUser(loggedUser))
-		{
-			// Just print a warning, but do not set the operation as failed
-			this.getLogger().warning("No valid user has been found. Operation interrupted.");
+            //TODO: The official RUBiS goes back to the previous operation
+            //      We could do the same by storing the previous operation in the session
+			this.getLogger().warning("No valid registered user has been found. Operation interrupted.");
 			this.setFailed(true);
 			return;
 		}
 
 		// Click on the user name link (representing the seller of an item)
 		URIBuilder uri = new URIBuilder(this.getGenerator().getViewUserInfoURL());
-		uri.setParameter("userId", Integer.toString(loggedUser.id));
+		uri.setParameter("userId", Integer.toString(user.id));
 		HttpGet reqGet = new HttpGet(uri.build());
 		StringBuilder response = this.getHttpTransport().fetch(reqGet);
 		this.trace(reqGet.getURI().toString());
@@ -99,6 +84,10 @@ public class ViewUserInfoOperation extends RubisOperation
 			this.getLogger().severe("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
 			throw new IOException("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
+
+		// Save session data
+		this.getSessionState().setLastResponse(response.toString());
+		//this.getSessionState().setLoggedUserId(loggedUser.id);
 
 		this.setFailed(false);
 	}

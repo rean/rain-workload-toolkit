@@ -35,28 +35,25 @@ package radlab.rain.workload.rubis;
 
 
 import java.io.IOException;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
 import radlab.rain.IScoreboard;
-import radlab.rain.workload.rubis.model.RubisCategory;
 
 
 /**
- * Browse-Categories operation.
+ * Browse operation.
  *
  * Emulates the following requests:
- * 1. Click on the 'Browse all items in a category'
+ * 1. Go to the browse page
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
-public class BrowseCategoriesOperation extends RubisOperation 
+public class BrowseOperation extends RubisOperation 
 {
-	public BrowseCategoriesOperation(boolean interactive, IScoreboard scoreboard) 
+	public BrowseOperation(boolean interactive, IScoreboard scoreboard) 
 	{
 		super(interactive, scoreboard);
 
-		this._operationName = "Browse-Categories";
-		this._operationIndex = RubisGenerator.BROWSE_CATEGORIES_OP;
+		this._operationName = "Browse";
+		this._operationIndex = RubisGenerator.BROWSE_OP;
 	}
 
 	@Override
@@ -64,13 +61,13 @@ public class BrowseCategoriesOperation extends RubisOperation
 	{
 		StringBuilder response = null;
 
-		// Emulate a click on the "Browse all items in a category" link
-		response = this.getHttpTransport().fetchUrl(this.getGenerator().getBrowseCategoriesURL());
-		this.trace(this.getGenerator().getBrowseCategoriesURL());
+		// Go to the browse page
+		response = this.getHttpTransport().fetchUrl(this.getGenerator().getBrowseURL());
+		this.trace(this.getGenerator().getBrowseURL());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
-		{
-			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getBrowseCategoriesURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getBrowseCategoriesURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+		{   
+			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getBrowseURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getBrowseURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		// Save session data

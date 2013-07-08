@@ -39,33 +39,41 @@ import radlab.rain.IScoreboard;
 
 
 /**
- * The 'Home-Page' operation.
+ * Sell operation.
+ *
+ * This is the operation of selling a certain item.
  *
  * Emulates the following requests:
- * 1. Request the 'Home Page' page
+ * 1. Go to the sell page
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
-public class HomePageOperation extends RubisOperation 
+public class SellOperation extends RubisOperation 
 {
-	public HomePageOperation(boolean interactive, IScoreboard scoreboard) 
+	public SellOperation(boolean interactive, IScoreboard scoreboard) 
 	{
 		super(interactive, scoreboard);
-
-		this._operationName = "Home-Page";
-		this._operationIndex = RubisGenerator.HOME_PAGE_OP;
+		this._operationName = "Sell";
+		this._operationIndex = RubisGenerator.SELL_OP;
+		//this._mustBeSync = true;
 	}
 
 	@Override
 	public void execute() throws Throwable
 	{
-		StringBuilder response = this.getHttpTransport().fetchUrl(this.getGenerator().getHomepageURL());
-		this.trace(this.getGenerator().getHomepageURL());
+		StringBuilder response = null;
+
+		// Go to the sell home page
+		response = this.getHttpTransport().fetchUrl(this.getGenerator().getSellURL());
+		this.trace(this.getGenerator().getSellURL());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getHomepageURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getHomepageURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getSellURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getSellURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
+
+		// Save session data
+		this.getSessionState().setLastResponse(response.toString());
 
 		this.setFailed(false);
 	}

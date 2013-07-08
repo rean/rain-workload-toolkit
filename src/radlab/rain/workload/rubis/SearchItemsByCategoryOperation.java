@@ -42,21 +42,21 @@ import radlab.rain.workload.rubis.model.RubisCategory;
 
 
 /**
- * Browse-Categories operation.
+ * Search-Items-By-Category operation.
  *
  * Emulates the following requests:
- * 1. Click on the 'Browse all items in a category'
+ * 1. Emulate a click on a category
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
-public class BrowseCategoriesOperation extends RubisOperation 
+public class SearchItemsByCategoryOperation extends RubisOperation 
 {
-	public BrowseCategoriesOperation(boolean interactive, IScoreboard scoreboard) 
+	public SearchItemsByCategoryOperation(boolean interactive, IScoreboard scoreboard) 
 	{
 		super(interactive, scoreboard);
 
-		this._operationName = "Browse-Categories";
-		this._operationIndex = RubisGenerator.BROWSE_CATEGORIES_OP;
+		this._operationName = "Search-Items-By-Category";
+		this._operationIndex = RubisGenerator.SEARCH_ITEMS_BY_CATEGORY_OP;
 	}
 
 	@Override
@@ -64,13 +64,29 @@ public class BrowseCategoriesOperation extends RubisOperation
 	{
 		StringBuilder response = null;
 
-		// Emulate a click on the "Browse all items in a category" link
-		response = this.getHttpTransport().fetchUrl(this.getGenerator().getBrowseCategoriesURL());
-		this.trace(this.getGenerator().getBrowseCategoriesURL());
+		// Generate a random category
+		RubisCategory category = this.getGenerator().generateCategory();
+		if (!this.getGenerator().isValidCategory(category))
+		{
+			// Just print a warning, but do not set the operation as failed
+			this.getLogger().warning("No valid category has been found. Operation interrupted.");
+			this.setFailed(true);
+			return;
+		}
+
+		// Emulate a click on a category
+		URIBuilder uri = new URIBuilder(this.getGenerator().getSearchItemsByCategoryURL());
+		uri.setParameter("category", Integer.toString(category.id));
+		uri.setParameter("categoryName", category.name);
+		uri.setParameter("page", Integer.toString(this.getUtility().findPageInHtml(this.getSessionState().getLastResponse())));
+		uri.setParameter("nbOfItems", Integer.toString(this.getGenerator().getNumItemsPerPage()));
+		HttpGet reqGet = new HttpGet(uri.build());
+		response = this.getHttpTransport().fetch(reqGet);
+		this.trace(reqGet.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getBrowseCategoriesURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getBrowseCategoriesURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			this.getLogger().severe("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+			throw new IOException("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		// Save session data

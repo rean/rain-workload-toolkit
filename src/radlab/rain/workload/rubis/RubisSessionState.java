@@ -34,48 +34,92 @@
 package radlab.rain.workload.rubis;
 
 
-import java.io.IOException;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
-import radlab.rain.IScoreboard;
-import radlab.rain.workload.rubis.model.RubisCategory;
-
-
 /**
- * Browse-Categories operation.
- *
- * Emulates the following requests:
- * 1. Click on the 'Browse all items in a category'
+ * The state of a RUBiS user session.
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
-public class BrowseCategoriesOperation extends RubisOperation 
+public final class RubisSessionState
 {
-	public BrowseCategoriesOperation(boolean interactive, IScoreboard scoreboard) 
-	{
-		super(interactive, scoreboard);
+	private int _loggedUserId; ///< The current logged user identifier
+	private int _lastOp; ///< The identifier of the last terminated operation
+//	private int _categoryId; ///< The current category identifier
+//	private int _regionId; ///< The current region identifier
+	private int _itemId; ///< The current item identifier
+	private String _lastResponse; ///< The response of the last terminated operation
 
-		this._operationName = "Browse-Categories";
-		this._operationIndex = RubisGenerator.BROWSE_CATEGORIES_OP;
+
+	public RubisSessionState()
+	{
+		this._loggedUserId = RubisConstants.ANONYMOUS_USER_ID;
+		this._lastOp = RubisConstants.INVALID_OPERATION_ID;
+//		this._categoryId = RubisConstants.INVALID_CATEGORY_ID;
+//		this._regionId = RubisConstants.INVALID_REGION_ID;
+		this._itemId = RubisConstants.INVALID_ITEM_ID;
 	}
 
-	@Override
-	public void execute() throws Throwable
+	public int getLastOperation()
 	{
-		StringBuilder response = null;
-
-		// Emulate a click on the "Browse all items in a category" link
-		response = this.getHttpTransport().fetchUrl(this.getGenerator().getBrowseCategoriesURL());
-		this.trace(this.getGenerator().getBrowseCategoriesURL());
-		if (!this.getGenerator().checkHttpResponse(response.toString()))
-		{
-			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getBrowseCategoriesURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getBrowseCategoriesURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
-		}
-
-		// Save session data
-		this.getSessionState().setLastResponse(response.toString());
-
-		this.setFailed(false);
+		return this._lastOp;
 	}
+
+	public void setLastOperation(int value)
+	{
+		this._lastOp = value;
+	}
+
+	public void setLastResponse(String value)
+	{
+		this._lastResponse = value;
+	}
+
+	public String getLastResponse()
+	{
+		return this._lastResponse;
+	}
+
+	public int getLoggedUserId()
+	{
+		return this._loggedUserId;
+	}
+
+	public void setLoggedUserId(int value)
+	{
+		this._loggedUserId = value;
+	}
+
+//	public int getCategoryId()
+//	{
+//		return this._categoryId;
+//	}
+//
+//	public void setCategoryId(int value)
+//	{
+//		this._categoryId = value;
+//	}
+//
+//	public int getRegionId()
+//	{
+//		return this._regionId;
+//	}
+//
+//	public void setRegionId(int value)
+//	{
+//		this._regionId = value;
+//	}
+
+	public int getItemId()
+	{
+		return this._itemId;
+	}
+
+	public void setItemId(int value)
+	{
+		this._itemId = value;
+	}
+
+    public boolean isUserLoggedIn()
+    {
+        return RubisConstants.ANONYMOUS_USER_ID != this._loggedUserId;
+    }
 }

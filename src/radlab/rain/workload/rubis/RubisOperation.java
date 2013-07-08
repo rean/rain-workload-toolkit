@@ -40,6 +40,7 @@ import radlab.rain.Generator;
 import radlab.rain.IScoreboard;
 import radlab.rain.Operation;
 import radlab.rain.util.HttpTransport;
+import radlab.rain.workload.rubis.model.RubisUser;
 
 
 /**
@@ -58,6 +59,37 @@ public abstract class RubisOperation extends Operation
 	public void prepare(Generator generator) 
 	{
 		this._generator = generator;
+		String html = this.getSessionState().getLastResponse();
+		if (html != null)
+		{
+			if (html.indexOf("Sorry") != -1)
+			{
+				// Nothing matched the request, we have to go back
+				this.setFailed(true);
+			}
+		}
+		// Select a random user for current session (if needed)
+		RubisUser loggedUser = this.getGenerator().getUser(this.getSessionState().getLoggedUserId());
+		if (this.getUtility().isAnonymousUser(loggedUser))
+		{
+			loggedUser = this.getGenerator().generateUser();
+			this.getSessionState().setLoggedUserId(loggedUser.id);
+		}
+	}
+
+	@Override
+	public void postExecute() 
+	{
+		this.getSessionState().setLastOperation(this._operationIndex);
+		if (this.isFailed())
+		{
+			this.getSessionState().setLastResponse(null);
+		}
+		else if (this.getSessionState().getLastResponse() != null && this.getSessionState().getLastResponse().indexOf("ERROR") != -1)
+		{
+			this.getSessionState().setLastResponse(null);
+			this.setFailed(true);
+		}
 	}
 
 	@Override
@@ -84,5 +116,15 @@ public abstract class RubisOperation extends Operation
 	public Logger getLogger()
 	{
 		return this.getGenerator().getLogger();
+	}
+
+	public RubisSessionState getSessionState()
+	{
+		return this.getGenerator().getSessionState();
+	}
+
+	public RubisUtility getUtility()
+	{
+		return this.getGenerator().getUtility();
 	}
 }

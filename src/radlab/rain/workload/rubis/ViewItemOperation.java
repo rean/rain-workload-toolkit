@@ -61,23 +61,21 @@ public class ViewItemOperation extends RubisOperation
 	@Override
 	public void execute() throws Throwable
 	{
-		// Generate a random item
-		RubisItem item = null;
-		try
-		{
-			RubisGenerator.lockItems();
-			item = this.getGenerator().generateItem();
-		}
-		finally
-		{
-			RubisGenerator.unlockItems();
-		}
+		// Get an item (from last response or from session)
+		int itemId = this.getUtility().findItemIdInHtml(this.getSessionState().getLastResponse());
+		RubisItem item = this.getGenerator().getItem(itemId);
 		if (!this.getGenerator().isValidItem(item))
 		{
-			// Just print a warning, but do not set the operation as failed
-			this.getLogger().warning("No valid item has been found. Operation interrupted.");
-			this.setFailed(true);
-			return;
+			// Try to see if there an item in session
+			item = this.getGenerator().getItem(this.getSessionState().getItemId());
+			if (!this.getGenerator().isValidItem(item))
+			{
+				//TODO: The official RUBiS goes back to the previous operation
+				//      We could do the same by storing the previous operation in the session
+				this.getLogger().warning("No valid item has been found. Operation interrupted.");
+				this.setFailed(true);
+				return;
+			}
 		}
 
 		// Click on the item name link
@@ -91,6 +89,10 @@ public class ViewItemOperation extends RubisOperation
 			this.getLogger().severe("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
 			throw new IOException("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
+
+		// Save session data
+		this.getSessionState().setLastResponse(response.toString());
+		this.getSessionState().setItemId(item.id);
 
 		this.setFailed(false);
 	}

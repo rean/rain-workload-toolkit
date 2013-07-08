@@ -38,35 +38,31 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import radlab.rain.IScoreboard;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.NameValuePair;
-import radlab.rain.workload.rubis.model.RubisComment;
 import radlab.rain.workload.rubis.model.RubisItem;
 import radlab.rain.workload.rubis.model.RubisUser;
 
 
 /**
- * Comment operation.
+ * Put-Comment operation.
  *
  * This emulates the operation of commenting on another user for a certain item.
  * Emulates the following requests:
- * 1. Click on the 'Leave a comment on this user' for a certain item and user
- * 2. Send authentication data (login name and password)
- * 3. Fill-in the form anc click on the 'Post this comment now!' button 
+ * 1. Send authentication data (login name and password)
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
-public class CommentItemOperation extends RubisOperation 
+public class PutCommentOperation extends RubisOperation 
 {
-	public CommentItemOperation(boolean interactive, IScoreboard scoreboard) 
+	public PutCommentOperation(boolean interactive, IScoreboard scoreboard) 
 	{
 		super(interactive, scoreboard);
-		this._operationName = "Comment";
-		this._operationIndex = RubisGenerator.COMMENT_ITEM_OP;
+		this._operationName = "Put-Comment";
+		this._operationIndex = RubisGenerator.PUT_COMMENT_OP;
 		//this._mustBeSync = true;
 	}
 
@@ -75,82 +71,41 @@ public class CommentItemOperation extends RubisOperation
 	{
 		StringBuilder response = null;
 
-		// Generate a random item and user to which post the comment
-		RubisItem item = null;
-		try
-		{
-			RubisGenerator.lockItems();
-			item = this.getGenerator().generateItem();
-		}
-		finally
-		{
-			RubisGenerator.unlockItems();
-		}
+		// Get an item (from last response or from session)
+		int itemId = this.getUtility().findItemIdInHtml(this.getSessionState().getLastResponse());
+		RubisItem item = this.getGenerator().getItem(itemId);
 		if (!this.getGenerator().isValidItem(item))
 		{
-			// Just print a warning, but do not set the operation as failed
-			this.getLogger().warning("No valid item has been found. Operation interrupted.");
-			this.setFailed(true);
-			return;
+			// Try to see if there an item in session
+			item = this.getGenerator().getItem(this.getSessionState().getItemId());
+			if (!this.getGenerator().isValidItem(item))
+			{
+				this.getLogger().warning("No valid item has been found. Operation interrupted.");
+				this.setFailed(true);
+				return;
+			}
 		}
-		RubisUser toUser = null;
-		try
-		{
-			RubisGenerator.lockUsers();
-			toUser = this.getGenerator().generateUser();
-		}
-		finally
-		{
-			RubisGenerator.unlockUsers();
-		}
+		// Get an user from last response
+		int toUserId = Integer.parseInt(this.getUtility().findParamInHtml(this.getSessionState().getLastResponse(), "to"));
+		RubisUser toUser = this.getGenerator().getUser(toUserId);
 		if (!this.getGenerator().isValidUser(toUser))
 		{
-			// Just print a warning, but do not set the operation as failed
 			this.getLogger().warning("No valid user has been found. Operation interrupted.");
 			this.setFailed(true);
 			return;
 		}
 
-		// Click on the 'Leave a comment on this user' for a certain item and user
-		// This will lead to a user authentification.
-		URIBuilder uri = new URIBuilder(this.getGenerator().getPutCommentAuthURL());
-		uri.setParameter("itemId", Integer.toString(item.id));
-		uri.setParameter("to", Integer.toString(toUser.id));
-		HttpGet reqGet = new HttpGet(uri.build());
-		response = this.getHttpTransport().fetch(reqGet);
-		this.trace(reqGet.getURI().toString());
-		if (!this.getGenerator().checkHttpResponse(response.toString()))
-		{
-			this.getLogger().severe("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
-			throw new IOException("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
-		}
-
 		// Need a logged user
-		RubisUser loggedUser = null;
-		if (this.getGenerator().isUserLoggedIn())
+		RubisUser loggedUser = this.getGenerator().getUser(this.getSessionState().getLoggedUserId());
+		if (!this.getGenerator().isValidUser(loggedUser) || this.getUtility().isAnonymousUser(loggedUser))
 		{
-			loggedUser = this.getGenerator().getLoggedUser();
-		}
-		else
-		{
-			// Randomly generate a user
-			try
+			loggedUser = this.getGenerator().generateUser();
+			if (!this.getGenerator().isValidUser(loggedUser) || this.getUtility().isAnonymousUser(loggedUser))
 			{
-				RubisGenerator.lockUsers();
-				loggedUser = this.getGenerator().generateUser();
+				this.getLogger().warning("Need a logged user; got an anonymous one. Operation interrupted.");
+				this.setFailed(true);
+				return;
 			}
-			finally
-			{
-				RubisGenerator.unlockUsers();
-			}
-			this.getGenerator().setLoggedUserId(loggedUser.id);
-		}
-		if (!this.getGenerator().isValidUser(loggedUser))
-		{
-			// Just print a warning, but do not set the operation as failed
-			this.getLogger().warning("Need a logged user; got an anonymous one. Operation interrupted.");
-			this.setFailed(true);
-			return;
 		}
 
 		HttpPost reqPost = null;
@@ -175,25 +130,10 @@ public class CommentItemOperation extends RubisOperation
 			throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
- 		// Fill-in the form anc click on the 'Post this comment now!' button 
-		// This will really store the comment on the DB.
-		RubisComment comment = this.getGenerator().generateComment(loggedUser.id, toUser.id, item.id);
-		reqPost = new HttpPost(this.getGenerator().getStoreCommentURL());
-		form = new ArrayList<NameValuePair>();
-		form.add(new BasicNameValuePair("from", Integer.toString(comment.fromUserId)));
-		form.add(new BasicNameValuePair("to", Integer.toString(comment.toUserId)));
-		form.add(new BasicNameValuePair("itemId", Integer.toString(comment.itemId)));
-		form.add(new BasicNameValuePair("rating", Integer.toString(comment.rating)));
-		form.add(new BasicNameValuePair("comment", comment.comment));
-		entity = new UrlEncodedFormEntity(form, "UTF-8");
-		reqPost.setEntity(entity);
-		response = this.getHttpTransport().fetch(reqPost);
-		this.trace(reqPost.getURI().toString());
-		if (!this.getGenerator().checkHttpResponse(response.toString()))
-		{
-			this.getLogger().severe("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
-			throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
-		}
+		// Save session data
+		this.getSessionState().setLastResponse(response.toString());
+		this.getSessionState().setItemId(item.id);
+		this.getSessionState().setLoggedUserId(loggedUser.id);
 
 		this.setFailed(false);
 	}

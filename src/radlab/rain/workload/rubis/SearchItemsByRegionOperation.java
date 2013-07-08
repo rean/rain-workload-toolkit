@@ -39,24 +39,25 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import radlab.rain.IScoreboard;
 import radlab.rain.workload.rubis.model.RubisCategory;
+import radlab.rain.workload.rubis.model.RubisRegion;
 
 
 /**
- * Browse-Categories operation.
+ * Search-Items-By-Region operation.
  *
  * Emulates the following requests:
- * 1. Click on the 'Browse all items in a category'
+ * 1. Click on a category name to browse all items in that category and region
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
-public class BrowseCategoriesOperation extends RubisOperation 
+public class SearchItemsByRegionOperation extends RubisOperation 
 {
-	public BrowseCategoriesOperation(boolean interactive, IScoreboard scoreboard) 
+	public SearchItemsByRegionOperation(boolean interactive, IScoreboard scoreboard) 
 	{
 		super(interactive, scoreboard);
 
-		this._operationName = "Browse-Categories";
-		this._operationIndex = RubisGenerator.BROWSE_CATEGORIES_OP;
+		this._operationName = "Search-Items-By-Region";
+		this._operationIndex = RubisGenerator.SEARCH_ITEMS_BY_REGION_OP;
 	}
 
 	@Override
@@ -64,17 +65,46 @@ public class BrowseCategoriesOperation extends RubisOperation
 	{
 		StringBuilder response = null;
 
-		// Emulate a click on the "Browse all items in a category" link
-		response = this.getHttpTransport().fetchUrl(this.getGenerator().getBrowseCategoriesURL());
-		this.trace(this.getGenerator().getBrowseCategoriesURL());
+		// Generate a random region
+		RubisRegion region = this.getGenerator().generateRegion();
+		if (!this.getGenerator().isValidRegion(region))
+		{
+			this.getLogger().warning("No valid region has been found. Operation interrupted.");
+			this.setFailed(true);
+			return;
+		}
+
+		// Generate a random category
+		RubisCategory category = this.getGenerator().generateCategory();
+		if (!this.getGenerator().isValidCategory(category))
+		{
+			this.getLogger().warning("No valid category has been found. Operation interrupted.");
+			this.setFailed(true);
+			return;
+		}
+
+		URIBuilder uri = null;
+		HttpGet reqGet = null;
+
+		// Emulate a click on a category name to browse all items in that category and region
+		uri = new URIBuilder(this.getGenerator().getSearchItemsByRegionURL());
+		uri.setParameter("region", Integer.toString(region.id));
+		uri.setParameter("category", Integer.toString(category.id));
+		uri.setParameter("categoryName", category.name);
+		//uri.setParameter("page", Integer.toString(this.getUtility.extractPageFromHTML(this.getLastHTML())));
+		uri.setParameter("page", Integer.toString(1));
+		uri.setParameter("nbOfItems", Integer.toString(this.getGenerator().getNumItemsPerPage()));
+		reqGet = new HttpGet(uri.build());
+		response = this.getHttpTransport().fetch(reqGet);
+		this.trace(reqGet.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getBrowseCategoriesURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getBrowseCategoriesURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			this.getLogger().severe("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+			throw new IOException("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		// Save session data
-		this.getSessionState().setLastResponse(response.toString());
+		this.getGenerator().getSessionState().setLastResponse(response.toString());
 
 		this.setFailed(false);
 	}

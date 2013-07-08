@@ -35,33 +35,31 @@ package radlab.rain.workload.rubis;
 
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.NameValuePair;
 import radlab.rain.IScoreboard;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+import radlab.rain.workload.rubis.model.RubisCategory;
 import radlab.rain.workload.rubis.model.RubisUser;
 
 
 /**
- * Register-User operation.
+ * Sell-Item-Form operation.
  *
- * Emulates the following operations:
- * 1. Go the the user registration page
- * 2. Fill-in the form and click on the 'Register now!' button
+ * This is the operation of selling a certain item.
+ *
+ * Emulates the following requests:
+ * 1. Fill-in the form and click on the 'Register item!' button
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
-public class RegisterUserOperation extends RubisOperation 
+public class SellItemFormOperation extends RubisOperation 
 {
-	public RegisterUserOperation(boolean interactive, IScoreboard scoreboard)
+	public SellItemFormOperation(boolean interactive, IScoreboard scoreboard) 
 	{
-		super( interactive, scoreboard );
-		this._operationName = "Register-User";
-		this._operationIndex = RubisGenerator.REGISTER_USER_OP;
-		this._mustBeSync = true;
+		super(interactive, scoreboard);
+		this._operationName = "Sell-Item-Form";
+		this._operationIndex = RubisGenerator.SELL_ITEM_FORM_OP;
+		//this._mustBeSync = true;
 	}
 
 	@Override
@@ -69,46 +67,43 @@ public class RegisterUserOperation extends RubisOperation
 	{
 		StringBuilder response = null;
 
-		try
+		RubisUser loggedUser = this.getGenerator().getUser(this.getSessionState().getLoggedUserId());
+		if (!this.getGenerator().isValidUser(loggedUser))
 		{
-			RubisGenerator.lockUsers();
-
-			// Generate a new user
-			RubisUser user = this.getGenerator().newUser();
-			if (!this.getGenerator().isValidUser(user))
+			loggedUser = this.getGenerator().generateUser();
+			if (!this.getGenerator().isValidUser(loggedUser) || this.getUtility().isAnonymousUser(loggedUser))
 			{
-				// Just print a warning, but do not set the operation as failed
 				this.getLogger().warning("No valid user has been found. Operation interrupted.");
 				this.setFailed(true);
 				return;
 			}
-
-			// Fill-in the form and click on the 'Register now!' button
-			HttpPost reqPost = new HttpPost(this.getGenerator().getRegisterUserURL());
-			List<NameValuePair> form = new ArrayList<NameValuePair>();
-			form.add(new BasicNameValuePair("firstname", user.firstname));
-			form.add(new BasicNameValuePair("lastname", user.lastname));
-			form.add(new BasicNameValuePair("nickname", user.nickname));
-			form.add(new BasicNameValuePair("email", user.email));
-			form.add(new BasicNameValuePair("password", user.password));
-			form.add(new BasicNameValuePair("region", this.getGenerator().getRegion(user.region).name));
-			UrlEncodedFormEntity entity = new UrlEncodedFormEntity(form, "UTF-8");
-			reqPost.setEntity(entity);
-			response = this.getHttpTransport().fetch(reqPost);
-			this.trace(reqPost.getURI().toString());
-			if (!this.getGenerator().checkHttpResponse(response.toString()))
-			{
-				this.getLogger().severe("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
-				throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
-			}
 		}
-		finally
+
+		// Generate a random category
+		RubisCategory category = this.getGenerator().generateCategory();
+		if (!this.getGenerator().isValidCategory(category))
 		{
-			RubisGenerator.unlockUsers();
+			this.getLogger().warning("No valid category has been found. Operation interrupted.");
+			this.setFailed(true);
+			return;
+		}
+
+		// Select the category of the item to sell
+		URIBuilder uri = new URIBuilder(this.getGenerator().getSellItemFormURL());
+		uri.setParameter("user", Integer.toString(loggedUser.id));
+		uri.setParameter("category", Integer.toString(category.id));
+		HttpGet reqGet = new HttpGet(uri.build());
+		response = this.getHttpTransport().fetch(reqGet);
+		this.trace(reqGet.getURI().toString());
+		if (!this.getGenerator().checkHttpResponse(response.toString()))
+		{
+			this.getLogger().severe("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+			throw new IOException("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		// Save session data
 		this.getSessionState().setLastResponse(response.toString());
+		this.getSessionState().setLoggedUserId(loggedUser.id);
 
 		this.setFailed(false);
 	}

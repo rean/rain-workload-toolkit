@@ -35,32 +35,37 @@ package radlab.rain.workload.rubis;
 
 
 import java.io.IOException;
+import radlab.rain.IScoreboard;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
-import radlab.rain.IScoreboard;
 import radlab.rain.workload.rubis.model.RubisItem;
+import radlab.rain.workload.rubis.model.RubisUser;
 
 
 /**
- * View-Bid-History operation.
+ * Put-Comment-Auth operation.
  *
+ * This emulates the operation of commenting on another user for a certain item.
  * Emulates the following requests:
- * 1. Click on the 'bid history' link
+ * 1. Click on the 'Leave a comment on this user' for a certain item and user
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
-public class ViewBidHistoryOperation extends RubisOperation 
+public class PutCommentAuthOperation extends RubisOperation 
 {
-	public ViewBidHistoryOperation(boolean interactive, IScoreboard scoreboard) 
+	public PutCommentAuthOperation(boolean interactive, IScoreboard scoreboard) 
 	{
 		super(interactive, scoreboard);
-		this._operationName = "View-Bid-History";
-		this._operationIndex = RubisGenerator.VIEW_BID_HISTORY_OP;
+		this._operationName = "Put-Comment-Auth";
+		this._operationIndex = RubisGenerator.PUT_COMMENT_AUTH_OP;
+		//this._mustBeSync = true;
 	}
 
 	@Override
 	public void execute() throws Throwable
 	{
+		StringBuilder response = null;
+
 		// Get an item (from last response or from session)
 		int itemId = this.getUtility().findItemIdInHtml(this.getSessionState().getLastResponse());
 		RubisItem item = this.getGenerator().getItem(itemId);
@@ -75,12 +80,23 @@ public class ViewBidHistoryOperation extends RubisOperation
 				return;
 			}
 		}
+		// Get an user from last response
+		int toUserId = Integer.parseInt(this.getUtility().findParamInHtml(this.getSessionState().getLastResponse(), "to"));
+		RubisUser toUser = this.getGenerator().getUser(toUserId);
+		if (!this.getGenerator().isValidUser(toUser))
+		{
+			this.getLogger().warning("No valid user has been found. Operation interrupted.");
+			this.setFailed(true);
+			return;
+		}
 
-		// Click on the 'bid history' link
-		URIBuilder uri = new URIBuilder(this.getGenerator().getViewBidHistoryURL());
+		// Click on the 'Leave a comment on this user' for a certain item and user
+		// This will lead to a user authentification.
+		URIBuilder uri = new URIBuilder(this.getGenerator().getPutCommentAuthURL());
 		uri.setParameter("itemId", Integer.toString(item.id));
+		uri.setParameter("to", Integer.toString(toUser.id));
 		HttpGet reqGet = new HttpGet(uri.build());
-		StringBuilder response = this.getHttpTransport().fetch(reqGet);
+		response = this.getHttpTransport().fetch(reqGet);
 		this.trace(reqGet.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{

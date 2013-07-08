@@ -34,9 +34,9 @@
 package radlab.rain.workload.rubis;
 
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.IOException;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.message.BasicNameValuePair;
@@ -46,22 +46,23 @@ import radlab.rain.workload.rubis.model.RubisUser;
 
 
 /**
- * Register-User operation.
+ * Select-Category-To-Sell-Item operation.
  *
- * Emulates the following operations:
- * 1. Go the the user registration page
- * 2. Fill-in the form and click on the 'Register now!' button
+ * This is the operation of selling a certain item.
+ *
+ * Emulates the following requests:
+ * 1. Select the category of the item to sell
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
-public class RegisterUserOperation extends RubisOperation 
+public class SelectCategoryToSellItemOperation extends RubisOperation 
 {
-	public RegisterUserOperation(boolean interactive, IScoreboard scoreboard)
+	public SelectCategoryToSellItemOperation(boolean interactive, IScoreboard scoreboard) 
 	{
-		super( interactive, scoreboard );
-		this._operationName = "Register-User";
-		this._operationIndex = RubisGenerator.REGISTER_USER_OP;
-		this._mustBeSync = true;
+		super(interactive, scoreboard);
+		this._operationName = "Select-Category-To-Sell-Item";
+		this._operationIndex = RubisGenerator.SELECT_CATEGORY_TO_SELL_ITEM_OP;
+		//this._mustBeSync = true;
 	}
 
 	@Override
@@ -69,46 +70,40 @@ public class RegisterUserOperation extends RubisOperation
 	{
 		StringBuilder response = null;
 
-		try
+		RubisUser loggedUser = this.getGenerator().getUser(this.getSessionState().getLoggedUserId());
+		if (!this.getGenerator().isValidUser(loggedUser))
 		{
-			RubisGenerator.lockUsers();
-
-			// Generate a new user
-			RubisUser user = this.getGenerator().newUser();
-			if (!this.getGenerator().isValidUser(user))
+			loggedUser = this.getGenerator().generateUser();
+			if (!this.getGenerator().isValidUser(loggedUser) || this.getUtility().isAnonymousUser(loggedUser))
 			{
-				// Just print a warning, but do not set the operation as failed
-				this.getLogger().warning("No valid user has been found. Operation interrupted.");
+				this.getLogger().warning("Need a logged user; got an anonymous one. Operation interrupted.");
 				this.setFailed(true);
 				return;
 			}
-
-			// Fill-in the form and click on the 'Register now!' button
-			HttpPost reqPost = new HttpPost(this.getGenerator().getRegisterUserURL());
-			List<NameValuePair> form = new ArrayList<NameValuePair>();
-			form.add(new BasicNameValuePair("firstname", user.firstname));
-			form.add(new BasicNameValuePair("lastname", user.lastname));
-			form.add(new BasicNameValuePair("nickname", user.nickname));
-			form.add(new BasicNameValuePair("email", user.email));
-			form.add(new BasicNameValuePair("password", user.password));
-			form.add(new BasicNameValuePair("region", this.getGenerator().getRegion(user.region).name));
-			UrlEncodedFormEntity entity = new UrlEncodedFormEntity(form, "UTF-8");
-			reqPost.setEntity(entity);
-			response = this.getHttpTransport().fetch(reqPost);
-			this.trace(reqPost.getURI().toString());
-			if (!this.getGenerator().checkHttpResponse(response.toString()))
-			{
-				this.getLogger().severe("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
-				throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
-			}
 		}
-		finally
+
+		HttpPost reqPost = null;
+		List<NameValuePair> form = null;
+		UrlEncodedFormEntity entity = null;
+
+		// Send authentication data (login name and password)
+		reqPost = new HttpPost(this.getGenerator().getSelectCategoryToSellItemURL());
+		form = new ArrayList<NameValuePair>();
+		form.add(new BasicNameValuePair("nickname", loggedUser.nickname));
+		form.add(new BasicNameValuePair("password", loggedUser.password));
+		entity = new UrlEncodedFormEntity(form, "UTF-8");
+		reqPost.setEntity(entity);
+		response = this.getHttpTransport().fetch(reqPost);
+		this.trace(reqPost.getURI().toString());
+		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			RubisGenerator.unlockUsers();
+			this.getLogger().severe("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+			throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		// Save session data
 		this.getSessionState().setLastResponse(response.toString());
+		this.getSessionState().setLoggedUserId(loggedUser.id);
 
 		this.setFailed(false);
 	}

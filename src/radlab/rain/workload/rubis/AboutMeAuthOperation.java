@@ -35,28 +35,24 @@ package radlab.rain.workload.rubis;
 
 
 import java.io.IOException;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
 import radlab.rain.IScoreboard;
-import radlab.rain.workload.rubis.model.RubisCategory;
 
 
 /**
- * Browse-Categories operation.
+ * The About-Me Authentitcation operation.
  *
- * Emulates the following requests:
- * 1. Click on the 'Browse all items in a category'
+ * Emulates the following request:
+ * - Go to the 'About Me Authentitcation' page
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
-public class BrowseCategoriesOperation extends RubisOperation 
+public class AboutMeAuthOperation extends RubisOperation 
 {
-	public BrowseCategoriesOperation(boolean interactive, IScoreboard scoreboard) 
+	public AboutMeAuthOperation(boolean interactive, IScoreboard scoreboard) 
 	{
 		super(interactive, scoreboard);
-
-		this._operationName = "Browse-Categories";
-		this._operationIndex = RubisGenerator.BROWSE_CATEGORIES_OP;
+		this._operationName = "About-Me-Auth";
+		this._operationIndex = RubisGenerator.ABOUT_ME_AUTH_OP;
 	}
 
 	@Override
@@ -64,13 +60,13 @@ public class BrowseCategoriesOperation extends RubisOperation
 	{
 		StringBuilder response = null;
 
-		// Emulate a click on the "Browse all items in a category" link
-		response = this.getHttpTransport().fetchUrl(this.getGenerator().getBrowseCategoriesURL());
-		this.trace(this.getGenerator().getBrowseCategoriesURL());
+		// Go to the About-Me home page
+		response = this.getHttpTransport().fetchUrl(this.getGenerator().getAboutMeAuthURL());
+		this.trace(this.getGenerator().getAboutMeAuthURL());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getBrowseCategoriesURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getBrowseCategoriesURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getAboutMeAuthURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getAboutMeAuthURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		// Save session data

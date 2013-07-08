@@ -34,77 +34,248 @@
 package radlab.rain.workload.rubis;
 
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Random;
+import org.apache.http.HttpStatus;
+import radlab.rain.util.HttpTransport;
+import radlab.rain.workload.rubis.model.RubisCategory;
+import radlab.rain.workload.rubis.model.RubisItem;
+import radlab.rain.workload.rubis.model.RubisRegion;
+import radlab.rain.workload.rubis.model.RubisUser;
 
 
 /**
- * Collection of utilities for the RUBiS workload.
+ * Collection of RUBiS utilities.
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
-public class RubisUtility
+public final class RubisUtility
 {
-	/**
-	 * Extract the value of the given form parameter.
-	 *
-	 * @param paramName the pattern to look for.
-	 * @return the value corresponding to the given parameter name, or @c null if not found.
-	 */
-	public static String extractFormParamFromHtml(String html, String paramName)
+	private Random _rand = new Random();
+
+
+	public RubisUtility()
 	{
-		if (html == null)
+	}
+
+	public boolean isAnonymousUser(RubisUser user)
+	{
+		return RubisConstants.ANONYMOUS_USER_ID == user.id;
+	}
+
+	public boolean isValidUser(RubisUser user)
+	{
+		return null != user && RubisConstants.MIN_USER_ID <= user.id;
+	}
+
+	public boolean isValidItem(RubisItem item)
+	{
+		return null != item && RubisConstants.MIN_ITEM_ID <= item.id;
+	}
+
+	public boolean isValidCategory(RubisCategory category)
+	{
+		return null != category && RubisConstants.MIN_CATEGORY_ID <= category.id;
+	}
+
+	public boolean isValidRegion(RubisRegion region)
+	{
+		return null != region && RubisConstants.MIN_REGION_ID <= region.id;
+	}
+
+	public boolean checkHttpResponse(HttpTransport httpTransport, String response)
+	{
+		if (response.length() == 0
+			|| HttpStatus.SC_OK != httpTransport.getStatusCode()
+			|| -1 != response.indexOf("ERROR"))
 		{
-			throw new IllegalArgumentException("HTML text cannot be null");
-		}
-		if (paramName == null)
-		{
-			throw new IllegalArgumentException("Parameter name cannot be null");
+			return false;
 		}
 
-		// Look for the key
-		Pattern rePatt = Pattern.compile("^.*<input\\s+[^>]*?name=" + Pattern.quote(paramName) + "\\s+[^>]*?value=([^\\s>]*).*$",
-										 Pattern.CASE_INSENSITIVE);
-		// Alternative
-		//Pattern rePatt = Pattern.compile("^.*<input\\s+[^>]*?name\\s*=\\s*['\"]?" + Pattern.quote(paramName) + "['\"]?\\s+[^>]*?value\\s*=\\s*['\"]?(.*?)['\"]?(?:\\s|>).*$", Pattern.CASE_INSENSITIVE);
-		Matcher reMatch = rePatt.matcher(html);
-
-		if (reMatch.matches())
-		{
-			return reMatch.group(1);
-		}
-
-		return "";
+		return true;
 	}
 
 	/**
-	 * Extract the value of the given link parameter.
+	 * Parses the given HTML text to find an item identifier.
 	 *
-	 * @param paramName the pattern to look for.
-	 * @return the value corresponding to the given parameter name, or @c null if not found.
+	 * @param html The HTML string where to look for the item identifier.
+	 * @return The found item identifier, or RubisConstants.INVALID_ITEM_ID if
+	 *  no item identifier is found. If more than one item is found, returns the
+	 *  one picked at random.
+	 *
+	 * This method is based on the edu.rice.rubis.client.UserSession#extractItemIdFromHTML.
 	 */
-	public static String extractLinkParamFromHtml(String html, String paramName)
+	public int findItemIdInHtml(String html)
 	{
 		if (html == null)
 		{
-			throw new IllegalArgumentException("HTML text cannot be null");
+			return RubisConstants.INVALID_ITEM_ID;
 		}
-		if (paramName == null)
+
+		// Count number of itemId
+		int count = 0;
+		int keyIdx = html.indexOf("itemId=");
+		while (keyIdx != -1)
 		{
-			throw new IllegalArgumentException("Parameter name cannot be null");
+			++count;
+			keyIdx = html.indexOf("itemId=", keyIdx + 7); // 7 equals to "itemId="
 		}
-
-		// Look for the key
-		//Pattern rePatt = Pattern.compile("^.*<a\\s+[^>]*?href\\s*=\\s*(?:'|\")[^'\"&>]*?" + Pattern.quote(paramName) + "\\s*=\\s*([^'\"&>]*?).*$",
-		Pattern rePatt = Pattern.compile("^.*<a\\s+[^>]*?href\\s*=\\s*(?:'|\")[^?&]*?" + Pattern.quote(paramName) + "=([^'\"&>]*?).*$",
-										 Pattern.CASE_INSENSITIVE);
-		Matcher reMatch = rePatt.matcher(html);
-
-		if (reMatch.matches())
+		if (count == 0)
 		{
-			return reMatch.group(1);
+			return RubisConstants.INVALID_ITEM_ID;
 		}
 
-		return "";
+		// Choose randomly an item
+		count = this._rand.nextInt(count) + 1;
+
+		keyIdx = -7;
+		while (count > 0)
+		{
+			keyIdx = html.indexOf("itemId=", keyIdx + 7); // 7 equals to itemId=
+			--count;
+		}
+
+		int lastIdx = minIndex(Integer.MAX_VALUE, html.indexOf('\"', keyIdx + 7));
+		lastIdx = minIndex(lastIdx, html.indexOf('?', keyIdx + 7));
+		lastIdx = minIndex(lastIdx, html.indexOf('&', keyIdx + 7));
+		lastIdx = minIndex(lastIdx, html.indexOf('>', keyIdx + 7));
+
+		String str = html.substring(keyIdx + 7, lastIdx);
+
+		return Integer.parseInt(str);
+	}
+
+	/**
+	 * Parses the given HTML text to find the value of the given parameter.
+	 *
+	 * @param html The HTML string where to look for the parameter.
+	 * @param paramName The name of the parameter to look for.
+	 * @return The value of the parameter as a string, or null if
+	 *  no parameter is found.
+	 *
+	 * This method is based on the edu.rice.rubis.client.UserSession#extractIntFromHTML
+	 * and edu.rice.rubis.client.UserSession#extractFloatFromHTML.
+	 */
+	public String findParamInHtml(String html, String paramName)
+	{
+		if (html == null)
+		{
+			return null;
+		}
+
+		// Look for the parameter
+		int paramIdx = html.indexOf(paramName);
+		if (paramIdx == -1)
+		{
+			return null;
+		}
+		int lastIdx = minIndex(Integer.MAX_VALUE, html.indexOf('=', paramIdx + paramName.length()));
+		lastIdx = minIndex(Integer.MAX_VALUE, html.indexOf('\"', paramIdx + paramName.length()));
+		lastIdx = minIndex(lastIdx, html.indexOf('?', paramIdx + paramName.length()));
+		lastIdx = minIndex(lastIdx, html.indexOf('&', paramIdx + paramName.length()));
+		lastIdx = minIndex(lastIdx, html.indexOf('>', paramIdx + paramName.length()));
+		return html.substring(paramIdx + paramName.length(), lastIdx);
+	}
+
+	/**
+	 * Parses the given HTML text to find the value of the given form parameter.
+	 *
+	 * @param html The HTML string where to look for the form parameter.
+	 * @param paramName The name of the form parameter to look for.
+	 * @return The value of the form parameter as a string, or null if
+	 *  no parameter is found.
+	 *
+	 * This method is based on the edu.rice.rubis.client.UserSession#extractIntFromHTML
+	 * and edu.rice.rubis.client.UserSession#extractFloatFromHTML.
+	 */
+	public String findFormParamInHtml(String html, String paramName)
+	{
+		if (html == null)
+		{
+			return null;
+		}
+
+		// Look for the parameter
+		String key = "name=" + paramName + " value=";
+		int paramIdx = html.indexOf(key);
+		if (paramIdx == -1)
+		{
+			return null;
+		}
+		int lastIdx = minIndex(Integer.MAX_VALUE, html.indexOf('=', paramIdx + paramName.length()));
+		lastIdx = minIndex(Integer.MAX_VALUE, html.indexOf('\"', paramIdx + paramName.length()));
+		lastIdx = minIndex(lastIdx, html.indexOf('?', paramIdx + paramName.length()));
+		lastIdx = minIndex(lastIdx, html.indexOf('&', paramIdx + paramName.length()));
+		lastIdx = minIndex(lastIdx, html.indexOf('>', paramIdx + paramName.length()));
+		return html.substring(paramIdx + paramName.length(), lastIdx);
+	}
+
+
+	/**
+	 * Parses the given HTML text to find the page value.
+	 *
+	 * @param html The HTML string where to look for the item identifier.
+	 * @return The page value.
+	 *
+	 * This method is based on the edu.rice.rubis.client.UserSession#extractPageFromHTML
+	 */
+	public int findPageInHtml(String html)
+	{
+		if (html == null)
+		{
+			return 0;
+		}
+
+		int firstPageIdx = html.indexOf("&page=");
+		if (firstPageIdx == -1)
+		{
+			return 0;
+		}
+		int secondPageIdx = html.indexOf("&page=", firstPageIdx + 6); // 6 equals to &page=
+		int chosenIdx = 0;
+		if (secondPageIdx == -1)
+		{
+			chosenIdx = firstPageIdx; // First or last page => go to next or previous page
+		}
+		else
+		{
+			// Choose randomly a page (previous or next)
+			if (this._rand.nextInt(100000) < 50000)
+			{
+				chosenIdx = firstPageIdx;
+			}
+			else
+			{
+				chosenIdx = secondPageIdx;
+			}
+		}
+		int lastIdx = minIndex(Integer.MAX_VALUE, html.indexOf('\"', chosenIdx + 6));
+		lastIdx = minIndex(lastIdx, html.indexOf('?', chosenIdx + 6));
+		lastIdx = minIndex(lastIdx, html.indexOf('&', chosenIdx + 6));
+		lastIdx = minIndex(lastIdx, html.indexOf('>', chosenIdx + 6));
+
+		String str = html.substring(chosenIdx + 6, lastIdx);
+
+		return Integer.parseInt(str);
+	}
+
+	/**
+	 * Internal method that returns the min between ix1 and ix2 if ix2 is not
+	 * equal to -1.
+	 * 
+	 * @param ix1 The first index
+	 * @param ix2 The second index to compare with ix1
+	 * @return ix2 if (ix2 < ix1 and ix2!=-1) else ix1
+	 */
+	private static int minIndex(int ix1, int ix2)
+	{
+		if (ix2 == -1)
+		{
+			return ix1;
+		}
+		if (ix1 <= ix2)
+		{
+			return ix1;
+		}
+		return ix2;
 	}
 }
