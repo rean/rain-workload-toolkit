@@ -68,13 +68,13 @@ public abstract class RubisOperation extends Operation
 				this.setFailed(true);
 			}
 		}
-		// Select a random user for current session (if needed)
-		RubisUser loggedUser = this.getGenerator().getUser(this.getSessionState().getLoggedUserId());
-		if (this.getUtility().isAnonymousUser(loggedUser))
-		{
-			loggedUser = this.getGenerator().generateUser();
-			this.getSessionState().setLoggedUserId(loggedUser.id);
-		}
+//		// Select a random user for current session (if needed)
+//		RubisUser loggedUser = this.getGenerator().getUser(this.getSessionState().getLoggedUserId());
+//		if (this.getUtility().isAnonymousUser(loggedUser))
+//		{
+//			loggedUser = this.getGenerator().generateUser();
+//			this.getSessionState().setLoggedUserId(loggedUser.id);
+//		}
 	}
 
 	@Override
