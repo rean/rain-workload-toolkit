@@ -62,7 +62,15 @@ public class ViewUserInfoOperation extends RubisOperation
 	public void execute() throws Throwable
 	{
 //		// Need a logged user
-		int userId = Integer.parseInt(this.getUtility().findParamInHtml(this.getSessionState().getLastResponse(), "userId"));
+		int userId = RubisConstants.ANONYMOUS_USER_ID;
+		try
+		{
+			userId = Integer.parseInt(this.getUtility().findParamInHtml(this.getSessionState().getLastResponse(), "userId"));
+		}
+		catch (NumberFormatException nfe)
+		{
+			// ignore: use anonymous user id
+		}
 		RubisUser user = this.getGenerator().getUser(userId);
 		if (!this.getGenerator().isValidUser(user) || this.getUtility().isAnonymousUser(user))
 		{
