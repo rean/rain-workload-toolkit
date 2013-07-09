@@ -84,7 +84,7 @@
 		"pLogSampling": 0.0,
 		"pOpenLoop": 0.0,
 		"meanCycleTime": 0,
-		"meanThinkTime": 7,
+		"meanThinkTime": 7000,
 		"interactive": true
 	}
 }
