@@ -81,7 +81,15 @@ public class PutCommentAuthOperation extends RubisOperation
 			}
 		}
 		// Get an user from last response
-		int toUserId = Integer.parseInt(this.getUtility().findParamInHtml(this.getSessionState().getLastResponse(), "to"));
+		int toUserId = RubisConstants.ANONYMOUS_USER_ID;
+		try
+		{
+			toUserId = Integer.parseInt(this.getUtility().findParamInHtml(this.getSessionState().getLastResponse(), "to"));
+		}
+		catch (NumberFormatException nfe)
+		{
+			// ignore and use  the anonymous user id
+		}
 		RubisUser toUser = this.getGenerator().getUser(toUserId);
 		if (!this.getGenerator().isValidUser(toUser))
 		{
