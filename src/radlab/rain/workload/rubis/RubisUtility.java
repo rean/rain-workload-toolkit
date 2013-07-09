@@ -35,6 +35,8 @@ package radlab.rain.workload.rubis;
 
 
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.http.HttpStatus;
 import radlab.rain.util.HttpTransport;
 import radlab.rain.workload.rubis.model.RubisCategory;
@@ -163,18 +165,27 @@ public final class RubisUtility
 		}
 
 		// Look for the parameter
-		int paramIdx = html.indexOf(paramName);
-		if (paramIdx == -1)
-		{
-			return null;
-		}
-		int lastIdx = minIndex(Integer.MAX_VALUE, html.indexOf('=', paramIdx + paramName.length()));
-		lastIdx = minIndex(lastIdx, html.indexOf('\"', paramIdx + paramName.length()));
-		lastIdx = minIndex(lastIdx, html.indexOf('?', paramIdx + paramName.length()));
-		lastIdx = minIndex(lastIdx, html.indexOf('&', paramIdx + paramName.length()));
-		lastIdx = minIndex(lastIdx, html.indexOf('>', paramIdx + paramName.length()));
+//		int paramIdx = html.indexOf(paramName);
+//		if (paramIdx == -1)
+//		{
+//			return null;
+//		}
+//		int lastIdx = minIndex(Integer.MAX_VALUE, html.indexOf('=', paramIdx + paramName.length()));
+//		lastIdx = minIndex(lastIdx, html.indexOf('\"', paramIdx + paramName.length()));
+//		lastIdx = minIndex(lastIdx, html.indexOf('?', paramIdx + paramName.length()));
+//		lastIdx = minIndex(lastIdx, html.indexOf('&', paramIdx + paramName.length()));
+//		lastIdx = minIndex(lastIdx, html.indexOf('>', paramIdx + paramName.length()));
 
-		return html.substring(paramIdx + paramName.length(), lastIdx);
+//		return html.substring(paramIdx + paramName.length(), lastIdx);
+
+		Pattern p = Pattern.compile("^.*?[&?]" + paramName + "=([^\"?&]*).*$");
+		Matcher m = p.matcher(html);
+		if (m.matches())
+		{
+			return m.group(1);
+		}
+
+		return null;
 	}
 
 	/**
@@ -196,19 +207,28 @@ public final class RubisUtility
 		}
 
 		// Look for the parameter
-		String key = "name=" + paramName + " value=";
-		int keyIdx = html.indexOf(key);
-		if (keyIdx == -1)
-		{
-			return null;
-		}
-		int lastIdx = minIndex(Integer.MAX_VALUE, html.indexOf('=', keyIdx + key.length()));
-		lastIdx = minIndex(lastIdx, html.indexOf('\"', keyIdx + key.length()));
-		lastIdx = minIndex(lastIdx, html.indexOf('?', keyIdx + key.length()));
-		lastIdx = minIndex(lastIdx, html.indexOf('&', keyIdx + key.length()));
-		lastIdx = minIndex(lastIdx, html.indexOf('>', keyIdx + key.length()));
+//		String key = "name=" + paramName + " value=";
+//		int keyIdx = html.indexOf(key);
+//		if (keyIdx == -1)
+//		{
+//			return null;
+//		}
+//		int lastIdx = minIndex(Integer.MAX_VALUE, html.indexOf('=', keyIdx + key.length()));
+//		lastIdx = minIndex(lastIdx, html.indexOf('\"', keyIdx + key.length()));
+//		lastIdx = minIndex(lastIdx, html.indexOf('?', keyIdx + key.length()));
+//		lastIdx = minIndex(lastIdx, html.indexOf('&', keyIdx + key.length()));
+//		lastIdx = minIndex(lastIdx, html.indexOf('>', keyIdx + key.length()));
+//
+//		return html.substring(keyIdx + key.length(), lastIdx);
 
-		return html.substring(keyIdx + key.length(), lastIdx);
+		Pattern p = Pattern.compile("^.*?<(?i:input)\\s+(?:.+\\s)?(?i:name)=" + paramName + "\\s+(?:.+\\s)?(?i:value)=([^\"?&>]+).*$");
+		Matcher m = p.matcher(html);
+		if (m.matches())
+		{
+			return m.group(1);
+		}
+
+		return null;
 	}
 
 
