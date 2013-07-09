@@ -921,6 +921,18 @@ public class RubisGenerator extends Generator
 		return op;
 	}
 
+	/**
+	 * Factory method.
+	 * 
+	 * @return  A prepared DummyOperation.
+	 */
+	public DummyOperation createDummyOperation()
+	{
+		DummyOperation op = new DummyOperation(this.getTrack().getInteractive(), this.getScoreboard());
+		op.prepare(this);
+		return op;
+	}
+
 	public RubisUser newUser()
 	{
 		return this.getUser(RubisGenerator.nextUserId());
@@ -1145,6 +1157,10 @@ public class RubisGenerator extends Generator
 				return this.createAboutMeAuthOperation();
 			case ABOUT_ME_OP:
 				return this.createAboutMeOperation();
+			case BACK_SPECIAL_OP:
+				return this.createDummyOperation();
+			case EOS_SPECIAL_OP:
+				return this.createDummyOperation();
 			default:
 		}
 
