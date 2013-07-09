@@ -285,7 +285,7 @@ public final class RubisUtility
 		Matcher m = _pageRegex.matcher(html);
 		if (m.matches())
 		{
-			if (m.groupCount() == 2)
+			if (m.groupCount() == 2 && m.group(2) != null)
 			{
 				// Choose randomly a page (previous or next)
 				if (this._rand.nextInt(100000) < 50000)
@@ -296,7 +296,7 @@ public final class RubisUtility
 			}
 
 			// First or last page => go to next or previous page
-			return Integer.parseInt(m.group(1));
+			return (m.group(1) != null) ? Integer.parseInt(m.group(1)) : 0;
 		}
 
 		return 0;
