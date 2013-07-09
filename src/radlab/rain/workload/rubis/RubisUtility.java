@@ -280,8 +280,8 @@ public final class RubisUtility
 //
 //		return Integer.parseInt(str);
 
-		//Pattern p = Pattern.compile("^.*?[&?]page=([^\"?&]*).*(?:[&?]page=([^\"?&]*).*)?$");
-		Pattern p = Pattern.compile("^.*?[&?]page=(\\d+).*?(?:[&?]page=(\\d+).*?)?$");
+		////Pattern p = Pattern.compile("^.*?[&?]page=([^\"?&]*).*(?:[&?]page=([^\"?&]*).*)?$");
+		//Pattern p = Pattern.compile("^.*?[&?]page=(\\d+).*?(?:[&?]page=(\\d+).*?)?$");
 		Matcher m = _pageRegex.matcher(html);
 		if (m.matches())
 		{
