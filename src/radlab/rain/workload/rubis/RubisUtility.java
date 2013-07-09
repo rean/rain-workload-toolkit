@@ -173,6 +173,7 @@ public final class RubisUtility
 		lastIdx = minIndex(lastIdx, html.indexOf('?', paramIdx + paramName.length()));
 		lastIdx = minIndex(lastIdx, html.indexOf('&', paramIdx + paramName.length()));
 		lastIdx = minIndex(lastIdx, html.indexOf('>', paramIdx + paramName.length()));
+
 		return html.substring(paramIdx + paramName.length(), lastIdx);
 	}
 
@@ -196,17 +197,18 @@ public final class RubisUtility
 
 		// Look for the parameter
 		String key = "name=" + paramName + " value=";
-		int paramIdx = html.indexOf(key);
-		if (paramIdx == -1)
+		int keyIdx = html.indexOf(key);
+		if (keyIdx == -1)
 		{
 			return null;
 		}
-		int lastIdx = minIndex(Integer.MAX_VALUE, html.indexOf('=', paramIdx + paramName.length()));
-		lastIdx = minIndex(lastIdx, html.indexOf('\"', paramIdx + paramName.length()));
-		lastIdx = minIndex(lastIdx, html.indexOf('?', paramIdx + paramName.length()));
-		lastIdx = minIndex(lastIdx, html.indexOf('&', paramIdx + paramName.length()));
-		lastIdx = minIndex(lastIdx, html.indexOf('>', paramIdx + paramName.length()));
-		return html.substring(paramIdx + paramName.length(), lastIdx);
+		int lastIdx = minIndex(Integer.MAX_VALUE, html.indexOf('=', keyIdx + key.length()));
+		lastIdx = minIndex(lastIdx, html.indexOf('\"', keyIdx + key.length()));
+		lastIdx = minIndex(lastIdx, html.indexOf('?', keyIdx + key.length()));
+		lastIdx = minIndex(lastIdx, html.indexOf('&', keyIdx + key.length()));
+		lastIdx = minIndex(lastIdx, html.indexOf('>', keyIdx + key.length()));
+
+		return html.substring(keyIdx + key.length(), lastIdx);
 	}
 
 
