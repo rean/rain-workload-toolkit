@@ -1254,7 +1254,7 @@ public class RubisGenerator extends Generator
 	/**
 	 * Initialize the shared random number generator.
 	 */
-	private synchronized initizializeRandomGenerator()
+	private synchronized void initizializeRandomGenerator()
 	{
 		if (this._rng == null)
 		{
