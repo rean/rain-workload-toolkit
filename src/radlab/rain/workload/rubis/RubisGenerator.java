@@ -202,20 +202,7 @@ public class RubisGenerator extends Generator
 	public void initialize()
 	{
 		this._http = new HttpTransport();
-		synchronized (this._rng)
-		{ 
-			if (this._rng == null)
-			{
-				if (this._rngSeed >= 0)
-				{
-					this._rng = new Random(this._rngSeed);
-				}
-				else
-				{
-					this._rng = new Random();
-				}
-			}
-		}
+		initizializeRandomGenerator();
 		this._logger = Logger.getLogger(this.getName());
 		this._sessionState = new RubisSessionState();
 //		this._loggedUserId = ANONYMOUS_USER_ID;
@@ -1262,5 +1249,23 @@ public class RubisGenerator extends Generator
 		this._aboutMeAuthURL = this._baseURL + "/rubis_servlets/about_me.html";
 		this._aboutMeURL = this._baseURL + "/rubis_servlets/about_me.html";
 		this._aboutMePostURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.AboutMe";
+	}
+
+	/**
+	 * Initialize the shared random number generator.
+	 */
+	private synchronized initizializeRandomGenerator()
+	{
+		if (this._rng == null)
+		{
+			if (this._rngSeed >= 0)
+			{
+				this._rng = new Random(this._rngSeed);
+			}
+			else
+			{
+				this._rng = new Random();
+			}
+		}
 	}
 }
