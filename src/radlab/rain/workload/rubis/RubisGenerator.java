@@ -106,7 +106,7 @@ public class RubisGenerator extends Generator
 	private static Semaphore _itemLock = new Semaphore(1, true);
 
 
-	private Random _rng; ///< The Random Number Generator
+	private static Random _rng; ///< The Random Number Generator
 	private long _rngSeed = -1; ///< The seed used for the Random Number Generator; a value <= 0 means that no special seed is used.
 	private HttpTransport _http;
 	private Logger _logger;
@@ -202,13 +202,19 @@ public class RubisGenerator extends Generator
 	public void initialize()
 	{
 		this._http = new HttpTransport();
-		if (this._rngSeed >= 0)
-		{
-			this._rng = new Random(this._rngSeed);
-		}
-		else
-		{
-			this._rng = new Random();
+		synchronized (this._rng)
+		{ 
+			if (this._rng == null)
+			{
+				if (this._rngSeed >= 0)
+				{
+					this._rng = new Random(this._rngSeed);
+				}
+				else
+				{
+					this._rng = new Random();
+				}
+			}
 		}
 		this._logger = Logger.getLogger(this.getName());
 		this._sessionState = new RubisSessionState();
@@ -217,12 +223,12 @@ public class RubisGenerator extends Generator
 		this._thinkTime = this.getTrack().getMeanThinkTime();
 		if (this._thinkTime > 0)
 		{
-			this._thinkTimeRng = new NegativeExponential(this._thinkTime, this._rng);
+			this._thinkTimeRng = new NegativeExponential(this._thinkTime, this.getRandomGenerator());
 		}
 		this._cycleTime = this.getTrack().getMeanCycleTime();
 		if (this._cycleTime > 0)
 		{
-			this._cycleTimeRng = new NegativeExponential(this._cycleTime, this._rng);
+			this._cycleTimeRng = new NegativeExponential(this._cycleTime, this.getRandomGenerator());
 		}
 
 		this.initializeUrls();
@@ -261,7 +267,7 @@ public class RubisGenerator extends Generator
 		{
 			// Get the selection matrix
 			double[][] selectionMix = this.getTrack().getMixMatrix(currentLoad.getMixName()).getSelectionMix();
-			double rand = this._rng.nextDouble();
+			double rand = this.getRandomGenerator().nextDouble();
 
 			int j;
 			for (j = 0; j < selectionMix.length; ++j)
@@ -322,9 +328,9 @@ public class RubisGenerator extends Generator
 	 * 
 	 * @return A Random object.
 	 */
-	public Random getRandomGenerator()
+	public static synchronized Random getRandomGenerator()
 	{
-		return this._rng;
+		return _rng;
 	}
 
 	/**
@@ -944,7 +950,7 @@ public class RubisGenerator extends Generator
 		int lastUserId = RubisGenerator.lastUserId();
 		if (lastUserId >= RubisConstants.MIN_USER_ID)
 		{
-			userId = this._rng.nextInt(lastUserId+1-RubisConstants.MIN_USER_ID)+RubisConstants.MIN_USER_ID;
+			userId = this.getRandomGenerator().nextInt(lastUserId+1-RubisConstants.MIN_USER_ID)+RubisConstants.MIN_USER_ID;
 		}
 		return this.getUser(userId);
 	}
@@ -975,7 +981,7 @@ public class RubisGenerator extends Generator
 		int lastItemId = RubisGenerator.lastItemId();
 		if (lastItemId >= RubisConstants.MIN_ITEM_ID)
 		{
-			itemId = this._rng.nextInt(lastItemId+1-RubisConstants.MIN_ITEM_ID)+RubisConstants.MIN_ITEM_ID;
+			itemId = this.getRandomGenerator().nextInt(lastItemId+1-RubisConstants.MIN_ITEM_ID)+RubisConstants.MIN_ITEM_ID;
 		}
 		return this.getItem(itemId);
 	}
@@ -987,26 +993,26 @@ public class RubisGenerator extends Generator
 		item.id = id;
 		item.name = "RUBiS automatically generated item #" + item.id;
 		item.description = this.generateText(1, RubisConstants.MAX_ITEM_DESCR_LEN);
-		item.initialPrice = this._rng.nextInt(RubisConstants.MAX_ITEM_INIT_PRICE)+1;
-		if (this._rng.nextInt(RubisConstants.TOTAL_ACTIVE_ITEMS) < (RubisConstants.PERCENT_UNIQUE_ITEMS*RubisConstants.TOTAL_ACTIVE_ITEMS/100))
+		item.initialPrice = this.getRandomGenerator().nextInt(RubisConstants.MAX_ITEM_INIT_PRICE)+1;
+		if (this.getRandomGenerator().nextInt(RubisConstants.TOTAL_ACTIVE_ITEMS) < (RubisConstants.PERCENT_UNIQUE_ITEMS*RubisConstants.TOTAL_ACTIVE_ITEMS/100))
 		{
 			item.quantity = 1;
 		}
 		else
 		{
-			item.quantity = this._rng.nextInt(RubisConstants.MAX_ITEM_QUANTITY)+1;
+			item.quantity = this.getRandomGenerator().nextInt(RubisConstants.MAX_ITEM_QUANTITY)+1;
 		}
-		if (this._rng.nextInt(RubisConstants.TOTAL_ACTIVE_ITEMS) < (RubisConstants.PERCENT_ITEMS_RESERVE_PRICE*RubisConstants.TOTAL_ACTIVE_ITEMS/100))
+		if (this.getRandomGenerator().nextInt(RubisConstants.TOTAL_ACTIVE_ITEMS) < (RubisConstants.PERCENT_ITEMS_RESERVE_PRICE*RubisConstants.TOTAL_ACTIVE_ITEMS/100))
 		{
-			item.reservePrice = this._rng.nextInt(RubisConstants.MIN_ITEM_RESERVE_PRICE)+item.initialPrice;
+			item.reservePrice = this.getRandomGenerator().nextInt(RubisConstants.MIN_ITEM_RESERVE_PRICE)+item.initialPrice;
 		}
 		else
 		{
 			item.reservePrice = 0;
 		}
-		if (this._rng.nextInt(RubisConstants.TOTAL_ACTIVE_ITEMS) < (RubisConstants.PERCENT_ITEMS_BUY_NOW_PRICE*RubisConstants.TOTAL_ACTIVE_ITEMS/100))
+		if (this.getRandomGenerator().nextInt(RubisConstants.TOTAL_ACTIVE_ITEMS) < (RubisConstants.PERCENT_ITEMS_BUY_NOW_PRICE*RubisConstants.TOTAL_ACTIVE_ITEMS/100))
 		{
-			item.buyNow = this._rng.nextInt(RubisConstants.MIN_ITEM_BUY_NOW_PRICE)+item.initialPrice+item.reservePrice;
+			item.buyNow = this.getRandomGenerator().nextInt(RubisConstants.MIN_ITEM_BUY_NOW_PRICE)+item.initialPrice+item.reservePrice;
 		}
 		else
 		{
@@ -1016,7 +1022,7 @@ public class RubisGenerator extends Generator
 		item.maxBid = 0;
 		Calendar cal = Calendar.getInstance();
 		item.startDate = cal.getTime();
-		cal.add(Calendar.DAY_OF_MONTH, this._rng.nextInt(RubisConstants.MAX_ITEM_DURATION)+1);
+		cal.add(Calendar.DAY_OF_MONTH, this.getRandomGenerator().nextInt(RubisConstants.MAX_ITEM_DURATION)+1);
 		item.endDate = cal.getTime();
 		item.seller = this._sessionState.getLoggedUserId();
 		item.category = this.generateCategory().id;
@@ -1026,12 +1032,12 @@ public class RubisGenerator extends Generator
 
 	public RubisCategory generateCategory()
 	{
-		return this.getCategory(this._rng.nextInt(RubisConstants.CATEGORIES.length-RubisConstants.MIN_CATEGORY_ID)+RubisConstants.MIN_CATEGORY_ID);
+		return this.getCategory(this.getRandomGenerator().nextInt(RubisConstants.CATEGORIES.length-RubisConstants.MIN_CATEGORY_ID)+RubisConstants.MIN_CATEGORY_ID);
 	}
 
 	public RubisRegion generateRegion()
 	{
-		return this.getRegion(this._rng.nextInt(RubisConstants.REGIONS.length-RubisConstants.MIN_REGION_ID)+RubisConstants.MIN_REGION_ID);
+		return this.getRegion(this.getRandomGenerator().nextInt(RubisConstants.REGIONS.length-RubisConstants.MIN_REGION_ID)+RubisConstants.MIN_REGION_ID);
 	}
 
 	public RubisCategory getCategory(int id)
@@ -1074,7 +1080,7 @@ public class RubisGenerator extends Generator
 		return getComment(fromUserId,
 						  toUserId,
 						  itemId,
-						  RubisConstants.COMMENT_RATINGS[this._rng.nextInt(RubisConstants.COMMENT_RATINGS.length)]);
+						  RubisConstants.COMMENT_RATINGS[this.getRandomGenerator().nextInt(RubisConstants.COMMENT_RATINGS.length)]);
 	}
 
 	public RubisComment getComment(int fromUserId, int toUserId, int itemId, int rating)
@@ -1176,7 +1182,7 @@ public class RubisGenerator extends Generator
 	 */
 	private String generateText(int minLen, int maxLen)
 	{
-		int len = minLen+this._rng.nextInt(maxLen-minLen+1);
+		int len = minLen+this.getRandomGenerator().nextInt(maxLen-minLen+1);
 		StringBuilder buf = new StringBuilder(len);
 		int left = len;
 		while (left > 0)
@@ -1209,13 +1215,13 @@ public class RubisGenerator extends Generator
 			return "";
 		}
 
-		int len = minLen+this._rng.nextInt(maxLen-minLen+1);
+		int len = minLen+this.getRandomGenerator().nextInt(maxLen-minLen+1);
 
 		char[] buf = new char[len];
 
 		for (int i = 0; i < len; ++i)
 		{
-			int j = this._rng.nextInt(RubisConstants.ALNUM_CHARS.length);
+			int j = this.getRandomGenerator().nextInt(RubisConstants.ALNUM_CHARS.length);
 			buf[i] = RubisConstants.ALNUM_CHARS[j];
 		}
 
