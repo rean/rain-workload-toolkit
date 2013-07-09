@@ -53,6 +53,7 @@ import radlab.rain.workload.rubis.model.RubisUser;
 public final class RubisUtility
 {
 	private Random _rand = new Random();
+	private Pattern _pageRegex = Pattern.compile("^.*?[&?]page=(\\d+).*?(?:[&?]page=(\\d+).*?)?$");
 
 
 	public RubisUtility()
@@ -281,7 +282,7 @@ public final class RubisUtility
 
 		//Pattern p = Pattern.compile("^.*?[&?]page=([^\"?&]*).*(?:[&?]page=([^\"?&]*).*)?$");
 		Pattern p = Pattern.compile("^.*?[&?]page=(\\d+).*?(?:[&?]page=(\\d+).*?)?$");
-		Matcher m = p.matcher(html);
+		Matcher m = _pageRegex.matcher(html);
 		if (m.matches())
 		{
 			if (m.groupCount() == 2)
@@ -289,13 +290,13 @@ public final class RubisUtility
 				// Choose randomly a page (previous or next)
 				if (this._rand.nextInt(100000) < 50000)
 				{
-					return m.group(1);
+					return Integer.parseInt(m.group(1));
 				}
-				return m.group(2);
+				return Integer.parseInt(m.group(2));
 			}
 
 			// First or last page => go to next or previous page
-			return m.group(1);
+			return Integer.parseInt(m.group(1));
 		}
 
 		return 0;
