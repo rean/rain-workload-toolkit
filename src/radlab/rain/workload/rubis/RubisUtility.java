@@ -178,7 +178,7 @@ public final class RubisUtility
 
 //		return html.substring(paramIdx + paramName.length(), lastIdx);
 
-		Pattern p = Pattern.compile("^.*?[&?]" + paramName + "=([^\"?&]*).*$");
+		Pattern p = Pattern.compile("^.*?[&?]" + paramName + "=([^\"?&]*).+$");
 		Matcher m = p.matcher(html);
 		if (m.matches())
 		{
@@ -221,7 +221,7 @@ public final class RubisUtility
 //
 //		return html.substring(keyIdx + key.length(), lastIdx);
 
-		Pattern p = Pattern.compile("^.*?<(?i:input)\\s+(?:.+\\s)?(?i:name)=" + paramName + "\\s+(?:.+\\s)?(?i:value)=([^\"?&>]+).*$");
+		Pattern p = Pattern.compile("^.*?<(?i:input)\\s+(?:.+\\s)?(?i:name)=" + paramName + "\\s+(?:.+\\s)?(?i:value)=([^\"?&>]+).+$");
 		Matcher m = p.matcher(html);
 		if (m.matches())
 		{
@@ -247,37 +247,58 @@ public final class RubisUtility
 			return 0;
 		}
 
-		int firstPageIdx = html.indexOf("&page=");
-		if (firstPageIdx == -1)
-		{
-			return 0;
-		}
-		int secondPageIdx = html.indexOf("&page=", firstPageIdx + 6); // 6 equals to &page=
-		int chosenIdx = 0;
-		if (secondPageIdx == -1)
-		{
-			chosenIdx = firstPageIdx; // First or last page => go to next or previous page
-		}
-		else
-		{
-			// Choose randomly a page (previous or next)
-			if (this._rand.nextInt(100000) < 50000)
-			{
-				chosenIdx = firstPageIdx;
-			}
-			else
-			{
-				chosenIdx = secondPageIdx;
-			}
-		}
-		int lastIdx = minIndex(Integer.MAX_VALUE, html.indexOf('\"', chosenIdx + 6));
-		lastIdx = minIndex(lastIdx, html.indexOf('?', chosenIdx + 6));
-		lastIdx = minIndex(lastIdx, html.indexOf('&', chosenIdx + 6));
-		lastIdx = minIndex(lastIdx, html.indexOf('>', chosenIdx + 6));
+//		int firstPageIdx = html.indexOf("&page=");
+//		if (firstPageIdx == -1)
+//		{
+//			return 0;
+//		}
+//		int secondPageIdx = html.indexOf("&page=", firstPageIdx + 6); // 6 equals to &page=
+//		int chosenIdx = 0;
+//		if (secondPageIdx == -1)
+//		{
+//			chosenIdx = firstPageIdx; // First or last page => go to next or previous page
+//		}
+//		else
+//		{
+//			// Choose randomly a page (previous or next)
+//			if (this._rand.nextInt(100000) < 50000)
+//			{
+//				chosenIdx = firstPageIdx;
+//			}
+//			else
+//			{
+//				chosenIdx = secondPageIdx;
+//			}
+//		}
+//		int lastIdx = minIndex(Integer.MAX_VALUE, html.indexOf('\"', chosenIdx + 6));
+//		lastIdx = minIndex(lastIdx, html.indexOf('?', chosenIdx + 6));
+//		lastIdx = minIndex(lastIdx, html.indexOf('&', chosenIdx + 6));
+//		lastIdx = minIndex(lastIdx, html.indexOf('>', chosenIdx + 6));
+//
+//		String str = html.substring(chosenIdx + 6, lastIdx);
+//
+//		return Integer.parseInt(str);
 
-		String str = html.substring(chosenIdx + 6, lastIdx);
+		//Pattern p = Pattern.compile("^.*?[&?]page=([^\"?&]*).*(?:[&?]page=([^\"?&]*).*)?$");
+		Pattern p = Pattern.compile("^.*?[&?]page=(\\d+).*?(?:[&?]page=(\\d+).*?)?$");
+		Matcher m = p.matcher(html);
+		if (m.matches())
+		{
+			if (m.groupCount() == 2)
+			{
+				// Choose randomly a page (previous or next)
+				if (this._rand.nextInt(100000) < 50000)
+				{
+					return m.group(1);
+				}
+				return m.group(2);
+			}
 
-		return Integer.parseInt(str);
+			// First or last page => go to next or previous page
+			return m.group(1);
+		}
+
+		return 0;
 	}
 
 	/**
