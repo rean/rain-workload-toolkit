@@ -169,7 +169,7 @@ public final class RubisUtility
 			return null;
 		}
 		int lastIdx = minIndex(Integer.MAX_VALUE, html.indexOf('=', paramIdx + paramName.length()));
-		lastIdx = minIndex(Integer.MAX_VALUE, html.indexOf('\"', paramIdx + paramName.length()));
+		lastIdx = minIndex(lastIdx, html.indexOf('\"', paramIdx + paramName.length()));
 		lastIdx = minIndex(lastIdx, html.indexOf('?', paramIdx + paramName.length()));
 		lastIdx = minIndex(lastIdx, html.indexOf('&', paramIdx + paramName.length()));
 		lastIdx = minIndex(lastIdx, html.indexOf('>', paramIdx + paramName.length()));
@@ -202,7 +202,7 @@ public final class RubisUtility
 			return null;
 		}
 		int lastIdx = minIndex(Integer.MAX_VALUE, html.indexOf('=', paramIdx + paramName.length()));
-		lastIdx = minIndex(Integer.MAX_VALUE, html.indexOf('\"', paramIdx + paramName.length()));
+		lastIdx = minIndex(lastIdx, html.indexOf('\"', paramIdx + paramName.length()));
 		lastIdx = minIndex(lastIdx, html.indexOf('?', paramIdx + paramName.length()));
 		lastIdx = minIndex(lastIdx, html.indexOf('&', paramIdx + paramName.length()));
 		lastIdx = minIndex(lastIdx, html.indexOf('>', paramIdx + paramName.length()));
