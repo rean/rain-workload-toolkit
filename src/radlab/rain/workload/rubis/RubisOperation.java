@@ -127,4 +127,9 @@ public abstract class RubisOperation extends Operation
 	{
 		return this.getGenerator().getUtility();
 	}
+
+	public RubisConfiguration getConfiguration()
+	{
+		return this.getGenerator().getConfiguration();
+	}
 }

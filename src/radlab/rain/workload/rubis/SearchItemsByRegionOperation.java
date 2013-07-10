@@ -93,7 +93,7 @@ public class SearchItemsByRegionOperation extends RubisOperation
 		uri.setParameter("categoryName", category.name);
 		//uri.setParameter("page", Integer.toString(this.getUtility.extractPageFromHTML(this.getLastHTML())));
 		uri.setParameter("page", Integer.toString(1));
-		uri.setParameter("nbOfItems", Integer.toString(this.getGenerator().getNumItemsPerPage()));
+		uri.setParameter("nbOfItems", Integer.toString(this.getConfiguration().getNumOfItemsPerPage()));
 		reqGet = new HttpGet(uri.build());
 		response = this.getHttpTransport().fetch(reqGet);
 		this.trace(reqGet.getURI().toString());

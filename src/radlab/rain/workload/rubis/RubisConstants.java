@@ -158,29 +158,27 @@ public final class RubisConstants
 												   3, // Average
 												   5}; // Excellent
 
-	//BEGIN FIXME: get from configuration file
-	public static final int TOTAL_ACTIVE_ITEMS = 1374+2691+259+2874+538+7521+664+586+1077+976+2325+1051+1420+170+1069+3029+305+242+3671+825;
-	public static final int NUM_OLD_ITEMS = 100000;
-	public static final int PERCENT_UNIQUE_ITEMS = 80;
-	public static final int PERCENT_ITEMS_RESERVE_PRICE = 40;
-	public static final int PERCENT_ITEMS_BUY_NOW_PRICE = 10;
-	public static final int MAX_ITEM_QUANTITY = 10;
-	public static final int MAX_ADD_BID = 10;
-	public static final int MAX_ITEM_DESCR_LEN = 8192;
+	public static final int DEFAULT_TOTAL_ACTIVE_ITEMS = 1374+2691+259+2874+538+7521+664+586+1077+976+2325+1051+1420+170+1069+3029+305+242+3671+825;
+	public static final int DEFAULT_NUM_OLD_ITEMS = 100000;
+	public static final int DEFAULT_PERCENT_UNIQUE_ITEMS = 80;
+	public static final int DEFAULT_PERCENT_ITEMS_RESERVE_PRICE = 40;
+	public static final int DEFAULT_PERCENT_ITEMS_BUY_NOW_PRICE = 10;
+	public static final int DEFAULT_MAX_ITEM_QUANTITY = 10;
+	public static final int DEFAULT_MAX_ADD_BID = 10;
+	public static final int DEFAULT_MAX_ITEM_DESCR_LEN = 8192;
 	public static final int MAX_WORD_LEN = 12;
 	public static final int MAX_ITEM_INIT_PRICE = 5000;
 	public static final int MIN_ITEM_RESERVE_PRICE = 1000;
 	public static final int MIN_ITEM_BUY_NOW_PRICE = 1000;
 	public static final int MAX_ITEM_DURATION = 7;
-	public static final int NUM_ITEMS_PER_PAGE = 20;
-	public static final int MAX_COMMENT_LEN = 2048;
+	public static final int DEFAULT_NUM_ITEMS_PER_PAGE = 20;
+	public static final int DEFAULT_MAX_COMMENT_LEN = 2048;
 	public static final int MIN_USER_ID = 1;
 	public static final int MIN_ITEM_ID = 1;
 	public static final int MIN_REGION_ID = 1;
 	public static final int MIN_CATEGORY_ID = 1;
-	public static final int MIN_FREE_USER_ID = MIN_USER_ID;
-	public static final int MIN_FREE_ITEM_ID = MIN_ITEM_ID;
-	public static final int MIN_FREE_REGION_ID = MIN_REGION_ID;
-	public static final int MIN_FREE_CATEGORY_ID = MIN_CATEGORY_ID;
-	//END FIXME: get from configuration file
+	public static final int DEFAULT_NEXT_AVAIL_USER_ID = MIN_USER_ID;
+	public static final int DEFAULT_NEXT_AVAIL_ITEM_ID = MIN_ITEM_ID;
+//	public static final int DEFAULT_NEXT_AVAIL_REGION_ID = MIN_REGION_ID;
+//	public static final int DEFAULT_NEXT_AVAIL_CATEGORY_ID = MIN_CATEGORY_ID;
 }

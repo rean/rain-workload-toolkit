@@ -95,24 +95,49 @@ public class RubisGenerator extends Generator
 	public static final int BACK_SPECIAL_OP = 27; ///< Emulate a click on the "Back" button of the browser
 	public static final int EOS_SPECIAL_OP = 28; ///< Terminate the current user session
 
-	// Configuration keys
-	public static final String CFG_RNG_SEED_KEY = "rngSeed";
+//	// Configuration keys
+//	public static final String CFG_RNG_SEED_KEY = "rubis.rngSeed";
+//	public static final String CFG_TOTAL_ACTIVE_ITEMS = "rubis.totalActiveItems";
+//	public static final String CFG_NUM_OLD_ITEMS = "rubis.numOldItems";
+//	public static final String CFG_PERCENT_UNIQUE_ITEMS = "rubis.percentUniqueItems";
+//	public static final String CFG_PERCENT_ITEMS_RESERVE_PRICE = "rubis.percentItemsReservePrice";
+//	public static final String CFG_PERCENT_ITEMS_BUY_NOW_PRICE = "rubis.percentItemsBuyNowPrice";
+//	public static final String CFG_MAX_ITEM_QUANTITY = "rubis.maxItemQuantity";
+//	public static final String CFG_MAX_ADD_BID = "rubis.maxAddBid";
+//	public static final String CFG_MAX_ITEM_DESCR_LEN = "rubis.maxItemDescrLen";
+//	public static final String CFG_MAX_WORD_LEN = "rubis.maxWordLen";
+//	public static final String CFG_MAX_ITEM_INIT_PRICE = "rubis.maxItemInitPrice";
+//	public static final String CFG_MIN_ITEM_RESERVE_PRICE = "rubis.minItemReservePrice";
+//	public static final String CFG_MIN_ITEM_BUY_NOW_PRICE = "rubis.itemBuyNowPrice";
+//	public static final String CFG_MAX_ITEM_DURATION = "rubis.itemDuration";
+//	public static final String CFG_NUM_ITEMS_PER_PAGE = "rubis.numItemsPerPage";
+//	public static final String CFG_MAX_COMMENT_LEN = "rubis.maxCommentLen";
+//	public static final String CFG_MIN_USER_ID = "rubis.minUserId";
+//	public static final String CFG_MIN_ITEM_ID = "rubis.minItemId";
+//	public static final String CFG_MIN_REGION_ID = "rubis.minRegionId";
+//	public static final String CFG_MIN_CATEGORY_ID = "rubis.minCategoryId";
+//	public static final String CFG_MIN_FREE_USER_ID = "rubis.minFreeUserId";
+//	public static final String CFG_MIN_FREE_ITEM_ID = "rubis.minFreeItemId";
+//	public static final String CFG_MIN_FREE_REGION_ID = "rubis.minFreeRegionId";
+//	public static final String CFG_MIN_FREE_CATEGORY_ID = "rubis.minFreeCategoryId";
 
 
 	// Static members used to atomically generate users and items
-	private static AtomicInteger _userId = new AtomicInteger(RubisConstants.MIN_FREE_USER_ID-1);
-	private static AtomicInteger _itemId = new AtomicInteger(RubisConstants.MIN_FREE_ITEM_ID-1);
+	private static AtomicInteger _userId = new AtomicInteger(RubisConstants.DEFAULT_NEXT_AVAIL_USER_ID-1);
+	private static AtomicInteger _itemId = new AtomicInteger(RubisConstants.DEFAULT_NEXT_AVAIL_ITEM_ID-1);
 	private static Semaphore _userLock = new Semaphore(1, true);
 	private static Semaphore _itemLock = new Semaphore(1, true);
 
 
 	private static Random _rng; ///< The Random Number Generator
-	private long _rngSeed = -1; ///< The seed used for the Random Number Generator; a value <= 0 means that no special seed is used.
+	//private long _rngSeed = -1; ///< The seed used for the Random Number Generator; a value <= 0 means that no special seed is used.
 	private HttpTransport _http;
 	private Logger _logger;
 //	private int _loggedUserId;
 	private RubisSessionState _sessionState; ///< Holds session data
 	private RubisUtility _utility;
+	private RubisSessionState _userSession; ///< Holds user session data
+	private RubisConfiguration _conf; ///< The RUBiS-related configuration found in the JSON profile file
 	private double _thinkTime = -1; ///< The mean think time; a value <= 0 means that no think time is used.
 	private NegativeExponential _thinkTimeRng;
 	private double _cycleTime = -1; ///< The mean cycle time; a value <= 0 means that no cycle time is used.
@@ -146,7 +171,6 @@ public class RubisGenerator extends Generator
 	private String _aboutMeAuthURL;
 	private String _aboutMeURL;
 	private String _aboutMePostURL;
-	private RubisSessionState _userSession;
 
 
 	public static int nextUserId()
@@ -224,10 +248,11 @@ public class RubisGenerator extends Generator
 	@Override
 	public void configure(JSONObject config) throws JSONException
 	{
-		if (config.has(CFG_RNG_SEED_KEY))
-		{
-			this._rngSeed = config.getLong(CFG_RNG_SEED_KEY);
-		}
+		this._conf = new RubisConfiguration(config);
+//		if (config.has(CFG_RNG_SEED_KEY))
+//		{
+//			this._rngSeed = config.getLong(CFG_RNG_SEED_KEY);
+//		}
 	}
 
 	/**
@@ -358,6 +383,16 @@ public class RubisGenerator extends Generator
 	protected void setUtility(RubisUtility value)
 	{
 		this._utility = value;
+	}
+
+	public RubisConfiguration getConfiguration()
+	{
+		return this._conf;
+	}
+
+	protected void setConfiguration(RubisConfiguration value)
+	{
+		this._conf = value;
 	}
 
 	public boolean isUserLoggedIn()
@@ -979,17 +1014,17 @@ public class RubisGenerator extends Generator
 
 		item.id = id;
 		item.name = "RUBiS automatically generated item #" + item.id;
-		item.description = this.generateText(1, RubisConstants.MAX_ITEM_DESCR_LEN);
+		item.description = this.generateText(1, this._conf.getMaxItemDescriptionLength());
 		item.initialPrice = this.getRandomGenerator().nextInt(RubisConstants.MAX_ITEM_INIT_PRICE)+1;
-		if (this.getRandomGenerator().nextInt(RubisConstants.TOTAL_ACTIVE_ITEMS) < (RubisConstants.PERCENT_UNIQUE_ITEMS*RubisConstants.TOTAL_ACTIVE_ITEMS/100))
+		if (this.getRandomGenerator().nextInt(this._conf.getTotalActiveItems()) < (this._conf.getPercentageOfUniqueItems()*this._conf.getTotalActiveItems()/100.0))
 		{
 			item.quantity = 1;
 		}
 		else
 		{
-			item.quantity = this.getRandomGenerator().nextInt(RubisConstants.MAX_ITEM_QUANTITY)+1;
+			item.quantity = this.getRandomGenerator().nextInt(this._conf.getMaxItemQuantity())+1;
 		}
-		if (this.getRandomGenerator().nextInt(RubisConstants.TOTAL_ACTIVE_ITEMS) < (RubisConstants.PERCENT_ITEMS_RESERVE_PRICE*RubisConstants.TOTAL_ACTIVE_ITEMS/100))
+		if (this.getRandomGenerator().nextInt(this._conf.getTotalActiveItems()) < (this._conf.getPercentageOfItemsReservePrice()*this._conf.getTotalActiveItems()/100.0))
 		{
 			item.reservePrice = this.getRandomGenerator().nextInt(RubisConstants.MIN_ITEM_RESERVE_PRICE)+item.initialPrice;
 		}
@@ -997,7 +1032,7 @@ public class RubisGenerator extends Generator
 		{
 			item.reservePrice = 0;
 		}
-		if (this.getRandomGenerator().nextInt(RubisConstants.TOTAL_ACTIVE_ITEMS) < (RubisConstants.PERCENT_ITEMS_BUY_NOW_PRICE*RubisConstants.TOTAL_ACTIVE_ITEMS/100))
+		if (this.getRandomGenerator().nextInt(this._conf.getTotalActiveItems()) < (this._conf.getPercentageOfItemsBuyNow()*this._conf.getTotalActiveItems()/100.0))
 		{
 			item.buyNow = this.getRandomGenerator().nextInt(RubisConstants.MIN_ITEM_BUY_NOW_PRICE)+item.initialPrice+item.reservePrice;
 		}
@@ -1047,20 +1082,20 @@ public class RubisGenerator extends Generator
 		return region;
 	}
 
-	public int getNumItemsPerPage()
-	{
-		return RubisConstants.NUM_ITEMS_PER_PAGE;
-	}
+//	public int getNumItemsPerPage()
+//	{
+//		return RubisConstants.NUM_ITEMS_PER_PAGE;
+//	}
 
-	public int getMaxAddBid()
-	{
-		return RubisConstants.MAX_ADD_BID;
-	}
+//	public int getMaxAddBid()
+//	{
+//		return RubisConstants.MAX_ADD_BID;
+//	}
 
-	public int getMaxCommentLength()
-	{
-		return RubisConstants.MAX_COMMENT_LEN;
-	}
+//	public int getMaxCommentLength()
+//	{
+//		return RubisConstants.MAX_COMMENT_LEN;
+//	}
 
 	public RubisComment generateComment(int fromUserId, int toUserId, int itemId)
 	{
@@ -1079,7 +1114,7 @@ public class RubisGenerator extends Generator
 		comment.itemId = itemId;
 		int rateIdx = Arrays.binarySearch(RubisConstants.COMMENT_RATINGS, rating);
 		comment.rating = RubisConstants.COMMENT_RATINGS[rateIdx];
-		comment.comment = this.generateText(1, RubisConstants.MAX_COMMENT_LEN-RubisConstants.COMMENTS[rateIdx].length()-System.lineSeparator().length()) + System.lineSeparator() + RubisConstants.COMMENTS[rateIdx];
+		comment.comment = this.generateText(1, this._conf.getMaxCommentLength()-RubisConstants.COMMENTS[rateIdx].length()-System.lineSeparator().length()) + System.lineSeparator() + RubisConstants.COMMENTS[rateIdx];
 		Calendar cal = Calendar.getInstance();
 		comment.date = cal.getTime();
 
@@ -1258,9 +1293,9 @@ public class RubisGenerator extends Generator
 	{
 		if (this._rng == null)
 		{
-			if (this._rngSeed >= 0)
+			if (this._conf.getRngSeed() >= 0)
 			{
-				this._rng = new Random(this._rngSeed);
+				this._rng = new Random(this._conf.getRngSeed());
 			}
 			else
 			{

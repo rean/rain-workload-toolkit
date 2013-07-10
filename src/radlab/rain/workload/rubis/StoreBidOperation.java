@@ -121,7 +121,7 @@ public class StoreBidOperation extends RubisOperation
 		{
 			minBid = Float.parseFloat(str);
 		}
-		int addBid = this.getRandomGenerator().nextInt(this.getGenerator().getMaxAddBid())+1;
+		int addBid = this.getRandomGenerator().nextInt(this.getConfiguration().getMaxBidsPerItems())+1;
 		float bid = minBid+addBid;
 		float maxBid = minBid+addBid*2;
 		reqPost = new HttpPost(this.getGenerator().getStoreBidURL());
