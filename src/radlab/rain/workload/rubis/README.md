@@ -45,11 +45,9 @@ Currently, the supported configuration properties are the following:
 - *rubis.percentUniqueItems*: a non-negative real value between 0 and 100 (inclusive) representing the percentage of unique items; this is the RAIN counterpart of the *percentage\_of\_unique\_items* RUBiS property.
 - *rubis.regionsFile*: a string representing the path to the RUBiS regions file; this is the RAIN counterpart of the *database\_regions\_file* RUBiS property.
 - *rubis.rngSeed*: an integer number representing the seed used to initialize the random number generator used by the RUBiS generator; if set to `-1`, the random number generator will be initialized with the Java's default (i.e., to a value very likely to be distinct from any other invocation of the `java.util.Random` default constructor).
-.
 
 ### Assumptions
 
 The current implementation assumes that:
 - One and only one instance of RAIN RUBiS workload is running. This assumption is needed to assign _unique_ identifiers to both users and items.
-- You have at least one user preloaded inside the RUBiS database.
-.
+- There is at least one preloaded user inside the RUBiS database.
