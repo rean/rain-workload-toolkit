@@ -87,7 +87,7 @@ public class StoreCommentOperation extends RubisOperation
 			}
 		}
 		// Get a user from last response
-		int toUserId = RubisConstants.ANONYMOUS_USER_ID;
+		int toUserId = RubisUtility.ANONYMOUS_USER_ID;
 		try
 		{
 			toUserId = Integer.parseInt(this.getUtility().findParamInHtml(this.getSessionState().getLastResponse(), "to"));

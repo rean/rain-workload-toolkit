@@ -55,6 +55,39 @@ import radlab.rain.workload.rubis.model.RubisUser;
  */
 public final class RubisUtility
 {
+	public static final int ANONYMOUS_USER_ID = -1;
+	public static final int INVALID_CATEGORY_ID = -1;
+	public static final int INVALID_REGION_ID = -1;
+	public static final int INVALID_ITEM_ID = -1;
+	public static final int INVALID_OPERATION_ID = -1;
+
+	private static final char[] ALNUM_CHARS = { '0', '1', '2', '3', '4', '5',
+												'6', '7', '8', '9', 'A', 'B',
+												'C', 'D', 'E', 'F', 'G', 'H',
+												'I', 'J', 'K', 'L', 'M', 'N',
+												'O', 'P', 'Q', 'R', 'S', 'T',
+												'U', 'V', 'W', 'X', 'Y', 'Z',
+												'a', 'b', 'c', 'd', 'e', 'f',
+												'g', 'h', 'i', 'j', 'k', 'l',
+												'm', 'n', 'o', 'p', 'q', 'r',
+												's', 't', 'u', 'v', 'w', 'x',
+												'y', 'z'}; ///< The set of alphanumeric characters
+	private static final String[] COMMENTS = {"This is a very bad comment. Stay away from this seller!!",
+											  "This is a comment below average. I don't recommend this user!!",
+											  "This is a neutral comment. It is neither a good or a bad seller!!",
+											  "This is a comment above average. You can trust this seller even if it is not the best deal!!",
+											  "This is an excellent comment. You can make really great deals with this seller!!"}; ///< Descriptions associated to comment ratings
+	private static final int[] COMMENT_RATINGS = {-5, // Bad
+												  -3, // Below average
+												   0, // Neutral
+												   3, // Average
+												   5  /* Excellent */ }; ///< Possible comment ratings
+	private static final int MIN_USER_ID = 0; ///< Mininum value of user IDs
+	private static final int MIN_ITEM_ID = 0; ///< Mininum value of item IDs
+	private static final int MIN_REGION_ID = 0; ///< Mininum value of region IDs
+	private static final int MIN_CATEGORY_ID = 0; ///< Mininum value of category IDs
+
+
 	private Random _rng = null;
 	private RubisConfiguration _conf = null;
 	private Pattern _pageRegex = Pattern.compile("^.*?[&?]page=(\\d+).*?(?:[&?]page=(\\d+).*?)?$");
@@ -92,27 +125,42 @@ public final class RubisUtility
 
 	public boolean isAnonymousUser(RubisUser user)
 	{
-		return RubisConstants.ANONYMOUS_USER_ID == user.id;
+		return this.isAnonymousUser(user.id);
+	}
+
+	public boolean isAnonymousUser(int userId)
+	{
+		return ANONYMOUS_USER_ID == userId;
+	}
+
+	public boolean isLoggedUser(RubisUser user)
+	{
+		return !this.isLoggedUser(user.id);
+	}
+
+	public boolean isLoggedUser(int userId)
+	{
+		return !this.isAnonymousUser(userId);
 	}
 
 	public boolean isValidUser(RubisUser user)
 	{
-		return null != user && RubisConstants.MIN_USER_ID <= user.id;
+		return null != user && MIN_USER_ID <= user.id;
 	}
 
 	public boolean isValidItem(RubisItem item)
 	{
-		return null != item && RubisConstants.MIN_ITEM_ID <= item.id;
+		return null != item && MIN_ITEM_ID <= item.id;
 	}
 
 	public boolean isValidCategory(RubisCategory category)
 	{
-		return null != category && RubisConstants.MIN_CATEGORY_ID <= category.id;
+		return null != category && MIN_CATEGORY_ID <= category.id;
 	}
 
 	public boolean isValidRegion(RubisRegion region)
 	{
-		return null != region && RubisConstants.MIN_REGION_ID <= region.id;
+		return null != region && MIN_REGION_ID <= region.id;
 	}
 
 	public boolean checkHttpResponse(HttpTransport httpTransport, String response)
@@ -134,7 +182,7 @@ public final class RubisUtility
 	 */
 	public RubisUser newUser()
 	{
-		return this.getUser(RubisConstants.ANONYMOUS_USER_ID);
+		return this.getUser(ANONYMOUS_USER_ID);
 	}
 
 	/**
@@ -177,7 +225,7 @@ public final class RubisUtility
 	 */
 	public RubisItem newItem(int loggedUserId)
 	{
-		return this.getItem(RubisConstants.INVALID_ITEM_ID, loggedUserId);
+		return this.getItem(INVALID_ITEM_ID, loggedUserId);
 	}
 
 //	/**
@@ -187,11 +235,11 @@ public final class RubisUtility
 //	 */
 //	public RubisItem generateItem()
 //	{
-//		int itemId = RubisConstants.MIN_ITEM_ID-1;
+//		int itemId = MIN_ITEM_ID-1;
 //		int lastItemId = RubisGenerator.getLastItemId();
-//		if (lastItemId >= RubisConstants.MIN_ITEM_ID)
+//		if (lastItemId >= MIN_ITEM_ID)
 //		{
-//			itemId = this.getRandomGenerator().nextInt(lastItemId+1-RubisConstants.MIN_ITEM_ID)+RubisConstants.MIN_ITEM_ID;
+//			itemId = this.getRandomGenerator().nextInt(lastItemId+1-MIN_ITEM_ID)+MIN_ITEM_ID;
 //		}
 //		return this.getItem(itemId);
 //	}
@@ -248,12 +296,12 @@ public final class RubisUtility
 
 	public RubisCategory generateCategory()
 	{
-		return this.getCategory(this._rng.nextInt(this._conf.getCategories().size()-RubisConstants.MIN_CATEGORY_ID)+RubisConstants.MIN_CATEGORY_ID);
+		return this.getCategory(this._rng.nextInt(this._conf.getCategories().size()-MIN_CATEGORY_ID)+MIN_CATEGORY_ID);
 	}
 
 	public RubisRegion generateRegion()
 	{
-		return this.getRegion(this._rng.nextInt(this._conf.getRegions().size()-RubisConstants.MIN_REGION_ID)+RubisConstants.MIN_REGION_ID);
+		return this.getRegion(this._rng.nextInt(this._conf.getRegions().size()-MIN_REGION_ID)+MIN_REGION_ID);
 	}
 
 	public RubisCategory getCategory(int id)
@@ -281,7 +329,7 @@ public final class RubisUtility
 		return getComment(fromUserId,
 						  toUserId,
 						  itemId,
-						  RubisConstants.COMMENT_RATINGS[this._rng.nextInt(RubisConstants.COMMENT_RATINGS.length)]);
+						  COMMENT_RATINGS[this._rng.nextInt(COMMENT_RATINGS.length)]);
 	}
 
 	public RubisComment getComment(int fromUserId, int toUserId, int itemId, int rating)
@@ -291,9 +339,9 @@ public final class RubisUtility
 		comment.fromUserId = fromUserId;
 		comment.toUserId = toUserId;
 		comment.itemId = itemId;
-		int rateIdx = Arrays.binarySearch(RubisConstants.COMMENT_RATINGS, rating);
-		comment.rating = RubisConstants.COMMENT_RATINGS[rateIdx];
-		comment.comment = this.generateText(1, this._conf.getMaxCommentLength()-RubisConstants.COMMENTS[rateIdx].length()-System.lineSeparator().length()) + System.lineSeparator() + RubisConstants.COMMENTS[rateIdx];
+		int rateIdx = Arrays.binarySearch(COMMENT_RATINGS, rating);
+		comment.rating = COMMENT_RATINGS[rateIdx];
+		comment.comment = this.generateText(1, this._conf.getMaxCommentLength()-COMMENTS[rateIdx].length()-System.lineSeparator().length()) + System.lineSeparator() + COMMENTS[rateIdx];
 		Calendar cal = Calendar.getInstance();
 		comment.date = cal.getTime();
 
@@ -304,7 +352,7 @@ public final class RubisUtility
 	 * Parses the given HTML text to find an item identifier.
 	 *
 	 * @param html The HTML string where to look for the item identifier.
-	 * @return The found item identifier, or RubisConstants.INVALID_ITEM_ID if
+	 * @return The found item identifier, or INVALID_ITEM_ID if
 	 *  no item identifier is found. If more than one item is found, returns the
 	 *  one picked at rngom.
 	 *
@@ -314,7 +362,7 @@ public final class RubisUtility
 	{
 		if (html == null)
 		{
-			return RubisConstants.INVALID_ITEM_ID;
+			return INVALID_ITEM_ID;
 		}
 
 		// Count number of itemId
@@ -327,7 +375,7 @@ public final class RubisUtility
 		}
 		if (count == 0)
 		{
-			return RubisConstants.INVALID_ITEM_ID;
+			return INVALID_ITEM_ID;
 		}
 
 		// Choose rngomly an item
@@ -574,8 +622,8 @@ public final class RubisUtility
 
 		for (int i = 0; i < len; ++i)
 		{
-			int j = this._rng.nextInt(RubisConstants.ALNUM_CHARS.length);
-			buf[i] = RubisConstants.ALNUM_CHARS[j];
+			int j = this._rng.nextInt(ALNUM_CHARS.length);
+			buf[i] = ALNUM_CHARS[j];
 		}
 
 		return new String(buf);

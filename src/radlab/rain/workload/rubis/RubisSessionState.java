@@ -43,19 +43,15 @@ public final class RubisSessionState
 {
 	private int _loggedUserId; ///< The current logged user identifier
 	private int _lastOp; ///< The identifier of the last terminated operation
-//	private int _categoryId; ///< The current category identifier
-//	private int _regionId; ///< The current region identifier
 	private int _itemId; ///< The current item identifier
 	private String _lastResponse; ///< The response of the last terminated operation
 
 
 	public RubisSessionState()
 	{
-		this._loggedUserId = RubisConstants.ANONYMOUS_USER_ID;
-		this._lastOp = RubisConstants.INVALID_OPERATION_ID;
-//		this._categoryId = RubisConstants.INVALID_CATEGORY_ID;
-//		this._regionId = RubisConstants.INVALID_REGION_ID;
-		this._itemId = RubisConstants.INVALID_ITEM_ID;
+		this._loggedUserId = RubisUtility.ANONYMOUS_USER_ID;
+		this._lastOp = RubisUtility.INVALID_OPERATION_ID;
+		this._itemId = RubisUtility.INVALID_ITEM_ID;
 	}
 
 	public int getLastOperation()
@@ -88,26 +84,6 @@ public final class RubisSessionState
 		this._loggedUserId = value;
 	}
 
-//	public int getCategoryId()
-//	{
-//		return this._categoryId;
-//	}
-//
-//	public void setCategoryId(int value)
-//	{
-//		this._categoryId = value;
-//	}
-//
-//	public int getRegionId()
-//	{
-//		return this._regionId;
-//	}
-//
-//	public void setRegionId(int value)
-//	{
-//		this._regionId = value;
-//	}
-
 	public int getItemId()
 	{
 		return this._itemId;
@@ -117,9 +93,4 @@ public final class RubisSessionState
 	{
 		this._itemId = value;
 	}
-
-    public boolean isUserLoggedIn()
-    {
-        return RubisConstants.ANONYMOUS_USER_ID != this._loggedUserId;
-    }
 }

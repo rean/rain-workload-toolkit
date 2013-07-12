@@ -62,7 +62,7 @@ public class ViewUserInfoOperation extends RubisOperation
 	public void execute() throws Throwable
 	{
 //		// Need a logged user
-		int userId = RubisConstants.ANONYMOUS_USER_ID;
+		int userId = RubisUtility.ANONYMOUS_USER_ID;
 		try
 		{
 			userId = Integer.parseInt(this.getUtility().findParamInHtml(this.getSessionState().getLastResponse(), "userId"));
