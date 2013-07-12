@@ -34,12 +34,15 @@
 package radlab.rain.workload.rubis;
 
 
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.http.HttpStatus;
 import radlab.rain.util.HttpTransport;
 import radlab.rain.workload.rubis.model.RubisCategory;
+import radlab.rain.workload.rubis.model.RubisComment;
 import radlab.rain.workload.rubis.model.RubisItem;
 import radlab.rain.workload.rubis.model.RubisRegion;
 import radlab.rain.workload.rubis.model.RubisUser;
@@ -52,12 +55,39 @@ import radlab.rain.workload.rubis.model.RubisUser;
  */
 public final class RubisUtility
 {
-	private Random _rand = new Random();
+	private Random _rng = null;
+	private RubisConfiguration _conf = null;
 	private Pattern _pageRegex = Pattern.compile("^.*?[&?]page=(\\d+).*?(?:[&?]page=(\\d+).*?)?$");
 
 
 	public RubisUtility()
 	{
+	}
+
+	public RubisUtility(Random rng, RubisConfiguration conf)
+	{
+		this._rng = rng;
+		this._conf = conf;
+	}
+
+	public void setRandomGenerator(Random rng)
+	{
+		this._rng = rng;
+	}
+
+	public Random getRandomGenerator()
+	{
+		return this._rng;
+	}
+
+	public void setConfiguration(RubisConfiguration conf)
+	{
+		this._conf = conf;
+	}
+
+	public RubisConfiguration getConfiguration()
+	{
+		return this._conf;
 	}
 
 	public boolean isAnonymousUser(RubisUser user)
@@ -98,12 +128,185 @@ public final class RubisUtility
 	}
 
 	/**
+	 * Creates a new RUBiS user object.
+	 *
+	 * @return an instance of RubisUser.
+	 */
+	public RubisUser newUser()
+	{
+		return this.getUser(RubisConstants.ANONYMOUS_USER_ID);
+	}
+
+	/**
+	 * Generate a rngom RUBiS user among the ones already preloaded.
+	 *
+	 * @return an instance of RubisUser.
+	 */
+	public RubisUser generateUser()
+	{
+		int userId = this._rng.nextInt(this._conf.getNumberOfPreloadedUsers());
+
+		return this.getUser(userId);
+	}
+
+	/**
+	 * Get the RUBiS user associated to the given identifier.
+	 *
+	 * @param id The user identifier.
+	 * @return an instance of RubisUser.
+	 */
+	public RubisUser getUser(int id)
+	{
+		RubisUser user = new RubisUser();
+
+		user.id = id;
+		user.firstname = "Great" + user.id;
+		user.lastname = "User" + user.id;
+		user.nickname = "user" + user.id;
+		user.email = user.firstname + "." + user.lastname + "@rubis.com";
+		user.password = "password" + user.id;
+		user.region = this.generateRegion().id;
+
+		return user;
+	}
+
+	/**
+	 * Creates a new RUBiS item.
+	 *
+	 * @return an instance of RubisItem.
+	 */
+	public RubisItem newItem(int loggedUserId)
+	{
+		return this.getItem(RubisConstants.INVALID_ITEM_ID, loggedUserId);
+	}
+
+//	/**
+//	 * Generate a rngom RUBiS item among the ones already preloaded.
+//	 *
+//	 * @return an instance of RubisItem.
+//	 */
+//	public RubisItem generateItem()
+//	{
+//		int itemId = RubisConstants.MIN_ITEM_ID-1;
+//		int lastItemId = RubisGenerator.getLastItemId();
+//		if (lastItemId >= RubisConstants.MIN_ITEM_ID)
+//		{
+//			itemId = this.getRandomGenerator().nextInt(lastItemId+1-RubisConstants.MIN_ITEM_ID)+RubisConstants.MIN_ITEM_ID;
+//		}
+//		return this.getItem(itemId);
+//	}
+
+	/**
+	 * Get the RUBiS item associated to the given identifier.
+	 *
+	 * @param id The item identifier.
+	 * @return an instance of RubisItem.
+	 */
+	public RubisItem getItem(int id, int loggedUserId)
+	{
+		RubisItem item = new RubisItem();
+
+		item.id = id;
+		item.name = "RUBiS automatically generated item #" + item.id;
+		item.description = this.generateText(1, this._conf.getMaxItemDescriptionLength());
+		item.initialPrice = this._rng.nextInt((int) Math.round(this._conf.getMaxItemInitialPrice()))+1;
+		if (this._rng.nextInt(this._conf.getTotalActiveItems()) < (this._conf.getPercentageOfUniqueItems()*this._conf.getTotalActiveItems()/100.0))
+		{
+			item.quantity = 1;
+		}
+		else
+		{
+			item.quantity = this._rng.nextInt(this._conf.getMaxItemQuantity())+1;
+		}
+		if (this._rng.nextInt(this._conf.getTotalActiveItems()) < (this._conf.getPercentageOfItemsReserve()*this._conf.getTotalActiveItems()/100.0))
+		{
+			item.reservePrice = this._rng.nextInt((int) Math.round(this._conf.getMaxItemBaseReservePrice()))+item.initialPrice;
+		}
+		else
+		{
+			item.reservePrice = 0;
+		}
+		if (this._rng.nextInt(this._conf.getTotalActiveItems()) < (this._conf.getPercentageOfItemsBuyNow()*this._conf.getTotalActiveItems()/100.0))
+		{
+			item.buyNow = this._rng.nextInt((int) Math.round(this._conf.getMaxItemBaseBuyNowPrice()))+item.initialPrice+item.reservePrice;
+		}
+		else
+		{
+			item.buyNow = 0;
+		}
+		item.nbOfBids = 0;
+		item.maxBid = 0;
+		Calendar cal = Calendar.getInstance();
+		item.startDate = cal.getTime();
+		cal.add(Calendar.DAY_OF_MONTH, this._rng.nextInt(this._conf.getMaxItemDuration())+1);
+		item.endDate = cal.getTime();
+		item.seller = loggedUserId;
+		item.category = this.generateCategory().id;
+
+		return item;
+	}
+
+	public RubisCategory generateCategory()
+	{
+		return this.getCategory(this._rng.nextInt(this._conf.getCategories().size()-RubisConstants.MIN_CATEGORY_ID)+RubisConstants.MIN_CATEGORY_ID);
+	}
+
+	public RubisRegion generateRegion()
+	{
+		return this.getRegion(this._rng.nextInt(this._conf.getRegions().size()-RubisConstants.MIN_REGION_ID)+RubisConstants.MIN_REGION_ID);
+	}
+
+	public RubisCategory getCategory(int id)
+	{
+		RubisCategory category = new RubisCategory();
+
+		category.id = id;
+		category.name = this._conf.getCategories().get(category.id);
+
+		return category;
+	}
+
+	public RubisRegion getRegion(int id)
+	{
+		RubisRegion region = new RubisRegion();
+
+		region.id = id;
+		region.name = this._conf.getRegions().get(region.id);
+
+		return region;
+	}
+
+	public RubisComment generateComment(int fromUserId, int toUserId, int itemId)
+	{
+		return getComment(fromUserId,
+						  toUserId,
+						  itemId,
+						  RubisConstants.COMMENT_RATINGS[this._rng.nextInt(RubisConstants.COMMENT_RATINGS.length)]);
+	}
+
+	public RubisComment getComment(int fromUserId, int toUserId, int itemId, int rating)
+	{
+		RubisComment comment = new RubisComment();
+
+		comment.fromUserId = fromUserId;
+		comment.toUserId = toUserId;
+		comment.itemId = itemId;
+		int rateIdx = Arrays.binarySearch(RubisConstants.COMMENT_RATINGS, rating);
+		comment.rating = RubisConstants.COMMENT_RATINGS[rateIdx];
+		comment.comment = this.generateText(1, this._conf.getMaxCommentLength()-RubisConstants.COMMENTS[rateIdx].length()-System.lineSeparator().length()) + System.lineSeparator() + RubisConstants.COMMENTS[rateIdx];
+		Calendar cal = Calendar.getInstance();
+		comment.date = cal.getTime();
+
+		return comment;
+	}
+
+	/**
 	 * Parses the given HTML text to find an item identifier.
 	 *
 	 * @param html The HTML string where to look for the item identifier.
 	 * @return The found item identifier, or RubisConstants.INVALID_ITEM_ID if
 	 *  no item identifier is found. If more than one item is found, returns the
-	 *  one picked at random.
+	 *  one picked at rngom.
 	 *
 	 * This method is based on the edu.rice.rubis.client.UserSession#extractItemIdFromHTML.
 	 */
@@ -127,8 +330,8 @@ public final class RubisUtility
 			return RubisConstants.INVALID_ITEM_ID;
 		}
 
-		// Choose randomly an item
-		count = this._rand.nextInt(count) + 1;
+		// Choose rngomly an item
+		count = this._rng.nextInt(count) + 1;
 
 		keyIdx = -7;
 		while (count > 0)
@@ -261,8 +464,8 @@ public final class RubisUtility
 //		}
 //		else
 //		{
-//			// Choose randomly a page (previous or next)
-//			if (this._rand.nextInt(100000) < 50000)
+//			// Choose rngomly a page (previous or next)
+//			if (this._rng.nextInt(100000) < 50000)
 //			{
 //				chosenIdx = firstPageIdx;
 //			}
@@ -287,8 +490,8 @@ public final class RubisUtility
 		{
 			if (m.groupCount() == 2 && m.group(2) != null)
 			{
-				// Choose randomly a page (previous or next)
-				if (this._rand.nextInt(100000) < 50000)
+				// Choose rngomly a page (previous or next)
+				if (this._rng.nextInt(100000) < 50000)
 				{
 					return Integer.parseInt(m.group(1));
 				}
@@ -321,5 +524,60 @@ public final class RubisUtility
 			return ix1;
 		}
 		return ix2;
+	}
+
+	/**
+	 * Generates a rngom text.
+	 *
+	 * @param minLen The minimum length of the text.
+	 * @param maxLen The maximum length of the text.
+	 * @return The generated text.
+	 */
+	private String generateText(int minLen, int maxLen)
+	{
+		int len = minLen+this._rng.nextInt(maxLen-minLen+1);
+		StringBuilder buf = new StringBuilder(len);
+		int left = len;
+		while (left > 0)
+		{
+			if (buf.length() > 0)
+			{
+				buf.append(' ');
+				--left;
+			}
+
+			String word = this.generateWord(1, left < this._conf.getMaxWordLength() ? left : this._conf.getMaxWordLength());
+			buf.append(word);
+			left -= word.length();
+		}
+
+		return buf.toString();
+	}
+
+	/**
+	 * Generates a rngom word.
+	 *
+	 * @param minLen The minimum length of the word.
+	 * @param maxLen The maximum length of the word.
+	 * @return The generated word.
+	 */
+	private String generateWord(int minLen, int maxLen)
+	{
+		if (minLen > maxLen)
+		{
+			return "";
+		}
+
+		int len = minLen+this._rng.nextInt(maxLen-minLen+1);
+
+		char[] buf = new char[len];
+
+		for (int i = 0; i < len; ++i)
+		{
+			int j = this._rng.nextInt(RubisConstants.ALNUM_CHARS.length);
+			buf[i] = RubisConstants.ALNUM_CHARS[j];
+		}
+
+		return new String(buf);
 	}
 }

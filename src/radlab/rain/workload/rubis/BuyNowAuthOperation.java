@@ -65,12 +65,12 @@ public class BuyNowAuthOperation extends RubisOperation
 
 		// Get an item (from last response or from session)
 		int itemId = this.getUtility().findItemIdInHtml(this.getSessionState().getLastResponse());
-		RubisItem item = this.getGenerator().getItem(itemId);
-		if (!this.getGenerator().isValidItem(item))
+		RubisItem item = this.getUtility().getItem(itemId, this.getSessionState().getLoggedUserId());
+		if (!this.getUtility().isValidItem(item))
 		{
 			// Try to see if there an item in session
-			item = this.getGenerator().getItem(this.getSessionState().getItemId());
-			if (!this.getGenerator().isValidItem(item))
+			item = this.getUtility().getItem(this.getSessionState().getItemId(), this.getSessionState().getLoggedUserId());
+			if (!this.getUtility().isValidItem(item))
 			{
 				this.getLogger().warning("No valid item has been found. Operation interrupted.");
 				this.setFailed(true);

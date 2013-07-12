@@ -2,7 +2,27 @@
 	"rubis-001": {
 		"generator": "radlab.rain.workload.rubis.RubisGenerator",
         "generatorParameters": {
-            "rngSeed": 5489
+            "rubis.rngSeed": 5489,
+			"rubis.categoriesFile": "resources/rubis-ebay_full_categories.txt",
+			"rubis.regionsFile": "resources/rubis-ebay_regions.txt",
+			"rubis.numOldItems": 100000,
+			"rubis.percentUniqueItems": 80,
+			"rubis.percentItemsReservePrice": 40,
+			"rubis.percentItemsBuyNow": 10,
+			"rubis.maxItemQuantity": 10,
+			"rubis.maxBidsPerItem": 10,
+			"rubis.maxItemDescrLen": 8192,
+			"rubis.numItemsPerPage": 20,
+			"rubis.maxCommentLen": 2048,
+
+			"rubis.maxWordLen": 12,
+			"rubis.maxItemInitPrice": 5000,
+			"rubis.maxItemReservePrice": 1000,
+			"rubis.maxItemBuyNow": 1000,
+			"rubis.maxItemDuration": 7,
+
+			"rubis.nextAvailUserId": 1,
+			"rubis.nextAvailItemId": 1
         },
         "track": "radlab.rain.DefaultScenarioTrack",
         "resourcePath": "resources/",

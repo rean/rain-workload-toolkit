@@ -35,9 +35,9 @@ package radlab.rain.workload.rubis;
 
 
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.Semaphore;
+//import java.util.Calendar;
+//import java.util.concurrent.atomic.AtomicInteger;
+//import java.util.concurrent.Semaphore;
 import java.util.logging.Logger;
 import java.util.Random;
 import org.apache.http.HttpStatus;
@@ -95,49 +95,20 @@ public class RubisGenerator extends Generator
 	public static final int BACK_SPECIAL_OP = 27; ///< Emulate a click on the "Back" button of the browser
 	public static final int EOS_SPECIAL_OP = 28; ///< Terminate the current user session
 
-//	// Configuration keys
-//	public static final String CFG_RNG_SEED_KEY = "rubis.rngSeed";
-//	public static final String CFG_TOTAL_ACTIVE_ITEMS = "rubis.totalActiveItems";
-//	public static final String CFG_NUM_OLD_ITEMS = "rubis.numOldItems";
-//	public static final String CFG_PERCENT_UNIQUE_ITEMS = "rubis.percentUniqueItems";
-//	public static final String CFG_PERCENT_ITEMS_RESERVE_PRICE = "rubis.percentItemsReservePrice";
-//	public static final String CFG_PERCENT_ITEMS_BUY_NOW_PRICE = "rubis.percentItemsBuyNowPrice";
-//	public static final String CFG_MAX_ITEM_QUANTITY = "rubis.maxItemQuantity";
-//	public static final String CFG_MAX_ADD_BID = "rubis.maxAddBid";
-//	public static final String CFG_MAX_ITEM_DESCR_LEN = "rubis.maxItemDescrLen";
-//	public static final String CFG_MAX_WORD_LEN = "rubis.maxWordLen";
-//	public static final String CFG_MAX_ITEM_INIT_PRICE = "rubis.maxItemInitPrice";
-//	public static final String CFG_MIN_ITEM_RESERVE_PRICE = "rubis.minItemReservePrice";
-//	public static final String CFG_MIN_ITEM_BUY_NOW_PRICE = "rubis.itemBuyNowPrice";
-//	public static final String CFG_MAX_ITEM_DURATION = "rubis.itemDuration";
-//	public static final String CFG_NUM_ITEMS_PER_PAGE = "rubis.numItemsPerPage";
-//	public static final String CFG_MAX_COMMENT_LEN = "rubis.maxCommentLen";
-//	public static final String CFG_MIN_USER_ID = "rubis.minUserId";
-//	public static final String CFG_MIN_ITEM_ID = "rubis.minItemId";
-//	public static final String CFG_MIN_REGION_ID = "rubis.minRegionId";
-//	public static final String CFG_MIN_CATEGORY_ID = "rubis.minCategoryId";
-//	public static final String CFG_MIN_FREE_USER_ID = "rubis.minFreeUserId";
-//	public static final String CFG_MIN_FREE_ITEM_ID = "rubis.minFreeItemId";
-//	public static final String CFG_MIN_FREE_REGION_ID = "rubis.minFreeRegionId";
-//	public static final String CFG_MIN_FREE_CATEGORY_ID = "rubis.minFreeCategoryId";
-
-
-	// Static members used to atomically generate users and items
-	private static AtomicInteger _userId = new AtomicInteger(RubisConstants.DEFAULT_NEXT_AVAIL_USER_ID-1);
-	private static AtomicInteger _itemId = new AtomicInteger(RubisConstants.DEFAULT_NEXT_AVAIL_ITEM_ID-1);
-	private static Semaphore _userLock = new Semaphore(1, true);
-	private static Semaphore _itemLock = new Semaphore(1, true);
-
-
+//	// Static members used to atomically generate users and items
+//	private static AtomicInteger _userId = new AtomicInteger(/*RubisConstants.DEFAULT_NEXT_AVAIL_USER_ID-1*/);
+//	private static AtomicInteger _itemId = new AtomicInteger(/*RubisConstants.DEFAULT_NEXT_AVAIL_ITEM_ID-1*/);
+//	private static Semaphore _userLock = new Semaphore(1, true);
+//	private static Semaphore _itemLock = new Semaphore(1, true);
+	// Static members shared among all instances
 	private static Random _rng; ///< The Random Number Generator
-	//private long _rngSeed = -1; ///< The seed used for the Random Number Generator; a value <= 0 means that no special seed is used.
+	private static RubisConfiguration _conf; ///< The RUBiS-related configuration found in the JSON profile file
+
+
 	private HttpTransport _http;
 	private Logger _logger;
-//	private int _loggedUserId;
-	private RubisSessionState _sessionState; ///< Holds session data
+	private RubisSessionState _sessionState; ///< Holds user session data
 	private RubisUtility _utility;
-	private RubisSessionState _userSession; ///< Holds user session data
-	private RubisConfiguration _conf; ///< The RUBiS-related configuration found in the JSON profile file
 	private double _thinkTime = -1; ///< The mean think time; a value <= 0 means that no think time is used.
 	private NegativeExponential _thinkTimeRng;
 	private double _cycleTime = -1; ///< The mean cycle time; a value <= 0 means that no cycle time is used.
@@ -173,50 +144,151 @@ public class RubisGenerator extends Generator
 	private String _aboutMePostURL;
 
 
-	public static int nextUserId()
+//	/**
+//	 * Lock the users semaphore.
+//	 */
+//	public static void lockUsers() throws InterruptedException
+//	{
+//		_userLock.acquire();
+//	}
+
+//	/**
+//	 * Unlock the users semaphore.
+//	 */
+//	public static void unlockUsers()
+//	{
+//		_userLock.release();
+//	}
+
+//	/**
+//	 * Lock the items semaphore.
+//	 */
+//	public static void lockItems() throws InterruptedException
+//	{
+//		_itemLock.acquire();
+//	}
+
+//	/**
+//	 * Unlock the items semaphore.
+//	 */
+//	public static void unlockItems()
+//	{
+//		_itemLock.release();
+//	}
+
+	/**
+	 * Returns the internally used random number generator.
+	 * 
+	 * @return A Random object.
+	 */
+	public static Random getRandomGenerator()
 	{
-		return _userId.incrementAndGet();
+		//NOTE: this method is not "synchronized" since java.util.Random is threadsafe.
+		return _rng;
 	}
 
-	public static int lastUserId()
+	/**
+	 * Set the internally used random number generator.
+	 * 
+	 * @param value A Random object.
+	 */
+	protected static synchronized void setRandomGenerator(Random value)
 	{
-		return _userId.get();
+		_rng = value;
 	}
 
-	public static int nextItemId()
+	/**
+	 * Get the internally used RUBiS configuration object.
+	 * 
+	 * @return A RubisConfiguration object.
+	 */
+	public static synchronized RubisConfiguration getConfiguration()
 	{
-		return _itemId.incrementAndGet();
+		return _conf;
 	}
 
-	public static int lastItemId()
+	/**
+	 * Set the internally used RUBiS configuration object.
+	 * 
+	 * @param value A RubisConfiguration object.
+	 */
+	protected static synchronized void setConfiguration(RubisConfiguration value)
 	{
-		return _itemId.get();
+		_conf = value;
 	}
 
-	public static void lockUsers() throws InterruptedException
+//	private static void setNextUserId(int value)
+//	{
+//		_userId.set(value);
+//	}
+//
+//	private static int getNextUserId()
+//	{
+//		return _userId.incrementAndGet();
+//	}
+//
+//	private static int getLastUserId()
+//	{
+//		return _userId.get();
+//	}
+//
+//	private static void setNextItemId(int value)
+//	{
+//		_itemId.set(value);
+//	}
+//
+//	private static int getNextItemId()
+//	{
+//		return _itemId.incrementAndGet();
+//	}
+//
+//	private static int getLastItemId()
+//	{
+//		return _itemId.get();
+//	}
+
+	/**
+	 * Initialize the shared configuration object.
+	 */
+	private static synchronized void initializeConfiguration(JSONObject config) throws JSONException
 	{
-		_userLock.acquire();
+		if (_conf == null)
+		{
+			_conf = new RubisConfiguration(config);
+		}
 	}
 
-	public static void unlockUsers()
+	/**
+	 * Initialize the shared random number generator.
+	 */
+	private static synchronized void initizializeRandomGenerator()
 	{
-		_userLock.release();
+		if (_rng == null)
+		{
+			if (getConfiguration().getRngSeed() >= 0)
+			{
+				_rng = new Random(getConfiguration().getRngSeed());
+			}
+			else
+			{
+				_rng = new Random();
+			}
+		}
 	}
 
-	public static void lockItems() throws InterruptedException
-	{
-		_itemLock.acquire();
-	}
 
-	public static void unlockItems()
-	{
-		_itemLock.release();
-	}
-
-
+	/**
+	 * A constructor.
+	 */
 	public RubisGenerator(ScenarioTrack track)
 	{
 		super(track);
+	}
+
+	@Override
+	public void configure(JSONObject config) throws JSONException
+	{
+		this.initializeConfiguration(config);
 	}
 
 	/**
@@ -226,33 +298,23 @@ public class RubisGenerator extends Generator
 	public void initialize()
 	{
 		this._http = new HttpTransport();
-		initizializeRandomGenerator();
+		this.initizializeRandomGenerator();
 		this._logger = Logger.getLogger(this.getName());
 		this._sessionState = new RubisSessionState();
 //		this._loggedUserId = ANONYMOUS_USER_ID;
-		this._utility = new RubisUtility();
+		this._utility = new RubisUtility(this._rng, this._conf);
 		this._thinkTime = this.getTrack().getMeanThinkTime();
 		if (this._thinkTime > 0)
 		{
-			this._thinkTimeRng = new NegativeExponential(this._thinkTime, this.getRandomGenerator());
+			this._thinkTimeRng = new NegativeExponential(this._thinkTime, this._rng);
 		}
 		this._cycleTime = this.getTrack().getMeanCycleTime();
 		if (this._cycleTime > 0)
 		{
-			this._cycleTimeRng = new NegativeExponential(this._cycleTime, this.getRandomGenerator());
+			this._cycleTimeRng = new NegativeExponential(this._cycleTime, this._rng);
 		}
 
 		this.initializeUrls();
-	}
-
-	@Override
-	public void configure(JSONObject config) throws JSONException
-	{
-		this._conf = new RubisConfiguration(config);
-//		if (config.has(CFG_RNG_SEED_KEY))
-//		{
-//			this._rngSeed = config.getLong(CFG_RNG_SEED_KEY);
-//		}
 	}
 
 	/**
@@ -279,7 +341,7 @@ public class RubisGenerator extends Generator
 		{
 			// Get the selection matrix
 			double[][] selectionMix = this.getTrack().getMixMatrix(currentLoad.getMixName()).getSelectionMix();
-			double rand = this.getRandomGenerator().nextDouble();
+			double rand = this._rng.nextDouble();
 
 			int j;
 			for (j = 0; j < selectionMix.length; ++j)
@@ -336,16 +398,6 @@ public class RubisGenerator extends Generator
 	}
 
 	/**
-	 * Returns the internally used random number generator.
-	 * 
-	 * @return A Random object.
-	 */
-	public static synchronized Random getRandomGenerator()
-	{
-		return _rng;
-	}
-
-	/**
 	 * Returns the pre-existing HTTP transport.
 	 * 
 	 * @return An HTTP transport.
@@ -385,20 +437,10 @@ public class RubisGenerator extends Generator
 		this._utility = value;
 	}
 
-	public RubisConfiguration getConfiguration()
-	{
-		return this._conf;
-	}
-
-	protected void setConfiguration(RubisConfiguration value)
-	{
-		this._conf = value;
-	}
-
-	public boolean isUserLoggedIn()
-	{
-		return RubisConstants.ANONYMOUS_USER_ID != this._sessionState.getLoggedUserId() && RubisConstants.MIN_USER_ID <= this._sessionState.getLoggedUserId();
-	}
+//	public boolean isUserLoggedIn()
+//	{
+//		return RubisConstants.ANONYMOUS_USER_ID != this._sessionState.getLoggedUserId() && RubisConstants.MIN_USER_ID <= this._sessionState.getLoggedUserId();
+//	}
 
 //	public int getLoggedUserId()
 //	{
@@ -410,74 +452,71 @@ public class RubisGenerator extends Generator
 //		this._loggedUserId = val;
 //	}
 
-	public RubisUser getLoggedUser()
-	{
-		if (!this.isUserLoggedIn())
-		{
-			return null;
-		}
+//	public RubisUser getLoggedUser()
+//	{
+//		if (!this.isUserLoggedIn())
+//		{
+//			return null;
+//		}
+//
+//		return this.getUser(this._sessionState.getLoggedUserId());
+//	}
 
-		return this.getUser(this._sessionState.getLoggedUserId());
-	}
+//	/**
+//	 * Tells if at least one user exists in the DB.
+//	 *
+//	 * A user exists in the DB if either (s)he has been generated by the
+//	 * current run of the benchmark or (s)he was already present in the DB.
+//	 *
+//	 * @return <code>true</code> if at least one user exists in the DB;
+//	 *  <code>false</code> otherwise.
+//	 */
+//	public boolean isUserAvailable()
+//	{
+//		return RubisConstants.MIN_USER_ID <= RubisGenerator.getLastUserId();
+//	}
 
-	/**
- 	 * Tells if at least one user exists in the DB.
- 	 *
- 	 * A user exists in the DB if either (s)he has been generated by the
- 	 * current run of the benchmark or (s)he was already present in the DB.
- 	 *
- 	 * @return <code>true</code> if at least one user exists in the DB;
- 	 *  <code>false</code> otherwise.
- 	 */
-	public boolean isUserAvailable()
-	{
-		return RubisConstants.MIN_USER_ID <= RubisGenerator.lastUserId();
-	}
+//	/**
+//	 * Tells if at least one item exists in the DB.
+//	 *
+//	 * An item exists in the DB if either it has been generated by the
+//	 * current run of the benchmark or it was already present in the DB.
+//	 *
+//	 * @return <code>true</code> if at least one item exists in the DB;
+//	 *  <code>false</code> otherwise.
+//	 */
+//	public boolean isItemAvailable()
+//	{
+//		return RubisConstants.MIN_ITEM_ID <= RubisGenerator.getLastItemId();
+//	}
 
-	/**
- 	 * Tells if at least one item exists in the DB.
- 	 *
- 	 * An item exists in the DB if either it has been generated by the
- 	 * current run of the benchmark or it was already present in the DB.
- 	 *
- 	 * @return <code>true</code> if at least one item exists in the DB;
- 	 *  <code>false</code> otherwise.
- 	 */
-	public boolean isItemAvailable()
-	{
-		return RubisConstants.MIN_ITEM_ID <= RubisGenerator.lastItemId();
-	}
+//	@Deprecated
+//	public boolean isValidUser(RubisUser user)
+//	{
+//		return null != user && RubisConstants.MIN_USER_ID <= user.id;
+//	}
 
-	public boolean isValidUser(RubisUser user)
-	{
-		return null != user && RubisConstants.MIN_USER_ID <= user.id;
-	}
+//	@Deprecated
+//	public boolean isValidItem(RubisItem item)
+//	{
+//		return null != item && RubisConstants.MIN_ITEM_ID <= item.id;
+//	}
 
-	public boolean isValidItem(RubisItem item)
-	{
-		return null != item && RubisConstants.MIN_ITEM_ID <= item.id;
-	}
+//	@Deprecated
+//	public boolean isValidCategory(RubisCategory category)
+//	{
+//		return null != category && RubisConstants.MIN_CATEGORY_ID <= category.id;
+//	}
 
-	public boolean isValidCategory(RubisCategory category)
-	{
-		return null != category && RubisConstants.MIN_CATEGORY_ID <= category.id;
-	}
-
-	public boolean isValidRegion(RubisRegion region)
-	{
-		return null != region && RubisConstants.MIN_REGION_ID <= region.id;
-	}
+//	@Deprecated
+//	public boolean isValidRegion(RubisRegion region)
+//	{
+//		return null != region && RubisConstants.MIN_REGION_ID <= region.id;
+//	}
 
 	public boolean checkHttpResponse(String response)
 	{
-		if (response.length() == 0
-			|| HttpStatus.SC_OK != this.getHttpTransport().getStatusCode()
-			|| -1 != response.indexOf("ERROR"))
-		{
-			return false;
-		}
-
-		return true;
+		return this.getUtility().checkHttpResponse(this.getHttpTransport(), response);
 	}
 
 	public String getBaseURL()
@@ -961,126 +1000,134 @@ public class RubisGenerator extends Generator
 		return op;
 	}
 
-	public RubisUser newUser()
-	{
-		return this.getUser(RubisGenerator.nextUserId());
-	}
+//	public RubisUser newUser()
+//	{
+//		return this.getUser(RubisGenerator.getNextUserId());
+//	}
 
-	public RubisUser generateUser()
-	{
-		int userId = RubisConstants.MIN_USER_ID-1;;
-		int lastUserId = RubisGenerator.lastUserId();
-		if (lastUserId >= RubisConstants.MIN_USER_ID)
-		{
-			userId = this.getRandomGenerator().nextInt(lastUserId+1-RubisConstants.MIN_USER_ID)+RubisConstants.MIN_USER_ID;
-		}
-		return this.getUser(userId);
-	}
+//	public RubisUser generateUser()
+//	{
+//		int userId = RubisConstants.MIN_USER_ID-1;;
+//		int lastUserId = RubisGenerator.getLastUserId();
+//		if (lastUserId >= RubisConstants.MIN_USER_ID)
+//		{
+//			userId = this._rng.nextInt(lastUserId+1-RubisConstants.MIN_USER_ID)+RubisConstants.MIN_USER_ID;
+//		}
+//		return this.getUser(userId);
+//	}
 
-	public RubisUser getUser(int id)
-	{
-		RubisUser user = new RubisUser();
+//	@Deprecated
+//	public RubisUser getUser(int id)
+//	{
+//		RubisUser user = new RubisUser();
+//
+//		user.id = id;
+//		user.firstname = "Great" + user.id;
+//		user.lastname = "User" + user.id;
+//		user.nickname = "user" + user.id;
+//		user.email = user.firstname + "." + user.lastname + "@rubis.com";
+//		user.password = "password" + user.id;
+//		user.region = this.generateRegion().id;
+//
+//		return user;
+//	}
 
-		user.id = id;
-		user.firstname = "Great" + user.id;
-		user.lastname = "User" + user.id;
-		user.nickname = "user" + user.id;
-		user.email = user.firstname + "." + user.lastname + "@rubis.com";
-		user.password = "password" + user.id;
-		user.region = this.generateRegion().id;
+//	@Deprecated
+//	public RubisItem newItem()
+//	{
+//		return this.getItem(RubisGenerator.getNextItemId());
+//	}
+//
+//	@Deprecated
+//	public RubisItem generateItem()
+//	{
+//		int itemId = RubisConstants.MIN_ITEM_ID-1;
+//		int lastItemId = RubisGenerator.getLastItemId();
+//		if (lastItemId >= RubisConstants.MIN_ITEM_ID)
+//		{
+//			itemId = this._rng.nextInt(lastItemId+1-RubisConstants.MIN_ITEM_ID)+RubisConstants.MIN_ITEM_ID;
+//		}
+//		return this.getItem(itemId);
+//	}
+//
+//	@Deprecated
+//	public RubisItem getItem(int id)
+//	{
+//		RubisItem item = new RubisItem();
+//
+//		item.id = id;
+//		item.name = "RUBiS automatically generated item #" + item.id;
+//		item.description = this.generateText(1, this.getConfiguration().getMaxItemDescriptionLength());
+//		item.initialPrice = this._rng.nextInt(RubisConstants.MAX_ITEM_INIT_PRICE)+1;
+//		if (this._rng.nextInt(this.getConfiguration().getTotalActiveItems()) < (this.getConfiguration().getPercentageOfUniqueItems()*this.getConfiguration().getTotalActiveItems()/100.0))
+//		{
+//			item.quantity = 1;
+//		}
+//		else
+//		{
+//			item.quantity = this._rng.nextInt(this.getConfiguration().getMaxItemQuantity())+1;
+//		}
+//		if (this._rng.nextInt(this.getConfiguration().getTotalActiveItems()) < (this.getConfiguration().getPercentageOfItemsReservePrice()*this.getConfiguration().getTotalActiveItems()/100.0))
+//		{
+//			item.reservePrice = this._rng.nextInt(RubisConstants.MIN_ITEM_RESERVE_PRICE)+item.initialPrice;
+//		}
+//		else
+//		{
+//			item.reservePrice = 0;
+//		}
+//		if (this._rng.nextInt(this.getConfiguration().getTotalActiveItems()) < (this.getConfiguration().getPercentageOfItemsBuyNow()*this.getConfiguration().getTotalActiveItems()/100.0))
+//		{
+//			item.buyNow = this._rng.nextInt(RubisConstants.MIN_ITEM_BUY_NOW_PRICE)+item.initialPrice+item.reservePrice;
+//		}
+//		else
+//		{
+//			item.buyNow = 0;
+//		}
+//		item.nbOfBids = 0;
+//		item.maxBid = 0;
+//		Calendar cal = Calendar.getInstance();
+//		item.startDate = cal.getTime();
+//		cal.add(Calendar.DAY_OF_MONTH, this._rng.nextInt(RubisConstants.MAX_ITEM_DURATION)+1);
+//		item.endDate = cal.getTime();
+//		item.seller = this._sessionState.getLoggedUserId();
+//		item.category = this.generateCategory().id;
+//
+//		return item;
+//	}
 
-		return user;
-	}
+//	@Deprecated
+//	public RubisCategory generateCategory()
+//	{
+//		return this.getCategory(this._rng.nextInt(this.getConfiguration().getCategories().size()-RubisConstants.MIN_CATEGORY_ID)+RubisConstants.MIN_CATEGORY_ID);
+//	}
+//
+//	@Deprecated
+//	public RubisRegion generateRegion()
+//	{
+//		return this.getRegion(this._rng.nextInt(this.getConfiguration().getRegions().size()-RubisConstants.MIN_REGION_ID)+RubisConstants.MIN_REGION_ID);
+//	}
+//
+//	@Deprecated
+//	public RubisCategory getCategory(int id)
+//	{
+//		RubisCategory category = new RubisCategory();
+//
+//		category.id = id;
+//		category.name = this.getConfiguration().getCategories().get(category.id);
+//
+//		return category;
+//	}
 
-	public RubisItem newItem()
-	{
-		return this.getItem(RubisGenerator.nextItemId());
-	}
-
-	public RubisItem generateItem()
-	{
-		int itemId = RubisConstants.MIN_ITEM_ID-1;
-		int lastItemId = RubisGenerator.lastItemId();
-		if (lastItemId >= RubisConstants.MIN_ITEM_ID)
-		{
-			itemId = this.getRandomGenerator().nextInt(lastItemId+1-RubisConstants.MIN_ITEM_ID)+RubisConstants.MIN_ITEM_ID;
-		}
-		return this.getItem(itemId);
-	}
-
-	public RubisItem getItem(int id)
-	{
-		RubisItem item = new RubisItem();
-
-		item.id = id;
-		item.name = "RUBiS automatically generated item #" + item.id;
-		item.description = this.generateText(1, this._conf.getMaxItemDescriptionLength());
-		item.initialPrice = this.getRandomGenerator().nextInt(RubisConstants.MAX_ITEM_INIT_PRICE)+1;
-		if (this.getRandomGenerator().nextInt(this._conf.getTotalActiveItems()) < (this._conf.getPercentageOfUniqueItems()*this._conf.getTotalActiveItems()/100.0))
-		{
-			item.quantity = 1;
-		}
-		else
-		{
-			item.quantity = this.getRandomGenerator().nextInt(this._conf.getMaxItemQuantity())+1;
-		}
-		if (this.getRandomGenerator().nextInt(this._conf.getTotalActiveItems()) < (this._conf.getPercentageOfItemsReservePrice()*this._conf.getTotalActiveItems()/100.0))
-		{
-			item.reservePrice = this.getRandomGenerator().nextInt(RubisConstants.MIN_ITEM_RESERVE_PRICE)+item.initialPrice;
-		}
-		else
-		{
-			item.reservePrice = 0;
-		}
-		if (this.getRandomGenerator().nextInt(this._conf.getTotalActiveItems()) < (this._conf.getPercentageOfItemsBuyNow()*this._conf.getTotalActiveItems()/100.0))
-		{
-			item.buyNow = this.getRandomGenerator().nextInt(RubisConstants.MIN_ITEM_BUY_NOW_PRICE)+item.initialPrice+item.reservePrice;
-		}
-		else
-		{
-			item.buyNow = 0;
-		}
-		item.nbOfBids = 0;
-		item.maxBid = 0;
-		Calendar cal = Calendar.getInstance();
-		item.startDate = cal.getTime();
-		cal.add(Calendar.DAY_OF_MONTH, this.getRandomGenerator().nextInt(RubisConstants.MAX_ITEM_DURATION)+1);
-		item.endDate = cal.getTime();
-		item.seller = this._sessionState.getLoggedUserId();
-		item.category = this.generateCategory().id;
-
-		return item;
-	}
-
-	public RubisCategory generateCategory()
-	{
-		return this.getCategory(this.getRandomGenerator().nextInt(RubisConstants.CATEGORIES.length-RubisConstants.MIN_CATEGORY_ID)+RubisConstants.MIN_CATEGORY_ID);
-	}
-
-	public RubisRegion generateRegion()
-	{
-		return this.getRegion(this.getRandomGenerator().nextInt(RubisConstants.REGIONS.length-RubisConstants.MIN_REGION_ID)+RubisConstants.MIN_REGION_ID);
-	}
-
-	public RubisCategory getCategory(int id)
-	{
-		RubisCategory category = new RubisCategory();
-
-		category.id = id;
-		category.name = RubisConstants.CATEGORIES[category.id];
-
-		return category;
-	}
-
-	public RubisRegion getRegion(int id)
-	{
-		RubisRegion region = new RubisRegion();
-
-		region.id = id;
-		region.name = RubisConstants.REGIONS[region.id];
-
-		return region;
-	}
+//	@Deprecated
+//	public RubisRegion getRegion(int id)
+//	{
+//		RubisRegion region = new RubisRegion();
+//
+//		region.id = id;
+//		region.name = this.getConfiguration().getRegions().get(region.id);
+//
+//		return region;
+//	}
 
 //	public int getNumItemsPerPage()
 //	{
@@ -1097,29 +1144,31 @@ public class RubisGenerator extends Generator
 //		return RubisConstants.MAX_COMMENT_LEN;
 //	}
 
-	public RubisComment generateComment(int fromUserId, int toUserId, int itemId)
-	{
-		return getComment(fromUserId,
-						  toUserId,
-						  itemId,
-						  RubisConstants.COMMENT_RATINGS[this.getRandomGenerator().nextInt(RubisConstants.COMMENT_RATINGS.length)]);
-	}
+//	@Deprecated
+//	public RubisComment generateComment(int fromUserId, int toUserId, int itemId)
+//	{
+//		return getComment(fromUserId,
+//						  toUserId,
+//						  itemId,
+//						  RubisConstants.COMMENT_RATINGS[this._rng.nextInt(RubisConstants.COMMENT_RATINGS.length)]);
+//	}
 
-	public RubisComment getComment(int fromUserId, int toUserId, int itemId, int rating)
-	{
-		RubisComment comment = new RubisComment();
-
-		comment.fromUserId = fromUserId;
-		comment.toUserId = toUserId;
-		comment.itemId = itemId;
-		int rateIdx = Arrays.binarySearch(RubisConstants.COMMENT_RATINGS, rating);
-		comment.rating = RubisConstants.COMMENT_RATINGS[rateIdx];
-		comment.comment = this.generateText(1, this._conf.getMaxCommentLength()-RubisConstants.COMMENTS[rateIdx].length()-System.lineSeparator().length()) + System.lineSeparator() + RubisConstants.COMMENTS[rateIdx];
-		Calendar cal = Calendar.getInstance();
-		comment.date = cal.getTime();
-
-		return comment;
-	}
+//	@Deprecated
+//	public RubisComment getComment(int fromUserId, int toUserId, int itemId, int rating)
+//	{
+//		RubisComment comment = new RubisComment();
+//
+//		comment.fromUserId = fromUserId;
+//		comment.toUserId = toUserId;
+//		comment.itemId = itemId;
+//		int rateIdx = Arrays.binarySearch(RubisConstants.COMMENT_RATINGS, rating);
+//		comment.rating = RubisConstants.COMMENT_RATINGS[rateIdx];
+//		comment.comment = this.generateText(1, this.getConfiguration().getMaxCommentLength()-RubisConstants.COMMENTS[rateIdx].length()-System.lineSeparator().length()) + System.lineSeparator() + RubisConstants.COMMENTS[rateIdx];
+//		Calendar cal = Calendar.getInstance();
+//		comment.date = cal.getTime();
+//
+//		return comment;
+//	}
 
 	/**
 	 * Creates a newly instantiated, prepared operation.
@@ -1195,60 +1244,62 @@ public class RubisGenerator extends Generator
 		return null;
 	}
 
-	/**
-	 * Generates a random text.
-	 *
-	 * @param minLen The minimum length of the text.
-	 * @param maxLen The maximum length of the text.
-	 * @return The generated text.
-	 */
-	private String generateText(int minLen, int maxLen)
-	{
-		int len = minLen+this.getRandomGenerator().nextInt(maxLen-minLen+1);
-		StringBuilder buf = new StringBuilder(len);
-		int left = len;
-		while (left > 0)
-		{
-			if (buf.length() > 0)
-			{
-				buf.append(' ');
-				--left;
-			}
+//	/**
+//	 * Generates a random text.
+//	 *
+//	 * @param minLen The minimum length of the text.
+//	 * @param maxLen The maximum length of the text.
+//	 * @return The generated text.
+//	 */
+//	@Deprecated
+//	private String generateText(int minLen, int maxLen)
+//	{
+//		int len = minLen+this._rng.nextInt(maxLen-minLen+1);
+//		StringBuilder buf = new StringBuilder(len);
+//		int left = len;
+//		while (left > 0)
+//		{
+//			if (buf.length() > 0)
+//			{
+//				buf.append(' ');
+//				--left;
+//			}
+//
+//			String word = this.generateWord(1, left < RubisConstants.MAX_WORD_LEN ? left : RubisConstants.MAX_WORD_LEN);
+//			buf.append(word);
+//			left -= word.length();
+//		}
+//
+//		return buf.toString();
+//	}
 
-			String word = this.generateWord(1, left < RubisConstants.MAX_WORD_LEN ? left : RubisConstants.MAX_WORD_LEN);
-			buf.append(word);
-			left -= word.length();
-		}
-
-		return buf.toString();
-	}
-
-	/**
-	 * Generates a random word.
-	 *
-	 * @param minLen The minimum length of the word.
-	 * @param maxLen The maximum length of the word.
-	 * @return The generated word.
-	 */
-	private String generateWord(int minLen, int maxLen)
-	{
-		if (minLen > maxLen)
-		{
-			return "";
-		}
-
-		int len = minLen+this.getRandomGenerator().nextInt(maxLen-minLen+1);
-
-		char[] buf = new char[len];
-
-		for (int i = 0; i < len; ++i)
-		{
-			int j = this.getRandomGenerator().nextInt(RubisConstants.ALNUM_CHARS.length);
-			buf[i] = RubisConstants.ALNUM_CHARS[j];
-		}
-
-		return new String(buf);
-	}
+//	/**
+//	 * Generates a random word.
+//	 *
+//	 * @param minLen The minimum length of the word.
+//	 * @param maxLen The maximum length of the word.
+//	 * @return The generated word.
+//	 */
+//	@Deprecated
+//	private String generateWord(int minLen, int maxLen)
+//	{
+//		if (minLen > maxLen)
+//		{
+//			return "";
+//		}
+//
+//		int len = minLen+this._rng.nextInt(maxLen-minLen+1);
+//
+//		char[] buf = new char[len];
+//
+//		for (int i = 0; i < len; ++i)
+//		{
+//			int j = this._rng.nextInt(RubisConstants.ALNUM_CHARS.length);
+//			buf[i] = RubisConstants.ALNUM_CHARS[j];
+//		}
+//
+//		return new String(buf);
+//	}
 
 	/**
 	 * Initialize the roots/anchors of the URLs.
@@ -1284,23 +1335,5 @@ public class RubisGenerator extends Generator
 		this._aboutMeAuthURL = this._baseURL + "/rubis_servlets/about_me.html";
 		this._aboutMeURL = this._baseURL + "/rubis_servlets/about_me.html";
 		this._aboutMePostURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.AboutMe";
-	}
-
-	/**
-	 * Initialize the shared random number generator.
-	 */
-	private synchronized void initizializeRandomGenerator()
-	{
-		if (this._rng == null)
-		{
-			if (this._conf.getRngSeed() >= 0)
-			{
-				this._rng = new Random(this._conf.getRngSeed());
-			}
-			else
-			{
-				this._rng = new Random();
-			}
-		}
 	}
 }

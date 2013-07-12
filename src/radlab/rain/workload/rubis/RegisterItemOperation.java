@@ -74,11 +74,11 @@ public class RegisterItemOperation extends RubisOperation
 	{
 		StringBuilder response = null;
 
-		RubisUser loggedUser = this.getGenerator().getUser(this.getSessionState().getLoggedUserId());
-		if (!this.getGenerator().isValidUser(loggedUser))
+		RubisUser loggedUser = this.getUtility().getUser(this.getSessionState().getLoggedUserId());
+		if (!this.getUtility().isValidUser(loggedUser))
 		{
-			loggedUser = this.getGenerator().generateUser();
-			if (!this.getGenerator().isValidUser(loggedUser) || this.getUtility().isAnonymousUser(loggedUser))
+			loggedUser = this.getUtility().generateUser();
+			if (!this.getUtility().isValidUser(loggedUser) || this.getUtility().isAnonymousUser(loggedUser))
 			{
 				this.getLogger().warning("No valid user has been found. Operation interrupted.");
 				this.setFailed(true);
@@ -86,50 +86,40 @@ public class RegisterItemOperation extends RubisOperation
 			}
 		}
 
-		RubisItem item = null;
-		try
+		HttpPost reqPost = null;
+		List<NameValuePair> form = null;
+		UrlEncodedFormEntity entity = null;
+
+		// Generate a new item
+		RubisItem item = this.getUtility().newItem(this.getSessionState().getLoggedUserId());
+		if (!this.getUtility().isValidItem(item))
 		{
-			RubisGenerator.lockItems();
-
-			HttpPost reqPost = null;
-			List<NameValuePair> form = null;
-			UrlEncodedFormEntity entity = null;
-
-			// Generate a new item
-			item = this.getGenerator().newItem();
-			if (!this.getGenerator().isValidItem(item))
-			{
-				this.getLogger().warning("No valid item has been found. Operation interrupted.");
-				this.setFailed(true);
-				return;
-			}
-
-			// Fill-in the form and click on the 'Register item!' button
-			reqPost = new HttpPost(this.getGenerator().getRegisterItemURL());
-			form = new ArrayList<NameValuePair>();
-			form.add(new BasicNameValuePair("name", item.name));
-			form.add(new BasicNameValuePair("description", item.description));
-			form.add(new BasicNameValuePair("initialPrice", Float.toString(item.initialPrice)));
-			form.add(new BasicNameValuePair("reservePrice", Float.toString(item.reservePrice)));
-			form.add(new BasicNameValuePair("buyNow", Float.toString(item.buyNow)));
-			form.add(new BasicNameValuePair("duration", Integer.toString(this.getDuration(item.startDate, item.endDate))));
-			form.add(new BasicNameValuePair("quantity", Integer.toString(item.quantity)));
-			form.add(new BasicNameValuePair("userId", Integer.toString(loggedUser.id)));
-			//form.add(new BasicNameValuePair("categoryId", Integer.toString(this.getGenerator().getCategory(item.category).id)));
-			form.add(new BasicNameValuePair("categoryId", Integer.toString(item.category)));
-			entity = new UrlEncodedFormEntity(form, "UTF-8");
-			reqPost.setEntity(entity);
-			response = this.getHttpTransport().fetch(reqPost);
-			this.trace(reqPost.getURI().toString());
-			if (!this.getGenerator().checkHttpResponse(response.toString()))
-			{
-				this.getLogger().severe("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
-				throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
-			}
+			this.getLogger().warning("No valid item has been found. Operation interrupted.");
+			this.setFailed(true);
+			return;
 		}
-		finally
+
+		// Fill-in the form and click on the 'Register item!' button
+		reqPost = new HttpPost(this.getGenerator().getRegisterItemURL());
+		form = new ArrayList<NameValuePair>();
+		form.add(new BasicNameValuePair("name", item.name));
+		form.add(new BasicNameValuePair("description", item.description));
+		form.add(new BasicNameValuePair("initialPrice", Float.toString(item.initialPrice)));
+		form.add(new BasicNameValuePair("reservePrice", Float.toString(item.reservePrice)));
+		form.add(new BasicNameValuePair("buyNow", Float.toString(item.buyNow)));
+		form.add(new BasicNameValuePair("duration", Integer.toString(this.getDuration(item.startDate, item.endDate))));
+		form.add(new BasicNameValuePair("quantity", Integer.toString(item.quantity)));
+		form.add(new BasicNameValuePair("userId", Integer.toString(loggedUser.id)));
+		//form.add(new BasicNameValuePair("categoryId", Integer.toString(this.getGenerator().getCategory(item.category).id)));
+		form.add(new BasicNameValuePair("categoryId", Integer.toString(item.category)));
+		entity = new UrlEncodedFormEntity(form, "UTF-8");
+		reqPost.setEntity(entity);
+		response = this.getHttpTransport().fetch(reqPost);
+		this.trace(reqPost.getURI().toString());
+		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			RubisGenerator.unlockItems();
+			this.getLogger().severe("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+			throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		// Save session data

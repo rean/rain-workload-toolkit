@@ -69,42 +69,33 @@ public class RegisterUserOperation extends RubisOperation
 	{
 		StringBuilder response = null;
 
-		try
+		// Generate a new user
+		RubisUser user = this.getUtility().newUser();
+		if (!this.getUtility().isValidUser(user))
 		{
-			RubisGenerator.lockUsers();
-
-			// Generate a new user
-			RubisUser user = this.getGenerator().newUser();
-			if (!this.getGenerator().isValidUser(user))
-			{
-				// Just print a warning, but do not set the operation as failed
-				this.getLogger().warning("No valid user has been found. Operation interrupted.");
-				this.setFailed(true);
-				return;
-			}
-
-			// Fill-in the form and click on the 'Register now!' button
-			HttpPost reqPost = new HttpPost(this.getGenerator().getRegisterUserURL());
-			List<NameValuePair> form = new ArrayList<NameValuePair>();
-			form.add(new BasicNameValuePair("firstname", user.firstname));
-			form.add(new BasicNameValuePair("lastname", user.lastname));
-			form.add(new BasicNameValuePair("nickname", user.nickname));
-			form.add(new BasicNameValuePair("email", user.email));
-			form.add(new BasicNameValuePair("password", user.password));
-			form.add(new BasicNameValuePair("region", this.getGenerator().getRegion(user.region).name));
-			UrlEncodedFormEntity entity = new UrlEncodedFormEntity(form, "UTF-8");
-			reqPost.setEntity(entity);
-			response = this.getHttpTransport().fetch(reqPost);
-			this.trace(reqPost.getURI().toString());
-			if (!this.getGenerator().checkHttpResponse(response.toString()))
-			{
-				this.getLogger().severe("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
-				throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
-			}
+			// Just print a warning, but do not set the operation as failed
+			this.getLogger().warning("No valid user has been found. Operation interrupted.");
+			this.setFailed(true);
+			return;
 		}
-		finally
+
+		// Fill-in the form and click on the 'Register now!' button
+		HttpPost reqPost = new HttpPost(this.getGenerator().getRegisterUserURL());
+		List<NameValuePair> form = new ArrayList<NameValuePair>();
+		form.add(new BasicNameValuePair("firstname", user.firstname));
+		form.add(new BasicNameValuePair("lastname", user.lastname));
+		form.add(new BasicNameValuePair("nickname", user.nickname));
+		form.add(new BasicNameValuePair("email", user.email));
+		form.add(new BasicNameValuePair("password", user.password));
+		form.add(new BasicNameValuePair("region", this.getUtility().getRegion(user.region).name));
+		UrlEncodedFormEntity entity = new UrlEncodedFormEntity(form, "UTF-8");
+		reqPost.setEntity(entity);
+		response = this.getHttpTransport().fetch(reqPost);
+		this.trace(reqPost.getURI().toString());
+		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			RubisGenerator.unlockUsers();
+			this.getLogger().severe("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+			throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		// Save session data

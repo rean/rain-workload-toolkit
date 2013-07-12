@@ -72,8 +72,8 @@ public class BrowseCategoriesByRegionOperation extends RubisOperation
 //		}
 
 		// Generate a random region
-		RubisRegion region = this.getGenerator().generateRegion();
-		if (!this.getGenerator().isValidRegion(region))
+		RubisRegion region = this.getUtility().generateRegion();
+		if (!this.getUtility().isValidRegion(region))
 		{
 			this.getLogger().warning("No valid region has been found. Operation interrupted.");
 			this.setFailed(true);

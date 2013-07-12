@@ -70,11 +70,11 @@ public class SelectCategoryToSellItemOperation extends RubisOperation
 	{
 		StringBuilder response = null;
 
-		RubisUser loggedUser = this.getGenerator().getUser(this.getSessionState().getLoggedUserId());
-		if (!this.getGenerator().isValidUser(loggedUser))
+		RubisUser loggedUser = this.getUtility().getUser(this.getSessionState().getLoggedUserId());
+		if (!this.getUtility().isValidUser(loggedUser))
 		{
-			loggedUser = this.getGenerator().generateUser();
-			if (!this.getGenerator().isValidUser(loggedUser) || this.getUtility().isAnonymousUser(loggedUser))
+			loggedUser = this.getUtility().generateUser();
+			if (!this.getUtility().isValidUser(loggedUser) || this.getUtility().isAnonymousUser(loggedUser))
 			{
 				this.getLogger().warning("Need a logged user; got an anonymous one. Operation interrupted.");
 				this.setFailed(true);

@@ -71,8 +71,8 @@ public class ViewUserInfoOperation extends RubisOperation
 		{
 			// ignore: use anonymous user id
 		}
-		RubisUser user = this.getGenerator().getUser(userId);
-		if (!this.getGenerator().isValidUser(user) || this.getUtility().isAnonymousUser(user))
+		RubisUser user = this.getUtility().getUser(userId);
+		if (!this.getUtility().isValidUser(user) || this.getUtility().isAnonymousUser(user))
 		{
             //TODO: The official RUBiS goes back to the previous operation
             //      We could do the same by storing the previous operation in the session

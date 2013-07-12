@@ -69,11 +69,11 @@ public class AboutMeOperation extends RubisOperation
 		StringBuilder response = null;
 
 		// Need a logged user
-		RubisUser loggedUser = this.getGenerator().getUser(this.getSessionState().getLoggedUserId());
-		if (!this.getGenerator().isValidUser(loggedUser) || this.getUtility().isAnonymousUser(loggedUser))
+		RubisUser loggedUser = this.getUtility().getUser(this.getSessionState().getLoggedUserId());
+		if (!this.getUtility().isValidUser(loggedUser) || this.getUtility().isAnonymousUser(loggedUser))
 		{
-			loggedUser = this.getGenerator().generateUser();
-			if (!this.getGenerator().isValidUser(loggedUser) || this.getUtility().isAnonymousUser(loggedUser))
+			loggedUser = this.getUtility().generateUser();
+			if (!this.getUtility().isValidUser(loggedUser) || this.getUtility().isAnonymousUser(loggedUser))
 			{
 				// No user has been already registered
 				this.getLogger().warning("No valid user has been found to log-in. Operation interrupted.");

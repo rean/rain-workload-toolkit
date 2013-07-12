@@ -66,8 +66,8 @@ public class SearchItemsByRegionOperation extends RubisOperation
 		StringBuilder response = null;
 
 		// Generate a random region
-		RubisRegion region = this.getGenerator().generateRegion();
-		if (!this.getGenerator().isValidRegion(region))
+		RubisRegion region = this.getUtility().generateRegion();
+		if (!this.getUtility().isValidRegion(region))
 		{
 			this.getLogger().warning("No valid region has been found. Operation interrupted.");
 			this.setFailed(true);
@@ -75,8 +75,8 @@ public class SearchItemsByRegionOperation extends RubisOperation
 		}
 
 		// Generate a random category
-		RubisCategory category = this.getGenerator().generateCategory();
-		if (!this.getGenerator().isValidCategory(category))
+		RubisCategory category = this.getUtility().generateCategory();
+		if (!this.getUtility().isValidCategory(category))
 		{
 			this.getLogger().warning("No valid category has been found. Operation interrupted.");
 			this.setFailed(true);
@@ -104,7 +104,7 @@ public class SearchItemsByRegionOperation extends RubisOperation
 		}
 
 		// Save session data
-		this.getGenerator().getSessionState().setLastResponse(response.toString());
+		this.getSessionState().setLastResponse(response.toString());
 
 		this.setFailed(false);
 	}

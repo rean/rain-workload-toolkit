@@ -67,11 +67,11 @@ public class SellItemFormOperation extends RubisOperation
 	{
 		StringBuilder response = null;
 
-		RubisUser loggedUser = this.getGenerator().getUser(this.getSessionState().getLoggedUserId());
-		if (!this.getGenerator().isValidUser(loggedUser))
+		RubisUser loggedUser = this.getUtility().getUser(this.getSessionState().getLoggedUserId());
+		if (!this.getUtility().isValidUser(loggedUser))
 		{
-			loggedUser = this.getGenerator().generateUser();
-			if (!this.getGenerator().isValidUser(loggedUser) || this.getUtility().isAnonymousUser(loggedUser))
+			loggedUser = this.getUtility().generateUser();
+			if (!this.getUtility().isValidUser(loggedUser) || this.getUtility().isAnonymousUser(loggedUser))
 			{
 				this.getLogger().warning("No valid user has been found. Operation interrupted.");
 				this.setFailed(true);
@@ -80,8 +80,8 @@ public class SellItemFormOperation extends RubisOperation
 		}
 
 		// Generate a random category
-		RubisCategory category = this.getGenerator().generateCategory();
-		if (!this.getGenerator().isValidCategory(category))
+		RubisCategory category = this.getUtility().generateCategory();
+		if (!this.getUtility().isValidCategory(category))
 		{
 			this.getLogger().warning("No valid category has been found. Operation interrupted.");
 			this.setFailed(true);
