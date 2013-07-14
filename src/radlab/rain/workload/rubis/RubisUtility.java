@@ -36,6 +36,8 @@ package radlab.rain.workload.rubis;
 
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.concurrent.atomic.AtomicInteger;
+//import java.util.concurrent.Semaphore;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -82,15 +84,43 @@ public final class RubisUtility
 												   0, // Neutral
 												   3, // Average
 												   5  /* Excellent */ }; ///< Possible comment ratings
-	private static final int MIN_USER_ID = 0; ///< Mininum value of user IDs
-	private static final int MIN_ITEM_ID = 0; ///< Mininum value of item IDs
-	private static final int MIN_REGION_ID = 0; ///< Mininum value of region IDs
-	private static final int MIN_CATEGORY_ID = 0; ///< Mininum value of category IDs
+	private static final int MIN_USER_ID = 1; ///< Mininum value for user IDs
+	private static final int MIN_ITEM_ID = 1; ///< Mininum value for item IDs
+	private static final int MIN_REGION_ID = 1; ///< Mininum value for region IDs
+	private static final int MIN_CATEGORY_ID = 1; ///< Mininum value for category IDs
+	private static AtomicInteger _userId = new AtomicInteger();
+//	private static Semaphore _userLock = new Semaphore(1, true);
 
 
 	private Random _rng = null;
 	private RubisConfiguration _conf = null;
 	private Pattern _pageRegex = Pattern.compile("^.*?[&?]page=(\\d+).*?(?:[&?]page=(\\d+).*?)?$");
+
+
+	private static int nextUserId()
+	{
+		return _userId.incrementAndGet();
+	}
+
+	private static int lastUserId()
+	{
+		return _userId.get();
+	}
+
+//	private static void lockUsers() throws InterruptedException
+//	{
+//		_userLock.acquire();
+//	}
+
+//	private static void unlockUsers()
+//	{
+//		_userLock.release();
+//	}
+
+	private static synchronized void initUserId(int numPreloadUsers)
+	{
+		_userId = new AtomicInteger(MIN_USER_ID+numPreloadUsers);
+	}
 
 
 	public RubisUtility()
@@ -101,6 +131,8 @@ public final class RubisUtility
 	{
 		this._rng = rng;
 		this._conf = conf;
+
+		initUserId(this._conf.getNumberOfPreloadedUsers());
 	}
 
 	public void setRandomGenerator(Random rng)
@@ -116,6 +148,8 @@ public final class RubisUtility
 	public void setConfiguration(RubisConfiguration conf)
 	{
 		this._conf = conf;
+
+		initUserId(this._conf.getNumberOfPreloadedUsers());
 	}
 
 	public RubisConfiguration getConfiguration()
@@ -182,7 +216,7 @@ public final class RubisUtility
 	 */
 	public RubisUser newUser()
 	{
-		return this.getUser(ANONYMOUS_USER_ID);
+		return this.getUser(nextUserId());
 	}
 
 	/**
@@ -192,7 +226,8 @@ public final class RubisUtility
 	 */
 	public RubisUser generateUser()
 	{
-		int userId = this._rng.nextInt(this._conf.getNumberOfPreloadedUsers());
+		// Only generate a user among the ones that have been already preloaded in the DB
+		int userId = this._rng.nextInt(this._conf.getNumberOfPreloadedUsers()-MIN_USER_ID)+MIN_USER_ID;
 
 		return this.getUser(userId);
 	}
