@@ -103,8 +103,6 @@ public final class RubisConfiguration
 	private double _maxItemInitPrice= DEFAULT_MAX_ITEM_INIT_PRICE; ///< Maximum initial price for an item
 	private int _maxItemQty = DEFAULT_MAX_ITEM_QUANTITY; ///< Maximum quantity for multiple items
 	private int _maxWordLen = DEFAULT_MAX_WORD_LENGTH; ///< Maximum length of a word
-//	private int _nextAvailUserId = DEFAULT_NEXT_AVAILABLE_USER_ID; ///< Next available user ID in the RUBiS database
-//	private int _nextAvailItemId = DEFAULT_NEXT_AVAILABLE_ITEM_ID; ///< Next available user ID in the RUBiS database
 	private int _numItemsPerPage = DEFAULT_NUM_ITEMS_PER_PAGE; ///< Number of items per page
 //	private int _numOldItems = DEFAULT_NUM_OLD_ITEMS; ///< The total number of old (i.e., auction date is over) items to be inserted in the database
 	private int _numPreloadUsers = DEFAULT_NUM_PRELOADED_USERS; ///< Number of users that have been already preloaded in the RUBiS database
@@ -168,14 +166,6 @@ public final class RubisConfiguration
 		{
 			this._maxWordLen = config.getInt(CFG_MAX_WORD_LENGTH_KEY);
 		}
-//		if (config.has(CFG_NEXT_AVAIL_USER_ID_KEY))
-//		{
-//			this._nextAvailUserId = config.getInt(CFG_NEXT_AVAIL_USER_ID_KEY);
-//		}
-//		if (config.has(CFG_NEXT_AVAIL_ITEM_ID_KEY))
-//		{
-//			this._nextAvailItemId = config.getInt(CFG_NEXT_AVAIL_ITEM_ID_KEY);
-//		}
 		if (config.has(CFG_NUM_ITEMS_PER_PAGE_KEY))
 		{
 			this._numItemsPerPage = config.getInt(CFG_NUM_ITEMS_PER_PAGE_KEY);
@@ -396,7 +386,7 @@ public final class RubisConfiguration
 	 *
 	 * @return the number of preloaded users.
 	 */
-	public int getNumberOfPreloadedUsers()
+	public int getNumOfPreloadedUsers()
 	{
 		return this._numPreloadUsers;
 	}

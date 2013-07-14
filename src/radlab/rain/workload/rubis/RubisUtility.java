@@ -132,7 +132,7 @@ public final class RubisUtility
 		this._rng = rng;
 		this._conf = conf;
 
-		initUserId(this._conf.getNumberOfPreloadedUsers());
+		initUserId(this._conf.getNumOfPreloadedUsers());
 	}
 
 	public void setRandomGenerator(Random rng)
@@ -149,7 +149,7 @@ public final class RubisUtility
 	{
 		this._conf = conf;
 
-		initUserId(this._conf.getNumberOfPreloadedUsers());
+		initUserId(this._conf.getNumOfPreloadedUsers());
 	}
 
 	public RubisConfiguration getConfiguration()
@@ -227,7 +227,7 @@ public final class RubisUtility
 	public RubisUser generateUser()
 	{
 		// Only generate a user among the ones that have been already preloaded in the DB
-		int userId = this._rng.nextInt(this._conf.getNumberOfPreloadedUsers()-MIN_USER_ID)+MIN_USER_ID;
+		int userId = this._rng.nextInt(this._conf.getNumOfPreloadedUsers()-MIN_USER_ID)+MIN_USER_ID;
 
 		return this.getUser(userId);
 	}
