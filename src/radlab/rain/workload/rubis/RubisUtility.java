@@ -89,7 +89,9 @@ public final class RubisUtility
 	private static final int MIN_REGION_ID = 1; ///< Mininum value for region IDs
 	private static final int MIN_CATEGORY_ID = 1; ///< Mininum value for category IDs
 	private static AtomicInteger _userId = new AtomicInteger();
+	private static AtomicInteger _itemId = new AtomicInteger();
 //	private static Semaphore _userLock = new Semaphore(1, true);
+//	private static Semaphore _itemLock = new Semaphore(1, true);
 
 
 	private Random _rng = null;
@@ -107,6 +109,16 @@ public final class RubisUtility
 		return _userId.get();
 	}
 
+	private static int nextItemId()
+	{
+		return _itemId.incrementAndGet();
+	}
+
+	private static int lastItemId()
+	{
+		return _itemId.get();
+	}
+
 //	private static void lockUsers() throws InterruptedException
 //	{
 //		_userLock.acquire();
@@ -117,9 +129,24 @@ public final class RubisUtility
 //		_userLock.release();
 //	}
 
+//	private static void lockItems() throws InterruptedException
+//	{
+//		_itemLock.acquire();
+//	}
+
+//	private static void unlockItems()
+//	{
+//		_itemLock.release();
+//	}
+
 	private static synchronized void initUserId(int numPreloadUsers)
 	{
-		_userId = new AtomicInteger(MIN_USER_ID+numPreloadUsers);
+		_userId = new AtomicInteger(MIN_USER_ID+numPreloadUsers-1);
+	}
+
+	private static synchronized void initItemId(int numPreloadItems)
+	{
+		_itemId = new AtomicInteger(MIN_ITEM_ID+numPreloadItems-1);
 	}
 
 
@@ -133,6 +160,7 @@ public final class RubisUtility
 		this._conf = conf;
 
 		initUserId(this._conf.getNumOfPreloadedUsers());
+		initItemId(this._conf.getTotalActiveItems()+this._conf.getNumOfOldItems());
 	}
 
 	public void setRandomGenerator(Random rng)
@@ -260,24 +288,21 @@ public final class RubisUtility
 	 */
 	public RubisItem newItem(int loggedUserId)
 	{
-		return this.getItem(INVALID_ITEM_ID, loggedUserId);
+		return this.getItem(nextItemId(), loggedUserId);
 	}
 
-//	/**
-//	 * Generate a rngom RUBiS item among the ones already preloaded.
-//	 *
-//	 * @return an instance of RubisItem.
-//	 */
-//	public RubisItem generateItem()
-//	{
-//		int itemId = MIN_ITEM_ID-1;
-//		int lastItemId = RubisGenerator.getLastItemId();
-//		if (lastItemId >= MIN_ITEM_ID)
-//		{
-//			itemId = this.getRandomGenerator().nextInt(lastItemId+1-MIN_ITEM_ID)+MIN_ITEM_ID;
-//		}
-//		return this.getItem(itemId);
-//	}
+	/**
+	 * Generate a rngom RUBiS item among the ones already preloaded.
+	 *
+	 * @return an instance of RubisItem.
+	 */
+	public RubisItem generateItem(int loggedUserId)
+	{
+		// Only generate an item among the active and old ones
+		int itemId = this._rng.nextInt(this._conf.getTotalActiveItems()+this._conf.getNumOfOldItems()-MIN_ITEM_ID)+MIN_ITEM_ID;
+
+		return this.getItem(itemId, loggedUserId);
+	}
 
 	/**
 	 * Get the RUBiS item associated to the given identifier.
