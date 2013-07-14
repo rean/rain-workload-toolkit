@@ -67,16 +67,13 @@ public class SellItemFormOperation extends RubisOperation
 	{
 		StringBuilder response = null;
 
+		// Need a logged user
 		RubisUser loggedUser = this.getUtility().getUser(this.getSessionState().getLoggedUserId());
 		if (!this.getUtility().isValidUser(loggedUser))
 		{
-			loggedUser = this.getUtility().generateUser();
-			if (!this.getUtility().isValidUser(loggedUser) || this.getUtility().isAnonymousUser(loggedUser))
-			{
-				this.getLogger().warning("No valid user has been found. Operation interrupted.");
-				this.setFailed(true);
-				return;
-			}
+			this.getLogger().warning("No valid user has been found. Operation interrupted.");
+			this.setFailed(true);
+			return;
 		}
 
 		// Generate a random category
@@ -103,7 +100,6 @@ public class SellItemFormOperation extends RubisOperation
 
 		// Save session data
 		this.getSessionState().setLastResponse(response.toString());
-		this.getSessionState().setLoggedUserId(loggedUser.id);
 
 		this.setFailed(false);
 	}

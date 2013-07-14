@@ -108,13 +108,9 @@ public class StoreCommentOperation extends RubisOperation
 		RubisUser loggedUser = this.getUtility().getUser(this.getSessionState().getLoggedUserId());
 		if (!this.getUtility().isValidUser(loggedUser))
 		{
-			loggedUser = this.getUtility().generateUser();
-			if (!this.getUtility().isValidUser(loggedUser) || this.getUtility().isAnonymousUser(loggedUser))
-			{
-				this.getLogger().warning("Need a logged user; got an anonymous one. Operation interrupted.");
-				this.setFailed(true);
-				return;
-			}
+			this.getLogger().warning("Need a logged user; got an anonymous one. Operation interrupted.");
+			this.setFailed(true);
+			return;
 		}
 
 		HttpPost reqPost = null;
@@ -144,7 +140,6 @@ public class StoreCommentOperation extends RubisOperation
 		// Save session data
 		this.getSessionState().setLastResponse(response.toString());
 		this.getSessionState().setItemId(item.id);
-		this.getSessionState().setLoggedUserId(loggedUser.id);
 
 		this.setFailed(false);
 	}

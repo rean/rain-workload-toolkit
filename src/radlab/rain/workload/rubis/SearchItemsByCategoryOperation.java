@@ -68,7 +68,6 @@ public class SearchItemsByCategoryOperation extends RubisOperation
 		RubisCategory category = this.getUtility().generateCategory();
 		if (!this.getUtility().isValidCategory(category))
 		{
-			// Just print a warning, but do not set the operation as failed
 			this.getLogger().warning("No valid category has been found. Operation interrupted.");
 			this.setFailed(true);
 			return;

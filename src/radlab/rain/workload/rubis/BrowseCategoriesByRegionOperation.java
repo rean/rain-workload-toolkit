@@ -64,13 +64,6 @@ public class BrowseCategoriesByRegionOperation extends RubisOperation
 	{
 		StringBuilder response = null;
 
-//		if (this.getGenerator().getSessionState().getPreviousOperation() != RubisGenerator.BROWSE_REGIONS_OP)
-//		{
-//			this.getLogger().warning("Current and previous operation are not compatible. Operation interrupted.");
-//			this.setFailed(true);
-//			return;
-//		}
-
 		// Generate a random region
 		RubisRegion region = this.getUtility().generateRegion();
 		if (!this.getUtility().isValidRegion(region))
@@ -97,7 +90,7 @@ public class BrowseCategoriesByRegionOperation extends RubisOperation
 		}
 
 		// Save session data
-		this.getGenerator().getSessionState().setLastResponse(response.toString());
+		this.getSessionState().setLastResponse(response.toString());
 
 		this.setFailed(false);
 	}

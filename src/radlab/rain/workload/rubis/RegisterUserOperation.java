@@ -73,7 +73,6 @@ public class RegisterUserOperation extends RubisOperation
 		RubisUser user = this.getUtility().newUser();
 		if (!this.getUtility().isValidUser(user))
 		{
-			// Just print a warning, but do not set the operation as failed
 			this.getLogger().warning("No valid user has been found. Operation interrupted.");
 			this.setFailed(true);
 			return;

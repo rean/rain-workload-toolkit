@@ -74,16 +74,13 @@ public class RegisterItemOperation extends RubisOperation
 	{
 		StringBuilder response = null;
 
+		// Need a logged user
 		RubisUser loggedUser = this.getUtility().getUser(this.getSessionState().getLoggedUserId());
 		if (!this.getUtility().isValidUser(loggedUser))
 		{
-			loggedUser = this.getUtility().generateUser();
-			if (!this.getUtility().isValidUser(loggedUser) || this.getUtility().isAnonymousUser(loggedUser))
-			{
-				this.getLogger().warning("No valid user has been found. Operation interrupted.");
-				this.setFailed(true);
-				return;
-			}
+			this.getLogger().warning("No valid user has been found. Operation interrupted.");
+			this.setFailed(true);
+			return;
 		}
 
 		HttpPost reqPost = null;
@@ -124,7 +121,6 @@ public class RegisterItemOperation extends RubisOperation
 
 		// Save session data
 		this.getSessionState().setLastResponse(response.toString());
-		this.getSessionState().setLoggedUserId(loggedUser.id);
 		this.getSessionState().setItemId(item.id);
 
 		this.setFailed(false);
@@ -144,6 +140,6 @@ public class RegisterItemOperation extends RubisOperation
 
 		long diffTs = Math.abs(toTs-fromTs);
 
-		return (int)(diffTs/DAY_MILLISECS);
+		return (int) Math.round(diffTs/DAY_MILLISECS);
 	}
 }

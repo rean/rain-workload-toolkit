@@ -88,7 +88,7 @@ public class PutCommentAuthOperation extends RubisOperation
 		}
 		catch (NumberFormatException nfe)
 		{
-			// ignore and use  the anonymous user id
+			// ignore and use the anonymous user id
 		}
 		RubisUser toUser = this.getUtility().getUser(toUserId);
 		if (!this.getUtility().isValidUser(toUser))

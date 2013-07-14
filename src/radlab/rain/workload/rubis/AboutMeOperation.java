@@ -72,14 +72,9 @@ public class AboutMeOperation extends RubisOperation
 		RubisUser loggedUser = this.getUtility().getUser(this.getSessionState().getLoggedUserId());
 		if (!this.getUtility().isValidUser(loggedUser) || this.getUtility().isAnonymousUser(loggedUser))
 		{
-			loggedUser = this.getUtility().generateUser();
-			if (!this.getUtility().isValidUser(loggedUser) || this.getUtility().isAnonymousUser(loggedUser))
-			{
-				// No user has been already registered
-				this.getLogger().warning("No valid user has been found to log-in. Operation interrupted.");
-				this.setFailed(true);
-				return;
-			}
+			this.getLogger().warning("No valid user has been found to log-in. Operation interrupted.");
+			this.setFailed(true);
+			return;
 		}
 
 		HttpPost reqPost = null;
@@ -102,7 +97,6 @@ public class AboutMeOperation extends RubisOperation
 		}
 
 		// Save session data
-		this.getSessionState().setLoggedUserId(loggedUser.id);
 		this.getSessionState().setLastResponse(response.toString());
 
 		this.setFailed(false);

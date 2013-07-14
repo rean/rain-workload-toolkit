@@ -69,13 +69,15 @@ public class ViewUserInfoOperation extends RubisOperation
 		}
 		catch (NumberFormatException nfe)
 		{
-			// ignore: use anonymous user id
+			// ignore: use session user
+			userId = this.getSessionState().getLoggedUserId();
 		}
 		RubisUser user = this.getUtility().getUser(userId);
 		if (!this.getUtility().isValidUser(user) || this.getUtility().isAnonymousUser(user))
 		{
-            //TODO: The official RUBiS goes back to the previous operation
-            //      We could do the same by storing the previous operation in the session
+			//NOTE: The official RUBiS client goes back to the previous operation.
+			//      Currently, it seems there is no way to instruct RAIN to do a
+			//      similar thing.
 			this.getLogger().warning("No valid registered user has been found. Operation interrupted.");
 			this.setFailed(true);
 			return;
@@ -95,7 +97,6 @@ public class ViewUserInfoOperation extends RubisOperation
 
 		// Save session data
 		this.getSessionState().setLastResponse(response.toString());
-		//this.getSessionState().setLoggedUserId(loggedUser.id);
 
 		this.setFailed(false);
 	}

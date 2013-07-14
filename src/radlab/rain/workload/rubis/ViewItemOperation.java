@@ -70,8 +70,9 @@ public class ViewItemOperation extends RubisOperation
 			item = this.getUtility().getItem(this.getSessionState().getItemId(), this.getSessionState().getLoggedUserId());
 			if (!this.getUtility().isValidItem(item))
 			{
-				//TODO: The official RUBiS goes back to the previous operation
-				//      We could do the same by storing the previous operation in the session
+				//NOTE: The official RUBiS client goes back to the previous operation.
+				//      Currently, it seems there is no way to instruct RAIN to do a
+				//      similar thing.
 				this.getLogger().warning("No valid item has been found. Operation interrupted.");
 				this.setFailed(true);
 				return;

@@ -66,6 +66,9 @@ public class SearchItemsByRegionOperation extends RubisOperation
 		StringBuilder response = null;
 
 		// Generate a random region
+        // NOTE: Likewise the original RUBiS client, to favor speed of
+        //       computation we prefer to generate a random region instead
+        //       of getting it from the last HTML response.
 		RubisRegion region = this.getUtility().generateRegion();
 		if (!this.getUtility().isValidRegion(region))
 		{
@@ -75,6 +78,9 @@ public class SearchItemsByRegionOperation extends RubisOperation
 		}
 
 		// Generate a random category
+        // NOTE: Likewise the original RUBiS client, to favor speed of
+        //       computation we prefer to generate a random region instead
+        //       of getting it from the last HTML response.
 		RubisCategory category = this.getUtility().generateCategory();
 		if (!this.getUtility().isValidCategory(category))
 		{
@@ -91,8 +97,7 @@ public class SearchItemsByRegionOperation extends RubisOperation
 		uri.setParameter("region", Integer.toString(region.id));
 		uri.setParameter("category", Integer.toString(category.id));
 		uri.setParameter("categoryName", category.name);
-		//uri.setParameter("page", Integer.toString(this.getUtility.extractPageFromHTML(this.getLastHTML())));
-		uri.setParameter("page", Integer.toString(1));
+		uri.setParameter("page", Integer.toString(this.getUtility().findPageInHtml(this.getSessionState().getLastResponse())));
 		uri.setParameter("nbOfItems", Integer.toString(this.getConfiguration().getNumOfItemsPerPage()));
 		reqGet = new HttpGet(uri.build());
 		response = this.getHttpTransport().fetch(reqGet);
