@@ -273,7 +273,20 @@ public class RubisGenerator extends Generator
 		}
 		else if (lastOperation == BACK_SPECIAL_OP)
 		{
+			// Back to previous state
 			nextOperation = Math.max(HOME_OP, this._sessionState.getLastOperation());
+		}
+		else if (lastOperation == EOS_SPECIAL_OP)
+		{
+			// End-of-session
+
+			// Start from the initial operation
+			nextOperation = HOME_OP;
+
+			// Clear session data
+			this.getSessionState().clear();
+			// Generate a new user for the new session
+			this.getSessionState().setLoggedUserId(this.getUtility().generateUser().id);
 		}
 		else
 		{
@@ -849,18 +862,6 @@ public class RubisGenerator extends Generator
 	}
 
 	/**
-	 * Factory method.
-	 * 
-	 * @return  A prepared DummyOperation.
-	 */
-	public DummyOperation createDummyOperation()
-	{
-		DummyOperation op = new DummyOperation(this.getTrack().getInteractive(), this.getScoreboard());
-		op.prepare(this);
-		return op;
-	}
-
-	/**
 	 * Creates a newly instantiated, prepared operation.
 	 * 
 	 * @param opIndex The type of operation to instantiate.
@@ -924,10 +925,6 @@ public class RubisGenerator extends Generator
 				return this.createAboutMeAuthOperation();
 			case ABOUT_ME_OP:
 				return this.createAboutMeOperation();
-			case BACK_SPECIAL_OP:
-				return this.createDummyOperation();
-			case EOS_SPECIAL_OP:
-				return this.createDummyOperation();
 			default:
 		}
 

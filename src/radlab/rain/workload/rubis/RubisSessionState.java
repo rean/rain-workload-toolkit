@@ -41,17 +41,14 @@ package radlab.rain.workload.rubis;
  */
 public final class RubisSessionState
 {
-	private int _loggedUserId; ///< The current logged user identifier
-	private int _lastOp; ///< The identifier of the last terminated operation
-	private int _itemId; ///< The current item identifier
+	private int _loggedUserId = RubisUtility.ANONYMOUS_USER_ID; ///< The current logged user identifier
+	private int _lastOp = RubisUtility.INVALID_OPERATION_ID; ///< The identifier of the last terminated operation
+	private int _itemId = RubisUtility.INVALID_ITEM_ID; ///< The current item identifier
 	private String _lastResponse; ///< The response of the last terminated operation
 
 
 	public RubisSessionState()
 	{
-		this._loggedUserId = RubisUtility.ANONYMOUS_USER_ID;
-		this._lastOp = RubisUtility.INVALID_OPERATION_ID;
-		this._itemId = RubisUtility.INVALID_ITEM_ID;
 	}
 
 	public int getLastOperation()
@@ -92,5 +89,13 @@ public final class RubisSessionState
 	public void setItemId(int value)
 	{
 		this._itemId = value;
+	}
+
+	public void clear()
+	{
+		this._loggedUserId = RubisUtility.ANONYMOUS_USER_ID;
+		this._lastOp = RubisUtility.INVALID_OPERATION_ID;
+		this._itemId = RubisUtility.INVALID_ITEM_ID;
+		this._lastResponse = null;
 	}
 }
