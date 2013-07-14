@@ -72,6 +72,7 @@ Currently, the supported configuration properties are the following:
 - **rubis.maxItemQuantity**: a non-negative integer value representing the maximum quantity for multiple items; this is the RAIN counterpart of the *max\_quantity\_for_multiple\_items* RUBiS property.
 - **rubis.maxWordLen**: a non-negative integer value representing the maximum length of a randomly generated word.
 - **rubis.numItemsPerPage**: a non-negative integer value representing the maximum number of items to display in a single page; this is the RAIN counterpart of the *workload\_number\_of\_items\_per\_page* RUBiS property.
+- **rubis.numOldItems**: a non-negative integer value representing the number of items whose auction date is over; this is the RAIN counterpart of the *database\_number\_of\_old\_items* RUBiS property.
 - **rubis.numPreloadedUsers**: a non-negative integer value representing the number of user that have been already preloaded inside the RUBiS database; this is the RAIN counterpart of the *database\_number\_of\_users* RUBiS property.
 - **rubis.percentItemsBuyNow**: a non-negative real value between 0 and 100 (inclusive) represnting the percentage of items that users can "buy now"; this is the RAIN couterpart of the *percentage\_of_items\_with\_reserve\_price* RUBiS property.
 - **rubis.percentItemsReserve**: a non-negative real value between 0 and 100 (inclusive) representing the percentage of items with a reserve price; this is the RAIN counterpart of the *percentage\_of\_buy\_now\_items* RUBiS property.

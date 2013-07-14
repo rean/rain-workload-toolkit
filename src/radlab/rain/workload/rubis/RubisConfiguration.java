@@ -62,7 +62,7 @@ public final class RubisConfiguration
 	private static final String CFG_MAX_ITEM_QUANTITY_KEY = "rubis.maxItemQuantity";
 	private static final String CFG_MAX_WORD_LENGTH_KEY = "rubis.maxWordLen";
 	private static final String CFG_NUM_ITEMS_PER_PAGE_KEY = "rubis.numItemsPerPage";
-///	private static final String CFG_NUM_OLD_ITEMS_KEY = "rubis.numOldItems";
+	private static final String CFG_NUM_OLD_ITEMS_KEY = "rubis.numOldItems";
 	private static final String CFG_NUM_PRELOADED_USERS_KEY = "rubis.numPreloadedUsers";
 	private static final String CFG_PERCENT_UNIQUE_ITEMS_KEY = "rubis.percentUniqueItems";
 	private static final String CFG_PERCENT_ITEMS_RESERVE_KEY = "rubis.percentItemsReserve";
@@ -74,7 +74,7 @@ public final class RubisConfiguration
 	private static final long DEFAULT_RNG_SEED = -1;
 	private static final String DEFAULT_CATEGORIES_FILE = "resources/rubis-ebay_full_categories.txt";
 	private static final String DEFAULT_REGIONS_FILE = "resources/rubis-ebay_regions.txt";
-	//private static final int DEFAULT_NUM_OLD_ITEMS = 1000000;
+	private static final int DEFAULT_NUM_OLD_ITEMS = 1000000;
 	private static final double DEFAULT_PERCENTAGE_UNIQUE_ITEMS = 80;
 	private static final double DEFAULT_PERCENTAGE_ITEMS_RESERVE = 40;
 	private static final double DEFAULT_PERCENTAGE_ITEMS_BUY_NOW = 10;
@@ -104,7 +104,7 @@ public final class RubisConfiguration
 	private int _maxItemQty = DEFAULT_MAX_ITEM_QUANTITY; ///< Maximum quantity for multiple items
 	private int _maxWordLen = DEFAULT_MAX_WORD_LENGTH; ///< Maximum length of a word
 	private int _numItemsPerPage = DEFAULT_NUM_ITEMS_PER_PAGE; ///< Number of items per page
-//	private int _numOldItems = DEFAULT_NUM_OLD_ITEMS; ///< The total number of old (i.e., auction date is over) items to be inserted in the database
+	private int _numOldItems = DEFAULT_NUM_OLD_ITEMS; ///< The total number of old items (i.e., whose auction date is over) to be inserted in the database
 	private int _numPreloadUsers = DEFAULT_NUM_PRELOADED_USERS; ///< Number of users that have been already preloaded in the RUBiS database
 	private double _percItemsBuyNow = DEFAULT_PERCENTAGE_ITEMS_BUY_NOW; ///< Percentage of items that users can 'buy now'
 	private double _percItemsReserve = DEFAULT_PERCENTAGE_ITEMS_RESERVE; ///< Percentage of items with a reserve price
@@ -170,10 +170,10 @@ public final class RubisConfiguration
 		{
 			this._numItemsPerPage = config.getInt(CFG_NUM_ITEMS_PER_PAGE_KEY);
 		}
-//		if (config.has(CFG_NUM_OLD_ITEMS_KEY))
-//		{
-//			this._numOldItems = config.getInt(CFG_NUM_OLD_ITEMS_KEY);
-//		}
+		if (config.has(CFG_NUM_OLD_ITEMS_KEY))
+		{
+			this._numOldItems = config.getInt(CFG_NUM_OLD_ITEMS_KEY);
+		}
 		if (config.has(CFG_NUM_PRELOADED_USERS_KEY))
 		{
 			this._numPreloadUsers = config.getInt(CFG_NUM_PRELOADED_USERS_KEY);
@@ -330,32 +330,6 @@ public final class RubisConfiguration
 		return this._maxWordLen;
 	}
 
-//	/**
-//	 * Get the next available user ID that can be assigned to a new user inside
-//	 * the RUBiS database.
-//	 *
-//	 * This is the RAIN counterpart of the database_number_of_users RUBiS
-//	 * property; however, unlike that property, we require the next usable user
-//	 * ID instead of the last assigned user ID.
-//	 *
-//	 * @return next available user ID
-//	 */
-//	public int getNextAvailableUserId()
-//	{
-//		return this._nextAvailUserId;
-//	}
-
-//	/**
-//	 * Get the next available item ID that can be assigned to a new item inside
-//	 * the RUBiS database.
-//	 *
-//	 * @return next available item ID
-//	 */
-//	public int getNextAvailableItemId()
-//	{
-//		return this._nextAvailItemId;
-//	}
-
 	/**
 	 * Get the maximum number of items per page.
 	 *
@@ -369,16 +343,16 @@ public final class RubisConfiguration
 		return this._numItemsPerPage;
 	}
 
-//	/**
-//	 * Get the total number of old items (auction date is over) to be inserted
-//	 * in the database.
-//	 * 
-//	 * @return total number of old items (auction date is over)
-//	 */
-//	public int getNumOfOldItems()
-//	{
-//		return this._numOldItems;
-//	}
+	/**
+	 * Get the total number of old items (i.e. whose auction date is over) to be
+	 * inserted in the database.
+	 * 
+	 * @return total number of old items
+	 */
+	public int getNumOfOldItems()
+	{
+		return this._numOldItems;
+	}
 
 	/**
 	 * Get the number of users that have been already preloaded inside the
@@ -466,6 +440,34 @@ public final class RubisConfiguration
 	public int getTotalActiveItems()
 	{
 		return this._totActiveItems;
+	}
+
+	public String toString()
+	{
+		StringBuffer sb = new StringBuffer();
+
+		sb.append( " Categories: " + this.getCategories());
+		sb.append(", Categories File Name: " + this.getCategoriesFileName());
+		sb.append(", Max Bids per Item: " + this.getMaxBidsPerItem());
+		sb.append(", Max Comment Length: " + this.getMaxCommentLength());
+		sb.append(", Max Item Base Reserve Price: " + this.getMaxItemBaseReservePrice());
+		sb.append(", Max Item Base Buy Now: " + this.getMaxItemBaseBuyNowPrice());
+		sb.append(", Max Item Duration: " + this.getMaxItemDuration());
+		sb.append(", Max Item Initial Price: " + this.getMaxItemInitialPrice());
+		sb.append(", Max Item Quantity: " + this.getMaxItemQuantity());
+		sb.append(", Max Word Length: " + this.getMaxWordLength());
+		sb.append(", Number of Items per Page: " + this.getNumOfItemsPerPage());
+		sb.append(", Number of Old Items: " + this.getNumOfOldItems());
+		sb.append(", Number of Preloaded Users: " + this.getNumOfPreloadedUsers());
+		sb.append(", Percentage of Items that Users Can Buy Now: " + this.getPercentageOfItemsBuyNow());
+		sb.append(", Percentage of Items with a Reserve Price: " + this.getPercentageOfItemsReserve());
+		sb.append(", Percentage of Unique Items: " + this.getPercentageOfUniqueItems());
+		sb.append(", Regions: " + this.getRegions());
+		sb.append(", Regions File Name: " + this.getRegionsFileName());
+		sb.append(", Random Number Generator Seed: " + this.getRngSeed());
+		sb.append(", Total Active Items: " + this.getTotalActiveItems());
+
+		return sb.toString();
 	}
 
 	/**
