@@ -216,6 +216,12 @@ public final class RubisConfiguration
 		{
 			throw new JSONException(t);
 		}
+
+		//TODO: check parameters values
+		if (this._rngSeed <= 0)
+		{
+			this._rngSeed = DEFAULT_RNG_SEED;
+		}
 	}
 
 	/**
