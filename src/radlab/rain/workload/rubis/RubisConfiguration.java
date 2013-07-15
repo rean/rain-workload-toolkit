@@ -89,7 +89,7 @@ public final class RubisConfiguration
 	private static final int DEFAULT_MAX_ITEM_QUANTITY = 10;
 	private static final int DEFAULT_NUM_ITEMS_PER_PAGE = 20;
 	private static final int DEFAULT_MAX_COMMENT_LENGTH = 2048;
-	private static final int DEFAULT_NUM_PRELOADED_USERS = 0;
+	private static final int DEFAULT_NUM_PRELOADED_USERS = 1;
 	private static final int DEFAULT_MAX_WORD_LENGTH = 12;
 
 
