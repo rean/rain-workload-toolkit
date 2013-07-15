@@ -95,6 +95,7 @@ public final class RubisConfiguration
 
 	// Members to hold configuration values
 	private List<String> _categories = null; /*Arrays.asList(DEFAULT_CATEGORIES)*/; ///< A collection of categories
+	private List<Integer> _numItemsPerCategory = null; ///< Number of items for each category
 	private String _categoriesFile = DEFAULT_CATEGORIES_FILE; ///< File name of the RUBiS categories file
 	private int _maxCommentLen = DEFAULT_MAX_COMMENT_LENGTH; ///< Maximum comment length
 	private float _maxItemBaseBidPrice = DEFAULT_MAX_ITEM_BASE_BID_PRICE; ///< Maximum base bid price for an item
@@ -348,6 +349,18 @@ public final class RubisConfiguration
 	}
 
 	/**
+	 * Get the number of items for the given category.
+	 *
+	 * @param categoryId The category identifier for which the number of items has
+	 *  to be returned.
+	 * @return number of items for the given category
+	 */
+	public int getNumOfItemsPerCategory(int categoryId)
+	{
+		return this._numItemsPerCategory.get(categoryId);
+	}
+
+	/**
 	 * Get the maximum number of items per page.
 	 *
 	 * This is the RAIN counterpart of the workload_number_of_items_per_page
@@ -494,6 +507,7 @@ public final class RubisConfiguration
 	{
 		this._totActiveItems = 0;
 		this._categories = new ArrayList<String>();
+		this._numItemsPerCategory = new ArrayList<Integer>();
 
 		BufferedReader rd = null;
 		try
@@ -513,6 +527,7 @@ public final class RubisConfiguration
 				int numItems = Integer.parseInt(line.substring(openParIdx+1, closeParIdx));
 				this._totActiveItems += numItems;
 				this._categories.add(line.substring(0, openParIdx-1));
+				this._numItemsPerCategory.add(numItems);
 			}
 		}
 		finally
