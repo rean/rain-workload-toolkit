@@ -52,7 +52,7 @@ public class RubisItem
 	public float reservePrice;
 	public float buyNow;
 	public int nbOfBids;
-	public int maxBid;
+	public float maxBid;
 	public Date startDate;
 	public Date endDate;
 	public int seller;
