@@ -86,7 +86,16 @@ final class InitDb
 	public InitDb(RubisConfiguration conf, Connection dbConn)
 	{
 		this._conf = conf;
-		this._util = new RubisUtility(new Random(conf.getRngSeed()), conf);
+		Random rand = null;
+		if (conf.getRngSeed() <= 0)
+		{
+			rand = new Random(conf.getRngSeed());
+		}
+		else
+		{
+			rand = new Random();
+		}
+		this._util = new RubisUtility(rand, conf);
 		this._dbConn = dbConn;
 		this._testFlag = false;
 		this._pwr = null;
