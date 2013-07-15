@@ -671,6 +671,7 @@ public final class InitDbDriver
 		catch (Exception e)
 		{
 			System.err.println("[ERROR] Cannot initialize database: " + e);
+			e.printStackTrace();
 			System.exit(-1);
 		}
 		finally
