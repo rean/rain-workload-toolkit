@@ -38,6 +38,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.concurrent.atomic.AtomicInteger;
 //import java.util.concurrent.Semaphore;
+import java.util.Date;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -62,6 +63,8 @@ public final class RubisUtility
 	public static final int INVALID_REGION_ID = -1;
 	public static final int INVALID_ITEM_ID = -1;
 	public static final int INVALID_OPERATION_ID = -1;
+	public static final int MILLISECS_PER_DAY = 1000*60*60*24;
+
 
 	private static final char[] ALNUM_CHARS = { '0', '1', '2', '3', '4', '5',
 												'6', '7', '8', '9', 'A', 'B',
@@ -88,8 +91,8 @@ public final class RubisUtility
 	private static final int MIN_ITEM_ID = 1; ///< Mininum value for item IDs
 	private static final int MIN_REGION_ID = 1; ///< Mininum value for region IDs
 	private static final int MIN_CATEGORY_ID = 1; ///< Mininum value for category IDs
-	private static AtomicInteger _userId = new AtomicInteger();
-	private static AtomicInteger _itemId = new AtomicInteger();
+	private static AtomicInteger _userId;
+	private static AtomicInteger _itemId;
 //	private static Semaphore _userLock = new Semaphore(1, true);
 //	private static Semaphore _itemLock = new Semaphore(1, true);
 
@@ -611,6 +614,39 @@ public final class RubisUtility
 		}
 
 		return 0;
+	}
+
+	/**
+	 * Get the number of days between the two input dates.
+	 *
+	 * @param from The first date
+	 * @param to The second date
+	 * @return The number of days between from and to.
+	 *  A negative number means that the second date is earlier then the first
+	 *  date.
+	 */
+	public int getDaysBetween(Date from, Date to)
+	{
+		Calendar cal = Calendar.getInstance();
+
+		cal.setTime(from);
+		long fromTs = cal.getTimeInMillis();
+		cal.setTime(to);
+		long toTs = cal.getTimeInMillis();
+
+		//long diffTs = Math.abs(toTs-fromTs);
+		long diffTs = toTs-fromTs;
+
+		return Math.round(diffTs/MILLISECS_PER_DAY);
+	}
+
+	public Date addDays(Date date, int n)
+	{
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		cal.add(Calendar.DATE, n);
+
+		return cal.getTime();
 	}
 
 	/**

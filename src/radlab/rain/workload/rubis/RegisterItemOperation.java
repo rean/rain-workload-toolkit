@@ -36,8 +36,6 @@ package radlab.rain.workload.rubis;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import radlab.rain.IScoreboard;
 import org.apache.http.client.methods.HttpPost;
@@ -104,7 +102,7 @@ public class RegisterItemOperation extends RubisOperation
 		form.add(new BasicNameValuePair("initialPrice", Float.toString(item.initialPrice)));
 		form.add(new BasicNameValuePair("reservePrice", Float.toString(item.reservePrice)));
 		form.add(new BasicNameValuePair("buyNow", Float.toString(item.buyNow)));
-		form.add(new BasicNameValuePair("duration", Integer.toString(this.getDuration(item.startDate, item.endDate))));
+		form.add(new BasicNameValuePair("duration", Integer.toString(this.getUtility().getDaysBetween(item.startDate, item.endDate))));
 		form.add(new BasicNameValuePair("quantity", Integer.toString(item.quantity)));
 		form.add(new BasicNameValuePair("userId", Integer.toString(loggedUser.id)));
 		//form.add(new BasicNameValuePair("categoryId", Integer.toString(this.getGenerator().getCategory(item.category).id)));
@@ -124,22 +122,5 @@ public class RegisterItemOperation extends RubisOperation
 		this.getSessionState().setItemId(item.id);
 
 		this.setFailed(false);
-	}
-
-	/// Returns the number of days between the two dates.
-	private static int getDuration(Date from, Date to)
-	{
-		final int DAY_MILLISECS = 1000*60*60*24;
-
-		Calendar cal = Calendar.getInstance();
-
-		cal.setTime(from);
-		long fromTs = cal.getTimeInMillis();
-		cal.setTime(to);
-		long toTs = cal.getTimeInMillis();
-
-		long diffTs = Math.abs(toTs-fromTs);
-
-		return (int) Math.round(diffTs/DAY_MILLISECS);
 	}
 }
