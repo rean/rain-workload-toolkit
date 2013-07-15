@@ -64,6 +64,7 @@ Currently, the supported configuration properties are the following:
 - **rubis.categoriesFile**: a string representing the path to the RUBiS categories file; this is the RAIN counterpart of the *database\_regions\_file* RUBiS property.
 - **rubis.maxBidsPerItem**: a non-negative integer value representing the maximum number of bids per item; this is the RAIN counterpart of the *max\_bids\_per\_item* RUBiS property.
 - **rubis.maxCommentLen**: a non-negative integer value representing the maximum length of a comment to an item; this is the RAIN counterpart of the *comment\_max\_length* RUBiS property.
+- **rubis.maxItemBaseBidPrice**: a non-negative real value representing the maximum base "bid" price for an item.
 - **rubis.maxItemBaseBuyNowPrice**: a non-negative real value representing the maximum base "buy now" price for an item.
 - **rubis.maxItemBaseReservePrice**: a non-negative real value representing the maximum base reserve price for an item.
 - **rubis.maxItemDescrLen**: a string value representing the maximum length for the description of an item; this is the RAIN counterpart of the *item\_description\_length* RUBiS property.

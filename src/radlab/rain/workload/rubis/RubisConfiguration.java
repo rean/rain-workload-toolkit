@@ -54,8 +54,9 @@ public final class RubisConfiguration
 	private static final String CFG_CATEGORIES_FILE_KEY = "rubis.categoriesFile";
 	private static final String CFG_MAX_BIDS_PER_ITEM_KEY = "rubis.maxBidsPerItem";
 	private static final String CFG_MAX_COMMENT_LENGTH_KEY = "rubis.maxCommentLen";
-	private static final String CFG_MAX_ITEM_BASE_RESERVE_PRICE_KEY = "rubis.maxItemBaseReservePrice";
+	private static final String CFG_MAX_ITEM_BASE_BID_PRICE_KEY = "rubis.maxItemBaseBidPrice";
 	private static final String CFG_MAX_ITEM_BASE_BUY_NOW_PRICE_KEY = "rubis.maxItemBaseBuyNowPrice";
+	private static final String CFG_MAX_ITEM_BASE_RESERVE_PRICE_KEY = "rubis.maxItemBaseReservePrice";
 	private static final String CFG_MAX_ITEM_DESCR_LENGTH_KEY = "rubis.maxItemDescrLen";
 	private static final String CFG_MAX_ITEM_DURATION_KEY = "rubis.maxItemDuration";
 	private static final String CFG_MAX_ITEM_INIT_PRICE_KEY = "rubis.maxItemInitPrice";
@@ -75,40 +76,42 @@ public final class RubisConfiguration
 	private static final String DEFAULT_CATEGORIES_FILE = "resources/rubis-ebay_full_categories.txt";
 	private static final String DEFAULT_REGIONS_FILE = "resources/rubis-ebay_regions.txt";
 	private static final int DEFAULT_NUM_OLD_ITEMS = 1000000;
-	private static final double DEFAULT_PERCENTAGE_UNIQUE_ITEMS = 80;
-	private static final double DEFAULT_PERCENTAGE_ITEMS_RESERVE = 40;
-	private static final double DEFAULT_PERCENTAGE_ITEMS_BUY_NOW = 10;
-	private static final int DEFAULT_MAX_ITEM_QUANTITY = 10;
+	private static final float DEFAULT_PERCENTAGE_UNIQUE_ITEMS = 80;
+	private static final float DEFAULT_PERCENTAGE_ITEMS_RESERVE = 40;
+	private static final float DEFAULT_PERCENTAGE_ITEMS_BUY_NOW = 10;
 	private static final int DEFAULT_MAX_BIDS_PER_ITEM = 20;
+	private static final float DEFAULT_MAX_ITEM_BASE_BID_PRICE = 10;
+	private static final float DEFAULT_MAX_ITEM_BASE_BUY_NOW_PRICE = 1000;
+	private static final float DEFAULT_MAX_ITEM_BASE_RESERVE_PRICE = 1000;
 	private static final int DEFAULT_MAX_ITEM_DESCRIPTION_LENGTH = 8192;
+	private static final int DEFAULT_MAX_ITEM_DURATION = 7;
+	private static final int DEFAULT_MAX_ITEM_INIT_PRICE = 5000;
+	private static final int DEFAULT_MAX_ITEM_QUANTITY = 10;
 	private static final int DEFAULT_NUM_ITEMS_PER_PAGE = 20;
 	private static final int DEFAULT_MAX_COMMENT_LENGTH = 2048;
 	private static final int DEFAULT_NUM_PRELOADED_USERS = 0;
 	private static final int DEFAULT_MAX_WORD_LENGTH = 12;
-	private static final int DEFAULT_MAX_ITEM_INIT_PRICE = 5000;
-	private static final int DEFAULT_MAX_ITEM_BASE_RESERVE_PRICE = 1000;
-	private static final int DEFAULT_MAX_ITEM_BASE_BUY_NOW_PRICE = 1000;
-	private static final int DEFAULT_MAX_ITEM_DURATION = 7;
 
 
 	// Members to hold configuration values
 	private List<String> _categories = null; /*Arrays.asList(DEFAULT_CATEGORIES)*/; ///< A collection of categories
 	private String _categoriesFile = DEFAULT_CATEGORIES_FILE; ///< File name of the RUBiS categories file
 	private int _maxCommentLen = DEFAULT_MAX_COMMENT_LENGTH; ///< Maximum comment length
-	private double _maxItemBaseReservePrice= DEFAULT_MAX_ITEM_BASE_RESERVE_PRICE; ///< Maximum base reserve price for an item
-	private double _maxItemBaseBuyNowPrice= DEFAULT_MAX_ITEM_BASE_BUY_NOW_PRICE; ///< Maximum base buy now price for an item
+	private float _maxItemBaseBidPrice = DEFAULT_MAX_ITEM_BASE_BID_PRICE; ///< Maximum base bid price for an item
+	private float _maxItemBaseBuyNowPrice = DEFAULT_MAX_ITEM_BASE_BUY_NOW_PRICE; ///< Maximum base buy now price for an item
+	private float _maxItemBaseReservePrice = DEFAULT_MAX_ITEM_BASE_RESERVE_PRICE; ///< Maximum base reserve price for an item
 	private int _maxItemBids = DEFAULT_MAX_BIDS_PER_ITEM; ///< Maximum number of bids per item
 	private int _maxItemDescrLen = DEFAULT_MAX_ITEM_DESCRIPTION_LENGTH; ///< Maximum item description length
 	private int _maxItemDuration = DEFAULT_MAX_ITEM_DURATION; ///< Maximum duration of an item
-	private double _maxItemInitPrice= DEFAULT_MAX_ITEM_INIT_PRICE; ///< Maximum initial price for an item
+	private float _maxItemInitPrice= DEFAULT_MAX_ITEM_INIT_PRICE; ///< Maximum initial price for an item
 	private int _maxItemQty = DEFAULT_MAX_ITEM_QUANTITY; ///< Maximum quantity for multiple items
 	private int _maxWordLen = DEFAULT_MAX_WORD_LENGTH; ///< Maximum length of a word
 	private int _numItemsPerPage = DEFAULT_NUM_ITEMS_PER_PAGE; ///< Number of items per page
 	private int _numOldItems = DEFAULT_NUM_OLD_ITEMS; ///< The total number of old items (i.e., whose auction date is over) to be inserted in the database
 	private int _numPreloadUsers = DEFAULT_NUM_PRELOADED_USERS; ///< Number of users that have been already preloaded in the RUBiS database
-	private double _percItemsBuyNow = DEFAULT_PERCENTAGE_ITEMS_BUY_NOW; ///< Percentage of items that users can 'buy now'
-	private double _percItemsReserve = DEFAULT_PERCENTAGE_ITEMS_RESERVE; ///< Percentage of items with a reserve price
-	private double _percUniqueItems = DEFAULT_PERCENTAGE_UNIQUE_ITEMS; ///< Percentage of unique items
+	private float _percItemsBuyNow = DEFAULT_PERCENTAGE_ITEMS_BUY_NOW; ///< Percentage of items that users can 'buy now'
+	private float _percItemsReserve = DEFAULT_PERCENTAGE_ITEMS_RESERVE; ///< Percentage of items with a reserve price
+	private float _percUniqueItems = DEFAULT_PERCENTAGE_UNIQUE_ITEMS; ///< Percentage of unique items
 	private List<String> _regions = null; /*Arrays.asList(DEFAULT_REGIONS)*/; ///< A collection of categories
 	private String _regionsFile = DEFAULT_REGIONS_FILE; ///< File name of the RUBiS regions file
     private long _rngSeed = DEFAULT_RNG_SEED; ///< The seed used for the Random Number Generator; a value <= 0 means that no special seed is used.
@@ -138,13 +141,17 @@ public final class RubisConfiguration
 		{
 			this._maxCommentLen = config.getInt(CFG_MAX_COMMENT_LENGTH_KEY);
 		}
+		if (config.has(CFG_MAX_ITEM_BASE_BID_PRICE_KEY))
+		{
+			this._maxItemBaseBidPrice = (float) config.getDouble(CFG_MAX_ITEM_BASE_BID_PRICE_KEY);
+		}
 		if (config.has(CFG_MAX_ITEM_BASE_BUY_NOW_PRICE_KEY))
 		{
-			this._maxItemBaseBuyNowPrice = config.getDouble(CFG_MAX_ITEM_BASE_BUY_NOW_PRICE_KEY);
+			this._maxItemBaseBuyNowPrice = (float) config.getDouble(CFG_MAX_ITEM_BASE_BUY_NOW_PRICE_KEY);
 		}
 		if (config.has(CFG_MAX_ITEM_BASE_RESERVE_PRICE_KEY))
 		{
-			this._maxItemBaseReservePrice = config.getDouble(CFG_MAX_ITEM_BASE_RESERVE_PRICE_KEY);
+			this._maxItemBaseReservePrice = (float) config.getDouble(CFG_MAX_ITEM_BASE_RESERVE_PRICE_KEY);
 		}
 		if (config.has(CFG_MAX_ITEM_DESCR_LENGTH_KEY))
 		{
@@ -156,7 +163,7 @@ public final class RubisConfiguration
 		}
 		if (config.has(CFG_MAX_ITEM_INIT_PRICE_KEY))
 		{
-			this._maxItemInitPrice = config.getDouble(CFG_MAX_ITEM_INIT_PRICE_KEY);
+			this._maxItemInitPrice = (float) config.getDouble(CFG_MAX_ITEM_INIT_PRICE_KEY);
 		}
 		if (config.has(CFG_MAX_ITEM_QUANTITY_KEY))
 		{
@@ -180,15 +187,15 @@ public final class RubisConfiguration
 		}
 		if (config.has(CFG_PERCENT_UNIQUE_ITEMS_KEY))
 		{
-			this._percUniqueItems = config.getDouble(CFG_PERCENT_UNIQUE_ITEMS_KEY);
+			this._percUniqueItems = (float) config.getDouble(CFG_PERCENT_UNIQUE_ITEMS_KEY);
 		}
 		if (config.has(CFG_PERCENT_ITEMS_RESERVE_KEY))
 		{
-			this._percItemsReserve = config.getDouble(CFG_PERCENT_ITEMS_RESERVE_KEY);
+			this._percItemsReserve = (float) config.getDouble(CFG_PERCENT_ITEMS_RESERVE_KEY);
 		}
 		if (config.has(CFG_PERCENT_ITEMS_BUY_NOW_KEY))
 		{
-			this._percItemsBuyNow = config.getDouble(CFG_PERCENT_ITEMS_BUY_NOW_KEY);
+			this._percItemsBuyNow = (float) config.getDouble(CFG_PERCENT_ITEMS_BUY_NOW_KEY);
 		}
 		if (config.has(CFG_REGIONS_FILE_KEY))
 		{
@@ -260,9 +267,19 @@ public final class RubisConfiguration
 	 *
 	 * @return the maximum base reserve price for an item
 	 */
-	public double getMaxItemBaseReservePrice()
+	public float getMaxItemBaseReservePrice()
 	{
 		return this._maxItemBaseReservePrice;
+	}
+
+	/**
+	 * Get the maximum base bid price for an item
+	 * 
+	 * @return maximum base bid price for an item
+	 */
+	public float getMaxItemBaseBidPrice()
+	{
+		return this._maxItemBaseBidPrice;
 	}
 
 	/**
@@ -270,7 +287,7 @@ public final class RubisConfiguration
 	 *
 	 * @return the maximum base buy now price for an item
 	 */
-	public double getMaxItemBaseBuyNowPrice()
+	public float getMaxItemBaseBuyNowPrice()
 	{
 		return this._maxItemBaseBuyNowPrice;
 	}
@@ -303,7 +320,7 @@ public final class RubisConfiguration
 	 *
 	 * @return the maximum initial price for an item
 	 */
-	public double getMaxItemInitialPrice()
+	public float getMaxItemInitialPrice()
 	{
 		return this._maxItemInitPrice;
 	}
@@ -372,7 +389,7 @@ public final class RubisConfiguration
 	 *
 	 * @return percentage of items that users can 'buy now'.
 	 */
-	public double getPercentageOfItemsBuyNow()
+	public float getPercentageOfItemsBuyNow()
 	{
 		return this._percItemsBuyNow;
 	}
@@ -384,7 +401,7 @@ public final class RubisConfiguration
 	 *
 	 * @return percentage of items with a reserve price
 	 */
-	public double getPercentageOfItemsReserve()
+	public float getPercentageOfItemsReserve()
 	{
 		return this._percItemsReserve;
 	}
@@ -396,7 +413,7 @@ public final class RubisConfiguration
 	 *
 	 * @return percentage of unique items
 	 */
-	public double getPercentageOfUniqueItems()
+	public float getPercentageOfUniqueItems()
 	{
 		return this._percUniqueItems;
 	}
