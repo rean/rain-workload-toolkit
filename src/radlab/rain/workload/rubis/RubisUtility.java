@@ -265,7 +265,7 @@ public final class RubisUtility
 	}
 
 	/**
-	 * Generate a rngom RUBiS user among the ones already preloaded.
+	 * Generate a random RUBiS user among the ones already preloaded.
 	 *
 	 * @return an instance of RubisUser.
 	 */
@@ -309,7 +309,7 @@ public final class RubisUtility
 	}
 
 	/**
-	 * Generate a rngom RUBiS item among the ones already preloaded.
+	 * Generate a random RUBiS item among the ones already preloaded.
 	 *
 	 * @return an instance of RubisItem.
 	 */
@@ -432,7 +432,7 @@ public final class RubisUtility
 	 * @param html The HTML string where to look for the item identifier.
 	 * @return The found item identifier, or INVALID_ITEM_ID if
 	 *  no item identifier is found. If more than one item is found, returns the
-	 *  one picked at rngom.
+	 *  one picked at random.
 	 *
 	 * This method is based on the edu.rice.rubis.client.UserSession#extractItemIdFromHTML.
 	 */
@@ -456,7 +456,7 @@ public final class RubisUtility
 			return INVALID_ITEM_ID;
 		}
 
-		// Choose rngomly an item
+		// Choose randomly an item
 		count = this._rng.nextInt(count) + 1;
 
 		keyIdx = -7;
@@ -590,7 +590,7 @@ public final class RubisUtility
 //		}
 //		else
 //		{
-//			// Choose rngomly a page (previous or next)
+//			// Choose randomly a page (previous or next)
 //			if (this._rng.nextInt(100000) < 50000)
 //			{
 //				chosenIdx = firstPageIdx;
@@ -616,7 +616,7 @@ public final class RubisUtility
 		{
 			if (m.groupCount() == 2 && m.group(2) != null)
 			{
-				// Choose rngomly a page (previous or next)
+				// Choose randomly a page (previous or next)
 				if (this._rng.nextInt(100000) < 50000)
 				{
 					return Integer.parseInt(m.group(1));
@@ -686,7 +686,7 @@ public final class RubisUtility
 	}
 
 	/**
-	 * Generates a rngom text.
+	 * Generates a random text.
 	 *
 	 * @param minLen The minimum length of the text.
 	 * @param maxLen The maximum length of the text.
@@ -714,7 +714,7 @@ public final class RubisUtility
 	}
 
 	/**
-	 * Generates a rngom word.
+	 * Generates a random word.
 	 *
 	 * @param minLen The minimum length of the word.
 	 * @param maxLen The maximum length of the word.
