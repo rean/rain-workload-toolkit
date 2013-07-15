@@ -51,6 +51,7 @@ import java.sql.Statement;
 import java.util.Random;
 import org.json.JSONObject;
 import org.json.JSONException;
+import radlab.rain.ScenarioTrack;
 import radlab.rain.workload.rubis.model.RubisComment;
 import radlab.rain.workload.rubis.model.RubisItem;
 import radlab.rain.workload.rubis.model.RubisUser;
@@ -195,7 +196,7 @@ final class InitDb
 
 						if (id != genId)
 						{
-							System.err.println("Warning: expected user ID (" + id + ") is different from the one that has been generated (" + genId + ")");
+							System.err.println("[WARNING] Expected user ID (" + id + ") is different from the one that has been generated (" + genId + ")");
 						}
 					}
 					rs.close();
@@ -360,7 +361,7 @@ final class InitDb
 
 						if (id != genId)
 						{
-							System.err.println("Warning: expected item ID (" + id + ") is different from the one that has been generated (" + genId + ")");
+							System.err.println("[WARNING] Expected item ID (" + id + ") is different from the one that has been generated (" + genId + ")");
 						}
 					}
 					rs.close();
@@ -614,7 +615,19 @@ public final class InitDbDriver
 		RubisConfiguration conf = null;
 		try
 		{
-			conf = new RubisConfiguration(new JSONObject(sb.toString()));
+			JSONObject json = new JSONObject(sb.toString());
+			if (json.has(ScenarioTrack.CFG_GENERATOR_PARAMS_KEY))
+			{
+				conf = new RubisConfiguration(json.getJSONObject(ScenarioTrack.CFG_GENERATOR_PARAMS_KEY));
+			}
+			else
+			{
+				// Try to use default values
+
+				System.err.println("[WARNING] No generator parameters has been found. Try to use default values.");
+
+				conf = new RubisConfiguration();
+			}
 		}
 		catch (JSONException je)
 		{
