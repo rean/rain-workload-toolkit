@@ -49,6 +49,7 @@ import radlab.rain.workload.rubis.model.RubisComment;
 import radlab.rain.workload.rubis.model.RubisItem;
 import radlab.rain.workload.rubis.model.RubisRegion;
 import radlab.rain.workload.rubis.model.RubisUser;
+import radlab.rain.workload.rubis.util.DiscreteDistribution;
 
 
 /**
@@ -99,6 +100,7 @@ public final class RubisUtility
 
 	private Random _rng = null;
 	private RubisConfiguration _conf = null;
+	private DiscreteDistribution _catDistr = null; ///< Probability distribution for generating random categories
 	private Pattern _pageRegex = Pattern.compile("^.*?[&?]page=(\\d+).*?(?:[&?]page=(\\d+).*?)?$");
 
 
@@ -164,6 +166,18 @@ public final class RubisUtility
 
 		initUserId(this._conf.getNumOfPreloadedUsers());
 		initItemId(this._conf.getTotalActiveItems()+this._conf.getNumOfOldItems());
+
+		int nc = this._conf.getCategories().size();
+		if (nc > 0)
+		{
+			double[] catProbs = new double[nc];
+			for (int i = 0; i < nc; ++i)
+			{
+				catProbs[i] = this._conf.getNumOfItemsPerCategory(i) / this._conf.getTotalActiveItems();
+			}
+
+			this._catDistr = new DiscreteDistribution(catProbs);
+		}
 	}
 
 	public void setRandomGenerator(Random rng)
@@ -359,7 +373,8 @@ public final class RubisUtility
 
 	public RubisCategory generateCategory()
 	{
-		return this.getCategory(this._rng.nextInt(this._conf.getCategories().size()-MIN_CATEGORY_ID)+MIN_CATEGORY_ID);
+//		return this.getCategory(this._rng.nextInt(this._conf.getCategories().size()-MIN_CATEGORY_ID)+MIN_CATEGORY_ID);
+		return this.getCategory(this._catDistr.nextInt(this._rng)+MIN_CATEGORY_ID);
 	}
 
 	public RubisRegion generateRegion()
