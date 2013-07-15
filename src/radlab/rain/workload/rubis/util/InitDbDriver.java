@@ -545,6 +545,7 @@ public final class InitDbDriver
 	private static String DEFAULT_OPT_DB_URL = "jdbc:mysql://localhost/rubis";
 	private static String DEFAULT_OPT_DB_USER = "";
 	private static String DEFAULT_OPT_DB_PASSWORD = "";
+	private static boolean DEFAULT_OPT_DEBUG = false;
 	private static boolean DEFAULT_OPT_TEST = false;
 	private static boolean DEFAULT_OPT_DUMP = false;
 	private static String DEFAULT_OPT_DUMP_FILE = "";
@@ -556,6 +557,7 @@ public final class InitDbDriver
 		String optDbUrl = DEFAULT_OPT_DB_URL;
 		String optDbUser = DEFAULT_OPT_DB_USER;
 		String optDbPassword = DEFAULT_OPT_DB_PASSWORD;
+		boolean optDebug = DEFAULT_OPT_DEBUG;
 		boolean optTest = DEFAULT_OPT_TEST;
 		boolean optDump = DEFAULT_OPT_DUMP;
 		String optDumpFile = DEFAULT_OPT_DUMP_FILE;
@@ -581,6 +583,11 @@ public final class InitDbDriver
 			else if (args[i].equals("-dbpwd"))
 			{
 				optDbPassword = args[i+1];
+				++i;
+			}
+			else if (args[i].equals("-debug"))
+			{
+				optDebug = true;
 				++i;
 			}
 			else if (args[i].equals("-test"))
@@ -621,6 +628,11 @@ public final class InitDbDriver
 			System.exit(-1);
 		}
 
+		if (optDebug)
+		{
+			System.err.println("[DEBUG] Configuration File: " + sb.toString());
+		}
+
 		RubisConfiguration conf = null;
 		try
 		{
@@ -649,6 +661,11 @@ public final class InitDbDriver
 		{
 			System.err.println("[ERROR] Cannot parse configuration file '" + optConfigFile + ": " + je);
 			System.exit(-1);
+		}
+
+		if (optDebug)
+		{
+			System.err.println("[DEBUG] Configuration: " + conf);
 		}
 
 		Connection dbConn = null;
@@ -724,6 +741,8 @@ public final class InitDbDriver
 		System.err.println("  [Default='" + DEFAULT_OPT_DB_USER + "']");
 		System.err.println(" -dbpwd <password>: The user's password.");
 		System.err.println("  [Default='" + DEFAULT_OPT_DB_PASSWORD + "']");
+		System.err.println(" -debug: Print messages that can be useful for debugging purpose.");
+		System.err.println("  [Default='" + DEFAULT_OPT_DEBUG + "']");
 		System.err.println(" -test: Does not perform any operation inside the database.");
 		System.err.println("  [Default='" + DEFAULT_OPT_TEST + "']");
 		System.err.println(" -dump: Dump the generated SQL on the <dumpfile> (if specified) or on standard output.");
