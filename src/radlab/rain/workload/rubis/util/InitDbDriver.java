@@ -625,11 +625,18 @@ public final class InitDbDriver
 		try
 		{
 			JSONObject json = new JSONObject(sb.toString());
-			if (json.has(ScenarioTrack.CFG_GENERATOR_PARAMS_KEY))
+			if (json.length() > 0)
 			{
-				conf = new RubisConfiguration(json.getJSONObject(ScenarioTrack.CFG_GENERATOR_PARAMS_KEY));
+				// The first key is something link "rubis-001"
+
+				String key = json.keys().next().toString();
+				json = json.getJSONObject(key);
+				if (json != null && json.has(ScenarioTrack.CFG_GENERATOR_PARAMS_KEY))
+				{   
+					conf = new RubisConfiguration(json.getJSONObject(ScenarioTrack.CFG_GENERATOR_PARAMS_KEY));
+				}
 			}
-			else
+			if (conf == null)
 			{
 				// Try to use default values
 
