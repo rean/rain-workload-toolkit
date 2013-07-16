@@ -588,12 +588,10 @@ public final class InitDbDriver
 			else if (args[i].equals("-debug"))
 			{
 				optDebug = true;
-				++i;
 			}
 			else if (args[i].equals("-dump"))
 			{
 				optDump = true;
-				++i;
 			}
 			else if (args[i].equals("-dumpfile"))
 			{
@@ -609,7 +607,6 @@ public final class InitDbDriver
 			else if (args[i].equals("-test"))
 			{
 				optTest = true;
-				++i;
 			}
 		}
 
