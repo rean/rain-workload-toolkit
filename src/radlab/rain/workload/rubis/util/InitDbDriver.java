@@ -147,7 +147,7 @@ final class InitDb
 		PreparedStatement prepStmt = null;
 
 		double nextProgress = 0;
-		double stepProgress = 10;
+		double stepProgress = 0.1;
 
 		if (this._verboseFlag)
 		{
@@ -292,6 +292,15 @@ final class InitDb
 		PreparedStatement bidStmt = null;
 		PreparedStatement comStmt = null;
 
+		double nextProgress = 0;
+		double stepProgress = 0.1;
+
+		if (this._verboseFlag)
+		{
+			System.err.print("[INFO] Initialize Items: ");
+			System.err.flush();
+		}
+
 		try
 		{
 			if (!this._testFlag)
@@ -421,6 +430,17 @@ final class InitDb
 
 				this.initializeBids(item, bidStmt);
 				this.initializeComments(item, bidStmt);
+
+				if (this._verboseFlag)
+				{
+					double currentProgress = (id-minId)/((double) (maxId-minId));
+					if (currentProgress >= nextProgress)
+					{
+						System.err.print(".");
+						System.err.flush();
+						nextProgress += stepProgress;
+					}
+				}
 			}
 
 			if (!this._testFlag)
@@ -460,6 +480,11 @@ final class InitDb
 
 				this._dbConn.setAutoCommit(true);
 			}
+		}
+
+		if (this._verboseFlag)
+		{
+			System.err.println();
 		}
 	}
 
