@@ -52,8 +52,10 @@ import java.util.Random;
 import org.json.JSONObject;
 import org.json.JSONException;
 import radlab.rain.ScenarioTrack;
+import radlab.rain.workload.rubis.model.RubisCategory;
 import radlab.rain.workload.rubis.model.RubisComment;
 import radlab.rain.workload.rubis.model.RubisItem;
+import radlab.rain.workload.rubis.model.RubisRegion;
 import radlab.rain.workload.rubis.model.RubisUser;
 import radlab.rain.workload.rubis.RubisConfiguration;
 import radlab.rain.workload.rubis.RubisUtility;
@@ -66,6 +68,10 @@ import radlab.rain.workload.rubis.RubisUtility;
  */
 final class InitDb
 {
+	private static final String SQL_DELETE_REGIONS = "DELETE FROM regions";
+	private static final String SQL_INSERT_REGION = "INSERT INTO regions (id,name) VALUES (?,?)";
+	private static final String SQL_DELETE_CATEGORIES = "DELETE FROM categories";
+	private static final String SQL_INSERT_CATEGORY = "INSERT INTO categories (id,name) VALUES (?,?)";
 	private static final String SQL_DELETE_USERS = "DELETE FROM users";
 	private static final String SQL_INSERT_USER = "INSERT INTO users (id,firstname,lastname,nickname,password,email,rating,balance,creation_date,region) VALUES (?,?,?,?,?,?,?,?,?,?)";
 	private static final String SQL_DELETE_ITEMS = "DELETE FROM items";
@@ -137,8 +143,264 @@ final class InitDb
 
 	public void initialize() throws Exception
 	{
+		this.initializeRegions();
+		this.initializeCategories();
 		this.initializeUsers();
 		this.initializeItems();
+	}
+
+	private void initializeRegions() throws Exception
+	{
+		Statement stmt = null;
+		PreparedStatement prepStmt = null;
+
+		double nextProgress = 0;
+		double stepProgress = 0.1;
+
+		if (this._verboseFlag)
+		{
+			System.err.print("[INFO] Initialize Regions: ");
+			System.err.flush();
+		}
+
+		try
+		{
+			if (!this._testFlag)
+			{
+				this._dbConn.setAutoCommit(false);
+
+			}
+
+			int minId = 1;
+
+			// Delete all existing regions
+			if (!this._testFlag)
+			{
+				stmt = this._dbConn.createStatement();
+				stmt.executeUpdate(SQL_DELETE_REGIONS);
+			}
+			if (this._pwr != null)
+			{
+				this._pwr.println(this._dbConn.nativeSQL(SQL_DELETE_REGIONS));
+			}
+
+			// Generate regions
+			final int maxId = this._conf.getRegions().size()+minId;
+			prepStmt = this._dbConn.prepareStatement(SQL_INSERT_REGION, Statement.RETURN_GENERATED_KEYS);
+			for (int id = minId; id <= maxId; ++id)
+			{
+				RubisRegion region = this._util.getRegion(id);
+
+				prepStmt.clearParameters();
+				prepStmt.setInt(1, region.id);
+				prepStmt.setString(2, region.name);
+
+				if (!this._testFlag)
+				{
+					int affectedRows = prepStmt.executeUpdate();
+
+					// Experimental: use batches instead of execute one query at a time
+					//prepStmt.addBatch();
+					//if ((id % 1000) == 0)
+					//{
+					//	prepStmt.executeBatch();
+					//}
+
+					if (affectedRows == 0)
+					{
+						throw new SQLException("During region insertion: No rows affected");
+					}
+
+					ResultSet rs = prepStmt.getGeneratedKeys();
+					if (rs.last())
+					{
+						int genId = rs.getInt(1);
+
+						if (id != genId)
+						{
+							System.err.println("[WARNING] Expected region ID (" + id + ") is different from the one that has been generated (" + genId + ")");
+						}
+					}
+					rs.close();
+				}
+				if (this._pwr != null)
+				{
+					this._pwr.println(prepStmt);
+				}
+
+				if (this._verboseFlag)
+				{
+					double currentProgress = (id-minId)/((double) (maxId-minId));
+					if (currentProgress >= nextProgress)
+					{
+						System.err.print(".");
+						System.err.flush();
+						nextProgress += stepProgress;
+					}
+				}
+			}
+
+			if (!this._testFlag)
+			{
+				this._dbConn.commit();
+			}
+		}
+		catch (SQLException se)
+		{
+			if (!this._testFlag)
+			{
+				this._dbConn.rollback();
+			}
+
+			throw se;
+		}
+		finally
+		{
+			if (!this._testFlag)
+			{
+				if (stmt != null)
+				{
+					stmt.close();
+				}
+				if (prepStmt != null)
+				{
+					prepStmt.close();
+				}
+				this._dbConn.setAutoCommit(true);
+			}
+		}
+
+		if (this._verboseFlag)
+		{
+			System.err.println();
+		}
+	}
+
+	private void initializeCategories() throws Exception
+	{
+		Statement stmt = null;
+		PreparedStatement prepStmt = null;
+
+		double nextProgress = 0;
+		double stepProgress = 0.1;
+
+		if (this._verboseFlag)
+		{
+			System.err.print("[INFO] Initialize Categories: ");
+			System.err.flush();
+		}
+
+		try
+		{
+			if (!this._testFlag)
+			{
+				this._dbConn.setAutoCommit(false);
+
+			}
+
+			int minId = 1;
+
+			// Delete all existing categories
+			if (!this._testFlag)
+			{
+				stmt = this._dbConn.createStatement();
+				stmt.executeUpdate(SQL_DELETE_CATEGORIES);
+			}
+			if (this._pwr != null)
+			{
+				this._pwr.println(this._dbConn.nativeSQL(SQL_DELETE_CATEGORIES));
+			}
+
+			// Generate categories
+			final int maxId = this._conf.getRegions().size()+minId;
+			prepStmt = this._dbConn.prepareStatement(SQL_INSERT_CATEGORY, Statement.RETURN_GENERATED_KEYS);
+			for (int id = minId; id <= maxId; ++id)
+			{
+				RubisCategory category = this._util.getCategory(id);
+
+				prepStmt.clearParameters();
+				prepStmt.setInt(1, category.id);
+				prepStmt.setString(2, category.name);
+
+				if (!this._testFlag)
+				{
+					int affectedRows = prepStmt.executeUpdate();
+
+					// Experimental: use batches instead of execute one query at a time
+					//prepStmt.addBatch();
+					//if ((id % 1000) == 0)
+					//{
+					//	prepStmt.executeBatch();
+					//}
+
+					if (affectedRows == 0)
+					{
+						throw new SQLException("During category insertion: No rows affected");
+					}
+
+					ResultSet rs = prepStmt.getGeneratedKeys();
+					if (rs.last())
+					{
+						int genId = rs.getInt(1);
+
+						if (id != genId)
+						{
+							System.err.println("[WARNING] Expected category ID (" + id + ") is different from the one that has been generated (" + genId + ")");
+						}
+					}
+					rs.close();
+				}
+				if (this._pwr != null)
+				{
+					this._pwr.println(prepStmt);
+				}
+
+				if (this._verboseFlag)
+				{
+					double currentProgress = (id-minId)/((double) (maxId-minId));
+					if (currentProgress >= nextProgress)
+					{
+						System.err.print(".");
+						System.err.flush();
+						nextProgress += stepProgress;
+					}
+				}
+			}
+
+			if (!this._testFlag)
+			{
+				this._dbConn.commit();
+			}
+		}
+		catch (SQLException se)
+		{
+			if (!this._testFlag)
+			{
+				this._dbConn.rollback();
+			}
+
+			throw se;
+		}
+		finally
+		{
+			if (!this._testFlag)
+			{
+				if (stmt != null)
+				{
+					stmt.close();
+				}
+				if (prepStmt != null)
+				{
+					prepStmt.close();
+				}
+				this._dbConn.setAutoCommit(true);
+			}
+		}
+
+		if (this._verboseFlag)
+		{
+			System.err.println();
+		}
 	}
 
 	private void initializeUsers() throws Exception
@@ -186,7 +448,7 @@ final class InitDb
 			}
 
 			// Generate users
-			final int maxId = this._conf.getNumOfPreloadedUsers()-minId;
+			final int maxId = this._conf.getNumOfPreloadedUsers()+minId;
 			prepStmt = this._dbConn.prepareStatement(SQL_INSERT_USER, Statement.RETURN_GENERATED_KEYS);
 			for (int id = minId; id <= maxId; ++id)
 			{
@@ -332,7 +594,7 @@ final class InitDb
 			}
 
 			// Generate item
-			final int maxId = this._conf.getTotalActiveItems()+this._conf.getNumOfOldItems()-minId;
+			final int maxId = this._conf.getTotalActiveItems()+this._conf.getNumOfOldItems()+minId;
 			final int maxOldItemId = this._conf.getNumOfOldItems()-minId;
 			int count = 0;
 			itemStmt = this._dbConn.prepareStatement(SQL_INSERT_ITEM, Statement.RETURN_GENERATED_KEYS);
