@@ -61,8 +61,8 @@ public final class DiscreteDistribution
 			for (int i = 1; i < np; ++i)
 			{
 				//this._cdf[i] = this._cdf[i-1]+probs[i];
-				this._cdf[i] = cumProb;
 				cumProb += probs[i];
+				this._cdf[i] = cumProb;
 			}
 			// Normalize
 			for (int i = 0; i < np; ++i)
