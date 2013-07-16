@@ -699,9 +699,9 @@ public final class InitDbDriver
 		InitDb initDb = new InitDb(conf, dbConn);
 
 		initDb.setTestOnlyFlag(optTest);
-		PrintWriter dumpWr = null;
 		if (optDump)
 		{
+			PrintWriter dumpWr = null;
 			if (optDumpFile.isEmpty())
 			{
 				dumpWr = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out)));
@@ -718,6 +718,7 @@ public final class InitDbDriver
 					System.exit(-1);
 				}
 			}
+			initDb.setSqlWriter(dumpWr);
 		}
 
 		try
