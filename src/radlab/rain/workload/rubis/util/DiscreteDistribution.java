@@ -49,10 +49,14 @@ public final class DiscreteDistribution
 
 	public DiscreteDistribution(double[] probs)
 	{
-		this._cdf = new double[probs.length];
-		for (int i = 0; i < probs.length; ++i)
+		if (probs.length > 0)
 		{
-			this._cdf[i] = probs[i] + (i > 0 ? this._cdf[i-1] : 0.0);
+			this._cdf = new double[probs.length];
+			this._cdf[0] = probs[0];
+			for (int i = 0; i < probs.length; ++i)
+			{
+				this._cdf[i] = this._cdf[i-1]+probs[i];
+			}
 		}
 	}
 
