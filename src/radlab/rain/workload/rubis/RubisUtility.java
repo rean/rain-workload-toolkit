@@ -173,7 +173,7 @@ public final class RubisUtility
 			double[] catProbs = new double[nc];
 			for (int i = 0; i < nc; ++i)
 			{
-				catProbs[i] = this._conf.getNumOfItemsPerCategory(i) / this._conf.getTotalActiveItems();
+				catProbs[i] = this._conf.getNumOfItemsPerCategory(i) / ((double) this._conf.getTotalActiveItems());
 			}
 
 			this._catDistr = new DiscreteDistribution(catProbs);
