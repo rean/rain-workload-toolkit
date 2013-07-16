@@ -78,8 +78,8 @@ final class InitDb
 	private static final String SQL_INSERT_ITEM = "INSERT INTO items (id,name,description,initial_price,quantity,reserve_price,buy_now,nb_of_bids,max_bid,start_date,end_date,seller,category) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
 	private static final String SQL_DELETE_BIDS = "DELETE FROM bids";
 	private static final String SQL_INSERT_BID = "INSERT INTO bids (id,user_id,item_id,qty,bid,max_bid,date) VALUES (NULL,?,?,?,?,?,?)";
-	private static final String SQL_DELETE_COMMENTS = "DELETE FROM bids";
-	private static final String SQL_INSERT_COMMENT = "INSERT INTO bids (id,user_id,item_id,qty,bid,max_bid,date) VALUES (NULL,?,?,?,?,?,?)";
+	private static final String SQL_DELETE_COMMENTS = "DELETE FROM comments";
+	private static final String SQL_INSERT_COMMENT = "INSERT INTO comments (id,from_user_id,to_user_id,rating,date,comment) VALUES (NULL,?,?,?,?,?)";
 
 
 	private RubisConfiguration _conf;
@@ -861,6 +861,7 @@ final class InitDb
 		comStmt.setInt(3, comment.itemId);
 		comStmt.setInt(4, comment.rating);
 		comStmt.setDate(5, new Date(comment.date.getTime()));
+		comStmt.setString(6, comment.comment);
 
 		if (!this._testFlag)
 		{
