@@ -613,6 +613,19 @@ public final class InitDbDriver
 			}
 		}
 
+		if (optDebug)
+		{
+			System.err.println("[DEBUG] Command Line Options:");
+			System.err.println("[DEBUG]   Configuration file:" + optConfigFile);
+			System.err.println("[DEBUG]   Database URL:" + optDbUrl);
+			System.err.println("[DEBUG]   Database User:" + optDbUser);
+			System.err.println("[DEBUG]   Database Password:" + optDbPassword);
+			System.err.println("[DEBUG]   Debug:" + optDebug);
+			System.err.println("[DEBUG]   Dump:" + optDump);
+			System.err.println("[DEBUG]   Dump File:" + optDumpFile);
+			System.err.println("[DEBUG]   Test Only:" + optTest);
+		}
+
 		StringBuffer sb = new StringBuffer();
 		try
 		{
