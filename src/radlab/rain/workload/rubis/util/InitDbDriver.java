@@ -590,11 +590,6 @@ public final class InitDbDriver
 				optDebug = true;
 				++i;
 			}
-			else if (args[i].equals("-test"))
-			{
-				optTest = true;
-				++i;
-			}
 			else if (args[i].equals("-dump"))
 			{
 				optDump = true;
@@ -610,6 +605,11 @@ public final class InitDbDriver
 			{
 				usage();
 				System.exit(0);
+			}
+			else if (args[i].equals("-test"))
+			{
+				optTest = true;
+				++i;
 			}
 		}
 
@@ -743,12 +743,13 @@ public final class InitDbDriver
 		System.err.println("  [Default='" + DEFAULT_OPT_DB_PASSWORD + "']");
 		System.err.println(" -debug: Print messages that can be useful for debugging purpose.");
 		System.err.println("  [Default='" + DEFAULT_OPT_DEBUG + "']");
-		System.err.println(" -test: Does not perform any operation inside the database.");
-		System.err.println("  [Default='" + DEFAULT_OPT_TEST + "']");
 		System.err.println(" -dump: Dump the generated SQL on the <dumpfile> (if specified) or on standard output.");
 		System.err.println("  [Default='" + DEFAULT_OPT_DUMP + "']");
 		System.err.println(" -dumpfile <filename>: Dump the SQL on the specified file.");
 		System.err.println("  This option implies the '-dump' option.");
 		System.err.println("  [Default='" + DEFAULT_OPT_DUMP_FILE + "']");
+		System.err.println(" -help: Display this message.");
+		System.err.println(" -test: Does not perform any operation inside the database.");
+		System.err.println("  [Default='" + DEFAULT_OPT_TEST + "']");
 	}
 }
