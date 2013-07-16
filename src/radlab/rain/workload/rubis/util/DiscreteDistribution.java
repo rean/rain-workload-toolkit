@@ -91,6 +91,6 @@ public final class DiscreteDistribution
 
 		int x = Arrays.binarySearch(this._cdf, p);
 
-		return (x >= 0 ? x : -x);
+		return (x >= 0 ? x : -x-1);
 	}
 }
