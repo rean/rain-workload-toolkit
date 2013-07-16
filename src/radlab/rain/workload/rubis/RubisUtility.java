@@ -294,6 +294,8 @@ public final class RubisUtility
 		user.email = user.firstname + "." + user.lastname + "@rubis.com";
 		user.password = "password" + user.id;
 		user.region = this.generateRegion().id;
+		Calendar cal = Calendar.getInstance();
+		user.creationDate = cal.getTime();
 
 		return user;
 	}
@@ -377,11 +379,6 @@ public final class RubisUtility
 		return this.getCategory(this._catDistr.nextInt(this._rng)+MIN_CATEGORY_ID);
 	}
 
-	public RubisRegion generateRegion()
-	{
-		return this.getRegion(this._rng.nextInt(this._conf.getRegions().size()-MIN_REGION_ID)+MIN_REGION_ID);
-	}
-
 	public RubisCategory getCategory(int id)
 	{
 		RubisCategory category = new RubisCategory();
@@ -390,6 +387,11 @@ public final class RubisUtility
 		category.name = this._conf.getCategories().get(category.id);
 
 		return category;
+	}
+
+	public RubisRegion generateRegion()
+	{
+		return this.getRegion(this._rng.nextInt(this._conf.getRegions().size()-MIN_REGION_ID)+MIN_REGION_ID);
 	}
 
 	public RubisRegion getRegion(int id)
