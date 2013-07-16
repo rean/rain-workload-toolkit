@@ -80,6 +80,7 @@ final class InitDb
 	private RubisUtility _util;
 	private Connection _dbConn;
 	private PrintWriter _pwr;
+	private boolean _verboseFlag;
 	private boolean _testFlag;
 
 
@@ -97,9 +98,21 @@ final class InitDb
 		}
 		this._util = new RubisUtility(rand, conf);
 		this._dbConn = dbConn;
+		this._verboseFlag = false;
 		this._testFlag = false;
 		this._pwr = null;
 	}
+
+	public void setVerboseFlag(boolean value)
+	{
+		this._verboseFlag = value;
+	}
+
+	public boolean verbose()
+	{
+		return this._verboseFlag;
+	}
+
 
 	public void setTestOnlyFlag(boolean value)
 	{
@@ -132,6 +145,15 @@ final class InitDb
 	{
 		Statement stmt = null;
 		PreparedStatement prepStmt = null;
+
+		double nextProgress = 0;
+		double stepProgress = 10;
+
+		if (this._verboseFlag)
+		{
+			System.err.print("[INFO] Initialize Users: ");
+			System.err.flush();
+		}
 
 		try
 		{
@@ -214,6 +236,17 @@ final class InitDb
 				{
 					this._pwr.println(prepStmt);
 				}
+
+				if (this._verboseFlag)
+				{
+					double currentProgress = (id-minId)/((double) (maxId-minId));
+					if (currentProgress >= nextProgress)
+					{
+						System.err.print(".");
+						System.err.flush();
+						nextProgress += stepProgress;
+					}
+				}
 			}
 
 			if (!this._testFlag)
@@ -244,6 +277,11 @@ final class InitDb
 				}
 				this._dbConn.setAutoCommit(true);
 			}
+		}
+
+		if (this._verboseFlag)
+		{
+			System.err.println();
 		}
 	}
 
@@ -545,7 +583,7 @@ public final class InitDbDriver
 	private static String DEFAULT_OPT_DB_URL = "jdbc:mysql://localhost/rubis";
 	private static String DEFAULT_OPT_DB_USER = "";
 	private static String DEFAULT_OPT_DB_PASSWORD = "";
-	private static boolean DEFAULT_OPT_DEBUG = false;
+	private static boolean DEFAULT_OPT_VERBOSE = false;
 	private static boolean DEFAULT_OPT_TEST = false;
 	private static boolean DEFAULT_OPT_DUMP = false;
 	private static String DEFAULT_OPT_DUMP_FILE = "";
@@ -557,7 +595,7 @@ public final class InitDbDriver
 		String optDbUrl = DEFAULT_OPT_DB_URL;
 		String optDbUser = DEFAULT_OPT_DB_USER;
 		String optDbPassword = DEFAULT_OPT_DB_PASSWORD;
-		boolean optDebug = DEFAULT_OPT_DEBUG;
+		boolean optVerbose = DEFAULT_OPT_VERBOSE;
 		boolean optTest = DEFAULT_OPT_TEST;
 		boolean optDump = DEFAULT_OPT_DUMP;
 		String optDumpFile = DEFAULT_OPT_DUMP_FILE;
@@ -585,9 +623,9 @@ public final class InitDbDriver
 				optDbPassword = args[i+1];
 				++i;
 			}
-			else if (args[i].equals("-debug"))
+			else if (args[i].equals("-verbose"))
 			{
-				optDebug = true;
+				optVerbose = true;
 			}
 			else if (args[i].equals("-dump"))
 			{
@@ -610,17 +648,17 @@ public final class InitDbDriver
 			}
 		}
 
-		if (optDebug)
+		if (optVerbose)
 		{
-			System.err.println("[DEBUG] Command Line Options:");
-			System.err.println("[DEBUG]   Configuration file:" + optConfigFile);
-			System.err.println("[DEBUG]   Database URL:" + optDbUrl);
-			System.err.println("[DEBUG]   Database User:" + optDbUser);
-			System.err.println("[DEBUG]   Database Password:" + optDbPassword);
-			System.err.println("[DEBUG]   Debug:" + optDebug);
-			System.err.println("[DEBUG]   Dump:" + optDump);
-			System.err.println("[DEBUG]   Dump File:" + optDumpFile);
-			System.err.println("[DEBUG]   Test Only:" + optTest);
+			System.err.println("[INFO] Command Line Options:");
+			System.err.println("[INFO]   Configuration file:" + optConfigFile);
+			System.err.println("[INFO]   Database URL:" + optDbUrl);
+			System.err.println("[INFO]   Database User:" + optDbUser);
+			System.err.println("[INFO]   Database Password:" + optDbPassword);
+			System.err.println("[INFO]   Verbose:" + optVerbose);
+			System.err.println("[INFO]   Dump:" + optDump);
+			System.err.println("[INFO]   Dump File:" + optDumpFile);
+			System.err.println("[INFO]   Test Only:" + optTest);
 		}
 
 		StringBuffer sb = new StringBuffer();
@@ -638,9 +676,9 @@ public final class InitDbDriver
 			System.exit(-1);
 		}
 
-		if (optDebug)
+		if (optVerbose)
 		{
-			System.err.println("[DEBUG] Configuration File: " + sb.toString());
+			System.err.println("[INFO] Configuration File: " + sb.toString());
 		}
 
 		RubisConfiguration conf = null;
@@ -673,9 +711,9 @@ public final class InitDbDriver
 			System.exit(-1);
 		}
 
-		if (optDebug)
+		if (optVerbose)
 		{
-			System.err.println("[DEBUG] Configuration: " + conf);
+			System.err.println("[INFO] Configuration: " + conf);
 		}
 
 		Connection dbConn = null;
@@ -698,10 +736,11 @@ public final class InitDbDriver
 
 		InitDb initDb = new InitDb(conf, dbConn);
 
+		initDb.setVerboseFlag(optVerbose);
 		initDb.setTestOnlyFlag(optTest);
+		PrintWriter dumpWr = null;
 		if (optDump)
 		{
-			PrintWriter dumpWr = null;
 			if (optDumpFile.isEmpty())
 			{
 				dumpWr = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out)));
@@ -752,8 +791,8 @@ public final class InitDbDriver
 		System.err.println("  [Default='" + DEFAULT_OPT_DB_USER + "']");
 		System.err.println(" -dbpwd <password>: The user's password.");
 		System.err.println("  [Default='" + DEFAULT_OPT_DB_PASSWORD + "']");
-		System.err.println(" -debug: Print messages that can be useful for debugging purpose.");
-		System.err.println("  [Default='" + DEFAULT_OPT_DEBUG + "']");
+		System.err.println(" -verbose: Print messages that can be useful for debugging purpose.");
+		System.err.println("  [Default='" + DEFAULT_OPT_VERBOSE + "']");
 		System.err.println(" -dump: Dump the generated SQL on the <dumpfile> (if specified) or on standard output.");
 		System.err.println("  [Default='" + DEFAULT_OPT_DUMP + "']");
 		System.err.println(" -dumpfile <filename>: Dump the SQL on the specified file.");
