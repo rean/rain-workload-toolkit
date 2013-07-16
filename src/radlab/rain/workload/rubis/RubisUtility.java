@@ -399,7 +399,7 @@ public final class RubisUtility
 		RubisRegion region = new RubisRegion();
 
 		region.id = id;
-		region.name = this._conf.getRegions().get(region.id);
+		region.name = this._conf.getRegions().get(region.id+MIN_REGION_ID);
 
 		return region;
 	}
