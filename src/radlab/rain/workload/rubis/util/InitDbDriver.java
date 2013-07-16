@@ -317,7 +317,7 @@ final class InitDb
 
 			// Generate regions
 			final int minId = 1;
-			final int maxId = this._conf.getRegions().size()+minId;
+			final int maxId = this._conf.getRegions().size()+minId-1;
 			prepStmt = this._dbConn.prepareStatement(SQL_INSERT_REGION, Statement.RETURN_GENERATED_KEYS);
 			for (int id = minId; id <= maxId; ++id)
 			{
@@ -427,7 +427,7 @@ final class InitDb
 
 			// Generate categories
 			final int minId = 1;
-			final int maxId = this._conf.getRegions().size()+minId;
+			final int maxId = this._conf.getCategories().size()+minId-1;
 			prepStmt = this._dbConn.prepareStatement(SQL_INSERT_CATEGORY, Statement.RETURN_GENERATED_KEYS);
 			for (int id = minId; id <= maxId; ++id)
 			{
@@ -537,7 +537,7 @@ final class InitDb
 
 			// Generate users
 			final int minId = 1;
-			final int maxId = this._conf.getNumOfPreloadedUsers()+minId;
+			final int maxId = this._conf.getNumOfPreloadedUsers()+minId-1;
 			prepStmt = this._dbConn.prepareStatement(SQL_INSERT_USER, Statement.RETURN_GENERATED_KEYS);
 			for (int id = minId; id <= maxId; ++id)
 			{
@@ -657,8 +657,8 @@ final class InitDb
 
 			// Generate item
 			final int minId = 1;
-			final int maxId = this._conf.getTotalActiveItems()+this._conf.getNumOfOldItems()+minId;
-			final int maxOldItemId = this._conf.getNumOfOldItems()-minId;
+			final int maxId = this._conf.getTotalActiveItems()+this._conf.getNumOfOldItems()+minId-1;
+			final int maxOldItemId = this._conf.getNumOfOldItems()+minId-1;
 			int count = 0;
 			itemStmt = this._dbConn.prepareStatement(SQL_INSERT_ITEM, Statement.RETURN_GENERATED_KEYS);
 			bidStmt = this._dbConn.prepareStatement(SQL_INSERT_BID, Statement.RETURN_GENERATED_KEYS);
