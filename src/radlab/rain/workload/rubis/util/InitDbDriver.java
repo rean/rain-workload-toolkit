@@ -88,6 +88,7 @@ final class InitDb
 	private PrintWriter _pwr;
 	private boolean _verboseFlag;
 	private boolean _testFlag;
+	private boolean _transFlag;
 
 
 	public InitDb(RubisConfiguration conf, Connection dbConn)
@@ -106,6 +107,7 @@ final class InitDb
 		this._dbConn = dbConn;
 		this._verboseFlag = false;
 		this._testFlag = false;
+		this._transFlag = false;
 		this._pwr = null;
 	}
 
@@ -119,7 +121,6 @@ final class InitDb
 		return this._verboseFlag;
 	}
 
-
 	public void setTestOnlyFlag(boolean value)
 	{
 		this._testFlag = value;
@@ -130,6 +131,15 @@ final class InitDb
 		return this._testFlag;
 	}
 
+	public void setUseTransactionsFlag(boolean value)
+	{
+		this._transFlag = value;
+	}
+
+	public boolean useTransactions()
+	{
+		return this._transFlag;
+	}
 
 	public void setSqlWriter(PrintWriter pwr)
 	{
@@ -167,7 +177,7 @@ final class InitDb
 
 		try
 		{
-			if (!this._testFlag)
+			if (!this._testFlag && this._transFlag)
 			{
 				this._dbConn.setAutoCommit(false);
 			}
@@ -262,14 +272,14 @@ final class InitDb
 				System.err.print(".");
 				System.err.flush();
 			}
-			if (!this._testFlag)
+			if (!this._testFlag && this._transFlag)
 			{
 				this._dbConn.commit();
 			}
 		}
 		catch (SQLException se)
 		{
-			if (!this._testFlag)
+			if (!this._testFlag && this._transFlag)
 			{
 				this._dbConn.rollback();
 			}
@@ -284,7 +294,10 @@ final class InitDb
 				{
 					stmt.close();
 				}
-				this._dbConn.setAutoCommit(true);
+				if (this._transFlag)
+				{
+					this._dbConn.setAutoCommit(true);
+				}
 			}
 		}
 
@@ -309,7 +322,7 @@ final class InitDb
 
 		try
 		{
-			if (!this._testFlag)
+			if (!this._testFlag && this._transFlag)
 			{
 				this._dbConn.setAutoCommit(false);
 
@@ -372,14 +385,14 @@ final class InitDb
 				}
 			}
 
-			if (!this._testFlag)
+			if (!this._testFlag && this._transFlag)
 			{
 				this._dbConn.commit();
 			}
 		}
 		catch (SQLException se)
 		{
-			if (!this._testFlag)
+			if (!this._testFlag && this._transFlag)
 			{
 				this._dbConn.rollback();
 			}
@@ -394,7 +407,11 @@ final class InitDb
 				{
 					prepStmt.close();
 				}
-				this._dbConn.setAutoCommit(true);
+
+				if (this._transFlag)
+				{
+					this._dbConn.setAutoCommit(true);
+				}
 			}
 		}
 
@@ -419,7 +436,7 @@ final class InitDb
 
 		try
 		{
-			if (!this._testFlag)
+			if (!this._testFlag && this._transFlag)
 			{
 				this._dbConn.setAutoCommit(false);
 
@@ -482,14 +499,14 @@ final class InitDb
 				}
 			}
 
-			if (!this._testFlag)
+			if (!this._testFlag && this._transFlag)
 			{
 				this._dbConn.commit();
 			}
 		}
 		catch (SQLException se)
 		{
-			if (!this._testFlag)
+			if (!this._testFlag && this._transFlag)
 			{
 				this._dbConn.rollback();
 			}
@@ -504,7 +521,11 @@ final class InitDb
 				{
 					prepStmt.close();
 				}
-				this._dbConn.setAutoCommit(true);
+
+				if (this._transFlag)
+				{
+					this._dbConn.setAutoCommit(true);
+				}
 			}
 		}
 
@@ -529,7 +550,7 @@ final class InitDb
 
 		try
 		{
-			if (!this._testFlag)
+			if (!this._testFlag && this._transFlag)
 			{
 				this._dbConn.setAutoCommit(false);
 
@@ -600,14 +621,14 @@ final class InitDb
 				}
 			}
 
-			if (!this._testFlag)
+			if (!this._testFlag && this._transFlag)
 			{
 				this._dbConn.commit();
 			}
 		}
 		catch (SQLException se)
 		{
-			if (!this._testFlag)
+			if (!this._testFlag && this._transFlag)
 			{
 				this._dbConn.rollback();
 			}
@@ -622,7 +643,11 @@ final class InitDb
 				{
 					prepStmt.close();
 				}
-				this._dbConn.setAutoCommit(true);
+
+				if (this._transFlag)
+				{
+					this._dbConn.setAutoCommit(true);
+				}
 			}
 		}
 
@@ -649,7 +674,7 @@ final class InitDb
 
 		try
 		{
-			if (!this._testFlag)
+			if (!this._testFlag && this._transFlag)
 			{
 				this._dbConn.setAutoCommit(false);
 
@@ -768,14 +793,14 @@ final class InitDb
 				}
 			}
 
-			if (!this._testFlag)
+			if (!this._testFlag && this._transFlag)
 			{
 				this._dbConn.commit();
 			}
 		}
 		catch (SQLException se)
 		{
-			if (!this._testFlag)
+			if (!this._testFlag && this._transFlag)
 			{
 				this._dbConn.rollback();
 			}
@@ -799,7 +824,10 @@ final class InitDb
 					comStmt.close();
 				}
 
-				this._dbConn.setAutoCommit(true);
+				if (this._transFlag)
+				{
+					this._dbConn.setAutoCommit(true);
+				}
 			}
 		}
 
@@ -885,6 +913,7 @@ public final class InitDbDriver
 	private static String DEFAULT_OPT_DB_URL = "jdbc:mysql://localhost/rubis";
 	private static String DEFAULT_OPT_DB_USER = "";
 	private static String DEFAULT_OPT_DB_PASSWORD = "";
+	private static boolean DEFAULT_OPT_DB_TRANSACTION = false;
 	private static boolean DEFAULT_OPT_VERBOSE = false;
 	private static boolean DEFAULT_OPT_TEST = false;
 	private static boolean DEFAULT_OPT_DUMP = false;
@@ -897,6 +926,7 @@ public final class InitDbDriver
 		String optDbUrl = DEFAULT_OPT_DB_URL;
 		String optDbUser = DEFAULT_OPT_DB_USER;
 		String optDbPassword = DEFAULT_OPT_DB_PASSWORD;
+		boolean optDbTrans = DEFAULT_OPT_DB_TRANSACTION;
 		boolean optVerbose = DEFAULT_OPT_VERBOSE;
 		boolean optTest = DEFAULT_OPT_TEST;
 		boolean optDump = DEFAULT_OPT_DUMP;
@@ -957,6 +987,7 @@ public final class InitDbDriver
 			System.err.println("[INFO]   Database URL:" + optDbUrl);
 			System.err.println("[INFO]   Database User:" + optDbUser);
 			System.err.println("[INFO]   Database Password:" + optDbPassword);
+			System.err.println("[INFO]   Database Transactions:" + optDbTrans);
 			System.err.println("[INFO]   Verbose:" + optVerbose);
 			System.err.println("[INFO]   Dump:" + optDump);
 			System.err.println("[INFO]   Dump File:" + optDumpFile);
@@ -1040,6 +1071,7 @@ public final class InitDbDriver
 
 		initDb.setVerboseFlag(optVerbose);
 		initDb.setTestOnlyFlag(optTest);
+		initDb.setUseTransactionsFlag(optDbTrans);
 		PrintWriter dumpWr = null;
 		if (optDump)
 		{
@@ -1093,6 +1125,8 @@ public final class InitDbDriver
 		System.err.println("  [Default='" + DEFAULT_OPT_DB_USER + "']");
 		System.err.println(" -dbpwd <password>: The user's password.");
 		System.err.println("  [Default='" + DEFAULT_OPT_DB_PASSWORD + "']");
+		System.err.println(" -dbtrx: Enable the use of database transactions.");
+		System.err.println("  [Default='" + DEFAULT_OPT_DB_TRANSACTION + "']");
 		System.err.println(" -verbose: Print messages that can be useful for debugging purpose.");
 		System.err.println("  [Default='" + DEFAULT_OPT_VERBOSE + "']");
 		System.err.println(" -dump: Dump the generated SQL on the <dumpfile> (if specified) or on standard output.");
