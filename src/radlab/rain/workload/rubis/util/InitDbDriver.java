@@ -143,15 +143,159 @@ final class InitDb
 
 	public void initialize() throws Exception
 	{
+		this.deleteEntities();
 		this.initializeRegions();
 		this.initializeCategories();
 		this.initializeUsers();
 		this.initializeItems();
 	}
 
+	private void deleteEntities() throws Exception
+	{
+		// Entities should be deleted according to a specific order to avoid violating foreign constraints
+
+		Statement stmt = null;
+
+		double nextProgress = 0;
+		double stepProgress = 0.1;
+
+		if (this._verboseFlag)
+		{
+			System.err.print("[INFO] Delete Entities: ");
+			System.err.flush();
+		}
+
+		try
+		{
+			if (!this._testFlag)
+			{
+				this._dbConn.setAutoCommit(false);
+			}
+
+			// Delete all existing comments
+			if (!this._testFlag)
+			{
+				stmt = this._dbConn.createStatement();
+				stmt.executeUpdate(SQL_DELETE_COMMENTS);
+			}
+			if (this._pwr != null)
+			{
+				this._pwr.println(this._dbConn.nativeSQL(SQL_DELETE_COMMENTS));
+			}
+			if (this._verboseFlag)
+			{
+				System.err.print("..");
+				System.err.flush();
+			}
+			// Delete all existing bids
+			if (!this._testFlag)
+			{
+				stmt = this._dbConn.createStatement();
+				stmt.executeUpdate(SQL_DELETE_BIDS);
+			}
+			if (this._pwr != null)
+			{
+				this._pwr.println(this._dbConn.nativeSQL(SQL_DELETE_BIDS));
+			}
+			if (this._verboseFlag)
+			{
+				System.err.print("..");
+				System.err.flush();
+			}
+			// Delete all existing items
+			if (!this._testFlag)
+			{
+				stmt = this._dbConn.createStatement();
+				stmt.executeUpdate(SQL_DELETE_ITEMS);
+			}
+			if (this._pwr != null)
+			{
+				this._pwr.println(this._dbConn.nativeSQL(SQL_DELETE_ITEMS));
+			}
+			if (this._verboseFlag)
+			{
+				System.err.print("..");
+				System.err.flush();
+			}
+			// Delete all existing users
+			if (!this._testFlag)
+			{
+				stmt = this._dbConn.createStatement();
+				stmt.executeUpdate(SQL_DELETE_USERS);
+			}
+			if (this._pwr != null)
+			{
+				this._pwr.println(this._dbConn.nativeSQL(SQL_DELETE_USERS));
+			}
+			if (this._verboseFlag)
+			{
+				System.err.print("..");
+				System.err.flush();
+			}
+			// Delete all existing regions
+			if (!this._testFlag)
+			{
+				stmt = this._dbConn.createStatement();
+				stmt.executeUpdate(SQL_DELETE_REGIONS);
+			}
+			if (this._pwr != null)
+			{
+				this._pwr.println(this._dbConn.nativeSQL(SQL_DELETE_REGIONS));
+			}
+			if (this._verboseFlag)
+			{
+				System.err.print(".");
+				System.err.flush();
+			}
+			// Delete all existing categories
+			if (!this._testFlag)
+			{
+				stmt = this._dbConn.createStatement();
+				stmt.executeUpdate(SQL_DELETE_CATEGORIES);
+			}
+			if (this._pwr != null)
+			{
+				this._pwr.println(this._dbConn.nativeSQL(SQL_DELETE_CATEGORIES));
+			}
+			if (this._verboseFlag)
+			{
+				System.err.print(".");
+				System.err.flush();
+			}
+			if (!this._testFlag)
+			{
+				this._dbConn.commit();
+			}
+		}
+		catch (SQLException se)
+		{
+			if (!this._testFlag)
+			{
+				this._dbConn.rollback();
+			}
+
+			throw se;
+		}
+		finally
+		{
+			if (!this._testFlag)
+			{
+				if (stmt != null)
+				{
+					stmt.close();
+				}
+				this._dbConn.setAutoCommit(true);
+			}
+		}
+
+		if (this._verboseFlag)
+		{
+			System.err.println();
+		}
+	}
+
 	private void initializeRegions() throws Exception
 	{
-		Statement stmt = null;
 		PreparedStatement prepStmt = null;
 
 		double nextProgress = 0;
@@ -171,20 +315,8 @@ final class InitDb
 
 			}
 
-			int minId = 1;
-
-			// Delete all existing regions
-			if (!this._testFlag)
-			{
-				stmt = this._dbConn.createStatement();
-				stmt.executeUpdate(SQL_DELETE_REGIONS);
-			}
-			if (this._pwr != null)
-			{
-				this._pwr.println(this._dbConn.nativeSQL(SQL_DELETE_REGIONS));
-			}
-
 			// Generate regions
+			final int minId = 1;
 			final int maxId = this._conf.getRegions().size()+minId;
 			prepStmt = this._dbConn.prepareStatement(SQL_INSERT_REGION, Statement.RETURN_GENERATED_KEYS);
 			for (int id = minId; id <= maxId; ++id)
@@ -258,10 +390,6 @@ final class InitDb
 		{
 			if (!this._testFlag)
 			{
-				if (stmt != null)
-				{
-					stmt.close();
-				}
 				if (prepStmt != null)
 				{
 					prepStmt.close();
@@ -278,7 +406,6 @@ final class InitDb
 
 	private void initializeCategories() throws Exception
 	{
-		Statement stmt = null;
 		PreparedStatement prepStmt = null;
 
 		double nextProgress = 0;
@@ -298,20 +425,8 @@ final class InitDb
 
 			}
 
-			int minId = 1;
-
-			// Delete all existing categories
-			if (!this._testFlag)
-			{
-				stmt = this._dbConn.createStatement();
-				stmt.executeUpdate(SQL_DELETE_CATEGORIES);
-			}
-			if (this._pwr != null)
-			{
-				this._pwr.println(this._dbConn.nativeSQL(SQL_DELETE_CATEGORIES));
-			}
-
 			// Generate categories
+			final int minId = 1;
 			final int maxId = this._conf.getRegions().size()+minId;
 			prepStmt = this._dbConn.prepareStatement(SQL_INSERT_CATEGORY, Statement.RETURN_GENERATED_KEYS);
 			for (int id = minId; id <= maxId; ++id)
@@ -385,10 +500,6 @@ final class InitDb
 		{
 			if (!this._testFlag)
 			{
-				if (stmt != null)
-				{
-					stmt.close();
-				}
 				if (prepStmt != null)
 				{
 					prepStmt.close();
@@ -405,7 +516,6 @@ final class InitDb
 
 	private void initializeUsers() throws Exception
 	{
-		Statement stmt = null;
 		PreparedStatement prepStmt = null;
 
 		double nextProgress = 0;
@@ -425,29 +535,8 @@ final class InitDb
 
 			}
 
-			int minId = 1;
-
-			// Delete all existing users
-			if (!this._testFlag)
-			{
-				stmt = this._dbConn.createStatement();
-				int affectedRows = stmt.executeUpdate(SQL_DELETE_USERS, Statement.RETURN_GENERATED_KEYS);
-				if (affectedRows > 0)
-				{
-					ResultSet rs = stmt.getGeneratedKeys();
-					if (rs.next())
-					{
-						minId = rs.getInt(1)+1;
-					}
-					rs.close();
-				}
-			}
-			if (this._pwr != null)
-			{
-				this._pwr.println(this._dbConn.nativeSQL(SQL_DELETE_USERS));
-			}
-
 			// Generate users
+			final int minId = 1;
 			final int maxId = this._conf.getNumOfPreloadedUsers()+minId;
 			prepStmt = this._dbConn.prepareStatement(SQL_INSERT_USER, Statement.RETURN_GENERATED_KEYS);
 			for (int id = minId; id <= maxId; ++id)
@@ -529,10 +618,6 @@ final class InitDb
 		{
 			if (!this._testFlag)
 			{
-				if (stmt != null)
-				{
-					stmt.close();
-				}
 				if (prepStmt != null)
 				{
 					prepStmt.close();
@@ -549,7 +634,6 @@ final class InitDb
 
 	private void initializeItems() throws Exception
 	{
-		Statement stmt = null;
 		PreparedStatement itemStmt = null;
 		PreparedStatement bidStmt = null;
 		PreparedStatement comStmt = null;
@@ -571,29 +655,8 @@ final class InitDb
 
 			}
 
-			int minId = 1;
-
-			// Delete all existing items
-			if (!this._testFlag)
-			{
-				stmt = this._dbConn.createStatement();
-				int affectedRows = stmt.executeUpdate(SQL_DELETE_ITEMS, Statement.RETURN_GENERATED_KEYS);
-				if (affectedRows > 0)
-				{
-					ResultSet rs = stmt.getGeneratedKeys();
-					if (rs.next())
-					{
-						minId = rs.getInt(1)+1;
-					}
-					rs.close();
-				}
-			}
-			if (this._pwr != null)
-			{
-				this._pwr.println(this._dbConn.nativeSQL(SQL_DELETE_ITEMS));
-			}
-
 			// Generate item
+			final int minId = 1;
 			final int maxId = this._conf.getTotalActiveItems()+this._conf.getNumOfOldItems()+minId;
 			final int maxOldItemId = this._conf.getNumOfOldItems()-minId;
 			int count = 0;
@@ -723,10 +786,6 @@ final class InitDb
 		{
 			if (!this._testFlag)
 			{
-				if (stmt != null)
-				{
-					stmt.close();
-				}
 				if (itemStmt != null)
 				{
 					itemStmt.close();
@@ -752,114 +811,69 @@ final class InitDb
 
 	private void initializeBids(RubisItem item, PreparedStatement bidStmt) throws SQLException
 	{
-		Statement stmt = null;
-
-		try
+		// Generate bids
+		final int nbids = this._conf.getMaxBidsPerItem();
+		float minBid = item.initialPrice;
+		for (int j = 0; j < nbids; ++j)
 		{
-			// Delete all existing items
+			final int userId = this._util.generateUser().id;
+			final int addBid = this._util.getRandomGenerator().nextInt(Math.round(this._conf.getMaxItemBaseBidPrice()))+1;
+			final int qty = this._util.getRandomGenerator().nextInt(item.quantity)+1;
+			final float bid = minBid + addBid;
+			final float maxBid = minBid + addBid * 2;
+			final Date dtNow = new Date(System.currentTimeMillis());
+
+			bidStmt.clearParameters();
+			bidStmt.setInt(1, userId);
+			bidStmt.setInt(2, item.id);
+			bidStmt.setInt(3, qty);
+			bidStmt.setFloat(4, bid);
+			bidStmt.setFloat(5, maxBid);
+			bidStmt.setDate(6, dtNow);
+
 			if (!this._testFlag)
 			{
-				stmt = this._dbConn.createStatement();
-				stmt.executeUpdate(SQL_DELETE_BIDS);
+				int affectedRows = bidStmt.executeUpdate();
+
+				if (affectedRows == 0)
+				{
+					throw new SQLException("During bid insertion: No rows affected");
+				}
 			}
 			if (this._pwr != null)
 			{
-				this._pwr.println(this._dbConn.nativeSQL(SQL_DELETE_BIDS));
+				this._pwr.println(bidStmt);
 			}
-			// Generate bids
-			final int nbids = this._conf.getMaxBidsPerItem();
-			float minBid = item.initialPrice;
-			for (int j = 0; j < nbids; ++j)
-			{
-				final int userId = this._util.generateUser().id;
-				final int addBid = this._util.getRandomGenerator().nextInt(Math.round(this._conf.getMaxItemBaseBidPrice()))+1;
-				final int qty = this._util.getRandomGenerator().nextInt(item.quantity)+1;
-				final float bid = minBid + addBid;
-				final float maxBid = minBid + addBid * 2;
-				final Date dtNow = new Date(System.currentTimeMillis());
 
-				bidStmt.clearParameters();
-				bidStmt.setInt(1, userId);
-				bidStmt.setInt(2, item.id);
-				bidStmt.setInt(3, qty);
-				bidStmt.setFloat(4, bid);
-				bidStmt.setFloat(5, maxBid);
-				bidStmt.setDate(6, dtNow);
-
-				if (!this._testFlag)
-				{
-					int affectedRows = bidStmt.executeUpdate();
-
-					if (affectedRows == 0)
-					{
-						throw new SQLException("During bid insertion: No rows affected");
-					}
-				}
-				if (this._pwr != null)
-				{
-					this._pwr.println(bidStmt);
-				}
-
-				minBid += addBid;
-			}
-		}
-		finally
-		{
-			if (stmt != null)
-			{
-				stmt.close();
-			}
+			minBid += addBid;
 		}
 	}
 
 	private void initializeComments(RubisItem item, PreparedStatement comStmt) throws SQLException
 	{
-		Statement stmt = null;
+		RubisComment comment = this._util.generateComment(this._util.generateUser().id,
+														  item.seller,
+														  item.id);
 
-		try
+		comStmt.clearParameters();
+		comStmt.setInt(1, comment.fromUserId);
+		comStmt.setInt(2, comment.toUserId);
+		comStmt.setInt(3, comment.itemId);
+		comStmt.setInt(4, comment.rating);
+		comStmt.setDate(5, new Date(comment.date.getTime()));
+
+		if (!this._testFlag)
 		{
-			// Delete all existing items
-			if (!this._testFlag)
-			{
-				stmt = this._dbConn.createStatement();
-				stmt.executeUpdate(SQL_DELETE_COMMENTS);
-			}
-			if (this._pwr != null)
-			{
-				this._pwr.println(this._dbConn.nativeSQL(SQL_DELETE_COMMENTS));
-			}
+			int affectedRows = comStmt.executeUpdate();
 
-			RubisComment comment = this._util.generateComment(this._util.generateUser().id,
-															  item.seller,
-															  item.id);
-
-			comStmt.clearParameters();
-			comStmt.setInt(1, comment.fromUserId);
-			comStmt.setInt(2, comment.toUserId);
-			comStmt.setInt(3, comment.itemId);
-			comStmt.setInt(4, comment.rating);
-			comStmt.setDate(5, new Date(comment.date.getTime()));
-
-			if (!this._testFlag)
+			if (affectedRows == 0)
 			{
-				int affectedRows = comStmt.executeUpdate();
-
-				if (affectedRows == 0)
-				{
-					throw new SQLException("During comment insertion: No rows affected");
-				}
-			}
-			if (this._pwr != null)
-			{
-				this._pwr.println(comStmt);
+				throw new SQLException("During comment insertion: No rows affected");
 			}
 		}
-		finally
+		if (this._pwr != null)
 		{
-			if (stmt != null)
-			{
-				stmt.close();
-			}
+			this._pwr.println(comStmt);
 		}
 	}
 }
