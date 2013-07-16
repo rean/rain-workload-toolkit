@@ -754,7 +754,7 @@ final class InitDb
 
 
 				this.initializeBids(item, bidStmt);
-				this.initializeComments(item, bidStmt);
+				this.initializeComments(item, comStmt);
 
 				if (this._verboseFlag)
 				{
