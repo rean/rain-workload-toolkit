@@ -79,7 +79,7 @@ final class InitDb
 	private static final String SQL_DELETE_BIDS = "DELETE FROM bids";
 	private static final String SQL_INSERT_BID = "INSERT INTO bids (id,user_id,item_id,qty,bid,max_bid,date) VALUES (NULL,?,?,?,?,?,?)";
 	private static final String SQL_DELETE_COMMENTS = "DELETE FROM comments";
-	private static final String SQL_INSERT_COMMENT = "INSERT INTO comments (id,from_user_id,to_user_id,rating,date,comment) VALUES (NULL,?,?,?,?,?)";
+	private static final String SQL_INSERT_COMMENT = "INSERT INTO comments (id,from_user_id,to_user_id,item_id,rating,date,comment) VALUES (NULL,?,?,?,?,?,?)";
 
 
 	private RubisConfiguration _conf;
