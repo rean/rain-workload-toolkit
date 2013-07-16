@@ -52,10 +52,20 @@ public final class DiscreteDistribution
 		if (probs.length > 0)
 		{
 			this._cdf = new double[probs.length];
+
+			// Compute CDF
+			double cumProb = probs[0];
 			this._cdf[0] = probs[0];
 			for (int i = 1; i < probs.length; ++i)
 			{
-				this._cdf[i] = this._cdf[i-1]+probs[i];
+				//this._cdf[i] = this._cdf[i-1]+probs[i];
+				this._cdf[i] = cumProb;
+				cumProb += probs[i];
+			}
+			// Normalize
+			for (int i = 0; i < probs.length; ++i)
+			{
+				this._cdf[i] /= cumProb;
 			}
 		}
 	}
