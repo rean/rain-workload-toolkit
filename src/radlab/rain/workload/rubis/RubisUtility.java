@@ -384,7 +384,7 @@ public final class RubisUtility
 		RubisCategory category = new RubisCategory();
 
 		category.id = id;
-		category.name = this._conf.getCategories().get(category.id);
+		category.name = this._conf.getCategories().get(category.id-MIN_CATEGORY_ID);
 
 		return category;
 	}
