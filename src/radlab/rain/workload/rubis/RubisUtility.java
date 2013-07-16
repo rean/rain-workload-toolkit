@@ -272,7 +272,7 @@ public final class RubisUtility
 	public RubisUser generateUser()
 	{
 		// Only generate a user among the ones that have been already preloaded in the DB
-		int userId = this._rng.nextInt(this._conf.getNumOfPreloadedUsers()-MIN_USER_ID)+MIN_USER_ID;
+		int userId = this._rng.nextInt(this._conf.getNumOfPreloadedUsers())+MIN_USER_ID;
 
 		return this.getUser(userId);
 	}
@@ -318,7 +318,7 @@ public final class RubisUtility
 	public RubisItem generateItem(int loggedUserId)
 	{
 		// Only generate an item among the active and old ones
-		int itemId = this._rng.nextInt(this._conf.getTotalActiveItems()+this._conf.getNumOfOldItems()-MIN_ITEM_ID)+MIN_ITEM_ID;
+		int itemId = this._rng.nextInt(this._conf.getTotalActiveItems()+this._conf.getNumOfOldItems())+MIN_ITEM_ID;
 
 		return this.getItem(itemId, loggedUserId);
 	}
@@ -391,7 +391,7 @@ public final class RubisUtility
 
 	public RubisRegion generateRegion()
 	{
-		return this.getRegion(this._rng.nextInt(this._conf.getRegions().size()-MIN_REGION_ID)+MIN_REGION_ID);
+		return this.getRegion(this._rng.nextInt(this._conf.getRegions().size())+MIN_REGION_ID);
 	}
 
 	public RubisRegion getRegion(int id)
