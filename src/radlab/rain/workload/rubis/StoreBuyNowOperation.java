@@ -103,7 +103,7 @@ public class StoreBuyNowOperation extends RubisOperation
 		form.add(new BasicNameValuePair("itemId", Integer.toString(item.id)));
 		form.add(new BasicNameValuePair("userId", Integer.toString(loggedUser.id)));
 		String str = null;
-		int maxQty = 1;
+		int maxQty = 0;
 		str = this.getUtility().findFormParamInHtml(this.getSessionState().getLastResponse(), "maxQty");
 		if (str != null && !str.isEmpty())
 		{
