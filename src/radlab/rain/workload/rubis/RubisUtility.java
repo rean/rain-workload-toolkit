@@ -620,7 +620,7 @@ public final class RubisUtility
 			if (m.groupCount() == 2 && m.group(2) != null)
 			{
 				// Choose randomly a page (previous or next)
-				if (this._rng.nextInt(100000) < 50000)
+				if (this._rng.nextFloat() < 0.5)
 				{
 					return Integer.parseInt(m.group(1));
 				}
