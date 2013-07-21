@@ -212,12 +212,12 @@ public final class RubisUtility
 		return ANONYMOUS_USER_ID == userId;
 	}
 
-	public boolean isLoggedUser(RubisUser user)
+	public boolean isRegisteredUser(RubisUser user)
 	{
 		return this.isValidUser(user) && !this.isAnonymousUser(user.id);
 	}
 
-	public boolean isLoggedUser(int userId)
+	public boolean isRegisteredUser(int userId)
 	{
 		return !this.isAnonymousUser(userId);
 	}

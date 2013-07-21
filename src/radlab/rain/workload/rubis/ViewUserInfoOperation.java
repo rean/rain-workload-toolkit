@@ -73,7 +73,7 @@ public class ViewUserInfoOperation extends RubisOperation
 			userId = this.getSessionState().getLoggedUserId();
 		}
 		RubisUser user = this.getUtility().getUser(userId);
-		if (!this.getUtility().isValidUser(user) || this.getUtility().isAnonymousUser(user))
+		if (!this.getUtility().isRegisteredUser(user))
 		{
 			//NOTE: The official RUBiS client goes back to the previous operation.
 			//      Currently, it seems there is no way to instruct RAIN to do a

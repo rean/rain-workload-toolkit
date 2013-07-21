@@ -74,7 +74,7 @@ public class RegisterItemOperation extends RubisOperation
 
 		// Need a logged user
 		RubisUser loggedUser = this.getUtility().getUser(this.getSessionState().getLoggedUserId());
-		if (!this.getUtility().isLoggedUser(loggedUser))
+		if (!this.getUtility().isRegisteredUser(loggedUser))
 		{
 			this.getLogger().warning("Need a logged user; got an anonymous one. Operation interrupted.");
 			this.setFailed(true);

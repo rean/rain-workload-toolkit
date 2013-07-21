@@ -93,10 +93,10 @@ public class PutCommentOperation extends RubisOperation
 		}
 		catch (NumberFormatException nfe)
 		{
-			// ignore and use  the anonymous user id
+			// ignore and use the anonymous user id
 		}
 		RubisUser toUser = this.getUtility().getUser(toUserId);
-		if (!this.getUtility().isValidUser(toUser))
+		if (!this.getUtility().isRegisteredUser(toUser))
 		{
 			this.getLogger().warning("No valid user has been found. Operation interrupted.");
 			this.setFailed(true);
@@ -105,7 +105,7 @@ public class PutCommentOperation extends RubisOperation
 
 		// Need a logged user
 		RubisUser loggedUser = this.getUtility().getUser(this.getSessionState().getLoggedUserId());
-		if (!this.getUtility().isLoggedUser(loggedUser))
+		if (!this.getUtility().isRegisteredUser(loggedUser))
 		{
 			this.getLogger().warning("Need a logged user; got an anonymous one. Operation interrupted.");
 			this.setFailed(true);

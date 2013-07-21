@@ -91,7 +91,7 @@ public class PutCommentAuthOperation extends RubisOperation
 			// ignore and use the anonymous user id
 		}
 		RubisUser toUser = this.getUtility().getUser(toUserId);
-		if (!this.getUtility().isValidUser(toUser))
+		if (!this.getUtility().isRegisteredUser(toUser))
 		{
 			this.getLogger().warning("No valid user has been found. Operation interrupted.");
 			this.setFailed(true);

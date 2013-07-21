@@ -88,7 +88,7 @@ public class BuyNowOperation extends RubisOperation
 
 		// Need a logged user
 		RubisUser loggedUser = this.getUtility().getUser(this.getSessionState().getLoggedUserId());
-		if (!this.getUtility().isLoggedUser(loggedUser))
+		if (!this.getUtility().isRegisteredUser(loggedUser))
 		{
 			this.getLogger().warning("No valid user has been found to log-in. Operation interrupted.");
 			this.setFailed(true);
