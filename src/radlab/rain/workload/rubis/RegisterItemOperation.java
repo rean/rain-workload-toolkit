@@ -121,6 +121,6 @@ public class RegisterItemOperation extends RubisOperation
 		this.getSessionState().setLastResponse(response.toString());
 		this.getSessionState().setItemId(item.id);
 
-		this.setFailed(false);
+		this.setFailed(!this.getUtility().checkRubisResponse(response.toString()));
 	}
 }

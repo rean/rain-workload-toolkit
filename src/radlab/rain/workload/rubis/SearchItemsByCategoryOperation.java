@@ -91,6 +91,6 @@ public class SearchItemsByCategoryOperation extends RubisOperation
 		// Save session data
 		this.getSessionState().setLastResponse(response.toString());
 
-		this.setFailed(false);
+		this.setFailed(!this.getUtility().checkRubisResponse(response.toString()));
 	}
 }

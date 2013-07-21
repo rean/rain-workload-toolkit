@@ -123,7 +123,7 @@ public class PutBidOperation extends RubisOperation
 		this.getSessionState().setLastResponse(response.toString());
 		this.getSessionState().setItemId(item.id);
 
-		this.setFailed(false);
+		this.setFailed(!this.getUtility().checkRubisResponse(response.toString()));
 
 		//this.getLogger().finest("End Bid execution");
 	}

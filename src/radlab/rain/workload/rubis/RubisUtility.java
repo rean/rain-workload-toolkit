@@ -244,8 +244,21 @@ public final class RubisUtility
 
 	public boolean checkHttpResponse(HttpTransport httpTransport, String response)
 	{
-		if (response.length() == 0
+		if (response == null
+			|| response.length() == 0
 			|| HttpStatus.SC_OK != httpTransport.getStatusCode()
+			/*|| -1 != response.indexOf("ERROR")*/)
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	public boolean checkRubisResponse(String response)
+	{
+		if (response == null
+			|| response.length() == 0
 			|| -1 != response.indexOf("ERROR"))
 		{
 			return false;

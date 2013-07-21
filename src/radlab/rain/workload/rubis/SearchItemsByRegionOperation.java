@@ -111,6 +111,6 @@ public class SearchItemsByRegionOperation extends RubisOperation
 		// Save session data
 		this.getSessionState().setLastResponse(response.toString());
 
-		this.setFailed(false);
+		this.setFailed(!this.getUtility().checkRubisResponse(response.toString()));
 	}
 }
