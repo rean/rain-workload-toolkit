@@ -204,7 +204,7 @@ public final class RubisUtility
 
 	public boolean isAnonymousUser(RubisUser user)
 	{
-		return this.isAnonymousUser(user.id);
+		return this.isValidUser(user) && this.isAnonymousUser(user.id);
 	}
 
 	public boolean isAnonymousUser(int userId)
@@ -214,7 +214,7 @@ public final class RubisUtility
 
 	public boolean isLoggedUser(RubisUser user)
 	{
-		return !this.isLoggedUser(user.id);
+		return this.isValidUser(user) && !this.isAnonymousUser(user.id);
 	}
 
 	public boolean isLoggedUser(int userId)
@@ -224,7 +224,7 @@ public final class RubisUtility
 
 	public boolean isValidUser(RubisUser user)
 	{
-		return null != user && MIN_USER_ID <= user.id;
+		return null != user && (MIN_USER_ID <= user.id || this.isAnonymousUser(user.id));
 	}
 
 	public boolean isValidItem(RubisItem item)

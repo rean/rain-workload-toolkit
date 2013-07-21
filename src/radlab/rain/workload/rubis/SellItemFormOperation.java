@@ -69,7 +69,7 @@ public class SellItemFormOperation extends RubisOperation
 
 		// Need a logged user
 		RubisUser loggedUser = this.getUtility().getUser(this.getSessionState().getLoggedUserId());
-		if (!this.getUtility().isValidUser(loggedUser))
+		if (!this.getUtility().isLoggedUser(loggedUser))
 		{
 			this.getLogger().warning("No valid user has been found. Operation interrupted.");
 			this.setFailed(true);

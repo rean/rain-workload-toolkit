@@ -72,9 +72,9 @@ public class SelectCategoryToSellItemOperation extends RubisOperation
 
 		// Need a logged user
 		RubisUser loggedUser = this.getUtility().getUser(this.getSessionState().getLoggedUserId());
-		if (!this.getUtility().isValidUser(loggedUser))
+		if (!this.getUtility().isLoggedUser(loggedUser))
 		{
-			this.getLogger().warning("Need a logged user; got an anonymous one. Operation interrupted.");
+			this.getLogger().warning("No valid logged user has been found. Operation interrupted.");
 			this.setFailed(true);
 			return;
 		}

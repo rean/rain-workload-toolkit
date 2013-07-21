@@ -71,7 +71,7 @@ public class RegisterUserOperation extends RubisOperation
 
 		// Generate a new user
 		RubisUser user = this.getUtility().newUser();
-		if (!this.getUtility().isValidUser(user))
+		if (!this.getUtility().isValidUser(user) || this.getUtility().isAnonymousUser(user))
 		{
 			this.getLogger().warning("No valid user has been found. Operation interrupted.");
 			this.setFailed(true);
