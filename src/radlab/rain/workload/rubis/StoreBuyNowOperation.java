@@ -110,7 +110,7 @@ public class StoreBuyNowOperation extends RubisOperation
 			maxQty = Math.max(Integer.parseInt(str), maxQty);
 		}
 		form.add(new BasicNameValuePair("maxQty", Integer.toString(maxQty)));
-		int qty = this.getRandomGenerator().nextInt(maxQty)+1;
+		int qty = (maxQty > 0) ? (this.getRandomGenerator().nextInt(maxQty)+1) : 0;
 		form.add(new BasicNameValuePair("qty", Integer.toString(qty)));
 		entity = new UrlEncodedFormEntity(form, "UTF-8");
 		reqPost.setEntity(entity);
