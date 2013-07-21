@@ -5,7 +5,7 @@
             "rubis.rngSeed": 5489,
 			"rubis.categoriesFile": "resources/rubis-ebay_full_categories.txt",
 			"rubis.regionsFile": "resources/rubis-ebay_regions.txt",
-			"rubis.numOldItems": 1000000,
+			"rubis.numOldItems": 1000,
 			"rubis.numPreloadedUsers": 100,
 			"rubis.percentUniqueItems": 80,
 			"rubis.percentItemsReservePrice": 40,
