@@ -510,7 +510,7 @@ public final class RubisUtility
 
 //		return html.substring(paramIdx + paramName.length(), lastIdx);
 
-		Pattern p = Pattern.compile("^.*?[&?]" + paramName + "=([^\"?&]*).+$");
+		Pattern p = Pattern.compile("^.*?[&?]" + paramName + "=([^\"?&\\s>]*).*$");
 		Matcher m = p.matcher(html);
 		if (m.matches())
 		{
@@ -553,7 +553,8 @@ public final class RubisUtility
 //
 //		return html.substring(keyIdx + key.length(), lastIdx);
 
-		Pattern p = Pattern.compile("^.*?<(?i:input)\\s+(?:.+\\s)?(?i:name)=" + paramName + "\\s+(?:.+\\s)?(?i:value)=([^\"?&>]+).+$");
+		//Pattern p = Pattern.compile("^.*?<(?i:input)\\s+(?:.+?\\s)?(?i:name)=" + paramName + "\\s+(?:.+?\\s)?(?i:value)=([^\"?&>]+).+$");
+		Pattern p = Pattern.compile("^.*?<(?i:input)\\s+(?:.+?\\s)?(?i:name)=" + paramName + "\\s+(?i:value)=([^\"?&>\\s]+).+$");
 		Matcher m = p.matcher(html);
 		if (m.matches())
 		{
