@@ -104,13 +104,13 @@ public class StoreBidOperation extends RubisOperation
 		// Fill-in the form anc click on the 'Bid now!' button
 		// This will really store the bid on the DB.
 		String str = null;
-		int maxQty = 1;
+		int maxQty = 0;
 		str = this.getUtility().findFormParamInHtml(this.getSessionState().getLastResponse(), "maxQty");
 		if (str != null && !str.isEmpty())
 		{
 			maxQty = Math.max(Integer.parseInt(str), maxQty);
 		}
-		int qty = this.getRandomGenerator().nextInt(maxQty)+1;
+		int qty = (maxQty > 0) ? (this.getRandomGenerator().nextInt(maxQty)+1) : 0;
 		float minBid = 0;
 		str = this.getUtility().findFormParamInHtml(this.getSessionState().getLastResponse(), "minBid");
 		if (str != null && !str.isEmpty())
