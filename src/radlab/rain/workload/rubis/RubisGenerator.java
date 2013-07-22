@@ -136,7 +136,6 @@ public class RubisGenerator extends Generator
 	private String _registerItemURL;
 	private String _aboutMeAuthURL;
 	private String _aboutMeURL;
-	private String _aboutMePostURL;
 
 
 	/**
@@ -530,11 +529,6 @@ public class RubisGenerator extends Generator
 	public String getAboutMeURL()
 	{
 		return this._aboutMeURL;
-	}
-
-	public String getAboutMePostURL()
-	{
-		return this._aboutMePostURL;
 	}
 
 	/**
@@ -963,7 +957,6 @@ public class RubisGenerator extends Generator
 		this._sellItemFormURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.SellItemForm";
 		this._registerItemURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.RegisterItem";
 		this._aboutMeAuthURL = this._baseURL + "/rubis_servlets/about_me.html";
-		this._aboutMeURL = this._baseURL + "/rubis_servlets/about_me.html";
-		this._aboutMePostURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.AboutMe";
+		this._aboutMeURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.AboutMe";
 	}
 }
