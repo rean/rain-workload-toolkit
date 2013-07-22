@@ -82,7 +82,7 @@ public class AboutMeOperation extends RubisOperation
 		UrlEncodedFormEntity entity = null;
 
 		// Send authentication data (login name and password)
-		reqPost = new HttpPost(this.getGenerator().getAboutMePostURL());
+		reqPost = new HttpPost(this.getGenerator().getAboutMeURL());
 		form = new ArrayList<NameValuePair>();
 		form.add(new BasicNameValuePair("nickname", loggedUser.nickname));
 		form.add(new BasicNameValuePair("password", loggedUser.password));
