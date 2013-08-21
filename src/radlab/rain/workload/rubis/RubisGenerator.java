@@ -930,6 +930,24 @@ public class RubisGenerator extends Generator
 	 */
 	private void initializeUrls()
 	{
+		String incarnation = this.getConfiguration().getIncarnation();
+
+		if (incarnation.equals("servlet"))
+		{
+			this.initializeServletUrls();
+		}
+		else
+		{
+			this.getLogger().warning("RUBiS incarnation '" + incarnation + "' has not been implemented yet. Default to 'servlet'");
+			this.initializeServletUrls();
+		}
+	}
+
+	/**
+	 * Initialize the roots/anchors of the URLs for the servlet incarnation.
+	 */
+	private void initializeServletUrls()
+	{
 		this._baseURL = "http://" + this.getTrack().getTargetHostName() + ":" + this.getTrack().getTargetHostPort();
 		this._homeURL = this._baseURL + "/rubis_servlets/";
 		this._registerURL = this._baseURL + "/rubis_servlets/register.html";

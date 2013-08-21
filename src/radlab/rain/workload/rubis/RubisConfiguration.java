@@ -52,6 +52,7 @@ public final class RubisConfiguration
 {
 	// Configuration keys
 	private static final String CFG_CATEGORIES_FILE_KEY = "rubis.categoriesFile";
+	private static final String CFG_INCARNATION_KEY = "rubis.incarnation";
 	private static final String CFG_MAX_BIDS_PER_ITEM_KEY = "rubis.maxBidsPerItem";
 	private static final String CFG_MAX_COMMENT_LENGTH_KEY = "rubis.maxCommentLen";
 	private static final String CFG_MAX_ITEM_BASE_BID_PRICE_KEY = "rubis.maxItemBaseBidPrice";
@@ -74,6 +75,7 @@ public final class RubisConfiguration
 	// Default values
 	private static final long DEFAULT_RNG_SEED = -1;
 	private static final String DEFAULT_CATEGORIES_FILE = "resources/rubis-ebay_full_categories.txt";
+	private static final String DEFAULT_INCARNATION = "servlet";
 	private static final String DEFAULT_REGIONS_FILE = "resources/rubis-ebay_regions.txt";
 	private static final int DEFAULT_NUM_OLD_ITEMS = 1000000;
 	private static final float DEFAULT_PERCENTAGE_UNIQUE_ITEMS = 80;
@@ -97,6 +99,7 @@ public final class RubisConfiguration
 	private List<String> _categories = null; /*Arrays.asList(DEFAULT_CATEGORIES)*/; ///< A collection of categories
 	private List<Integer> _numItemsPerCategory = null; ///< Number of items for each category
 	private String _categoriesFile = DEFAULT_CATEGORIES_FILE; ///< File name of the RUBiS categories file
+	private String _incarnation = DEFAULT_INCARNATION; ///< RUBiS incarnation
 	private int _maxCommentLen = DEFAULT_MAX_COMMENT_LENGTH; ///< Maximum comment length
 	private float _maxItemBaseBidPrice = DEFAULT_MAX_ITEM_BASE_BID_PRICE; ///< Maximum base bid price for an item
 	private float _maxItemBaseBuyNowPrice = DEFAULT_MAX_ITEM_BASE_BUY_NOW_PRICE; ///< Maximum base buy now price for an item
@@ -133,6 +136,10 @@ public final class RubisConfiguration
 		if (config.has(CFG_CATEGORIES_FILE_KEY))
 		{
 			this._categoriesFile = config.getString(CFG_CATEGORIES_FILE_KEY);
+		}
+		if (config.has(CFG_INCARNATION_KEY))
+		{
+			this._incarnation = config.getString(CFG_INCARNATION_KEY);
 		}
 		if (config.has(CFG_MAX_BIDS_PER_ITEM_KEY))
 		{
@@ -242,6 +249,16 @@ public final class RubisConfiguration
 	public String getCategoriesFileName()
 	{
 		return this._categoriesFile;
+	}
+
+	/**
+	 * Get the RUBiS incarnation type.
+	 *
+	 * @return the RUBiS incarnation type.
+	 */
+	public String getIncarnation()
+	{
+		return this._incarnation;
 	}
 
 	/**
@@ -484,6 +501,7 @@ public final class RubisConfiguration
 
 		sb.append( " Categories: " + this.getCategories());
 		sb.append(", Categories File Name: " + this.getCategoriesFileName());
+		sb.append( " Incarnation: " + this.getIncarnation());
 		sb.append(", Max Bids per Item: " + this.getMaxBidsPerItem());
 		sb.append(", Max Comment Length: " + this.getMaxCommentLength());
 		sb.append(", Max Item Base Reserve Price: " + this.getMaxItemBaseReservePrice());
