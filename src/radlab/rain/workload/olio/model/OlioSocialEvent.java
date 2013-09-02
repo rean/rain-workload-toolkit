@@ -28,52 +28,30 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Author: Original authors
  * Author: Marco Guazzone (marco.guazzone@gmail.com), 2013
  */
 
-package radlab.rain.workload.olio;
+package radlab.rain.workload.olio.model;
 
-import radlab.rain.IScoreboard;
-
-import java.io.IOException;
-import java.util.Set;
+import java.util.List;
 
 /**
- * The HomePageOperation is an operation that visits the home page. This
- * entails potentially loading static content (CSS/JS) and images.
+ * Models an Olio person entity.
  *
- * @author Original authors
  * @author <a href="mailto:marco.guazzone@gmail.com">Marco Guazzone</a>
  */
-public class HomePageOperation extends OlioOperation 
+public class OlioPerson
 {
-	public HomePageOperation(boolean interactive, IScoreboard scoreboard) 
-	{
-		super(interactive, scoreboard);
-		this._operationName = OlioGenerator.HOME_PAGE_OP_NAME;
-		this._operationIndex = OlioGenerator.HOME_PAGE_OP;
-	}
-
-	@Override
-	public void execute() throws Throwable
-	{
-		StringBuilder homeResponse = this.getHttpTransport().fetchUrl(this.getGenerator().getHomepageURL());
-		this.trace(this.getGenerator().getHomepageURL());
-		if(homeResponse.length() == 0)
-		{
-			throw new IOException("Received empty response");
-		}
-
-		// Load the static files (CSS/JS).
-		loadStatics(this.getGenerator().getHomepageStatics());
-		this.trace(this.getGenerator().getHomepageStatics());
-
-		// Always load the images.
-		Set<String> imageURLs = this.parseImages(homeResponse);
-		loadImages(imageURLs);
-		this.trace(imageURLs);
-		
-		this.setFailed(false);
-	}
+	public int id;
+	public String userName;
+	public String password;
+	public String firstName;
+	public String lastname;
+	public String email;
+	public String telephone;
+	public String imageurl;
+	public String imagethumburl;
+	public String summary;
+	public String timezone;
+	public String[] address;
 }

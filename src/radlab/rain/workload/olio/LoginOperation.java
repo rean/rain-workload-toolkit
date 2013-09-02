@@ -27,11 +27,16 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Author: Original authors
+ * Author: Marco Guazzone (marco.guazzone@gmail.com), 2013
  */
 
 package radlab.rain.workload.olio;
 
+
 import radlab.rain.IScoreboard;
+
 
 /**
  * The LoginOperation is an operation that logs in as a random user. If the
@@ -44,37 +49,42 @@ import radlab.rain.IScoreboard;
  * <br />
  * The application is checked (via parsing of the document) for indication
  * that the login succeeded; the logged in state is saved.
+ *
+ * @author Original authors
+ * @author <a href="mailto:marco.guazzone@gmailcom">Marco Guazzone</a>
  */
 public class LoginOperation extends OlioOperation
 {
-	public LoginOperation( boolean interactive, IScoreboard scoreboard )
+	public LoginOperation(boolean interactive, IScoreboard scoreboard)
 	{ 
-		super( interactive, scoreboard );
-		this._operationName = "Login";
-		this._operationIndex = OlioGenerator.LOGIN;
-		
+		super(interactive, scoreboard);
+		this._operationName = OlioGenerator.LOGIN_OP_NAME;
+		this._operationIndex = OlioGenerator.LOGIN_OP;
+
 		/* Logging in cannot occur asynchronously because the state of the
 		 * HTTP client changes, affecting the execution of the following
 		 * operation. */
 		this._mustBeSync = true;
 	}
-	
+
+	@Override
 	public void execute() throws Throwable
 	{
-		if ( this.isLoggedOn() )
+		if (this.isLoggedOn())
 		{
 			this.logOff();
 		}
-		
-		// Logging in redirects the user to the home page.
-		StringBuilder homeResponse = this.logOn();
-		
-		// Check that the user was successfully logged in.
-		if ( homeResponse.indexOf("Successfully logged in!") < 0 ) {
-			throw new Exception( "Login did not persist for an unknown reason" );
-		}
-		
-		this.setFailed( false );
+
+		this.logOn();
+//		// Logging in redirects the user to the home page.
+//		StringBuilder homeResponse = this.logOn();
+//		
+//		// Check that the user was successfully logged in.
+//		if (homeResponse.indexOf("Successfully logged in!") < 0)
+//		{
+//			throw new Exception("Login did not persist for an unknown reason");
+//		}
+
+		this.setFailed(false);
 	}
-	
 }

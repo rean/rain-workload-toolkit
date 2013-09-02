@@ -27,19 +27,25 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Author Original authors
+ * Author: Marco Guazzone (marco.guazzone@gmail.com), 2013
  */
 
 package radlab.rain.workload.olio;
 
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-
-import radlab.rain.IScoreboard;
-
+import java.util.Calendar;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.HttpStatus;
+import radlab.rain.IScoreboard;
+import radlab.rain.workload.olio.model.OlioSocialEvent;
+
 
 /**
  * The AddEventOperation is an operation that creates a new event. The user
@@ -48,94 +54,198 @@ import org.apache.http.entity.mime.content.StringBody;
  * <br />
  * The requests made include loading the event form, loading the static URLs
  * (CSS/JS), and sending the POST data to the application.
+ * <br/>
+ * NOTE: Code based on {@code org.apache.olio.workload.driver.UIDriver} class
+ * and adapted for RAIN.
+ *
+ * @author Original authors
+ * @author <a href="mailto:marco.guazzone@gmail.com">Marco Guazzone</a>
  */
 public class AddEventOperation extends OlioOperation 
 {
-	public AddEventOperation( boolean interactive, IScoreboard scoreboard ) 
+	public AddEventOperation(boolean interactive, IScoreboard scoreboard) 
 	{
-		super( interactive, scoreboard );
-		this._operationName = "AddEvent";
-		this._operationIndex = OlioGenerator.ADD_EVENT;
+		super(interactive, scoreboard);
+		this._operationName = OlioGenerator.ADD_EVENT_OP_NAME;
+		this._operationIndex = OlioGenerator.ADD_EVENT_OP;
 	}
 	
 	@Override
 	public void execute() throws Throwable
 	{
-		if ( this.isLoggedOn() )
+		if (this.isLoggedOn())
 		{
 			// Fetch the add event form.
-			StringBuilder formResponse = this._http.fetchUrl( this.getGenerator().addEventURL );
-			this.trace( this.getGenerator().addEventURL );
-			if ( formResponse.length() == 0 )
+			StringBuilder formResponse = this.getHttpTransport().fetchUrl(this.getGenerator().getAddEventURL());
+			this.trace(this.getGenerator().getAddEventURL());
+			if (formResponse.length() == 0)
 			{
-				throw new IOException( "Received empty response" );
+				throw new IOException("Received empty response");
 			}
-			
+
 			// Get the authentication token needed to create the POST request.
-			String token = this.parseAuthToken( formResponse );
-			if ( token == null )
+			String token = null;
+			switch (this.getConfiguration().getIncarnation())
 			{
-				throw new Exception( "Authentication token could not be parsed" );
+				case OlioConstants.JAVA_INCARNATION:
+					// No token to parse
+					break;
+				case OlioConstants.PHP_INCARNATION:
+					// No token to parse
+					break;
+				case OlioConstants.RAILS_INCARNATION:
+					token = this.parseAuthToken( formResponse );
+					if ( token == null )
+					{
+						throw new Exception( "Authentication token could not be parsed" );
+					}
+					break;
 			}
 			
 			// Load the static files associated with the add event form.
-			this.loadStatics( this.getGenerator().addEventStatics );
-			this.trace( this.getGenerator().addEventStatics );
-			
+			this.loadStatics(this.getGenerator().getAddEventStatics());
+			this.trace(this.getGenerator().getAddEventStatics());
+
 			// Construct the POST request to create the event.
-			HttpPost httpPost = new HttpPost( this.getGenerator().addEventResultURL );
+			HttpPost httpPost = new HttpPost(this.getGenerator().getAddEventResultURL());
 			MultipartEntity entity = new MultipartEntity();
-			this.populateEntity( entity );
-			entity.addPart( "authenticity_token", new StringBody( token ) );
-			httpPost.setEntity( entity );
-			
+			this.populateEntity(entity);
+			switch (this.getConfiguration().getIncarnation())
+			{
+				case OlioConstants.JAVA_INCARNATION:
+					// No token to set
+					break;
+				case OlioConstants.PHP_INCARNATION:
+					// No token to set
+					break;
+				case OlioConstants.RAILS_INCARNATION:
+					entity.addPart("authenticity_token", new StringBody(token));
+					break;
+			}
+			httpPost.setEntity(entity);
+
 			// Make the POST request.
-			StringBuilder postResponse = this._http.fetch( httpPost );
-			this.trace( this.getGenerator().addEventResultURL );
-			
+			StringBuilder postResponse = this.getHttpTransport().fetch(httpPost);
+			this.trace(this.getGenerator().getAddEventResultURL());
+
+			//TODO: In Apache Olio there is also a check for redirection. Do we need it?
+
 			// Verify that the request succeeded. 
-			int index = postResponse.indexOf( "success" );
-			if( index == -1 ) {
-				throw new Exception( "Could not find success message in result body!" );
+			int status = this.getHttpTransport().getStatusCode();
+			if (HttpStatus.SC_OK != status)
+			{
+				throw new Exception("Multipart POST request did not work for URL: " + this.getGenerator().getAddEventResultURL() + ". Returned status code: " + status + "!");
+			}
+			int index = postResponse.indexOf("success");
+			if (index == -1)
+			{
+				throw new Exception("Multipart POST request did not work for URL: " + this.getGenerator().getAddEventResultURL() + ". Could not find success message in result body!");
 			}
 		}
 		else
 		{
-			// TODO: What's the best way to handle this case?
-			this._logger.warning( "Login required for " + this._operationName );
+			//this.getLogger().warning("Login required for adding an event");
+			throw new Exception("Login required for adding an event");
+			this.setFailed(true);
+			return;
 		}
-		
-		this.setFailed( false );
+
+		this.setFailed(false);
 	}
-	
+
 	/**
 	 * Adds the details and files needed to create a new event in Olio.
 	 * 
-	 * @param entity        The request entity in which to add event details.
-	 * 
-	 * @throws UnsupportedEncodingException
+	 * @param entity The request entity in which to add event details.
 	 */
-	protected void populateEntity( MultipartEntity entity ) throws UnsupportedEncodingException
+	protected void populateEntity(MultipartEntity entity) throws Throwable
 	{
-		entity.addPart("commit", new StringBody( "Create" ) );
-		
-		entity.addPart("event[title]", new StringBody( RandomUtil.randomText( this._random, 15, 20 ) ) );
-		entity.addPart("event[summary]", new StringBody( RandomUtil.randomText( this._random, 50, 200 ) ) );
-		entity.addPart("event[description]", new StringBody( RandomUtil.randomText( this._random, 100, 495 ) ) );
-		entity.addPart("event[telephone]", new StringBody( RandomUtil.randomPhone( this._random, new StringBuilder( 256 ) ) ) );
-		entity.addPart("event[event_timestamp(1i)]", new StringBody( "2008" ) );
-		entity.addPart("event[event_timestamp(2i)]", new StringBody( "10" ) );
-		entity.addPart("event[event_timestamp(3i)]", new StringBody( "20" ) );
-		entity.addPart("event[event_timestamp(4i)]", new StringBody( "20" ) );
-		entity.addPart("event[event_timestamp(5i)]", new StringBody( "10" ) );
-		
-		// Add uploaded files
-		entity.addPart( "event_image", new FileBody(this.getGenerator().eventImg ) );
-		entity.addPart( "event_document", new FileBody( this.getGenerator().eventPdf ) );
-		
-		entity.addPart( "tag_list", new StringBody( "tag1" ) );
-		
-		this.addAddress( entity );
+		OlioSocialEvent evt = this.getUtility().generateEvent();
+		if (evt.title == null || evt.title.length() == 0)
+		{
+			throw new Exception("Social event title cannot be null");
+
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(evt.eventTimestamp);
+
+		StringBuilder tags = new StringBuilder();
+		for (String tag : evt.tags)
+		{
+			tags.append(tag).append(' ');
+		}
+		tags.setLength(tags.length-1); // Trim trailing space
+
+		switch (this.getConfiguration().getIncarnation())
+		{
+			case OlioConstants.JAVA_INCARNATION:
+				entity.addPart("title", new StringBody(evt.title));
+				entity.addPart("summary", new StringBody(evt.summary));
+				entity.addPart("description", new StringBody(evt.description));
+            	entity.addPart("submitter_user_name", new StringBody(evt.submitterUserName));
+				entity.addPart("telephone", new StringBody(evt.telephone));
+				entity.addPart("timezone", new StringBody(evt.timezone));
+				entity.addPart("year", new StringBody(cal.get(Calendar.YEAR)));
+				entity.addPart("month", new StringBody(cal.get(Calendar.MONTH));
+				entity.addPart("day", new StringBody(Calendar.DAY_OF_MONTH));
+				entity.addPart("hour", new StringBody(Calendar.HOUR_OF_DAY));
+				entity.addPart("minute", new StringBody(Calendar.MINUTE));
+				entity.addPart("tags", new StringBody(tags));
+				entity.addPart("street1", new StringBody(evt.address[0]));
+				entity.addPart("street2", new StringBody(evt.address[1]));
+				entity.addPart("city", new StringBody(evt.address[2]));
+				entity.addPart("state", new StringBody(evt.address[3]));
+				entity.addPart("zip", new StringBody(evt.address[4]));
+				entity.addPart("country", new StringBody(evt.address[5]));
+				entity.addPart("upload_event_image", new FileBody(this.getGenerator().getEventImg()));
+				entity.addPart("upload_event_literature", new FileBody(this.getGenerator().getEventPdf()));
+				entity.addPart("submit", new StringBody("Create"));
+				break;
+			case OlioConstants.PHP_INCARNATION:
+				entity.addPart("title", new StringBody(evt.title));
+				//entity.addPart("summary", new StringBody(evt.summary));
+				entity.addPart("description", new StringBody(evt.description));
+            	entity.addPart("submitter_user_name", new StringBody(evt.submitterUserName));
+				entity.addPart("telephone", new StringBody(evt.telephone));
+				entity.addPart("timezone", new StringBody(evt.timezone));
+				entity.addPart("year", new StringBody(cal.get(Calendar.YEAR)));
+				entity.addPart("month", new StringBody(cal.get(Calendar.MONTH));
+				entity.addPart("day", new StringBody(Calendar.DAY_OF_MONTH));
+				entity.addPart("hour", new StringBody(Calendar.HOUR_OF_DAY));
+				entity.addPart("minute", new StringBody(Calendar.MINUTE));
+				entity.addPart("tags", new StringBody(tags));
+				entity.addPart("street1", new StringBody(evt.address[0]));
+				entity.addPart("street2", new StringBody(evt.address[1]));
+				entity.addPart("city", new StringBody(evt.address[2]));
+				entity.addPart("state", new StringBody(evt.address[3]));
+				entity.addPart("zip", new StringBody(evt.address[4]));
+				entity.addPart("country", new StringBody(evt.address[5]));
+				entity.addPart("upload_event_image", new FileBody(this.getGenerator().getEventImg()));
+				entity.addPart("upload_event_literature", new FileBody(this.getGenerator().getEventPdf()));
+				entity.addPart("addeventsubmit", new StringBody("Create"));
+				break;
+			case OlioConstants.RAILS_INCARNATION:
+				entity.addPart("event[title]", new StringBody(evt.title));
+				entity.addPart("event[summary]", new StringBody(evt.summary));
+				entity.addPart("event[description]", new StringBody(evt.description));
+				//FIXME: Submitter user name?
+				entity.addPart("event[telephone]", new StringBody(evt.telephone));
+				//FIXME: Timezone?
+				entity.addPart("event[event_timestamp(1i)]", new StringBody(cal.get(Calendar.YEAR));
+				entity.addPart("event[event_timestamp(2i)]", new StringBody(cal.get(Calendar.MONTH));
+				entity.addPart("event[event_timestamp(3i)]", new StringBody(cal.get(Calendar.DAY_OF_MONTH));
+				entity.addPart("event[event_timestamp(4i)]", new StringBody(cal.get(Calendar.HOUR_OF_DAY));
+				entity.addPart("event[event_timestamp(5i)]", new StringBody(cal.get(Calendar.MINUTE));
+				entity.addPart("tag_list", new StringBody(tags));
+				entity.addPart("event_image", new FileBody(this.getGenerator().getEventImg()));
+				entity.addPart("event_document", new FileBody(this.getGenerator().getEventPdf()));
+				entity.addPart("address[street1]", new StringBody(evt.address[0]));
+				entity.addPart("address[street2]", new StringBody(evt.address[1]));
+				entity.addPart("address[city]", new StringBody(evt.address[2]));
+				entity.addPart("address[state]", new StringBody(evt.address[3]));
+				entity.addPart("address[zip]", new StringBody(evt.address[4]));
+				entity.addPart("address[country]", new StringBody(evt.address[5]));
+				entity.addPart("commit", new StringBody("Create"));
+				break;
+		}
 	}
-	
 }

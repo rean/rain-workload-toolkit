@@ -27,50 +27,66 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Author: Original authors
+ * Author: Marco Guazzone (marco.guazzone@gmail.com), 2013
  */
 
 package radlab.rain.workload.olio;
 
 import radlab.rain.IScoreboard;
 
-import java.util.Set;
+
 import java.io.IOException;
+import java.util.Set;
+
 
 /**
  * The TagSearchOperation is an operation that does a tag search. A random tag
  * is generated and the search result page is loaded.
+ *
+ * @author Original authors
+ * @author <a href="mailto:marco.guazzone@gmail.com">Marco Guazzone</a>
  */
 public class TagSearchOperation extends OlioOperation 
 {
-	public TagSearchOperation( boolean interactive, IScoreboard scoreboard )
+	public TagSearchOperation(boolean interactive, IScoreboard scoreboard)
 	{
-		super( interactive, scoreboard );
-		this._operationName = "TagSearch";
-		this._operationIndex = OlioGenerator.TAG_SEARCH;
+		super(interactive, scoreboard);
+		this._operationName = OlioGenerator.TAG_SEARCH_OP_NAME;
+		this._operationIndex = OlioGenerator.TAG_SEARCH_OP;
 	}
-	
+
 	@Override
 	public void execute() throws Throwable
 	{
-		String tag = RandomUtil.randomTagName( this._random );
-		this._logger.finer( "Searching the tag: " + tag );
+		String tag = this.getUtility().generateTagName();
+		this.getLogger().finer("Searching the tag: " + tag);
 		
-		String searchUrl = this.getGenerator().tagSearchURL + "?tag=" + tag + "&submit=Search+Tags";
-		StringBuilder searchResponse = this._http.fetchUrl( searchUrl );
-		this.trace( searchUrl );
-		if( searchResponse.length() == 0 )
+		String searchUrl = null;
+		switch (this.getConfiguration().getIncarnation())
 		{
-			throw new IOException( "Received empty response" );
+			case JAVA_INCARNATION:
+				searchUrl = this.getGenerator().getTagSearchURL() + "?tag=" + tag + "&tagsearchsubmit=Seach+Tags";
+				break;
+			case RAILS_INCARNATION:
+				searchUrl = this.getGenerator().getTagSearchURL() + "?tag=" + tag + "&submit=Search+Tags";
+				break;
 		}
-		
-		this.loadStatics( this.getGenerator().tagSearchStatics );
-		this.trace( this.getGenerator().tagSearchStatics );
-		
-		Set<String> imageUrls = this.parseImages( searchResponse );
-		this.loadImages( imageUrls );
-		this.trace( imageUrls );
-		
-		this.setFailed( false );
+		StringBuilder searchResponse = this.getHttpTransport().fetchUrl(searchUrl);
+		this.trace(searchUrl);
+		if(searchResponse.length() == 0)
+		{
+			throw new IOException("Received empty response");
+		}
+
+		this.loadStatics(this.getGenerator().getTagSearchStatics());
+		this.trace( this.getGenerator().getTagSearchStatics());
+
+		Set<String> imageUrls = this.parseImages(searchResponse);
+		this.loadImages(imageUrls);
+		this.trace(imageUrls);
+
+		this.setFailed(false);
 	}
-	
 }

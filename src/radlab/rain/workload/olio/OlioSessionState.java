@@ -28,52 +28,62 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Author: Original authors
- * Author: Marco Guazzone (marco.guazzone@gmail.com), 2013
+ * Author: Marco Guazzone (marco.guazzone@gmail.com), 2013.
  */
 
-package radlab.rain.workload.olio;
+package radlab.rain.workload.Olio;
 
-import radlab.rain.IScoreboard;
-
-import java.io.IOException;
-import java.util.Set;
 
 /**
- * The HomePageOperation is an operation that visits the home page. This
- * entails potentially loading static content (CSS/JS) and images.
+ * The state of a Olio user session.
  *
- * @author Original authors
  * @author <a href="mailto:marco.guazzone@gmail.com">Marco Guazzone</a>
  */
-public class HomePageOperation extends OlioOperation 
+public final class OlioSessionState
 {
-	public HomePageOperation(boolean interactive, IScoreboard scoreboard) 
+	private int _loggedPersonId = OlioUtility.ANONYMOUS_PERSON_ID; ///< The current logged person identifier
+	private int _lastOp = OlioUtility.INVALID_OPERATION_ID; ///< The identifier of the last terminated operation
+	private String _lastResponse; ///< The response of the last terminated operation
+
+
+	public OlioSessionState()
 	{
-		super(interactive, scoreboard);
-		this._operationName = OlioGenerator.HOME_PAGE_OP_NAME;
-		this._operationIndex = OlioGenerator.HOME_PAGE_OP;
 	}
 
-	@Override
-	public void execute() throws Throwable
+	public int getLastOperation()
 	{
-		StringBuilder homeResponse = this.getHttpTransport().fetchUrl(this.getGenerator().getHomepageURL());
-		this.trace(this.getGenerator().getHomepageURL());
-		if(homeResponse.length() == 0)
-		{
-			throw new IOException("Received empty response");
-		}
+		return this._lastOp;
+	}
 
-		// Load the static files (CSS/JS).
-		loadStatics(this.getGenerator().getHomepageStatics());
-		this.trace(this.getGenerator().getHomepageStatics());
+	public void setLastOperation(int value)
+	{
+		this._lastOp = value;
+	}
 
-		// Always load the images.
-		Set<String> imageURLs = this.parseImages(homeResponse);
-		loadImages(imageURLs);
-		this.trace(imageURLs);
-		
-		this.setFailed(false);
+	public void setLastResponse(String value)
+	{
+		this._lastResponse = value;
+	}
+
+	public String getLastResponse()
+	{
+		return this._lastResponse;
+	}
+
+	public int getLoggedPersonId()
+	{
+		return this._loggedPersonId;
+	}
+
+	public void setLoggedPersonId(int value)
+	{
+		this._loggedPersonId = value;
+	}
+
+	public void clear()
+	{
+		this._loggedPersonId = OlioUtility.ANONYMOUS_PERSON_ID;
+		this._lastOp = OlioUtility.INVALID_OPERATION_ID;
+		this._lastResponse = null;
 	}
 }

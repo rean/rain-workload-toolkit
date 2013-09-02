@@ -27,53 +27,75 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Author: Original authors
+ * Author: Marco Guazzone (marco.guazzone@gmail.com), 2013
  */
 
 package radlab.rain.workload.olio;
 
-import radlab.rain.IScoreboard;
 
 import java.io.IOException;
-	
+import radlab.rain.IScoreboard;
+
+
 /**
  * The PersonDetailOperation is an operation that shows the details of a
  * randomly selected user. The user must be logged in to see the details.
+ *
+ * @author Original authors
+ * @author <a href="mailto:marco.guazzone@gmail.com">Marco Guazzone</a>
  */
 public class PersonDetailOperation extends OlioOperation 
 {
-	public PersonDetailOperation( boolean interactive, IScoreboard scoreboard ) 
+	public PersonDetailOperation(boolean interactive, IScoreboard scoreboard) 
 	{
-		super( interactive, scoreboard );
-		this._operationName = "PersonDetails";
-		this._operationIndex = OlioGenerator.PERSON_DETAIL;
+		super(interactive, scoreboard);
+		this._operationName = OlioGenerator.PERSON_DETAIL_OP_NAME;
+		this._operationIndex = OlioGenerator.PERSON_DETAIL_OP;
 	}
-	
+
 	@Override
 	public void execute() throws Throwable
 	{
-		if ( this.isLoggedOn() )
+		if (this.isLoggedOn())
 		{
-			int userId = this._random.random( 1, ScaleFactors.loadedUsers );
-			
-			String personUrl = this.getGenerator().personDetailURL + userId;
-			StringBuilder personResponse = this._http.fetchUrl( personUrl );
-			this.trace( personUrl );
+			int userId = this.getUtility().generateInt(1, ScaleFactors.loadedUsers);
+
+			String personUrl = null;
+			switch (this.getConfiguration().getIncarnation())
+			{
+				case JAVA_INCARNATION:
+					personUrl = this.getGenerator().getPersonDetailURL() + "&user_name=" + UserName.getUserName( userId );
+					break;
+				case RAILS_INCARNATION:
+					personUrl = this.getGenerator().getPersonDetailURL() + userId;
+					break;
+			}
+			StringBuilder personResponse = this.getHttpTransport().fetchUrl(personUrl);
+			this.trace(personUrl);
 			if (personResponse.length() == 0)
 			{
 				throw new IOException("Received empty response");
 			}
+
+			this.loadStatics(this.getGenerator().getPersonStatics());
+			this.trace(this.getGenerator().getPersonStatics());
+
+			Set<String> imageUrls = this.parseImages(personResponse);
+			this.loadImages(imageUrls);
+			this.trace(imageUrls);
 		}
 		else
 		{
-			if ( this.checkIsLoggedIn() )
+			if (this.checkIsLoggedIn())
 			{
-				this._logger.warning( "isLoggedOn() returned false but checkIsLoggedIn() returned true" );
+				this.getLogger().warning("isLoggedOn() returned false but checkIsLoggedIn() returned true");
 			}
 			// TODO: What's the best way to handle this case?
-			this._logger.warning( "Login required for " + this._operationName );
+			this.getLogger().warning("Login required for " + this._operationName);
 		}
 		
-		this.setFailed( false );
+		this.setFailed(false);
 	}
-	
 }
