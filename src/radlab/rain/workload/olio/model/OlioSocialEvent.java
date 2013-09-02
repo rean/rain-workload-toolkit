@@ -36,22 +36,26 @@ package radlab.rain.workload.olio.model;
 import java.util.List;
 
 /**
- * Models an Olio person entity.
+ * Models an Olio social event entity.
  *
  * @author <a href="mailto:marco.guazzone@gmail.com">Marco Guazzone</a>
  */
-public class OlioPerson
+public class OlioSocialEvent
 {
 	public int id;
-	public String userName;
-	public String password;
-	public String firstName;
-	public String lastname;
-	public String email;
-	public String telephone;
-	public String imageurl;
-	public String imagethumburl;
+	public String description;
+	public String title;
+	public String submitterUserName;
 	public String summary;
-	public String timezone;
-	public String[] address;
+	public String telephone;
+	public String imageThumbUrl;
+	public String imageUrl;
+	public String literatureUrl;
+	public Date eventTimestamp;
+	public int totalScore;
+	public int numberOfVotes;
+	public boolean disabled;
+	public Date createdTimestamp;
+	public int addressId;
+	public List[] tags;
 }
