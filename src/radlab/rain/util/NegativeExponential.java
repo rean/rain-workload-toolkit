@@ -35,12 +35,19 @@ import java.util.Random;
 
 public class NegativeExponential 
 {
-	private Random _random = new Random();
+	private Random _random;
 	private double _mean = 0.0;
 	
 	public NegativeExponential( double mean )
 	{
 		this._mean = mean;
+		this._random = new Random();
+	}
+	
+	public NegativeExponential( double mean, Random rng )
+	{
+		this._mean = mean;
+		this._random = rng;
 	}
 	
 	// Courtesy: http://www.sitmo.com/eq/513 - Generating an Exponential distributed random number
