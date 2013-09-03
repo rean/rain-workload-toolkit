@@ -31,7 +31,7 @@
  * Author: Marco Guazzone (marco.guazzone@gmail.com), 2013.
  */
 
-package radlab.rain.workload.Olio;
+package radlab.rain.workload.olio;
 
 
 /**

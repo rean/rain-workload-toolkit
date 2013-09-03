@@ -50,6 +50,7 @@ import org.json.JSONException;
  */
 public final class OlioConfiguration
 {
+	// Possible Java incarnation
 	public static final int JAVA_INCARNATION = 0;
 	public static final int PHP_INCARNATION = 1;
 	public static final int RAILS_INCARNATION = 2;
@@ -57,15 +58,24 @@ public final class OlioConfiguration
 	// Configuration keys
 	private static final String CFG_INCARNATION_KEY = "olio.incarnation";
 	private static final String CFG_RNG_SEED_KEY = "olio.rngSeed";
+	private static final String CFG_NUM_PRELOADED_EVENTS_KEY = "olio.numPreloadedEvents";
+	private static final String CFG_NUM_PRELOADED_PERSONS_KEY = "olio.numPreloadedPersons";
+	private static final String CFG_NUM_PRELOADED_TAGS_KEY = "olio.numPreloadedTags";
 
 	// Default values
 	private static final int DEFAULT_INCARNATION = RAILS_INCARNATION;
 	private static final long DEFAULT_RNG_SEED = -1;
+	private static final int DEFAULT_NUM_PRELOADED_EVENTS = 0;
+	private static final int DEFAULT_NUM_PRELOADED_PERSONS = 0;
+	private static final int DEFAULT_NUM_PRELOADED_TAGS = 0;
 
 
 	// Members to hold configuration values
 	private int _incarnation = DEFAULT_INCARNATION; ///< Olio incarnation
     private long _rngSeed = DEFAULT_RNG_SEED; ///< The seed used for the Random Number Generator; a value <= 0 means that no special seed is used.
+	private int _numPreloadEvents = DEFAULT_NUM_PRELOADED_EVENTS; ///< Number of events that have been already preloaded in the Olio database
+	private int _numPreloadPersons = DEFAULT_NUM_PRELOADED_PERSONS; ///< Number of persons that have been already preloaded in the Olio database
+	private int _numPreloadTags = DEFAULT_NUM_PRELOADED_TAGS; ///< Number of tags that have been already preloaded in the Olio database
 
 
 	public OlioConfiguration()
@@ -116,7 +126,7 @@ public final class OlioConfiguration
 	 *
 	 * @return the Olio incarnation type.
 	 */
-	public String getIncarnation()
+	public int getIncarnation()
 	{
 		return this._incarnation;
 	}
@@ -131,12 +141,48 @@ public final class OlioConfiguration
 		return this._rngSeed;
 	}
 
+	/**
+	 * Get the number of events that have been already preloaded inside the
+	 * Olio database.
+	 *
+	 * @return the number of preloaded events.
+	 */
+	public int getNumOfPreloadedEvents()
+	{
+		return this._numPreloadEvents;
+	}
+
+	/**
+	 * Get the number of persons that have been already preloaded inside the
+	 * Olio database.
+	 *
+	 * @return the number of preloaded persons.
+	 */
+	public int getNumOfPreloadedPersons()
+	{
+		return this._numPreloadPersons;
+	}
+
+	/**
+	 * Get the number of tags that have been already preloaded inside the
+	 * Olio database.
+	 *
+	 * @return the tags of preloaded persons.
+	 */
+	public int getNumOfPreloadedTags()
+	{
+		return this._numPreloadTags;
+	}
+
 	public String toString()
 	{
 		StringBuffer sb = new StringBuffer();
 
 		sb.append( " Incarnation: " + this.getIncarnation());
 		sb.append(", Random Number Generator Seed: " + this.getRngSeed());
+		sb.append(", Number of Preloaded Events: " + this.getNumOfPreloadedEvents());
+		sb.append(", Number of Preloaded Persons: " + this.getNumOfPreloadedPersons());
+		sb.append(", Number of Preloaded Tags: " + this.getNumOfPreloadedTags());
 
 		return sb.toString();
 	}

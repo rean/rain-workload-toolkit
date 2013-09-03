@@ -44,6 +44,8 @@ import java.util.Map;
 import java.util.logging.Logger;
 import java.util.Random;
 import java.util.Set;
+import org.json.JSONObject;
+import org.json.JSONException;
 import radlab.rain.Generator;
 import radlab.rain.LoadProfile;
 import radlab.rain.Operation;
@@ -213,12 +215,18 @@ public class OlioGenerator extends Generator
 		};
 
 	/** Additional static files for Event Detail operation (for PHP incarnation). */
-    private static final String[] PHP_EVENT_DETAIL_STATICS = {
+    private static final String[] PHP_EVENT_DETAIL_COMMON_STATICS = {
 			"/js/starrating.js",
 			"/images/star_on.png",
 			"/images/star_off.png"
 		};
 
+	/** Additional static files for Event Detail operation (for Rails incarnation). */
+	private static final String[] PHP_EVENT_DETAIL_BASE_STATICS = {};
+
+	/** Additional static files for Event Detail operation (for Rails incarnation). */
+	private static final String[] PHP_EVENT_DETAIL_JMAKI_STATICS = {};
+ 
 	/** Additional static files for Add Person operation (for PHP incarnation). */
     private static final String[] PHP_ADD_PERSON_STATICS = {
 			"/js/validateform.js"
@@ -358,8 +366,8 @@ public class OlioGenerator extends Generator
 	private String _checkNameURL;
 	private String _fileServiceURL;
 	private String _tagCloudURL;
-	private String _imgCloudURL;
-	private String _docCloudURL;
+	private String _imgStoreURL;
+	private String _docStoreURL;
 	// Statics URLs
 	private String[] _homepageStatics; 
 	private String[] _personStatics; 
@@ -494,8 +502,8 @@ public class OlioGenerator extends Generator
 
 		ScaleFactors.setActiveUsers( this.getTrack().getMaxUsers() );
 
-		// Select a random user for current session (if needed)
-		this.getSessionState().setLoggedUserId(this.getUtility().generatePerson().id);
+//		// Select a random user for current session (if needed)
+//		this.getSessionState().setLoggedUserId(this.getUtility().generatePerson().id);
 
 		// Build Olio URLs
 		this.initializeUrlAnchors();
@@ -519,19 +527,19 @@ public class OlioGenerator extends Generator
 		
 		if( lastOperation == -1 )
 		{
-			nextOperation = HOME_OP;
+			nextOperation = HOME_PAGE_OP;
 		}
 //		else if (lastOperation == BACK_SPECIAL_OP)
 //		{
 //			// Back to previous state
-//			nextOperation = Math.max(HOME_OP, this._sessionState.getLastOperation());
+//			nextOperation = Math.max(HOME_PAGE_OP, this._sessionState.getLastOperation());
 //		}
 //		else if (lastOperation == EOS_SPECIAL_OP)
 //		{
 //			// End-of-session
 //
 //			// Start from the initial operation
-//			nextOperation = HOME_OP;
+//			nextOperation = HOME_PAGE_OP;
 //			// Clear session data
 //			this.getSessionState().clear();
 //			// Generate a new user for the new session
@@ -814,6 +822,31 @@ public class OlioGenerator extends Generator
 //		return this._cachedURLs;
 //	}
 
+	public File getEventImgFile()
+	{
+		return this._eventImg;
+	}
+
+	public File getEventThumbImgFile()
+	{
+		return this._eventThumb;
+	}
+
+	public File getEventPdfFile()
+	{
+		return this._eventPdf; 
+	}
+
+	public File getPersonImgFile()
+	{
+		return this._personImg; 
+	}
+
+	public File getPersonThumbImgFile()
+	{
+		return this._personThumb;
+	}
+
 	/**
 	 * Creates a newly instantiated, prepared operation.
 	 * 
@@ -935,32 +968,32 @@ public class OlioGenerator extends Generator
 	{
 		switch (this.getConfiguration().getIncarnation())
 		{
-			case OlioConstants.JAVA_INCARNATION:
-				this.homepageStatics = this.joinStatics(JAVA_LAYOUT_STATICS, JAVA_HOME_STATICS);
-				this.personStatics = this.joinStatics(JAVA_LAYOUT_STATICS, JAVA_PERSON_STATICS);
-				//this.personGets = this.joinStatics(JAVA_LAYOUT_STATICS, JAVA_PERSON_GETS);
-				this.tagSearchStatics = this.joinStatics(JAVA_LAYOUT_STATICS, JAVA_TAG_SEARCH_STATICS);
-				this.eventDetailStatics = this.joinStatics(JAVA_LAYOUT_STATICS, JAVA_EVENT_DETAIL_COMMON_STATICS, JAVA_EVENT_DETAIL_BASE_STATICS);
-				this.addPersonStatics = this.joinStatics(JAVA_LAYOUT_STATICS, JAVA_ADD_PERSON_STATICS);
-				this.addEventStatics = this.joinStatics(JAVA_LAYOUT_STATICS, JAVA_ADD_EVENT_STATICS);
+			case OlioConfiguration.JAVA_INCARNATION:
+				this._homepageStatics = this.joinStatics(JAVA_COMMON_STATICS, JAVA_HOME_STATICS);
+				this._personStatics = this.joinStatics(JAVA_COMMON_STATICS, JAVA_PERSON_STATICS);
+				//this._personGets = this.joinStatics(JAVA_COMMON_STATICS, JAVA_PERSON_GETS);
+				this._tagSearchStatics = this.joinStatics(JAVA_COMMON_STATICS, JAVA_TAG_SEARCH_STATICS);
+				this._eventDetailStatics = this.joinStatics(JAVA_COMMON_STATICS, JAVA_EVENT_DETAIL_COMMON_STATICS, JAVA_EVENT_DETAIL_BASE_STATICS);
+				this._addPersonStatics = this.joinStatics(JAVA_COMMON_STATICS, JAVA_ADD_PERSON_STATICS);
+				this._addEventStatics = this.joinStatics(JAVA_COMMON_STATICS, JAVA_ADD_EVENT_STATICS);
 				break;
-			case OlioConstants.PHP_INCARNATION:
-				this.homepageStatics = this.joinStatics(PHP_LAYOUT_STATICS, PHP_HOME_STATICS);
-				this.personStatics = this.joinStatics(PHP_LAYOUT_STATICS, PHP_PERSON_STATICS);
-				//this.personGets = this.joinStatics(PHP_LAYOUT_STATICS, PHP_PERSON_GETS);
-				this.tagSearchStatics = this.joinStatics(PHP_LAYOUT_STATICS, PHP_TAG_SEARCH_STATICS);
-				this.eventDetailStatics = this.joinStatics(PHP_LAYOUT_STATICS, PHP_EVENT_DETAIL_COMMON_STATICS, PHP_EVENT_DETAIL_BASE_STATICS);
-				this.addPersonStatics = this.joinStatics(PHP_LAYOUT_STATICS, PHP_ADD_PERSON_STATICS);
-				this.addEventStatics = this.joinStatics(PHP_LAYOUT_STATICS, PHP_ADD_EVENT_STATICS);
+			case OlioConfiguration.PHP_INCARNATION:
+				this._homepageStatics = this.joinStatics(PHP_COMMON_STATICS, PHP_HOME_STATICS);
+				this._personStatics = this.joinStatics(PHP_COMMON_STATICS, PHP_PERSON_STATICS);
+				//this._personGets = this.joinStatics(PHP_COMMON_STATICS, PHP_PERSON_GETS);
+				this._tagSearchStatics = this.joinStatics(PHP_COMMON_STATICS, PHP_TAG_SEARCH_STATICS);
+				this._eventDetailStatics = this.joinStatics(PHP_COMMON_STATICS, PHP_EVENT_DETAIL_COMMON_STATICS, PHP_EVENT_DETAIL_BASE_STATICS);
+				this._addPersonStatics = this.joinStatics(PHP_COMMON_STATICS, PHP_ADD_PERSON_STATICS);
+				this._addEventStatics = this.joinStatics(PHP_COMMON_STATICS, PHP_ADD_EVENT_STATICS);
 				break;
-			case OlioConstants.RAILS_INCARNATION:
-				this.homepageStatics = this.joinStatics(RAILS_LAYOUT_STATICS, RAILS_HOME_STATICS);
-				this.personStatics = this.joinStatics(RAILS_LAYOUT_STATICS, RAILS_PERSON_STATICS);
-				//this.personGets = this.joinStatics(RAILS_LAYOUT_STATICS, RAILS_PERSON_GETS);
-				this.tagSearchStatics = this.joinStatics(RAILS_LAYOUT_STATICS, RAILS_TAG_SEARCH_STATICS);
-				this.eventDetailStatics = this.joinStatics(RAILS_LAYOUT_STATICS, RAILS_EVENT_DETAIL_COMMON_STATICS, RAILS_EVENT_DETAIL_BASE_STATICS);
-				this.addPersonStatics = this.joinStatics(RAILS_LAYOUT_STATICS, RAILS_ADD_PERSON_STATICS);
-				this.addEventStatics = this.joinStatics(RAILS_LAYOUT_STATICS, RAILS_ADD_EVENT_STATICS);
+			case OlioConfiguration.RAILS_INCARNATION:
+				this._homepageStatics = this.joinStatics(RAILS_COMMON_STATICS, RAILS_HOME_STATICS);
+				this._personStatics = this.joinStatics(RAILS_COMMON_STATICS, RAILS_PERSON_STATICS);
+				//this._personGets = this.joinStatics(RAILS_COMMON_STATICS, RAILS_PERSON_GETS);
+				this._tagSearchStatics = this.joinStatics(RAILS_COMMON_STATICS, RAILS_TAG_SEARCH_STATICS);
+				this._eventDetailStatics = this.joinStatics(RAILS_COMMON_STATICS, RAILS_EVENT_DETAIL_COMMON_STATICS, RAILS_EVENT_DETAIL_BASE_STATICS);
+				this._addPersonStatics = this.joinStatics(RAILS_COMMON_STATICS, RAILS_ADD_PERSON_STATICS);
+				this._addEventStatics = this.joinStatics(RAILS_COMMON_STATICS, RAILS_ADD_EVENT_STATICS);
 				break;
 		}
 	}
@@ -972,16 +1005,16 @@ public class OlioGenerator extends Generator
 	{
 		String host = this._loadTrack.getTargetHostName() + ":" + this._loadTrack.getTargetHostPort();
 
-		this.loginHeaders.clear();
-		this.loginHeaders.put("Host", host);
-		this.loginHeaders.put("User-Agent", "Mozilla/5.0");
-		this.loginHeaders.put("Accept", "text/xml.application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5");
-		this.loginHeaders.put("Accept-Language", "en-us,en;q=0.5");
-		this.loginHeaders.put("Accept-Encoding", "gzip,deflate");
-		this.loginHeaders.put("Accept-Charset", "ISO-8859-1,utf-8;q=0.7,*;q=0.7");
-		this.loginHeaders.put("Keep-Alive", "300");
-		this.loginHeaders.put("Connection", "keep-alive");
-		this.loginHeaders.put("Referer", this._homepageURL);
+		this._loginHeaders.clear();
+		this._loginHeaders.put("Host", host);
+		this._loginHeaders.put("User-Agent", "Mozilla/5.0");
+		this._loginHeaders.put("Accept", "text/xml.application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5");
+		this._loginHeaders.put("Accept-Language", "en-us,en;q=0.5");
+		this._loginHeaders.put("Accept-Encoding", "gzip,deflate");
+		this._loginHeaders.put("Accept-Charset", "ISO-8859-1,utf-8;q=0.7,*;q=0.7");
+		this._loginHeaders.put("Keep-Alive", "300");
+		this._loginHeaders.put("Connection", "keep-alive");
+		this._loginHeaders.put("Referer", this._homepageURL);
 	}
 
 	/**
@@ -1011,8 +1044,8 @@ public class OlioGenerator extends Generator
 
 		switch (this.getConfiguration().getIncarnation())
 		{
-			case OlioConstants.JAVA_INCARNATION:
-				this._baseURL = this.hostURL + JAVA_CONTEXT_ROOT;
+			case OlioConfiguration.JAVA_INCARNATION:
+				this._baseURL = this._hostURL + JAVA_CONTEXT_ROOT;
 				this._tagSearchURL = this._baseURL + "/tag/display";
 				this._tagCloudURL = this._baseURL + "/tag/display";
 				this._addEventURL = this._baseURL + "/event/addEvent";
@@ -1030,8 +1063,8 @@ public class OlioGenerator extends Generator
 				this._imgStoreURL = this._baseURL + "/access-artifacts";
 				this._docStoreURL = this._baseURL + "/access-artifacts";
 				break;
-			case OlioConstants.PHP_INCARNATION:
-				this._baseURL = this.hostURL + PHP_CONTEXT_ROOT;
+			case OlioConfiguration.PHP_INCARNATION:
+				this._baseURL = this._hostURL + PHP_CONTEXT_ROOT;
 				this._personDetailURL = this._baseURL + "/users.php?username?";
 				this._tagSearchURL = this._baseURL + "/taggedEvents.php";
 				this._tagCloudURL = this._baseURL + "/taggedEvents.php";
@@ -1048,8 +1081,8 @@ public class OlioGenerator extends Generator
 				this._imgStoreURL = this._baseURL + "/fileService.php";
 				this._docStoreURL = this._baseURL + "/fileService.php";
 				break;
-			case OlioConstants.RAILS_INCARNATION:
-				this._baseURL = this.hostURL + RAILS_CONTEXT_ROOT;
+			case OlioConfiguration.RAILS_INCARNATION:
+				this._baseURL = this._hostURL + RAILS_CONTEXT_ROOT;
 				this._personDetailURL = this._baseURL + "/users/";
 				this._tagSearchURL = this._baseURL + "/events/tag_search/";
 				this._tagCloudURL = this._baseURL + "/tagCloud.html";

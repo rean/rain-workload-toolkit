@@ -33,24 +33,14 @@
 
 package radlab.rain.workload.olio.model;
 
-
 /**
- * Models an Olio person entity.
+ * Models an Olio tag entity.
  *
  * @author <a href="mailto:marco.guazzone@gmail.com">Marco Guazzone</a>
  */
-public class OlioPerson
+public class OlioTag
 {
 	public int id;
-	public String userName;
-	public String password;
-	public String firstName;
-	public String lastName;
-	public String email;
-	public String telephone;
-	public String imageUrl;
-	public String imageThumbUrl;
-	public String summary;
-	public String timezone;
-	public String[] address;
+	public String name;
+	public int refCount;
 }

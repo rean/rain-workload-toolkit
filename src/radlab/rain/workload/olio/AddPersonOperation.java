@@ -35,6 +35,7 @@
 package radlab.rain.workload.olio;
 
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntity;
@@ -42,6 +43,7 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.HttpStatus;
 import radlab.rain.IScoreboard;
+import radlab.rain.workload.olio.model.OlioPerson;
 
 
 /**
@@ -74,43 +76,57 @@ public class AddPersonOperation extends OlioOperation
 	@Override
 	public void execute() throws Throwable 
 	{
-		if (this.isLoggedOn())
+		StringBuilder response = null;
+
+		// Check if current session has a logged user and, in this case, log him/her out
+		if (this.getUtility().isRegisteredPerson(this.getSessionState().getLoggedPersonId()))
 		{
-			this.logOff();
+			response = this.getHttpTransport().fetchUrl(this.getGenerator().getLogoutURL());
+			this.trace(this.getGenerator().getLogoutURL());
+			if (this.getUtility().checkHttpResponse(this.getHttpTransport(), response.toString()))
+			{
+				this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getLogoutURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+				throw new IOException("Problems in performing request to URL: " + this.getGenerator().getLogoutURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			}
 		}
 
 		// Fetch the new user form.
-		this.getHttpTransport().fetchUrl(this.getGenerator().getAddPersonURL());
+		response = this.getHttpTransport().fetchUrl(this.getGenerator().getAddPersonURL());
 		this.trace(this.getGenerator().getAddPersonURL());
-		
+		if (this.getUtility().checkHttpResponse(this.getHttpTransport(), response.toString()))
+		{
+			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getAddPersonURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getAddPersonURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+		}
+
 		// Load the static files associated with the new user form.
 		this.loadStatics(this.getGenerator().getAddPersonStatics());
 		this.trace( this.getGenerator().getAddPersonStatics());
-		
-		// Decide on a user ID and username.
-		long id = this.generateUserId();
-		String username = UserName.getUserName(id);
-		if (username == null || username.length() == 0)
-		{
-			this.getLogger().warning("Username is null!");
-		}
-		String password = String.valueOf(id);
+
+		// Generate a new Olio person
+		OlioPerson person = this.getUtility().newPerson();
 
 		switch (this.getConfiguration().getIncarnation())
 		{
-			case OlioConstants.JAVA_INCARNATION:
+			case OlioConfiguration.JAVA_INCARNATION:
 				// Not available
 				break;
-			case OlioConstants.PHP_INCARNATION:
+			case OlioConfiguration.PHP_INCARNATION:
 				// Not available
 				break;
-			case OlioConstants.RAILS_INCARNATION:
+			case OlioConfiguration.RAILS_INCARNATION:
 				// Check that the username is unique.
-				StringBuilder checkResponse = this.getHttpTransport().fetchUrl(this.getGenerator().getCheckNameURL(), "name=" + username);
+				response = this.getHttpTransport().fetchUrl(this.getGenerator().getCheckNameURL(), "name=" + person.userName);
 				this.trace(this.getGenerator().getCheckNameURL());
-				if (checkResponse.equals( "Name taken" ))
+				if (this.getUtility().checkHttpResponse(this.getHttpTransport(), response.toString()))
 				{
-					throw new Exception( "Generated username was not unique" );
+					this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getCheckNameURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+					throw new IOException("Problems in performing request to URL: " + this.getGenerator().getCheckNameURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+				}
+				if (response.toString().toLowerCase().equals("name taken"))
+				{
+					this.getLogger().severe("Generated username was not unique");
+					throw new Exception("Generated username was not unique");
 				}
 				break;
 		}
@@ -119,34 +135,44 @@ public class AddPersonOperation extends OlioOperation
 		String addPersonResultURL = null;
 		switch (this.getConfiguration().getIncarnation())
 		{
-			case OlioConstants.JAVA_INCARNATION:
-				addPersonResultURL = this.getGenerator().getAddPersonResultURL() + "?user_name=" + username;
+			case OlioConfiguration.JAVA_INCARNATION:
+				addPersonResultURL = this.getGenerator().getAddPersonResultURL() + "?user_name=" + person.userName;
 				break;
-			case OlioConstants.PHP_INCARNATION:
+			case OlioConfiguration.PHP_INCARNATION:
 				addPersonResultURL = this.getGenerator().getAddPersonResultURL();
 				break;
-			case OlioConstants.RAILS_INCARNATION:
+			case OlioConfiguration.RAILS_INCARNATION:
 				addPersonResultURL = this.getGenerator().getAddPersonResultURL();
 				break;
 		}
-		HttpPost httpPost = new HttpPost(addPersonResultURL);
+		HttpPost reqPost = new HttpPost(addPersonResultURL);
 		MultipartEntity entity = new MultipartEntity();
-		this.populateEntity(entity, username, password);
-		httpPost.setEntity(entity);
+		this.populateEntity(entity, person);
+		reqPost.setEntity(entity);
 
 		// Make the POST request and verify that it succeeds.
-		this.getHttpTransport().fetch(httpPost);
+		response = this.getHttpTransport().fetch(reqPost);
 		this.trace(addPersonResultURL);
+		if (this.getUtility().checkHttpResponse(this.getHttpTransport(), response.toString()))
+		{
+			this.getLogger().severe("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+			throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+		}
 
 		//TODO: in Apache Olio there is a check on header for redirection
 
-		int status = this.getHttpTransport().getStatusCode();
-		if (HttpStatus.SC_OK != status)
-		{
-			throw new IOException("Multipart POST did not work for URL: " + addPersonResultURL + ". Returned status code: " + status + "!");
-		}
+//		// Login with the newly created person
+//		response = this.getHttpTransport().fetchUrl(this.getGenerator().getLoginURL());
+//		this.trace(this.getGenerator().getLoginURL());
+//		if (this.getUtility().checkHttpResponse(this.getHttpTransport(), response.toString()))
+//		{
+//			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getLoginURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+//			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getLoginURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+//		}
 
-		this.logOn();
+		// Save session data
+		this.getSessionState().setLoggedPersonId(person.id);
+		this.getSessionState().setLastResponse(response.toString());
 
 		this.setFailed(false);
 	}
@@ -158,74 +184,66 @@ public class AddPersonOperation extends OlioOperation
 	 * 
 	 * @throws UnsupportedEncodingException
 	 */
-	protected void populateEntity(MultipartEntity entity, String username, String password) throws UnsupportedEncodingException
+	protected void populateEntity(MultipartEntity entity, OlioPerson person) throws UnsupportedEncodingException
 	{
-		String firstName = this.getUtility().generateName(2, 12);
-		String lastName  = this.getUtility().generateName(5, 12);
-		String telephone = this.getUtility().generatePhone(buffer);
-		String summary = this.getUtility.generateText(50, 200);
-		String timezone = this.getUtility.generateTimeZone();
-		String domain = this.getUtility().generateAlphaString(3, 10);
-		String address = this.getUtility().generateAddressParts();
-
 		switch (this.getConfiguration().getIncarnation())
 		{
-			case OlioConstants.JAVA_INCARNATION:
-				entity.addPart("user_name", new StringBody(username));
-				entity.addPart("password", new StringBody(password));
-				entity.addPart("passwordx", new StringBody(password));
-				entity.addPart("first_name", new StringBody(firstName));
-				entity.addPart("last_name", new StringBody(lastName));
-				entity.addPart("email", new StringBody(username + "@" + domain + ".com"));
-				entity.addPart("telephone", new StringBody(telephone));
-				entity.addPart("summary", new StringBody(summary));
-				entity.addPart("timezone", new StringBody(timezone));
-				entity.addPart("street1", new StringBody(address[0]));
-				entity.addPart("street2", new StringBody(address[1]));
-				entity.addPart("city", new StringBody(address[2]));
-				entity.addPart("state", new StringBody(address[3]));
-				entity.addPart("zip", new StringBody(address[4]));
-				entity.addPart("country", new StringBody(address[5]));
-				entity.addPart("upload_person_image", new FileBody(this.getGenerator().getPersonImg()));
+			case OlioConfiguration.JAVA_INCARNATION:
+				entity.addPart("user_name", new StringBody(person.userName));
+				entity.addPart("password", new StringBody(person.password));
+				entity.addPart("passwordx", new StringBody(person.password));
+				entity.addPart("first_name", new StringBody(person.firstName));
+				entity.addPart("last_name", new StringBody(person.lastName));
+				entity.addPart("email", new StringBody(person.email));
+				entity.addPart("telephone", new StringBody(person.telephone));
+				entity.addPart("summary", new StringBody(person.summary));
+				entity.addPart("timezone", new StringBody(person.timezone));
+				entity.addPart("street1", new StringBody(person.address[0]));
+				entity.addPart("street2", new StringBody(person.address[1]));
+				entity.addPart("city", new StringBody(person.address[2]));
+				entity.addPart("state", new StringBody(person.address[3]));
+				entity.addPart("zip", new StringBody(person.address[4]));
+				entity.addPart("country", new StringBody(person.address[5]));
+				entity.addPart("upload_person_image", new FileBody(this.getGenerator().getPersonImgFile()));
 				entity.addPart("Submit", new StringBody("Create"));
 				break;
-			case OlioConstants.PHP_INCARNATION:
-				entity.addPart("add_user_name", new StringBody(username));
-				entity.addPart("psword", new StringBody(password));
-				entity.addPart("passwordx", new StringBody(password));
-				entity.addPart("first_name", new StringBody(firstName));
-				entity.addPart("last_name", new StringBody(lastName));
-				entity.addPart("email", new StringBody(username + "@" + domain + ".com"));
-				entity.addPart("telephone", new StringBody(telephone));
-				entity.addPart("summary", new StringBody(summary));
-				entity.addPart("timezone", new StringBody(timezone));
-				entity.addPart("street1", new StringBody(address[0]));
-				entity.addPart("street2", new StringBody(address[1]));
-				entity.addPart("city", new StringBody(address[2]));
-				entity.addPart("state", new StringBody(address[3]));
-				entity.addPart("zip", new StringBody(address[4]));
-				entity.addPart("country", new StringBody(address[5]));
-				entity.addPart("user_image", new FileBody(this.getGenerator().getPersonImg()));
+			case OlioConfiguration.PHP_INCARNATION:
+				entity.addPart("add_user_name", new StringBody(person.userName));
+				entity.addPart("psword", new StringBody(person.password));
+				entity.addPart("passwordx", new StringBody(person.password));
+				entity.addPart("first_name", new StringBody(person.firstName));
+				entity.addPart("last_name", new StringBody(person.lastName));
+				entity.addPart("email", new StringBody(person.email));
+				entity.addPart("telephone", new StringBody(person.telephone));
+				entity.addPart("summary", new StringBody(person.summary));
+				entity.addPart("timezone", new StringBody(person.timezone));
+				entity.addPart("street1", new StringBody(person.address[0]));
+				entity.addPart("street2", new StringBody(person.address[1]));
+				entity.addPart("city", new StringBody(person.address[2]));
+				entity.addPart("state", new StringBody(person.address[3]));
+				entity.addPart("zip", new StringBody(person.address[4]));
+				entity.addPart("country", new StringBody(person.address[5]));
+				entity.addPart("user_image", new FileBody(this.getGenerator().getPersonImgFile()));
 				entity.addPart("addpersonsubmit", new StringBody("Create"));
 				break;
-			case OlioConstants.RAILS_INCARNATION:
-				entity.addPart("user[username]", new StringBody(username));
-				entity.addPart("user[password]", new StringBody(password));
-				entity.addPart("user[password_confirmation]", new StringBody(password));
-				entity.addPart("user[firstname]", firstName);
-				entity.addPart("user[lastname]", lastName);
-				entity.addPart("user[telephone]", telephone);
-				entity.addPart("user[summary]", new StringBody(summary));
-				entity.addPart("user[timezone]", new StringBody(timezone));
-				entity.addPart("user_image", new FileBody(this.getGenerator().getPersonImg()));
-				entity.addPart("user[email]", new StringBody(username + "@" + domain + ".com"));
-				entity.addPart("address[street1]", new StringBody(address[0]));
-				entity.addPart("address[street2]", new StringBody(address[1]));
-				entity.addPart("address[city]", new StringBody(address[2]));
-				entity.addPart("address[state]", new StringBody(address[3]));
-				entity.addPart("address[zip]", new StringBody(address[4]));
-				entity.addPart("address[country]", new StringBody(address[5]));
-				entity.addPart("user_image", new FileBody(this.getGenerator().getPersonImg()));
+			case OlioConfiguration.RAILS_INCARNATION:
+				entity.addPart("user[username]", new StringBody(person.userName));
+				entity.addPart("user[password]", new StringBody(person.password));
+				entity.addPart("user[password_confirmation]", new StringBody(person.password));
+				entity.addPart("user[firstname]", new StringBody(person.firstName));
+				entity.addPart("user[lastname]", new StringBody(person.lastName));
+				entity.addPart("user[telephone]", new StringBody(person.telephone));
+				entity.addPart("user[summary]", new StringBody(person.summary));
+				entity.addPart("user[timezone]", new StringBody(person.timezone));
+				entity.addPart("user_image", new FileBody(this.getGenerator().getPersonImgFile()));
+				entity.addPart("user[email]", new StringBody(person.email));
+				entity.addPart("address[street1]", new StringBody(person.address[0]));
+				entity.addPart("address[street2]", new StringBody(person.address[1]));
+				entity.addPart("address[city]", new StringBody(person.address[2]));
+				entity.addPart("address[state]", new StringBody(person.address[3]));
+				entity.addPart("address[zip]", new StringBody(person.address[4]));
+				entity.addPart("address[country]", new StringBody(person.address[5]));
+				entity.addPart("user_image", new FileBody(this.getGenerator().getPersonImgFile()));
 				break;
 		}
 	}

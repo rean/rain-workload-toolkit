@@ -35,7 +35,15 @@
 package radlab.rain.workload.olio;
 
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.NameValuePair;
 import radlab.rain.IScoreboard;
+import radlab.rain.workload.olio.model.OlioPerson;
 
 
 /**
@@ -70,21 +78,94 @@ public class LoginOperation extends OlioOperation
 	@Override
 	public void execute() throws Throwable
 	{
-		if (this.isLoggedOn())
+		StringBuilder response = null;
+
+		// Check if current session has a logged user and, in this case, log him/her out
+		if (this.getUtility().isRegisteredPerson(this.getSessionState().getLoggedPersonId()))
 		{
-			this.logOff();
+			response = this.getHttpTransport().fetchUrl(this.getGenerator().getLogoutURL());
+			this.trace(this.getGenerator().getLogoutURL());
+			if (this.getUtility().checkHttpResponse(this.getHttpTransport(), response.toString()))
+			{
+				this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getLogoutURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+				throw new IOException("Problems in performing request to URL: " + this.getGenerator().getLogoutURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			}
 		}
 
-		this.logOn();
-//		// Logging in redirects the user to the home page.
-//		StringBuilder homeResponse = this.logOn();
-//		
-//		// Check that the user was successfully logged in.
-//		if (homeResponse.indexOf("Successfully logged in!") < 0)
-//		{
-//			throw new Exception("Login did not persist for an unknown reason");
-//		}
+		OlioPerson person = this.getUtility().generatePerson();
+		if (!this.getUtility().isValidPerson(person))
+		{
+			//TODO
+		}
 
-		this.setFailed(false);
+		HttpPost reqPost = null;
+		List<NameValuePair> form = null;
+		UrlEncodedFormEntity entity = null;
+
+		reqPost = new HttpPost(this.getGenerator().getLoginURL());
+		form = new ArrayList<NameValuePair>();
+		switch (this.getConfiguration().getIncarnation())
+		{
+			case OlioConfiguration.JAVA_INCARNATION:
+				form.add(new BasicNameValuePair("user_name", person.userName));
+				form.add(new BasicNameValuePair("password", person.password));
+				form.add(new BasicNameValuePair("submit", "Login"));
+				break;
+			case OlioConfiguration.PHP_INCARNATION:
+				form.add(new BasicNameValuePair("user_name", person.userName));
+				form.add(new BasicNameValuePair("password", person.password));
+				form.add(new BasicNameValuePair("submit", "Login"));
+				break;
+			case OlioConfiguration.RAILS_INCARNATION:
+				form.add(new BasicNameValuePair("users[username]=", person.userName));
+				form.add(new BasicNameValuePair("users[password]=", person.password));
+				form.add(new BasicNameValuePair("submit", "Login"));
+				break;
+		}
+		entity = new UrlEncodedFormEntity(form, "UTF-8");
+		reqPost.setEntity(entity);
+		response = this.getHttpTransport().fetch(reqPost);
+		this.trace(reqPost.getURI().toString());
+		// Check that the request succeeded
+		if (this.getUtility().checkHttpResponse(this.getHttpTransport(), response.toString()))
+		{
+			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getAddEventURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getAddEventURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+		}
+
+		// Check that the login succeeded
+		boolean failed = false;
+		switch (this.getConfiguration().getIncarnation())
+		{
+			case OlioConfiguration.JAVA_INCARNATION:
+				response = this.getHttpTransport().fetchUrl(this.getGenerator().getHomePageURL());
+				if (response.indexOf("Username") != -1)
+				{
+					failed = true;
+				}
+				break;
+			case OlioConfiguration.PHP_INCARNATION:
+				response = this.getHttpTransport().fetchUrl(this.getGenerator().getHomePageURL());
+				if (response.indexOf("Username") != -1)
+				{
+					failed = true;
+				}
+				break;
+			case OlioConfiguration.RAILS_INCARNATION:
+				if (response.indexOf("Login:") != -1)
+				{
+					failed = true;
+				}
+				break;
+		}
+
+		// Save session data
+		this.getSessionState().setLastResponse(response.toString());
+ 
+		if (failed)
+		{
+			this.getLogger().warning("Login (" + person.userName + "," + person.password + ") failed");
+		}
+		this.setFailed(failed);
 	}
 }

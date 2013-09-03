@@ -33,7 +33,10 @@
 
 package radlab.rain.workload.olio.model;
 
+
+import java.util.Date;
 import java.util.List;
+
 
 /**
  * Models an Olio social event entity.
@@ -56,6 +59,7 @@ public class OlioSocialEvent
 	public int numberOfVotes;
 	public boolean disabled;
 	public Date createdTimestamp;
-	public int addressId;
-	public List[] tags;
+	public String[] address;
+	public List<String> tags;
+	public String timezone;
 }

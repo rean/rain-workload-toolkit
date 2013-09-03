@@ -36,7 +36,9 @@ package radlab.rain.workload.olio;
 
 
 import java.io.IOException;
+import java.util.Set;
 import radlab.rain.IScoreboard;
+import radlab.rain.workload.olio.model.OlioPerson;
 
 
 /**
@@ -58,44 +60,46 @@ public class PersonDetailOperation extends OlioOperation
 	@Override
 	public void execute() throws Throwable
 	{
-		if (this.isLoggedOn())
+		OlioPerson loggedPerson = this.getUtility().getPerson(this.getSessionState().getLoggedPersonId());
+		if (!this.getUtility().isRegisteredPerson(loggedPerson))
 		{
-			int userId = this.getUtility().generateInt(1, ScaleFactors.loadedUsers);
-
-			String personUrl = null;
-			switch (this.getConfiguration().getIncarnation())
-			{
-				case JAVA_INCARNATION:
-					personUrl = this.getGenerator().getPersonDetailURL() + "&user_name=" + UserName.getUserName( userId );
-					break;
-				case RAILS_INCARNATION:
-					personUrl = this.getGenerator().getPersonDetailURL() + userId;
-					break;
-			}
-			StringBuilder personResponse = this.getHttpTransport().fetchUrl(personUrl);
-			this.trace(personUrl);
-			if (personResponse.length() == 0)
-			{
-				throw new IOException("Received empty response");
-			}
-
-			this.loadStatics(this.getGenerator().getPersonStatics());
-			this.trace(this.getGenerator().getPersonStatics());
-
-			Set<String> imageUrls = this.parseImages(personResponse);
-			this.loadImages(imageUrls);
-			this.trace(imageUrls);
+			this.getLogger().warning("No valid user has been found to log-in. Operation interrupted.");
+			this.setFailed(true);
+			return;
 		}
-		else
+
+		//int userId = this.getUtility().generateInt(1, ScaleFactors.loadedUsers);
+		OlioPerson person = this.getUtility().generatePerson();
+
+		String personUrl = null;
+		switch (this.getConfiguration().getIncarnation())
 		{
-			if (this.checkIsLoggedIn())
-			{
-				this.getLogger().warning("isLoggedOn() returned false but checkIsLoggedIn() returned true");
-			}
-			// TODO: What's the best way to handle this case?
-			this.getLogger().warning("Login required for " + this._operationName);
+			case OlioConfiguration.JAVA_INCARNATION:
+				personUrl = this.getGenerator().getPersonDetailURL() + "&user_name=" + person.userName;
+				break;
+			case OlioConfiguration.RAILS_INCARNATION:
+				personUrl = this.getGenerator().getPersonDetailURL() + person.id;
+				break;
 		}
-		
+
+		StringBuilder response = this.getHttpTransport().fetchUrl(personUrl);
+		this.trace(personUrl);
+		if (this.getUtility().checkHttpResponse(this.getHttpTransport(), response.toString()))
+		{
+			this.getLogger().severe("Problems in performing request to URL: " + personUrl + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+			throw new IOException("Problems in performing request to URL: " + personUrl + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+		}
+
+		this.loadStatics(this.getGenerator().getPersonStatics());
+		this.trace(this.getGenerator().getPersonStatics());
+
+		Set<String> imageUrls = this.parseImages(response.toString());
+		this.loadImages(imageUrls);
+		this.trace(imageUrls);
+
+		// Save session state
+		this.getSessionState().setLastResponse(response.toString());
+
 		this.setFailed(false);
 	}
 }

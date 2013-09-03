@@ -34,11 +34,11 @@
 
 package radlab.rain.workload.olio;
 
-import radlab.rain.IScoreboard;
-
 
 import java.io.IOException;
 import java.util.Set;
+import radlab.rain.IScoreboard;
+import radlab.rain.workload.olio.model.OlioTag;
 
 
 /**
@@ -60,32 +60,35 @@ public class TagSearchOperation extends OlioOperation
 	@Override
 	public void execute() throws Throwable
 	{
-		String tag = this.getUtility().generateTagName();
-		this.getLogger().finer("Searching the tag: " + tag);
-		
+		OlioTag tag = this.getUtility().generateTag();
+
 		String searchUrl = null;
 		switch (this.getConfiguration().getIncarnation())
 		{
-			case JAVA_INCARNATION:
-				searchUrl = this.getGenerator().getTagSearchURL() + "?tag=" + tag + "&tagsearchsubmit=Seach+Tags";
+			case OlioConfiguration.JAVA_INCARNATION:
+				searchUrl = this.getGenerator().getTagSearchURL() + "?tag=" + tag.name + "&tagsearchsubmit=Seach+Tags";
 				break;
-			case RAILS_INCARNATION:
-				searchUrl = this.getGenerator().getTagSearchURL() + "?tag=" + tag + "&submit=Search+Tags";
+			case OlioConfiguration.RAILS_INCARNATION:
+				searchUrl = this.getGenerator().getTagSearchURL() + "?tag=" + tag.name + "&submit=Search+Tags";
 				break;
 		}
-		StringBuilder searchResponse = this.getHttpTransport().fetchUrl(searchUrl);
+		StringBuilder response = this.getHttpTransport().fetchUrl(searchUrl);
 		this.trace(searchUrl);
-		if(searchResponse.length() == 0)
+		if (this.getUtility().checkHttpResponse(this.getHttpTransport(), response.toString()))
 		{
-			throw new IOException("Received empty response");
+			this.getLogger().severe("Problems in performing request to URL: " + searchUrl + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+			throw new IOException("Problems in performing request to URL: " + searchUrl + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		this.loadStatics(this.getGenerator().getTagSearchStatics());
 		this.trace( this.getGenerator().getTagSearchStatics());
 
-		Set<String> imageUrls = this.parseImages(searchResponse);
+		Set<String> imageUrls = this.parseImages(response.toString());
 		this.loadImages(imageUrls);
 		this.trace(imageUrls);
+
+		// Save session data
+		this.getSessionState().setLastResponse(response.toString());
 
 		this.setFailed(false);
 	}

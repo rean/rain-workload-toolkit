@@ -38,12 +38,18 @@ package radlab.rain.workload.olio;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
-import java.util.Set;
+import java.util.Date;
 import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.logging.Logger;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
+import java.util.TimeZone;
+import java.text.SimpleDateFormat;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.StringBody;
@@ -94,6 +100,7 @@ public abstract class OlioOperation extends Operation
 	{
 		this._generator = generator;
 
+		// FIXME: Is this needed?
 		LoadProfile currentLoadProfile = generator.getLatestLoadProfile();
 		if (currentLoadProfile != null)
 		{
@@ -107,6 +114,16 @@ public abstract class OlioOperation extends Operation
 		SimpleDateFormat sdf = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
 		this._cachedHeaders.put("If-Modified-Since", sdf.format(new Date(System.currentTimeMillis())));
+	}
+
+	@Override
+	public void postExecute()
+	{
+		this.getSessionState().setLastOperation(this._operationIndex);
+		if (this.isFailed())
+		{
+			this.getSessionState().setLastResponse(null);
+		}
 	}
 
 	@Override
@@ -135,10 +152,10 @@ public abstract class OlioOperation extends Operation
 		return this.getGenerator().getLogger();
 	}
 
-//	public OlioSessionState getSessionState()
-//	{
-//		return this.getGenerator().getSessionState();
-//	}
+	public OlioSessionState getSessionState()
+	{
+		return this.getGenerator().getSessionState();
+	}
 
 	public OlioUtility getUtility()
 	{
@@ -156,10 +173,9 @@ public abstract class OlioOperation extends Operation
 	 * @param buffer    The HTTP response; expected to be an HTML document.
 	 * @return          An unordered set of image URLs.
 	 */
-	public Set<String> parseImages(StringBuilder buffer) 
+	public Set<String> parseImages(String html) 
 	{
-		Set<String> urlSet = new LinkedHashSet<String>();
-
+		String regex = null;
 		switch (this.getConfiguration().getIncarnation())
 		{
 			case OlioConfiguration.JAVA_INCARNATION:
@@ -177,7 +193,9 @@ public abstract class OlioOperation extends Operation
 
 		this.getLogger().finest( "Parsing images from buffer" );
 		Pattern pattern = Pattern.compile(regex, Pattern.DOTALL | Pattern.UNIX_LINES);
-		Matcher match = pattern.matcher(buffer);
+		Set<String> urlSet = new LinkedHashSet<String>();
+
+		Matcher match = pattern.matcher(html);
 		while (match.find())
 		{
 			String url = match.group(1);
@@ -201,7 +219,7 @@ public abstract class OlioOperation extends Operation
 	 * 
 	 * @throws IOException
 	 */
-	public String parseAuthToken(StringBuilder buffer) throws IOException 
+	public String parseAuthToken(String html) throws IOException 
 	{
 /*
 		String token = "";
@@ -236,25 +254,24 @@ public abstract class OlioOperation extends Operation
 		}
 */
 
-		int idx = buffer.indexOf("authenticity_token");
-
+		int idx = html.indexOf("authenticity_token");
 		if (idx == -1)
 		{
 			this.getLogger().info("Trying to add event but authenticity token not found");
 			return null;
 		}
 
-		int endIdx = buffer.indexOf("\" />", idx);
+		int endIdx = html.indexOf("\" />", idx);
 		if (endIdx == -1)
 		{
-			throw new IOException("Invalid authenticity_token element. Buffer = " + buffer);
+			throw new IOException("Invalid authenticity_token element. Buffer = " + html);
 		}
 
-		String tmpString = buffer.substring(idx, endIdx);
+		String tmpString = html.substring(idx, endIdx);
 		String[] splitStr = tmpString.split("value=\"");
 		if (splitStr.length < 2)
 		{
-			throw new IOException("Invalid authenticity_token element. Buffer = " + buffer);
+			throw new IOException("Invalid authenticity_token element. Buffer = " + html);
 		}
 
 		String token = splitStr[1];

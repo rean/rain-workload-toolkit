@@ -34,10 +34,11 @@
 
 package radlab.rain.workload.olio;
 
-import radlab.rain.IScoreboard;
 
 import java.io.IOException;
 import java.util.Set;
+import radlab.rain.IScoreboard;
+
 
 /**
  * The HomePageOperation is an operation that visits the home page. This
@@ -58,22 +59,32 @@ public class HomePageOperation extends OlioOperation
 	@Override
 	public void execute() throws Throwable
 	{
-		StringBuilder homeResponse = this.getHttpTransport().fetchUrl(this.getGenerator().getHomepageURL());
-		this.trace(this.getGenerator().getHomepageURL());
-		if(homeResponse.length() == 0)
+		StringBuilder response = null;
+
+		response = this.getHttpTransport().fetchUrl(this.getGenerator().getHomePageURL());
+		this.trace(this.getGenerator().getHomePageURL());
+		if (this.getUtility().checkHttpResponse(this.getHttpTransport(), response.toString()))
 		{
-			throw new IOException("Received empty response");
+			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getHomePageURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getHomePageURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		// Load the static files (CSS/JS).
-		loadStatics(this.getGenerator().getHomepageStatics());
-		this.trace(this.getGenerator().getHomepageStatics());
+		this.loadStatics(this.getGenerator().getHomePageStatics());
+		this.trace(this.getGenerator().getHomePageStatics());
 
 		// Always load the images.
-		Set<String> imageURLs = this.parseImages(homeResponse);
-		loadImages(imageURLs);
+		Set<String> imageURLs = this.parseImages(response.toString());
+		this.loadImages(imageURLs);
 		this.trace(imageURLs);
-		
+
+		// NOTE: In Apache Olio, the HTTP response is parsed to look for an event ID
+		//       Instead, we defer this to the operation that really needs this.
+		//       We can do this since the HTTP response is saved in the session state
+
+		// Save session data
+		this.getSessionState().setLastResponse(response.toString());
+
 		this.setFailed(false);
 	}
 }
