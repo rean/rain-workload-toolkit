@@ -38,6 +38,7 @@ import java.util.Random;
 import java.util.logging.Logger;
 import radlab.rain.Generator;
 import radlab.rain.IScoreboard;
+import radlab.rain.LoadProfile;
 import radlab.rain.Operation;
 import radlab.rain.util.HttpTransport;
 import radlab.rain.workload.rubis.model.RubisUser;
@@ -59,6 +60,13 @@ public abstract class RubisOperation extends Operation
 	public void prepare(Generator generator) 
 	{
 		this._generator = generator;
+
+		LoadProfile currentLoadProfile = generator.getLatestLoadProfile();
+		if (currentLoadProfile != null)
+		{
+			this.setGeneratedDuringProfile(currentLoadProfile);
+		}
+
 		String html = this.getSessionState().getLastResponse();
 		if (html != null)
 		{

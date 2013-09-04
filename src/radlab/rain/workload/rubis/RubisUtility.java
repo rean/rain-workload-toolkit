@@ -195,6 +195,7 @@ public final class RubisUtility
 		this._conf = conf;
 
 		initUserId(this._conf.getNumOfPreloadedUsers());
+		initItemId(this._conf.getTotalActiveItems()+this._conf.getNumOfOldItems());
 	}
 
 	public RubisConfiguration getConfiguration()
