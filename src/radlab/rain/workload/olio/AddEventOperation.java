@@ -95,6 +95,9 @@ public class AddEventOperation extends OlioOperation
 			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getAddEventURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
 			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getAddEventURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
+		// Load the static files associated with the add event form.
+		this.loadStatics(this.getGenerator().getAddEventStatics());
+		this.trace(this.getGenerator().getAddEventStatics());
 
 		// Get the authentication token needed to create the POST request.
 		String token = null;
@@ -115,14 +118,10 @@ public class AddEventOperation extends OlioOperation
 				break;
 		}
 		
-		// Load the static files associated with the add event form.
-		this.loadStatics(this.getGenerator().getAddEventStatics());
-		this.trace(this.getGenerator().getAddEventStatics());
-
 		// Generate a new Olio social event
 		OlioSocialEvent event = this.getUtility().newSocialEvent();
 
-		// Construct the POST request to create the event.
+		// Submit the add event form to create the event.
 		HttpPost reqPost = new HttpPost(this.getGenerator().getAddEventResultURL());
 		MultipartEntity entity = new MultipartEntity();
 		this.populateEntity(entity, event);
@@ -139,19 +138,35 @@ public class AddEventOperation extends OlioOperation
 				break;
 		}
 		reqPost.setEntity(entity);
-		// Make the POST request.
 		response = this.getHttpTransport().fetch(reqPost);
 		this.trace(this.getGenerator().getAddEventResultURL());
-
+		//FIXME: In Apache Olio there is also a check for redirection. Do we need it?
+		//       Probably no, since HttpTransport#fecth already take care of it
+		//String[] locationHeader = this.getHttpTransport().getHeadersMap().get("location");
+		//if (redirectionLocation != null)
+		//{
+		//	String redirectUrl = null;
+		//	switch (this.getConfiguration().getIncarnation())
+		//	{
+		//		case OlioConfiguration.JAVA_INCARNATION:
+		//			redirectUrl = this.getGenerator().getBaseURL() + '/' + locationHeader[0];
+		//			break;
+		//		case OlioConfiguration.PHP_INCARNATION:
+		//			redirectUrl = this.getGenerator().getBaseURL() + '/' + locationHeader[0];
+		//			break;
+		//		case OlioConfiguration.RAILS_INCARNATION:
+		//			redirectUrl = locationHeader[0];
+		//			break;
+		//	}
+		//	response = this.getHttpTransport().fetchURL(redirectUrl);
+		//}
 		// Verify that the request succeeded. 
 		if (this.getUtility().checkHttpResponse(this.getHttpTransport(), response.toString()))
 		{
 			this.getLogger().severe("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
 			throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
-
-		//TODO: In Apache Olio there is also a check for redirection. Do we need it?
-
+		// Verify that the operation succeeded. 
 		int index = response.toString().toLowerCase().indexOf("success");
 		if (index == -1)
 		{

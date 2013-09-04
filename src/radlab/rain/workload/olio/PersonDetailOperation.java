@@ -44,6 +44,9 @@ import radlab.rain.workload.olio.model.OlioPerson;
 /**
  * The PersonDetailOperation is an operation that shows the details of a
  * randomly selected user. The user must be logged in to see the details.
+ * <br/>
+ * NOTE: Code based on {@code org.apache.olio.workload.driver.UIDriver} class
+ * and adapted for RAIN.
  *
  * @author Original authors
  * @author <a href="mailto:marco.guazzone@gmail.com">Marco Guazzone</a>
@@ -60,22 +63,25 @@ public class PersonDetailOperation extends OlioOperation
 	@Override
 	public void execute() throws Throwable
 	{
-		OlioPerson loggedPerson = this.getUtility().getPerson(this.getSessionState().getLoggedPersonId());
-		if (!this.getUtility().isRegisteredPerson(loggedPerson))
-		{
-			this.getLogger().warning("No valid user has been found to log-in. Operation interrupted.");
-			this.setFailed(true);
-			return;
-		}
+		///XXX
+		//OlioPerson loggedPerson = this.getUtility().getPerson(this.getSessionState().getLoggedPersonId());
+		//if (!this.getUtility().isRegisteredPerson(loggedPerson))
+		//{
+		//	this.getLogger().warning("No valid user has been found to log-in. Operation interrupted.");
+		//	this.setFailed(true);
+		//	return;
+		//}
 
-		//int userId = this.getUtility().generateInt(1, ScaleFactors.loadedUsers);
 		OlioPerson person = this.getUtility().generatePerson();
 
 		String personUrl = null;
 		switch (this.getConfiguration().getIncarnation())
 		{
 			case OlioConfiguration.JAVA_INCARNATION:
-				personUrl = this.getGenerator().getPersonDetailURL() + "&user_name=" + person.userName;
+				personUrl = this.getGenerator().getPersonDetailURL() + person.userName;
+				break;
+			case OlioConfiguration.PHP_INCARNATION:
+				personUrl = this.getGenerator().getPersonDetailURL() + person.userName;
 				break;
 			case OlioConfiguration.RAILS_INCARNATION:
 				personUrl = this.getGenerator().getPersonDetailURL() + person.id;

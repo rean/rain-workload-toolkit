@@ -36,7 +36,15 @@ package radlab.rain.workload.olio;
 
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.NameValuePair;
 import radlab.rain.IScoreboard;
 import radlab.rain.workload.olio.model.OlioTag;
 
@@ -44,6 +52,9 @@ import radlab.rain.workload.olio.model.OlioTag;
 /**
  * The TagSearchOperation is an operation that does a tag search. A random tag
  * is generated and the search result page is loaded.
+ * <br/>
+ * NOTE: Code based on {@code org.apache.olio.workload.driver.UIDriver} class
+ * and adapted for RAIN.
  *
  * @author Original authors
  * @author <a href="mailto:marco.guazzone@gmail.com">Marco Guazzone</a>
@@ -62,30 +73,87 @@ public class TagSearchOperation extends OlioOperation
 	{
 		OlioTag tag = this.getUtility().generateTag();
 
-		String searchUrl = null;
+		HttpPost reqPost = null;
+		List<NameValuePair> form = null;
+		UrlEncodedFormEntity entity = null;
+		StringBuilder response = null;
+
+		reqPost = new HttpPost(this.getGenerator().getTagSearchURL());
+		form = new ArrayList<NameValuePair>();
 		switch (this.getConfiguration().getIncarnation())
 		{
 			case OlioConfiguration.JAVA_INCARNATION:
-				searchUrl = this.getGenerator().getTagSearchURL() + "?tag=" + tag.name + "&tagsearchsubmit=Seach+Tags";
+                form.add(new BasicNameValuePair("tag", tag.name));
+                form.add(new BasicNameValuePair("tagsearchsubmit", "Search+Tags"));
+				break;
+			case OlioConfiguration.PHP_INCARNATION:
+                form.add(new BasicNameValuePair("tag", tag.name));
+                form.add(new BasicNameValuePair("tagsearchsubmit", "Search+Tags"));
 				break;
 			case OlioConfiguration.RAILS_INCARNATION:
-				searchUrl = this.getGenerator().getTagSearchURL() + "?tag=" + tag.name + "&submit=Search+Tags";
+                form.add(new BasicNameValuePair("tag", tag.name));
+                form.add(new BasicNameValuePair("submit", "Search+Tags"));
 				break;
 		}
-		StringBuilder response = this.getHttpTransport().fetchUrl(searchUrl);
-		this.trace(searchUrl);
+        entity = new UrlEncodedFormEntity(form, "UTF-8");
+        reqPost.setEntity(entity);
+        response = this.getHttpTransport().fetch(reqPost);
+		this.trace(reqPost.getURI().toString());
 		if (this.getUtility().checkHttpResponse(this.getHttpTransport(), response.toString()))
 		{
-			this.getLogger().severe("Problems in performing request to URL: " + searchUrl + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
-			throw new IOException("Problems in performing request to URL: " + searchUrl + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			this.getLogger().severe("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+			throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
+
+		// 
+		switch (this.getConfiguration().getIncarnation())
+		{
+			case OlioConfiguration.JAVA_INCARNATION:
+				{
+					URIBuilder uri = new URIBuilder(this.getGenerator().getTagCloudURL());
+					uri.setParameter("tag", tag.name);
+					HttpGet reqGet = new HttpGet(uri.build());
+					response = this.getHttpTransport().fetch(reqGet);
+					this.trace(reqGet.getURI().toString());
+					if (!this.getGenerator().checkHttpResponse(response.toString()))
+					{
+						this.getLogger().severe("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+						throw new IOException("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+					}
+				}
+			case OlioConfiguration.PHP_INCARNATION:
+				{
+					URIBuilder uri = new URIBuilder(this.getGenerator().getTagCloudURL());
+					uri.setParameter("tag", tag.name);
+					uri.setParameter("count", Integer.toString(tag.refCount));
+					HttpGet reqGet = new HttpGet(uri.build());
+					response = this.getHttpTransport().fetch(reqGet);
+					this.trace(reqGet.getURI().toString());
+					if (!this.getGenerator().checkHttpResponse(response.toString()))
+					{
+						this.getLogger().severe("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+						throw new IOException("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+					}
+				}
+				break;
+			case OlioConfiguration.RAILS_INCARNATION:
+				// In original Apache Olio, there is no tag cloud request for RAILS incarnation
+				break;
+		}
 		this.loadStatics(this.getGenerator().getTagSearchStatics());
 		this.trace( this.getGenerator().getTagSearchStatics());
 
 		Set<String> imageUrls = this.parseImages(response.toString());
 		this.loadImages(imageUrls);
 		this.trace(imageUrls);
+
+		//NOTE: In the original Apache Olio, at this point a new event is
+		//      selected from last HTTP response and stored in a member variable
+		//      in order to be used later.
+		//      Here, we prefer to defer this action when it is really needed.
+		//      This is possible since we store the last response in the session
+		//      state.
 
 		// Save session data
 		this.getSessionState().setLastResponse(response.toString());

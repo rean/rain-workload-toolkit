@@ -57,6 +57,9 @@ import radlab.rain.workload.olio.model.OlioPerson;
  * <br />
  * The application is checked (via parsing of the document) for indication
  * that the login succeeded; the logged in state is saved.
+ * <br/>
+ * NOTE: Code based on {@code org.apache.olio.workload.driver.UIDriver} class
+ * and adapted for RAIN.
  *
  * @author Original authors
  * @author <a href="mailto:marco.guazzone@gmailcom">Marco Guazzone</a>
@@ -95,7 +98,9 @@ public class LoginOperation extends OlioOperation
 		OlioPerson person = this.getUtility().generatePerson();
 		if (!this.getUtility().isValidPerson(person))
 		{
-			//TODO
+			this.getLogger().severe("Unable to select a random Olio person");
+			this.setFailed(true);
+			return;
 		}
 
 		HttpPost reqPost = null;
@@ -129,8 +134,8 @@ public class LoginOperation extends OlioOperation
 		// Check that the request succeeded
 		if (this.getUtility().checkHttpResponse(this.getHttpTransport(), response.toString()))
 		{
-			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getAddEventURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getAddEventURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			this.getLogger().severe("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+			throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		// Check that the login succeeded
@@ -160,6 +165,7 @@ public class LoginOperation extends OlioOperation
 		}
 
 		// Save session data
+		this.getSessionState().setLoggedPersonId(person.id);
 		this.getSessionState().setLastResponse(response.toString());
  
 		if (failed)

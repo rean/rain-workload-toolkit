@@ -43,6 +43,9 @@ import radlab.rain.IScoreboard;
 /**
  * The HomePageOperation is an operation that visits the home page. This
  * entails potentially loading static content (CSS/JS) and images.
+ * <br/>
+ * NOTE: Code based on {@code org.apache.olio.workload.driver.UIDriver} class
+ * and adapted for RAIN.
  *
  * @author Original authors
  * @author <a href="mailto:marco.guazzone@gmail.com">Marco Guazzone</a>

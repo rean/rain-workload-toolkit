@@ -36,11 +36,7 @@ package radlab.rain.workload.olio;
 
 
 import java.io.File;
-//import java.util.concurrent.atomic.AtomicLong;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.logging.Logger;
 import java.util.Random;
 import java.util.Set;
@@ -156,14 +152,6 @@ public class OlioGenerator extends Generator
 			"/js/httpobject.js"
 		};
 
-//	/** Additional static files for Person operation (for Java incarnation). */
-//	private static final String[] JAVA_PERSON_GETS = {
-//			//"/api/person?user_name=@USER_NAME@_&actionType=get_friends", // This is the original one, but I think there is an extra '_' after @USER_NAME@
-//			"/api/person?user_name=@USER_NAME@&actionType=get_friends",
-//			"/api/person?user_name=@USER_NAME@&actionType=get_attend_events",
-//			"/api/person?user_name=@USER_NAME@&actionType=get_posted_events"
-//		};
-
 	/** Additional static files for Tag Search operation (for Java incarnation). */
 	private static final String[] JAVA_TAG_SEARCH_STATICS = {
 			"/js/httpobject.js"
@@ -241,9 +229,6 @@ public class OlioGenerator extends Generator
     private static final String[] PHP_PERSON_STATICS = {
     	};
 
-//	/** Additional static files for Person Gets operation (for PHP incarnation). */
-//	private static final String[] PHP_PERSON_GETS = {};
-
 	/** Additional static files for Tag Search operation (for PHP incarnation). */
     private static final String[] PHP_TAG_SEARCH_STATICS = {
 			"/images/php_main_nav_hover_bg.gif"
@@ -310,9 +295,6 @@ public class OlioGenerator extends Generator
 	/** Additional static files for Person operation (for Rails incarnation). */
 	private static final String[] RAILS_PERSON_STATICS = {};
 
-//	/** Additional static files for Person operation (for Rails incarnation). */
-//	private static final String[] RAILS_PERSON_GETS = {};
-
 	/** Additional static files for Tag Search operation (for Rails incarnation). */
 	private static final String[] RAILS_TAG_SEARCH_STATICS = {};
 
@@ -343,12 +325,17 @@ public class OlioGenerator extends Generator
 	public static final String ADD_PERSON_OP_NAME    = "AddPerson";
 	public static final String ADD_EVENT_OP_NAME     = "AddEvent";
 
+
 	private static Random _rng; ///< The Random Number Generator
 	private static OlioConfiguration _conf; ///< The Olio-related configuration found in JSON profile file
 	private HttpTransport _http;
 	private Logger _logger;
 	private OlioUtility _utility;
 	private OlioSessionState _sessionState; ///< Holds user session data
+	private double _thinkTime = -1; ///< The mean think time; a value <= 0 means that no think time is used.
+	private double _cycleTime = -1; ///< The mean cycle time; a value <= 0 means that no cycle time is used.
+	private NegativeExponential _thinkTimeRng  = null;
+	private NegativeExponential _cycleTimeRng = null;
 	// URL roots/anchors for each request
 	private String _hostURL;
 	private String _baseURL;
@@ -371,28 +358,16 @@ public class OlioGenerator extends Generator
 	// Statics URLs
 	private String[] _homepageStatics; 
 	private String[] _personStatics; 
-	//private String[] _personGets;
 	private String[] _tagSearchStatics; 
 	private String[] _eventDetailStatics; 
 	private String[] _addPersonStatics; 
 	private String[] _addEventStatics;
-	// Login header collection 
-	private Map<String,String> _loginHeaders = new LinkedHashMap<String,String>();
 	// Local file resources used when creating people and events
 	private File _eventImg;
 	private File _eventThumb;
 	private File _eventPdf; 
 	private File _personImg; 
 	private File _personThumb;
-//	/** The number of users created during the benchmark run. */
-//	private AtomicLong _personsAdded = new AtomicLong(0L);
-	private boolean _isLoggedOn = false;
-	private String _loggedUser;
-//	private Set<String> _cachedURLs = new HashSet<String>();
-	private double _thinkTime = -1; ///< The mean think time; a value <= 0 means that no think time is used.
-	private double _cycleTime = -1; ///< The mean cycle time; a value <= 0 means that no cycle time is used.
-	private NegativeExponential _thinkTimeRng  = null;
-	private NegativeExponential _cycleTimeRng = null;
 
 
 	/**
@@ -508,7 +483,6 @@ public class OlioGenerator extends Generator
 		// Build Olio URLs
 		this.initializeUrlAnchors();
 		this.initializeLocalFileResources();
-		this.initializeLoginHeaders();
 		this.initializeStaticUrls();
 	}
 
@@ -654,34 +628,6 @@ public class OlioGenerator extends Generator
 		return this.getUtility().checkHttpResponse(this.getHttpTransport(), response);
 	}
 
-	/**
-	 * Updates the current "logged in" status.
-	 */
-	public void setIsLoggedOn(boolean val)
-	{
-		this._isLoggedOn = val;
-	}
-
-	/**
-	 * Returns the current "logged on" status.
-	 * 
-	 * @return      True if this user is "logged on"; otherwise false.
-	 */
-	public boolean isLoggedOn()
-	{
-		return this._isLoggedOn;
-	}
-
-	public void setLoggedUser(String user)
-	{
-		this._loggedUser = user;
-	}
-
-	public String getLoggedUser()
-	{
-		return this._loggedUser;
-	}
-
 	public String getHostURL()
 	{
 		return this._hostURL;
@@ -806,21 +752,6 @@ public class OlioGenerator extends Generator
 	{
 		return this._addEventStatics;
 	}
-
-	public Map<String,String> getLoginHeaders()
-	{
-		return _loginHeaders;
-	}
-
-//	/**
-//	 * Returns the set of cached URLs.
-//	 * 
-//	 * @return      A set of cached URLs.
-//	 */
-//	public Set<String> getCachedURLs()
-//	{
-//		return this._cachedURLs;
-//	}
 
 	public File getEventImgFile()
 	{
@@ -996,25 +927,6 @@ public class OlioGenerator extends Generator
 				this._addEventStatics = this.joinStatics(RAILS_COMMON_STATICS, RAILS_ADD_EVENT_STATICS);
 				break;
 		}
-	}
-
-	/**
-	 * Initialize the login header information.
-	 */
-	private void initializeLoginHeaders()
-	{
-		String host = this._loadTrack.getTargetHostName() + ":" + this._loadTrack.getTargetHostPort();
-
-		this._loginHeaders.clear();
-		this._loginHeaders.put("Host", host);
-		this._loginHeaders.put("User-Agent", "Mozilla/5.0");
-		this._loginHeaders.put("Accept", "text/xml.application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5");
-		this._loginHeaders.put("Accept-Language", "en-us,en;q=0.5");
-		this._loginHeaders.put("Accept-Encoding", "gzip,deflate");
-		this._loginHeaders.put("Accept-Charset", "ISO-8859-1,utf-8;q=0.7,*;q=0.7");
-		this._loginHeaders.put("Keep-Alive", "300");
-		this._loginHeaders.put("Connection", "keep-alive");
-		this._loginHeaders.put("Referer", this._homepageURL);
 	}
 
 	/**

@@ -159,7 +159,26 @@ public class AddPersonOperation extends OlioOperation
 			throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
-		//TODO: in Apache Olio there is a check on header for redirection
+		//FIXME: In Apache Olio there is also a check for redirection. Do we need it?
+		//       Probably no, since HttpTransport#fecth already take care of it
+		//String[] locationHeader = this.getHttpTransport().getHeadersMap().get("location");
+		//if (redirectionLocation != null)
+		//{
+		//	String redirectUrl = null;
+		//	switch (this.getConfiguration().getIncarnation())
+		//	{
+		//		case OlioConfiguration.JAVA_INCARNATION:
+		//			redirectUrl = this.getGenerator().getBaseURL() + '/' + locationHeader[0];
+		//			break;
+		//		case OlioConfiguration.PHP_INCARNATION:
+		//			redirectUrl = this.getGenerator().getBaseURL() + '/' + locationHeader[0];
+		//			break;
+		//		case OlioConfiguration.RAILS_INCARNATION:
+		//			redirectUrl = locationHeader[0];
+		//			break;
+		//	}
+		//	response = this.getHttpTransport().fetchURL(redirectUrl);
+		//}
 
 //		// Login with the newly created person
 //		response = this.getHttpTransport().fetchUrl(this.getGenerator().getLoginURL());

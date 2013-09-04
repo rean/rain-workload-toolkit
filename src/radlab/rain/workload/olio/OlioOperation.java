@@ -36,27 +36,18 @@ package radlab.rain.workload.olio;
 
 
 import java.io.IOException;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedHashMap;
 import java.util.logging.Logger;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 import java.util.TimeZone;
 import java.text.SimpleDateFormat;
-import javax.xml.parsers.DocumentBuilderFactory;
-import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.StringBody;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 import radlab.rain.Generator;
 import radlab.rain.IScoreboard;
 import radlab.rain.LoadProfile;
@@ -84,8 +75,6 @@ import radlab.rain.util.HttpTransport;
  */
 public abstract class OlioOperation extends Operation 
 {
-	protected int _imagesLoaded = 0;
-	protected long _imgBytes = 0;
 	protected Set<String> _cachedURLs = new HashSet<String>();
 	private Map<String, String> _cachedHeaders = new LinkedHashMap<String,String>();
 
@@ -100,7 +89,6 @@ public abstract class OlioOperation extends Operation
 	{
 		this._generator = generator;
 
-		// FIXME: Is this needed?
 		LoadProfile currentLoadProfile = generator.getLatestLoadProfile();
 		if (currentLoadProfile != null)
 		{
@@ -110,6 +98,18 @@ public abstract class OlioOperation extends Operation
 		// Refresh the cache to simulate real-world browsing.
 		this.refreshCache();
 
+		this._cachedHeaders.clear();
+		// Create login headers
+		String host = this.getGenerator().getTrack().getTargetHostName() + ":" + this.getGenerator().getTrack().getTargetHostPort();
+		this._cachedHeaders.put("Host", host);
+		this._cachedHeaders.put("User-Agent", "Mozilla/5.0");
+		this._cachedHeaders.put("Accept", "text/xml.application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5");
+		this._cachedHeaders.put("Accept-Language", "en-us,en;q=0.5");
+		this._cachedHeaders.put("Accept-Encoding", "gzip,deflate");
+		this._cachedHeaders.put("Accept-Charset", "ISO-8859-1,utf-8;q=0.7,*;q=0.7");
+		this._cachedHeaders.put("Keep-Alive", "300");
+		this._cachedHeaders.put("Connection", "keep-alive");
+		this._cachedHeaders.put("Referer", this.getGenerator().getHomePageURL());
 		// Create headers for if-modified-since
 		SimpleDateFormat sdf = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -119,7 +119,6 @@ public abstract class OlioOperation extends Operation
 	@Override
 	public void postExecute()
 	{
-		this.getSessionState().setLastOperation(this._operationIndex);
 		if (this.isFailed())
 		{
 			this.getSessionState().setLastResponse(null);
@@ -170,8 +169,8 @@ public abstract class OlioOperation extends Operation
 	/**
 	 * Parses an HTML document for image URLs specified by IMG tags.
 	 * 
-	 * @param buffer    The HTTP response; expected to be an HTML document.
-	 * @return          An unordered set of image URLs.
+	 * @param buffer The HTTP response; expected to be an HTML document.
+	 * @return An unordered set of image URLs.
 	 */
 	public Set<String> parseImages(String html) 
 	{
@@ -221,39 +220,6 @@ public abstract class OlioOperation extends Operation
 	 */
 	public String parseAuthToken(String html) throws IOException 
 	{
-/*
-		String token = "";
-
-		try
-		{
-			// TODO: Share this factory.
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-
-			factory.setValidating(false);
-			factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-
-			Document document = factory.newDocumentBuilder().parse( new InputSource( new StringReader( buffer.toString() ) ) );
-
-			NodeList inputList = document.getElementsByTagName("input");
-			for (int i = 0; i < inputList.getLength(); ++i)
-			{
-				Element input = (Element) inputList.item(i);
-				String name = input.getAttribute("name");
-				if ( name.equals("authenticity_token") )
-				{
-					token = input.getAttribute("value");
-					this.getLogger().finer("Parsed authenticity_token: " + token);
-					break;
-				}
-			}
-		}
-		catch (Exception e)
-		{
-			this.getLogger().warning("Unable to parse for authenticity token");
-			e.printStackTrace();
-		}
-*/
-
 		int idx = html.indexOf("authenticity_token");
 		if (idx == -1)
 		{
@@ -303,7 +269,6 @@ public abstract class OlioOperation extends Operation
 				{
 					this.getLogger().finer("Loading image: " + imageUrl);
 					this.getHttpTransport().fetchUrl(imageUrl);
-					this._imgBytes += this.getHttpTransport().getResponseLength();
 					++imagesLoaded;
 				} 
 				else
@@ -333,7 +298,7 @@ public abstract class OlioOperation extends Operation
 			if (this._cachedURLs.add(url)) 
 			{
 				this.getLogger().finer("Loading URL: " + url);
-				this.getHttpTransport().fetchUrl(url);
+				this.getHttpTransport().fetchUrl(url, this._cachedHeaders);
 				++staticsLoaded;
 			}
 			else 
@@ -344,139 +309,6 @@ public abstract class OlioOperation extends Operation
 
 		return staticsLoaded;
 	}
-
-//	/**
-//	 * Checks if the current HTTP client session is logged in or not. This
-//	 * should only be used for debugging purposes.
-//	 * 
-//	 * @return True if the user is logged in.
-//	 */
-//	public boolean checkIsLoggedIn()
-//	{
-//		boolean loggedIn = false;
-//
-//		try
-//		{
-//			StringBuilder responseBuffer = this.getHttpTransport().fetchUrl(this.getGenerator().getHomepageURL());
-//			loggedIn = (responseBuffer.indexOf("Username") == -1);
-//		}
-//		catch (Exception e)
-//		{
-//
-//		}
-//
-//		return loggedIn;
-//	}
-	
-//	/**
-//	 * Returns the current "logged on" status.
-//	 * 
-//	 * @return      True if this user is "logged on"; otherwise false.
-//	 */
-//	protected boolean isLoggedOn()
-//	{
-//		return this.getGenerator().isLoggedOn();
-//	}
-//
-//	protected void setIsLoggedOn(boolean val)
-//	{
-//		this.getGenerator().setIsLoggedOn(val);
-//	}
-
-//	protected String getLoggedUser()
-//	{
-//		return this.getGenerator().getLoggedUser();
-//	}
-
-//	/**
-//	 * Executes an HTTP request to log on. This method is not thread-safe and
-//	 * must not be called by an asynchronously executed operation. Any headers
-//	 * indicating a redirect will be executed, and the response of the last
-//	 * request is returned.
-//	 * 
-//	 * @return      The content of the response.
-//	 * 
-//	 * @throws IOException 
-//	 */
-//	protected StringBuilder logOn() throws IOException 
-//	{
-//		if (!this._mustBeSync)
-//		{
-//			this.getLogger().warning("logOn() is not thread-safe and should only be called by a synchronous operation!");
-//		}
-//
-//		this.getLogger().finer("Logging on. (Currently: " + this.getGenerator().isLoggedOn() + ")");
-//
-//		// Decide on the username and password.
-//		int userId = this.selectUserID();
-//		String username = UserName.getUserName(userId);
-//		String password = String.valueOf(userId);
-//		this.getLogger().fine("Logging on as " + username + " (ID/Password: " + password + ")");
-//
-//		// Make the POST request to log in.
-//		String postBody = null;
-//		switch (this.getConfiguration().getIncarnation())
-//		{
-//			case JAVA_INCARNATION:
-//				postBody = "user_name=" + username + "&password=" + password;
-//				break;
-//			case RAILS_INCARNATION:
-//				postBody = "users[username]=" + username + "&users[password]=" + password + "&submit=Login";
-//				break;
-//		}
-//
-//		StringBuilder response = this.getHttpTransport().fetchUrl(this.getGenerator().getLoginURL(), postBody);
-//		this.trace(this.getGenerator().getLoginURL());
-//
-//		int status = this.getHttpTransport().getStatusCode();
-//		if (HttpStatus.SC_OK != status)
-//		{
-//			throw new IOException("Login as " + username + ", " + userId + " failed. Returned status code: " + status);
-//		}
-//		int idx = response.indexOf("Username");
-//		if (idx != -1)
-//		{
-//			throw new IOException("Found login prompt at index " + idx + ", Login as " + username + ", " + userId + " failed.");
-//		}
-//		// Check that the user was successfully logged in.
-//		idx = response.indexOf("Successfully logged in");
-//		if (idx == -1)
-//		{
-//			throw new IOException( "Login did not persist for an unknown reason. Home response: " + response );
-//		}
-//
-//		this.setIsLoggedOn(true);
-//		// The following line is not thread-safe.
-//		this.setLoggeUser(username);
-//
-//		return response;
-//	}
-	
-//	/**
-//	 * Executes an HTTP request to log off. This method is not thread-safe and
-//	 * must not be called by an asynchronously executed operation. Any headers
-//	 * indicating a redirect will be executed, and the response of the last
-//	 * request is returned.
-//	 * 
-//	 * @return      The content of the response.
-//	 * 
-//	 * @throws IOException
-//	 */
-//	protected StringBuilder logOff() throws IOException 
-//	{
-//		if (!this._mustBeSync)
-//		{
-//			this.getLogger().warning("logOff() is not thread-safe and should only be called by a synchronous operation!");
-//		}
-//
-//		this.getLogger().finer("Logging off. (Currently: " + this.isLoggedOn() + ")");
-//		StringBuilder response = this.getHttpTransport().fetchUrl(this.getGenerator().getLogoutURL());
-//		
-//		this.setIsLoggedOn(false);
-//		this.setLoggedUser("");
-//
-//		return response;
-//	}
 
 	/**
 	 * Refreshes the cache by resetting it 40% of the time.
@@ -493,103 +325,4 @@ public abstract class OlioOperation extends Operation
 
 		return resetCache;
 	}
-
-//	/**
-//	 * Generates a new user ID (via a synchronized counter). This is used to
-//	 * create a new user.
-//	 * 
- //	 * @return      A new user ID.
-//	 */
-//	protected long generateUserId() throws UnsupportedEncodingException
-//	{
-//		long addedUsers = this.getGenerator()._personsAdded.addAndGet(1L) * ScaleFactors.activeUsers;
-//
-//		return ScaleFactors.loadedUsers + addedUsers + this.getGeneratorThreadID() + 1;
-//	}
-
-//	/**
-//	 * Used to decide on a random user ID.
-//	 * 
-//	 * @return      Returns an integer representing a valid user ID.
-//	 */
-//	protected int selectUserID()
-//	{
-//		return this.thisUtility().generateInt(0, 3) * ScaleFactors.activeUsers + (int) this.getGeneratorThreadID() + 1;
-//	}
-
-//	/**
-//	 * Adds necessary address fields to a multipart request entity.
-//	 * 
-//	 * @param reqEntity     The multipart request entity to add fields to.
-//	 * 
-//	 * @throws UnsupportedEncodingException
-//	 */
-//	public void addAddress( MultipartEntity reqEntity ) throws UnsupportedEncodingException
-//	{
-//		reqEntity.addPart( "address[street1]", new StringBody( street1() ) );
-//		reqEntity.addPart( "address[street2]", new StringBody( street2() ) );
-//		reqEntity.addPart( "address[city]",    new StringBody( this.getUtility().generateAlphaString( 4, 14 ) ) );
-//		reqEntity.addPart( "address[state]",   new StringBody( this.getUtility().generateAlphaString( 2, 2 ).toUpperCase() ) );
-//		reqEntity.addPart( "address[zip]",     new StringBody( this.getUtility().generateNumString( 5, 5 ) ) );
-//		reqEntity.addPart( "address[country]", new StringBody( country() ) );
-//	}
-	
-//	/**
-//	 * Generates the first line of a pseudorandom street address.
-//	 * 
-//	 * @return      A random street address.
-//	 */
-//	public String street1() 
-//	{
-//		StringBuilder buffer = new StringBuilder( 255 );
-//		buffer.append( this.getUtility().generateNumString( 1, 5 ) ).append( ' ' ); // Number
-//		this.getUtility().generateName( buffer, 1, 11 ); // Street Name
-//		
-//		String[] STREETEXTS = { "Blvd", "Ave", "St", "Ln", "" };
-//		String streetExt = STREETEXTS[this.getUtility().nextInt( 0, STREETEXTS.length - 1 )];
-//		if ( streetExt.length() > 0 )
-//		{
-//			buffer.append( ' ' ).append( streetExt );
-//		}
-//		
-//		return buffer.toString();
-//	}
-	
-//	/**
-//	 * Generates the second line of a pseudorandom street address.
-//	 * 
-//	 * @return      Half the time, a second line of a random street address;
-//	 *              otherwise an empty string.
-//	 */
-//	public String street2() 
-//	{
-//		String street = "";
-//		
-//		int toggle = this.getUtility().nextInt( 0, 1 );
-//		if ( toggle > 0 )
-//		{
-//		  street = this.getUtility().generateAlphaString( 5, 20 );
-//		}
-//		
-//		return street;
-//	}
-	
-//	/**
-//	 * Generates a pseudorandom country.
-//	 * 
-//	 * @return      Half the time, USA; otherwise, a random string.
-//	 */
-//	public String country() 
-//	{
-//		String country = "USA";
-//		
-//		int toggle = this.getUtility().nextInt( 0, 1 );
-//		if ( toggle == 0 ) 
-//		{
-//			StringBuilder buffer = new StringBuilder( 255 );
-//			country = this.getUtility().generateName( buffer, 6, 16 ).toString();
-//		}
-//		
-//		return country;
-//	}
 }

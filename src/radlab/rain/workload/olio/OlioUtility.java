@@ -61,6 +61,9 @@ import radlab.rain.workload.olio.model.OlioTag;
 
 /**
  * Collection of utilities for the Olio workload.
+ * <br/>
+ * NOTE: Code based on {@code org.apache.olio.workload.driver.UIDriver} class
+ * and adapted for RAIN.
  *
  * @author: Shanti Subramanyam
  * @author: Rean Griffith 
@@ -872,7 +875,7 @@ public final class OlioUtility
 
 		tag.id = id;
 		tag.name = this.generateUserName(id);
-		tag.refCount = 0;
+		tag.refCount = this.generateInt(100, 150);
 
 		return tag;
 	}
