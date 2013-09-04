@@ -13,14 +13,14 @@
     	<pathelement location="."/>
     	<pathelement location="bin"/>
 <!--
-        <pathelement location="thirdparty/httpcomponents-client-4.2.3/lib/commons-codec-1.6.jar"/>
-        <pathelement location="thirdparty/httpcomponents-client-4.2.3/lib/fluent-hc-4.2.3.jar"/>
-        <pathelement location="thirdparty/httpcomponents-client-4.2.3/lib/httpclient-cache-4.2.3.jar"/>
+        <pathelement location="thirdparty/httpcomponents-client-4.2.5/lib/commons-codec-1.6.jar"/>
+        <pathelement location="thirdparty/httpcomponents-client-4.2.5/lib/fluent-hc-4.2.5.jar"/>
+        <pathelement location="thirdparty/httpcomponents-client-4.2.5/lib/httpclient-cache-4.2.5.jar"/>
 -->
-        <pathelement location="thirdparty/httpcomponents-client-4.2.3/lib/commons-logging-1.1.1.jar"/>
-        <pathelement location="thirdparty/httpcomponents-client-4.2.3/lib/httpclient-4.2.3.jar"/>
-        <pathelement location="thirdparty/httpcomponents-client-4.2.3/lib/httpcore-4.2.2.jar"/>
-        <pathelement location="thirdparty/httpcomponents-client-4.2.3/lib/httpmime-4.2.3.jar"/>
+        <pathelement location="thirdparty/httpcomponents-client-4.2.5/lib/commons-logging-1.1.1.jar"/>
+        <pathelement location="thirdparty/httpcomponents-client-4.2.5/lib/httpclient-4.2.5.jar"/>
+        <pathelement location="thirdparty/httpcomponents-client-4.2.5/lib/httpcore-4.2.4.jar"/>
+        <pathelement location="thirdparty/httpcomponents-client-4.2.5/lib/httpmime-4.2.5.jar"/>
         <pathelement location="thirdparty/json-20090211.jar"/>
     	<pathelement location="thirdparty/colt-1.2.0/colt.jar"/>
     	<!-- zookeeper stuff -->
@@ -50,14 +50,14 @@
 	<path id="rain.classpath.with.mr">
         <pathelement location="bin"/>
 <!--
-        <pathelement location="thirdparty/httpcomponents-client-4.2.3/lib/commons-codec-1.6.jar"/>
-        <pathelement location="thirdparty/httpcomponents-client-4.2.3/lib/fluent-hc-4.2.3.jar"/>
-        <pathelement location="thirdparty/httpcomponents-client-4.2.3/lib/httpclient-cache-4.2.3.jar"/>
+        <pathelement location="thirdparty/httpcomponents-client-4.2.5/lib/commons-codec-1.6.jar"/>
+        <pathelement location="thirdparty/httpcomponents-client-4.2.5/lib/fluent-hc-4.2.5.jar"/>
+        <pathelement location="thirdparty/httpcomponents-client-4.2.5/lib/httpclient-cache-4.2.5.jar"/>
 -->
-        <pathelement location="thirdparty/httpcomponents-client-4.2.3/lib/commons-logging-1.1.1.jar"/>
-        <pathelement location="thirdparty/httpcomponents-client-4.2.3/lib/httpclient-4.2.3.jar"/>
-        <pathelement location="thirdparty/httpcomponents-client-4.2.3/lib/httpcore-4.2.2.jar"/>
-        <pathelement location="thirdparty/httpcomponents-client-4.2.3/lib/httpmime-4.2.3.jar"/>
+        <pathelement location="thirdparty/httpcomponents-client-4.2.5/lib/commons-logging-1.1.1.jar"/>
+        <pathelement location="thirdparty/httpcomponents-client-4.2.5/lib/httpclient-4.2.5.jar"/>
+        <pathelement location="thirdparty/httpcomponents-client-4.2.5/lib/httpcore-4.2.4.jar"/>
+        <pathelement location="thirdparty/httpcomponents-client-4.2.5/lib/httpmime-4.2.5.jar"/>
         <pathelement location="thirdparty/json-20090211.jar"/>
     	<pathelement location="thirdparty/colt-1.2.0/colt.jar"/>
 		<!-- zookeeper stuff -->
@@ -284,14 +284,14 @@
             </manifest>
             <fileset dir="bin" excludes="radlab/rain/workload/** radlab/rain/test/**"/>
 <!--
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/commons-codec-1.6.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/fluent-hc-4.2.3.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/httpclient-cache-4.2.3.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.5/lib/commons-codec-1.6.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.5/lib/fluent-hc-4.2.5.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.5/lib/httpclient-cache-4.2.5.jar"/>
 -->
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/commons-logging-1.1.1.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/httpclient-4.2.3.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/httpcore-4.2.2.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/httpmime-4.2.3.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.5/lib/commons-logging-1.1.1.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.5/lib/httpclient-4.2.5.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.5/lib/httpcore-4.2.4.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.5/lib/httpmime-4.2.5.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/json-20090211.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/colt-1.2.0/colt.jar"/>
         	<!-- Zookeeper stuff -->
@@ -309,14 +309,14 @@
             </manifest>
             <fileset dir="bin" excludes="radlab/rain/workload/** radlab/rain/test/**"/>
 <!--
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/commons-codec-1.6.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/fluent-hc-4.2.3.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/httpclient-cache-4.2.3.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.5/lib/commons-codec-1.6.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.5/lib/fluent-hc-4.2.5.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.5/lib/httpclient-cache-4.2.5.jar"/>
 -->
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/commons-logging-1.1.1.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/httpclient-4.2.3.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/httpcore-4.2.2.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.3/lib/httpmime-4.2.3.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.5/lib/commons-logging-1.1.1.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.5/lib/httpclient-4.2.5.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.5/lib/httpcore-4.2.4.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.5/lib/httpmime-4.2.5.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/json-20090211.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/colt-1.2.0/colt.jar"/>
         	<!-- zookeeper stuff -->
