@@ -475,8 +475,6 @@ public class OlioGenerator extends Generator
 			this._cycleTimeRng = new NegativeExponential(this._cycleTime, this._rng);
 		}
 
-		ScaleFactors.setActiveUsers( this.getTrack().getMaxUsers() );
-
 //		// Select a random user for current session (if needed)
 //		this.getSessionState().setLoggedUserId(this.getUtility().generatePerson().id);
 
