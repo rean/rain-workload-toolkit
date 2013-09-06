@@ -930,9 +930,9 @@ public class RubisGenerator extends Generator
 	 */
 	private void initializeUrls()
 	{
-		String incarnation = this.getConfiguration().getIncarnation();
+		int incarnation = this.getConfiguration().getIncarnation();
 
-		if (incarnation.equals("servlet"))
+		if (incarnation == RubisConfiguration.SERVLET_INCARNATION)
 		{
 			this.initializeServletUrls();
 		}

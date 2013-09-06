@@ -50,6 +50,9 @@ import org.json.JSONException;
  */
 public final class RubisConfiguration
 {
+	// RUBiS incarnations
+	public static final int SERVLET_INCARNATION = 0;
+
 	// Configuration keys
 	private static final String CFG_CATEGORIES_FILE_KEY = "rubis.categoriesFile";
 	private static final String CFG_INCARNATION_KEY = "rubis.incarnation";
@@ -75,7 +78,7 @@ public final class RubisConfiguration
 	// Default values
 	private static final long DEFAULT_RNG_SEED = -1;
 	private static final String DEFAULT_CATEGORIES_FILE = "resources/rubis-ebay_full_categories.txt";
-	private static final String DEFAULT_INCARNATION = "servlet";
+	private static final int DEFAULT_INCARNATION = SERVLET_INCARNATION;
 	private static final String DEFAULT_REGIONS_FILE = "resources/rubis-ebay_regions.txt";
 	private static final int DEFAULT_NUM_OLD_ITEMS = 1000000;
 	private static final float DEFAULT_PERCENTAGE_UNIQUE_ITEMS = 80;
@@ -99,7 +102,7 @@ public final class RubisConfiguration
 	private List<String> _categories = null; /*Arrays.asList(DEFAULT_CATEGORIES)*/; ///< A collection of categories
 	private List<Integer> _numItemsPerCategory = null; ///< Number of items for each category
 	private String _categoriesFile = DEFAULT_CATEGORIES_FILE; ///< File name of the RUBiS categories file
-	private String _incarnation = DEFAULT_INCARNATION; ///< RUBiS incarnation
+	private int _incarnation = DEFAULT_INCARNATION; ///< RUBiS incarnation
 	private int _maxCommentLen = DEFAULT_MAX_COMMENT_LENGTH; ///< Maximum comment length
 	private float _maxItemBaseBidPrice = DEFAULT_MAX_ITEM_BASE_BID_PRICE; ///< Maximum base bid price for an item
 	private float _maxItemBaseBuyNowPrice = DEFAULT_MAX_ITEM_BASE_BUY_NOW_PRICE; ///< Maximum base buy now price for an item
@@ -139,7 +142,16 @@ public final class RubisConfiguration
 		}
 		if (config.has(CFG_INCARNATION_KEY))
 		{
-			this._incarnation = config.getString(CFG_INCARNATION_KEY);
+			String str = config.getString(CFG_INCARNATION_KEY).toLowerCase();
+
+			if (str.equals("servlet"))
+			{
+				this._incarnation = SERVLET_INCARNATION;
+			}
+			else
+			{
+				throw new JSONException("Unknown RUBiS incarnation: '" + str + "'");
+			}
 		}
 		if (config.has(CFG_MAX_BIDS_PER_ITEM_KEY))
 		{
@@ -256,7 +268,7 @@ public final class RubisConfiguration
 	 *
 	 * @return the RUBiS incarnation type.
 	 */
-	public String getIncarnation()
+	public int getIncarnation()
 	{
 		return this._incarnation;
 	}
