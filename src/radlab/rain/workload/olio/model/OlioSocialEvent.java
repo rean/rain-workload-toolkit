@@ -60,6 +60,6 @@ public class OlioSocialEvent
 	public boolean disabled;
 	public Date createdTimestamp;
 	public String[] address;
-	public List<String> tags;
+	public List<OlioTag> tags;
 	public String timezone;
 }

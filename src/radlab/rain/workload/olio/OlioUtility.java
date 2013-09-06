@@ -1432,20 +1432,21 @@ public final class OlioUtility
 	 * Note: the number of generated tags is randomly chosen between 1 and
 	 * MAX_NUM_TAGS.
 	 */
-	private List<String> generateTags()
+	private List<OlioTag> generateTags()
 	{
     	Set<Integer> tagSet = new LinkedHashSet<Integer>(MAX_NUM_TAGS);
 		int numTags = this.generateInt(1, MAX_NUM_TAGS);
 		for (int i = 0; i < numTags; ++i)
 		{
-			tagSet.add(this.generateTagId(0.1D));
+			tagSet.add(this.generateTagId(0.1d));
 		}
 
-		List<String> tags = new ArrayList<String>();
+		List<OlioTag> tags = new ArrayList<OlioTag>();
 		for (int tagId : tagSet)
 		{
-			tags.add(this.generateUserName(tagId));
+			tags.add(this.getTag(tagId));
 		}
+
 		return tags;
 	}
 

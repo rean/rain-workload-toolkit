@@ -46,6 +46,7 @@ import org.apache.http.HttpStatus;
 import radlab.rain.IScoreboard;
 import radlab.rain.workload.olio.model.OlioPerson;
 import radlab.rain.workload.olio.model.OlioSocialEvent;
+import radlab.rain.workload.olio.model.OlioTag;
 
 
 /**
@@ -191,9 +192,9 @@ public class AddEventOperation extends OlioOperation
 		cal.setTime(evt.eventTimestamp);
 
 		StringBuilder tags = new StringBuilder();
-		for (String tag : evt.tags)
+		for (OlioTag tag : evt.tags)
 		{
-			tags.append(tag).append(' ');
+			tags.append(tag.name).append(' ');
 		}
 		tags.setLength(tags.length()-1); // Trim trailing space
 
