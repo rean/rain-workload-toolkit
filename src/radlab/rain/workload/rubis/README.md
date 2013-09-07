@@ -101,6 +101,7 @@ Currently, the supported configuration properties are the following:
   - *"RegisterItem"*,
   - *"AboutMeAuth"*,
   - *"AboutMe"*.
+
   Default value is: *"Home"*.
 - **rubis.maxBidsPerItem**: a non-negative integer value representing the maximum number of bids per item; this is the RAIN counterpart of the *max\_bids\_per\_item* RUBiS property.
   Default value is: *20*.
