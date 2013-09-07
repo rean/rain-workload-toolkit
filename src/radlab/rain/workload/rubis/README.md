@@ -68,24 +68,76 @@ All the 29 RUBiS operations are supported, included the two special operations *
 The RUBiS workload can be customized by means of a set of properties inside the *generatorParameters* key of the *profiles.config.rubis.json*.
 Currently, the supported configuration properties are the following:
 - **rubis.categoriesFile**: a string representing the path to the RUBiS categories file; this is the RAIN counterpart of the *database\_regions\_file* RUBiS property.
+  Default value is: *"resources/rubis-ebay_full_categories.txt"*.
+- **rubis.incarnation**: a case-insensitive string representing the RUBiS incarnation one wants to use.
+  Possible values are: *"servlet"*.
+  Default value is: *"servlet"*.
+- **rubis.initOp**: a case-insensitive string representing the RUBiS operation from which a user session starts.
+  Possible values are:
+  - *"Home"*,
+  - *"Register"*,
+  - *"RegisterUser"*,
+  - *"Browse"*,
+  - *"BrowseCategories"*,
+  - *"SearchItemsByCategory"*,
+  - *"BrowseRegions"*,
+  - *"BrowseCategoriesByRegions"*,
+  - *"SearchItemsByRegion"*,
+  - *"ViewItem"*,
+  - *"ViewUserInfo"*,
+  - *"ViewBidHistory"*,
+  - *"BuyNowAuth"*,
+  - *"BuyNow"*,
+  - *"StoreBuyNow"*,
+  - *"PutBidAuth"*,
+  - *"PutBid"*,
+  - *"StoreBid"*,
+  - *"PutCommentAuth"*,
+  - *"PutComment"*,
+  - *"StoreComment"*,
+  - *"Sell"*,
+  - *"SelectCategoryToSellItem"*,
+  - *"SellItemForm"*,
+  - *"RegisterItem"*,
+  - *"AboutMeAuth"*,
+  - *"AboutMe"*.
+  Default value is: *"Home"*.
 - **rubis.maxBidsPerItem**: a non-negative integer value representing the maximum number of bids per item; this is the RAIN counterpart of the *max\_bids\_per\_item* RUBiS property.
+  Default value is: *20*.
 - **rubis.maxCommentLen**: a non-negative integer value representing the maximum length of a comment to an item; this is the RAIN counterpart of the *comment\_max\_length* RUBiS property.
+  Default value is: *2048*.
 - **rubis.maxItemBaseBidPrice**: a non-negative real value representing the maximum base "bid" price for an item.
+  Default value is: *10*.
 - **rubis.maxItemBaseBuyNowPrice**: a non-negative real value representing the maximum base "buy now" price for an item.
+  Default value is: *1000*.
 - **rubis.maxItemBaseReservePrice**: a non-negative real value representing the maximum base reserve price for an item.
+  Default value is: *1000*.
 - **rubis.maxItemDescrLen**: a string value representing the maximum length for the description of an item; this is the RAIN counterpart of the *item\_description\_length* RUBiS property.
+  Default value is: *8192*.
 - **rubis.maxItemDuration**: a non-negative interger value representing the maximum duration (in days) of an item.
+  Default value is: *7*.
 - **rubis.maxItemInitPrice**: a non-negative real value representing the maximum initial price for an item.
+  Default value is: *5000*.
 - **rubis.maxItemQuantity**: a non-negative integer value representing the maximum quantity for multiple items; this is the RAIN counterpart of the *max\_quantity\_for_multiple\_items* RUBiS property.
+  Default value is: *10*.
 - **rubis.maxWordLen**: a non-negative integer value representing the maximum length of a randomly generated word.
+  Default value is: *12*.
 - **rubis.numItemsPerPage**: a non-negative integer value representing the maximum number of items to display in a single page; this is the RAIN counterpart of the *workload\_number\_of\_items\_per\_page* RUBiS property.
+  Default value is: *20*.
 - **rubis.numOldItems**: a non-negative integer value representing the number of items whose auction date is over; this is the RAIN counterpart of the *database\_number\_of\_old\_items* RUBiS property.
+  Default value is: *1000000*.
 - **rubis.numPreloadedUsers**: a non-negative integer value representing the number of user that have been already preloaded inside the RUBiS database; this is the RAIN counterpart of the *database\_number\_of\_users* RUBiS property.
+  Default value is: *1*.
 - **rubis.percentItemsBuyNow**: a non-negative real value between 0 and 100 (inclusive) represnting the percentage of items that users can "buy now"; this is the RAIN couterpart of the *percentage\_of_items\_with\_reserve\_price* RUBiS property.
+  Default value is: *80*.
 - **rubis.percentItemsReserve**: a non-negative real value between 0 and 100 (inclusive) representing the percentage of items with a reserve price; this is the RAIN counterpart of the *percentage\_of\_buy\_now\_items* RUBiS property.
+  Default value is: *40*.
 - **rubis.percentUniqueItems**: a non-negative real value between 0 and 100 (inclusive) representing the percentage of unique items; this is the RAIN counterpart of the *percentage\_of\_unique\_items* RUBiS property.
+  Default value is: *10*.
 - **rubis.regionsFile**: a string representing the path to the RUBiS regions file; this is the RAIN counterpart of the *database\_regions\_file* RUBiS property.
+  Default value is: *"resources/rubis-ebay_regions.txt"*.
 - **rubis.rngSeed**: an integer number representing the seed used to initialize the random number generator used by the RUBiS generator; if set to `-1`, the random number generator will be initialized with the Java's default (i.e., to a value very likely to be distinct from any other invocation of the `java.util.Random` default constructor).
+  Default value is: *-1*.
 The order of the operations in the traffic mix matrix is the same of the one specified in the previous section (i.e., 0 is the *Home Page* operation, 1 is the *Register* operation, and so on).
 
 ### Assumptions

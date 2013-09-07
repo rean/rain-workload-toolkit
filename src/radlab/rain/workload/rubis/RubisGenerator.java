@@ -268,19 +268,19 @@ public class RubisGenerator extends Generator
 
 		if (lastOperation == -1)
 		{
-			nextOperation = HOME_OP;
+			nextOperation = this.getConfiguration().getInitialOperation();
 		}
 		else if (lastOperation == BACK_SPECIAL_OP)
 		{
 			// Back to previous state
-			nextOperation = Math.max(HOME_OP, this._sessionState.getLastOperation());
+			nextOperation = Math.max(this.getConfiguration().getInitialOperation(), this._sessionState.getLastOperation());
 		}
 		else if (lastOperation == EOS_SPECIAL_OP)
 		{
 			// End-of-session
 
 			// Start from the initial operation
-			nextOperation = HOME_OP;
+			nextOperation = this.getConfiguration().getInitialOperation();
 
 			// Clear session data
 			this.getSessionState().clear();

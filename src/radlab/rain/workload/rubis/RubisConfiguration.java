@@ -52,9 +52,41 @@ public final class RubisConfiguration
 {
 	// RUBiS incarnations
 	public static final int SERVLET_INCARNATION = 0;
+	// RUBiS incarnation names
+	private static final String SERVLET_INCARNATION_NAME = "Servlet";
+
+	// RUBiS operation names
+	private static final String HOME_OP_NAME = "Home";
+	private static final String REGISTER_OP_NAME = "Register";
+	private static final String REGISTER_USER_OP_NAME = "RegisterUser";
+	private static final String BROWSE_OP_NAME = "Browse";
+	private static final String BROWSE_CATEGORIES_OP_NAME = "BrowseCategories";
+	private static final String SEARCH_ITEMS_BY_CATEGORY_OP_NAME = "SearchItemsByCategory";
+	private static final String BROWSE_REGIONS_OP_NAME = "BrowseRegions";
+	private static final String BROWSE_CATEGORIES_BY_REGION_OP_NAME = "BrowseCategoriesByRegions";
+	private static final String SEARCH_ITEMS_BY_REGION_OP_NAME = "SearchItemsByRegion";
+	private static final String VIEW_ITEM_OP_NAME = "ViewItem";
+	private static final String VIEW_USER_INFO_OP_NAME = "ViewUserInfo";
+	private static final String VIEW_BID_HISTORY_OP_NAME = "ViewBidHistory";
+	private static final String BUY_NOW_AUTH_OP_NAME = "BuyNowAuth";
+	private static final String BUY_NOW_OP_NAME = "BuyNow";
+	private static final String STORE_BUY_NOW_OP_NAME = "StoreBuyNow";
+	private static final String PUT_BID_AUTH_OP_NAME = "PutBidAuth";
+	private static final String PUT_BID_OP_NAME = "PutBid";
+	private static final String STORE_BID_OP_NAME = "StoreBid";
+	private static final String PUT_COMMENT_AUTH_OP_NAME = "PutCommentAuth";
+	private static final String PUT_COMMENT_OP_NAME = "PutComment";
+	private static final String STORE_COMMENT_OP_NAME = "StoreComment";
+	private static final String SELL_OP_NAME = "Sell";
+	private static final String SELECT_CATEGORY_TO_SELL_ITEM_OP_NAME = "SelectCategoryToSellItem";
+	private static final String SELL_ITEM_FORM_OP_NAME = "SellItemForm";
+	private static final String REGISTER_ITEM_OP_NAME = "RegisterItem";
+	private static final String ABOUT_ME_AUTH_OP_NAME = "AboutMeAuth";
+	private static final String ABOUT_ME_OP_NAME = "AboutMe";
 
 	// Configuration keys
 	private static final String CFG_CATEGORIES_FILE_KEY = "rubis.categoriesFile";
+	private static final String CFG_INITIAL_OPERATION_KEY = "rubis.initOp";
 	private static final String CFG_INCARNATION_KEY = "rubis.incarnation";
 	private static final String CFG_MAX_BIDS_PER_ITEM_KEY = "rubis.maxBidsPerItem";
 	private static final String CFG_MAX_COMMENT_LENGTH_KEY = "rubis.maxCommentLen";
@@ -76,15 +108,11 @@ public final class RubisConfiguration
 	private static final String CFG_RNG_SEED_KEY = "rubis.rngSeed";
 
 	// Default values
-	private static final long DEFAULT_RNG_SEED = -1;
 	private static final String DEFAULT_CATEGORIES_FILE = "resources/rubis-ebay_full_categories.txt";
 	private static final int DEFAULT_INCARNATION = SERVLET_INCARNATION;
-	private static final String DEFAULT_REGIONS_FILE = "resources/rubis-ebay_regions.txt";
-	private static final int DEFAULT_NUM_OLD_ITEMS = 1000000;
-	private static final float DEFAULT_PERCENTAGE_UNIQUE_ITEMS = 80;
-	private static final float DEFAULT_PERCENTAGE_ITEMS_RESERVE = 40;
-	private static final float DEFAULT_PERCENTAGE_ITEMS_BUY_NOW = 10;
+	private static final int DEFAULT_INITIAL_OPERATION = RubisGenerator.HOME_OP;
 	private static final int DEFAULT_MAX_BIDS_PER_ITEM = 20;
+	private static final int DEFAULT_MAX_COMMENT_LENGTH = 2048;
 	private static final float DEFAULT_MAX_ITEM_BASE_BID_PRICE = 10;
 	private static final float DEFAULT_MAX_ITEM_BASE_BUY_NOW_PRICE = 1000;
 	private static final float DEFAULT_MAX_ITEM_BASE_RESERVE_PRICE = 1000;
@@ -92,10 +120,15 @@ public final class RubisConfiguration
 	private static final int DEFAULT_MAX_ITEM_DURATION = 7;
 	private static final int DEFAULT_MAX_ITEM_INIT_PRICE = 5000;
 	private static final int DEFAULT_MAX_ITEM_QUANTITY = 10;
-	private static final int DEFAULT_NUM_ITEMS_PER_PAGE = 20;
-	private static final int DEFAULT_MAX_COMMENT_LENGTH = 2048;
-	private static final int DEFAULT_NUM_PRELOADED_USERS = 1;
 	private static final int DEFAULT_MAX_WORD_LENGTH = 12;
+	private static final int DEFAULT_NUM_ITEMS_PER_PAGE = 20;
+	private static final int DEFAULT_NUM_OLD_ITEMS = 1000000;
+	private static final int DEFAULT_NUM_PRELOADED_USERS = 1;
+	private static final float DEFAULT_PERCENTAGE_UNIQUE_ITEMS = 80;
+	private static final float DEFAULT_PERCENTAGE_ITEMS_RESERVE = 40;
+	private static final float DEFAULT_PERCENTAGE_ITEMS_BUY_NOW = 10;
+	private static final String DEFAULT_REGIONS_FILE = "resources/rubis-ebay_regions.txt";
+	private static final long DEFAULT_RNG_SEED = -1;
 
 
 	// Members to hold configuration values
@@ -103,6 +136,7 @@ public final class RubisConfiguration
 	private List<Integer> _numItemsPerCategory = null; ///< Number of items for each category
 	private String _categoriesFile = DEFAULT_CATEGORIES_FILE; ///< File name of the RUBiS categories file
 	private int _incarnation = DEFAULT_INCARNATION; ///< RUBiS incarnation
+	private int _initOp = DEFAULT_INITIAL_OPERATION; ///< RUBiS incarnation
 	private int _maxCommentLen = DEFAULT_MAX_COMMENT_LENGTH; ///< Maximum comment length
 	private float _maxItemBaseBidPrice = DEFAULT_MAX_ITEM_BASE_BID_PRICE; ///< Maximum base bid price for an item
 	private float _maxItemBaseBuyNowPrice = DEFAULT_MAX_ITEM_BASE_BUY_NOW_PRICE; ///< Maximum base buy now price for an item
@@ -144,13 +178,130 @@ public final class RubisConfiguration
 		{
 			String str = config.getString(CFG_INCARNATION_KEY).toLowerCase();
 
-			if (str.equals("servlet"))
+			if (str.equals(SERVLET_INCARNATION_NAME))
 			{
 				this._incarnation = SERVLET_INCARNATION;
 			}
 			else
 			{
 				throw new JSONException("Unknown RUBiS incarnation: '" + str + "'");
+			}
+		}
+		if (config.has(CFG_INITIAL_OPERATION_KEY))
+		{
+			String str = config.getString(CFG_INITIAL_OPERATION_KEY).toLowerCase();
+
+			if (str.equals(HOME_OP_NAME))
+			{
+				this._initOp = RubisGenerator.HOME_OP;
+			}
+			else if (str.equals(REGISTER_OP_NAME))
+			{
+				this._initOp = RubisGenerator.REGISTER_OP;
+			}
+			else if (str.equals(REGISTER_USER_OP_NAME))
+			{
+				this._initOp = RubisGenerator.REGISTER_USER_OP;
+			}
+			else if (str.equals(BROWSE_OP_NAME))
+			{
+				this._initOp = RubisGenerator.BROWSE_OP;
+			}
+			else if (str.equals(BROWSE_CATEGORIES_OP_NAME))
+			{
+				this._initOp = RubisGenerator.BROWSE_CATEGORIES_OP;
+			}
+			else if (str.equals(SEARCH_ITEMS_BY_CATEGORY_OP_NAME))
+			{
+				this._initOp = RubisGenerator.SEARCH_ITEMS_BY_CATEGORY_OP;
+			}
+			else if (str.equals(BROWSE_REGIONS_OP_NAME))
+			{
+				this._initOp = RubisGenerator.BROWSE_REGIONS_OP;
+			}
+			else if (str.equals(BROWSE_CATEGORIES_BY_REGION_OP_NAME))
+			{
+				this._initOp = RubisGenerator.BROWSE_CATEGORIES_BY_REGION_OP;
+			}
+			else if (str.equals(SEARCH_ITEMS_BY_REGION_OP_NAME))
+			{
+				this._initOp = RubisGenerator.SEARCH_ITEMS_BY_REGION_OP;
+			}
+			else if (str.equals(VIEW_ITEM_OP_NAME))
+			{
+				this._initOp = RubisGenerator.VIEW_ITEM_OP;
+			}
+			else if (str.equals(VIEW_USER_INFO_OP_NAME))
+			{
+				this._initOp = RubisGenerator.VIEW_USER_INFO_OP;
+			}
+			else if (str.equals(VIEW_BID_HISTORY_OP_NAME))
+			{
+				this._initOp = RubisGenerator.VIEW_BID_HISTORY_OP;
+			}
+			else if (str.equals(BUY_NOW_AUTH_OP_NAME))
+			{
+				this._initOp = RubisGenerator.BUY_NOW_AUTH_OP;
+			}
+			else if (str.equals(BUY_NOW_OP_NAME))
+			{
+				this._initOp = RubisGenerator.BUY_NOW_OP;
+			}
+			else if (str.equals(STORE_BUY_NOW_OP_NAME))
+			{
+				this._initOp = RubisGenerator.STORE_BUY_NOW_OP;
+			}
+			else if (str.equals(PUT_BID_AUTH_OP_NAME))
+			{
+				this._initOp = RubisGenerator.PUT_BID_AUTH_OP;
+			}
+			else if (str.equals(PUT_BID_OP_NAME))
+			{
+				this._initOp = RubisGenerator.PUT_BID_OP;
+			}
+			else if (str.equals(STORE_BID_OP_NAME))
+			{
+				this._initOp = RubisGenerator.STORE_BID_OP;
+			}
+			else if (str.equals(PUT_COMMENT_AUTH_OP_NAME))
+			{
+				this._initOp = RubisGenerator.PUT_COMMENT_AUTH_OP;
+			}
+			else if (str.equals(PUT_COMMENT_OP_NAME))
+			{
+				this._initOp = RubisGenerator.PUT_COMMENT_OP;
+			}
+			else if (str.equals(STORE_COMMENT_OP_NAME))
+			{
+				this._initOp = RubisGenerator.STORE_COMMENT_OP;
+			}
+			else if (str.equals(SELL_OP_NAME))
+			{
+				this._initOp = RubisGenerator.SELL_OP;
+			}
+			else if (str.equals(SELECT_CATEGORY_TO_SELL_ITEM_OP_NAME))
+			{
+				this._initOp = RubisGenerator.SELECT_CATEGORY_TO_SELL_ITEM_OP;
+			}
+			else if (str.equals(SELL_ITEM_FORM_OP_NAME))
+			{
+				this._initOp = RubisGenerator.SELL_ITEM_FORM_OP;
+			}
+			else if (str.equals(REGISTER_ITEM_OP_NAME))
+			{
+				this._initOp = RubisGenerator.REGISTER_ITEM_OP;
+			}
+			else if (str.equals(ABOUT_ME_AUTH_OP_NAME))
+			{
+				this._initOp = RubisGenerator.ABOUT_ME_AUTH_OP;
+			}
+			else if (str.equals(ABOUT_ME_OP_NAME))
+			{
+				this._initOp = RubisGenerator.ABOUT_ME_OP;
+			}
+			else
+			{
+				throw new JSONException("Unknown RUBiS operation: '" + str + "'");
 			}
 		}
 		if (config.has(CFG_MAX_BIDS_PER_ITEM_KEY))
@@ -271,6 +422,16 @@ public final class RubisConfiguration
 	public int getIncarnation()
 	{
 		return this._incarnation;
+	}
+
+	/**
+	 * Get the RUBiS initial operation type.
+	 *
+	 * @return the RUBiS initial operation type.
+	 */
+	public int getInitialOperation()
+	{
+		return this._initOp;
 	}
 
 	/**
