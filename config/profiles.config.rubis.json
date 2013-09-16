@@ -12,10 +12,9 @@
 			"rubis.percentItemsBuyNow": 10,
 			"rubis.maxItemQuantity": 10,
 			"rubis.maxBidsPerItem": 10,
-			"rubis.maxItemDescrLen": 8192,
+			"rubis.maxItemDescrLen": 7168,
 			"rubis.numItemsPerPage": 20,
 			"rubis.maxCommentLen": 2048,
-
 			"rubis.maxWordLen": 12,
 			"rubis.maxItemInitPrice": 5000,
 			"rubis.maxItemReservePrice": 1000,
