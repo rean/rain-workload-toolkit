@@ -425,7 +425,7 @@ public class OlioGenerator extends Generator
 	/**
 	 * Initialize the shared random number generator.
 	 */
-	private static synchronized void initizializeRandomGenerator()
+	private static synchronized void initializeRandomGenerator()
 	{
 		if (_rng == null)
 		{
@@ -450,13 +450,19 @@ public class OlioGenerator extends Generator
 		super(track);
 	}
 
+	@Override
+	public void configure(JSONObject config) throws JSONException
+	{
+		this.initializeConfiguration(config);
+	}
+
 	/**
 	 * Initialize this generator.
 	 */
 	@Override
 	public void initialize()
 	{
-		this.initizializeRandomGenerator();
+		this.initializeRandomGenerator();
 		this._http = new HttpTransport();
 		this._logger = Logger.getLogger(this.getName());
 		this._sessionState = new OlioSessionState();
