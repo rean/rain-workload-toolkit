@@ -113,6 +113,18 @@ public final class OlioConfiguration
 		{
 			this._rngSeed = config.getLong(CFG_RNG_SEED_KEY);
 		}
+		if (config.has(CFG_NUM_PRELOADED_EVENTS_KEY))
+		{
+			this._numPreloadEvents = config.getInt(CFG_NUM_PRELOADED_EVENTS_KEY);
+		}
+		if (config.has(CFG_NUM_PRELOADED_PERSONS_KEY))
+		{
+			this._numPreloadPersons = config.getInt(CFG_NUM_PRELOADED_PERSONS_KEY);
+		}
+		if (config.has(CFG_NUM_PRELOADED_TAGS_KEY))
+		{
+			this._numPreloadTags = config.getInt(CFG_NUM_PRELOADED_TAGS_KEY);
+		}
 
 		//TODO: check parameters values
 		if (this._rngSeed <= 0)
