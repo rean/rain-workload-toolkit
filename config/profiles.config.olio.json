@@ -4,11 +4,11 @@
         "track": "radlab.rain.DefaultScenarioTrack",
         "resourcePath": "resources/",
         "generatorParameters": {
-            "olio.incarnation": "php",
-            "olio.rngSeed": 5489,
-            "olio.numPreloadedEvents": 1867,
-            "olio.numPreloadedPersons": 2501,
-            "olio.numPreloadedTags": 623
+            "olio.incarnation": "rails",
+            "olio.rngSeed": -1,
+            "olio.numPreloadedEvents": 0,
+            "olio.numPreloadedPersons": 0,
+            "olio.numPreloadedTags": 0
         },
 		"behavior": {
 			"default" : [
