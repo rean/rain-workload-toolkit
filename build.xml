@@ -450,6 +450,10 @@
         </jar>
     </target>
 	<target depends="build" name="package-olio">
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}" includes="radlab/rain/workload/olio/**">
+            <src path="src"/>
+            <classpath refid="rain.classpath"/>
+        </javac>
         <mkdir dir="workloads"/>
         <jar destfile="workloads/olio.jar" filesetmanifest="mergewithoutmain">
             <fileset dir="bin" includes="radlab/rain/workload/olio/**"/>
