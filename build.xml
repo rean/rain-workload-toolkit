@@ -35,24 +35,38 @@
     	<pathelement location="thirdparty/zookeeper-3.3.2/lib/jline-0.9.94.jar"/>
     	<pathelement location="thirdparty/zookeeper-3.3.2/lib/log4j-1.2.15.jar"/>
     	<!-- mysql stuff -->
+        <!--
     	<pathelement location="thirdparty/mysql-connector-java-5.1.14/mysql-connector-java-5.1.14-bin.jar"/>
+        -->
     	<!-- Mongo stuff -->
+        <!--
     	<pathelement location="thirdparty/mongo-2.5.3/mongo-2.5.3.jar"/>
+        -->
     	<!-- Riak stuff -->
+        <!--
     	<pathelement location="thirdparty/riak-java-client/target/riak-client-1.0.6-SNAPSHOT-jar-with-dependencies.jar"/>
+        -->
     	<!-- Redis stuff -->
+        <!--
     	<pathelement location="thirdparty/jedis/target/jedis-1.5.3-SNAPSHOT.jar"/>
     	<pathelement location="thirdparty/commons-pool-1.5.6/commons-pool-1.5.6.jar"/>
+        -->
     	<!-- S3 stuff -->
+        <!--
     	<pathelement location="thirdparty/jets3t-0.8.1/jars/jets3t-0.8.1.jar"/>
     	<pathelement location="thirdparty/jets3t-0.8.1/libs/commons-codec/commons-codec-1.3.jar"/>
     	<pathelement location="thirdparty/jets3t-0.8.1/libs/commons-httpclient/commons-httpclient-3.1.jar"/>
     	<pathelement location="thirdparty/jets3t-0.8.1/libs/commons-logging/commons-logging-1.1.1.jar"/>
+        -->
     	<!--  HBase stuff  -->
+        <!--
     	<pathelement location="thirdparty/hbase-0.92.1/hbase-0.92.1.jar"/>
     	<fileset dir="thirdparty/hbase-0.92.1/lib/" includes="*.jar"/>
+        -->
     	<!-- Cassandra stuff -->
+        <!--
     	<fileset dir="thirdparty/hector-core-1.0-1/" includes="*.jar"/>
+        -->
     </path>
 	<path id="rain.classpath.with.mr">
         <pathelement location="bin"/>
@@ -79,30 +93,46 @@
     	<pathelement location="thirdparty/zookeeper-3.3.2/lib/jline-0.9.94.jar"/>
     	<pathelement location="thirdparty/zookeeper-3.3.2/lib/log4j-1.2.15.jar"/>
 		<!-- hadoop stuff -->
+        <!--
 		<pathelement location="thirdparty/hadoop-0.20.2/hadoop-0.20.2-core.jar"/>
 		<pathelement location="thirdparty/hadoop-0.20.2/hadoop-0.20.2-examples.jar"/>
 		<pathelement location="thirdparty/hadoop-0.20.2/hadoop-0.20.2-tools.jar"/>
 		<pathelement location="thirdparty/hadoop-0.20.2/lib/commons-cli-1.2.jar"/>
 		<pathelement location="thirdparty/hadoop-0.20.2/lib/commons-httpclient-3.0.1.jar"/>
+        -->
 		<!-- mysql stuff -->
+        <!--
 		<pathelement location="thirdparty/mysql-connector-java-5.1.14/mysql-connector-java-5.1.14-bin.jar"/>
+        -->
 		<!-- Mongo stuff -->
+        <!--
 		<pathelement location="thirdparty/mongo-2.5.3/mongo-2.5.3.jar"/>
+        -->
 		<!-- Riak stuff -->
+        <!--
 		<pathelement location="thirdparty/riak-java-client/target/riak-client-1.0.6-SNAPSHOT-jar-with-dependencies.jar"/>
+        -->
 		<!-- Redis stuff -->
+        <!--
 		<pathelement location="thirdparty/jedis/target/jedis-1.5.3-SNAPSHOT.jar"/>
 		<pathelement location="thirdparty/commons-pool-1.5.6/commons-pool-1.5.6.jar"/>
+        -->
 		<!-- S3 stuff -->
+        <!--
 		<pathelement location="thirdparty/jets3t-0.8.1/jars/jets3t-0.8.1.jar"/>
 		<pathelement location="thirdparty/jets3t-0.8.1/libs/commons-codec/commons-codec-1.3.jar"/>
 		<pathelement location="thirdparty/jets3t-0.8.1/libs/commons-httpclient/commons-httpclient-3.1.jar"/>
 		<pathelement location="thirdparty/jets3t-0.8.1/libs/commons-logging/commons-logging-1.1.1.jar"/>
+        -->
 		<!--  HBase stuff  -->
+        <!--
     	<pathelement location="thirdparty/hbase-0.92.1/hbase-0.92.1.jar"/>
     	<pathelement location="thirdparty/hbase-0.92.1/lib/*.jar"/>
+        -->
     	<!-- Cassandra stuff -->
+        <!--
     	<fileset dir="thirdparty/hector-core-1.0-1/" includes="*.jar"/>
+        -->
     </path>
     <target name="init">
         <mkdir dir="bin"/>
@@ -121,14 +151,20 @@
     <target name="build-subprojects"/>
     <target depends="init" name="build-project">
         <echo message="${ant.project.name}: ${ant.file}"/>
+<!--
         <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}" excludes="radlab/rain/workload/mapreduce/**">
+-->
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}" excludes="radlab/rain/workload/**">
             <src path="src"/>
             <classpath refid="rain.classpath"/>
         </javac>
     </target>
 	<target depends="init" name="build-with-mr">
         <echo message="${ant.project.name}: ${ant.file}"/>
+<!--
         <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+-->
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}" excludes="radlab/rain/workload/**">
             <src path="src"/>
             <classpath refid="rain.classpath.with.mr"/>
         </javac>
@@ -320,19 +356,29 @@
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/zookeeper-3.3.2/lib/jline-0.9.94.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/zookeeper-3.3.2/lib/log4j-1.2.15.jar"/>
         	<!-- MySQL stuff -->
+            <!--
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/mysql-connector-java-5.1.14/mysql-connector-java-5.1.14-bin.jar"/>
+            -->
         	<!-- Mongo stuff -->
+            <!--
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/mongo-2.5.3/mongo-2.5.3.jar"/>
+            -->
         	<!-- Riak stuff -->
+            <!--
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/riak-java-client/target/riak-client-1.0.6-SNAPSHOT-jar-with-dependencies.jar"/>
+            -->
         	<!-- Redis stuff -->
+            <!--
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jedis/target/jedis-1.5.3-SNAPSHOT.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/commons-pool-1.5.6/commons-pool-1.5.6.jar"/>
+            -->
         	<!-- S3 stuff -->
+            <!--
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/jars/jets3t-0.8.1.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/libs/commons-codec/commons-codec-1.3.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/libs/commons-httpclient/commons-httpclient-3.1.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/libs/commons-logging/commons-logging-1.1.1.jar"/>
+            -->
         </jar>
     </target>
 	<target depends="build-with-mr" name="package-with-mr">
@@ -364,25 +410,37 @@
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/zookeeper-3.3.2/lib/jline-0.9.94.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/zookeeper-3.3.2/lib/log4j-1.2.15.jar"/>
         	<!-- hadoop stuff -->
+            <!--
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/hadoop-0.20.2/hadoop-0.20.2-core.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/hadoop-0.20.2/hadoop-0.20.2-examples.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/hadoop-0.20.2/hadoop-0.20.2-tools.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/hadoop-0.20.2/lib/commons-cli-1.2.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/hadoop-0.20.2/lib/commons-httpclient-3.0.1.jar"/>
+            -->
         	<!-- mysql stuff -->
+            <!--
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/mysql-connector-java-5.1.14/mysql-connector-java-5.1.14-bin.jar"/>
+            -->
         	<!-- Mongo stuff -->
+            <!--
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/mongo-2.5.3/mongo-2.5.3.jar"/>
+            -->
         	<!-- Riak stuff -->
+            <!--
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/riak-java-client/target/riak-client-1.0.6-SNAPSHOT-jar-with-dependencies.jar"/>
+            -->
         	<!-- Redis stuff -->
+            <!--
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jedis/target/jedis-1.5.3-SNAPSHOT.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/commons-pool-1.5.6/commons-pool-1.5.6.jar"/>
+            -->
         	<!-- S3 stuff -->
+            <!--
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/jars/jets3t-0.8.1.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/libs/commons-codec/commons-codec-1.3.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/libs/commons-httpclient/commons-httpclient-3.1.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/libs/commons-logging/commons-logging-1.1.1.jar"/>
+            -->
         </jar>
     </target>
 	<target depends="build-with-mr" name="package-mapreduce">
@@ -395,6 +453,13 @@
         <mkdir dir="workloads"/>
         <jar destfile="workloads/olio.jar" filesetmanifest="mergewithoutmain">
             <fileset dir="bin" includes="radlab/rain/workload/olio/**"/>
+            <!-- Bake the configuration files into the jar -->
+            <fileset dir="config" includes="*olio*.json"/>
+            <fileset dir="resources" includes="event.pdf"/>
+            <fileset dir="resources" includes="event.jpg"/>
+            <fileset dir="resources" includes="event_thumb.jpg"/>
+            <fileset dir="resources" includes="person.jpg"/>
+            <fileset dir="resources" includes="person_thumb.jpg"/>
         </jar>
     </target>
     <target depends="build" name="package-cloudstoneNull">
@@ -470,6 +535,8 @@
             <fileset dir="bin" includes="radlab/rain/workload/mongodb/**"/>
         	<!-- Bake the configuration files into the jar -->
         	<fileset dir="config" includes="*mongo*.json"/>
+            <!-- Bake class dependencies into the jar -->
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/mongo-2.5.3/mongo-2.5.3.jar"/>
         </jar>
     </target>
 	<target depends="build" name="package-riak">
@@ -478,6 +545,8 @@
             <fileset dir="bin" includes="radlab/rain/workload/riak/**"/>
         	<!-- Bake the configuration files into the jar -->
         	<fileset dir="config" includes="*riak*.json"/>
+            <!-- Bake class dependencies into the jar -->
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/riak-java-client/target/riak-client-1.0.6-SNAPSHOT-jar-with-dependencies.jar"/>
         </jar>
     </target>
 	<target depends="build" name="package-redis">
@@ -486,6 +555,9 @@
             <fileset dir="bin" includes="radlab/rain/workload/redis/**"/>
         	<!-- Bake the configuration files into the jar -->
         	<fileset dir="config" includes="*redis*.json"/>
+            <!-- Bake class dependencies into the jar -->
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/jedis/target/jedis-1.5.3-SNAPSHOT.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/commons-pool-1.5.6/commons-pool-1.5.6.jar"/>
         </jar>
     </target>
 	<target depends="build" name="package-s3">
@@ -494,6 +566,11 @@
             <fileset dir="bin" includes="radlab/rain/workload/s3/**"/>
         	<!-- Bake the configuration files into the jar -->
         	<fileset dir="config" includes="*s3*.json"/>
+            <!-- Bake class dependencies into the jar -->
+    	    <zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/jars/jets3t-0.8.1.jar"/>
+    	    <zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/libs/commons-codec/commons-codec-1.3.jar"/>
+    	    <zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/libs/commons-httpclient/commons-httpclient-3.1.jar"/>
+    	    <zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/libs/commons-logging/commons-logging-1.1.1.jar"/>
         </jar>
     </target>
     <target depends="build" name="package-hbase">
@@ -502,6 +579,9 @@
             <fileset dir="bin" includes="radlab/rain/workload/hbase/**"/>
         	<!-- Bake the configuration files into the jar -->
         	<fileset dir="config" includes="*hbase*.json"/>
+            <!-- Bake class dependencies into the jar -->
+    	    <zipfileset excludes="META-INF/*.SF" src="thirdparty/hbase-0.92.1/hbase-0.92.1.jar"/>
+    	    <zipfileset dir="thirdparty/hbase-0.92.1/lib/" includes="*.jar" excludes="META-INF/*.SF"/>
         </jar>
     </target>
     <target depends="build" name="package-cassandra">
@@ -510,6 +590,8 @@
             <fileset dir="bin" includes="radlab/rain/workload/cassandra/**"/>
         	<!-- Bake the configuration files into the jar -->
         	<fileset dir="config" includes="*cassandra*.json"/>
+            <!-- Bake class dependencies into the jar -->
+    	    <zipfileset dir="thirdparty/hector-core-1.0-1/" includes="*.jar" excludes="META-INF/*.SF"/>
         </jar>
     </target>
 	<target depends="build" name="Benchmark-memprof">
