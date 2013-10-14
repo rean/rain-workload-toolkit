@@ -1490,7 +1490,7 @@ public final class OlioUtility
 	 */
 	private int generateTagId(double meanRatio)
 	{
-		double mean = ScaleFactors.tags * meanRatio;
+		double mean = this._cfg.getNumOfPreloadedTags() * meanRatio;
 
 		int selected;
 		int loops = 0;
@@ -1513,11 +1513,11 @@ public final class OlioUtility
 
 			// However, if we exceed the limit, we do not select the last one.
 			// We redo the selection instead.
-		} while (selected >= ScaleFactors.tags && loops++ < 10);
+		} while (selected >= this._cfg.getNumOfPreloadedTags() && loops++ < 10);
 
 		if (loops >= 10)
 		{
-			this._logger.severe("Exceeded loop limit. Selected:" + selected + " TagCount: " + ScaleFactors.tags);
+			this._logger.severe("Exceeded loop limit. Selected:" + selected + " TagCount: " + this._cfg.getNumOfPreloadedTags());
 		}
 
 		// We use the user name mechanism to create the tag names
@@ -1531,7 +1531,7 @@ public final class OlioUtility
 	 */
 	private String generateTagName(int tagId)
 	{
-		return this.generateUserName(this.generateInt(1, ScaleFactors.tags));
+		return this.generateUserName(this.generateInt(1, this._cfg.getNumOfPreloadedTags()));
 		//return this.generateUserName(randomTagId(r, 0.1));
 	}
 }
