@@ -465,6 +465,7 @@ public class OlioGenerator extends Generator
 		this.initializeRandomGenerator();
 		this._http = new HttpTransport();
 		this._logger = Logger.getLogger(this.getName());
+		this._utility = new OlioUtility(this._rng, this._conf);
 		this._sessionState = new OlioSessionState();
 
 		// Setup think and cycle times
