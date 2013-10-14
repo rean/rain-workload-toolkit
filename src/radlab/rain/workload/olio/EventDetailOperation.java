@@ -73,7 +73,7 @@ public class EventDetailOperation extends OlioOperation
 		// Select an event by parsing the home page.
 		response = this.getHttpTransport().fetchUrl(this.getGenerator().getHomePageURL());
 		this.trace(this.getGenerator().getHomePageURL());
-		if (this.getUtility().checkHttpResponse(this.getHttpTransport(), response.toString()))
+		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
 			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getHomePageURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
 			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getHomePageURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
@@ -103,7 +103,7 @@ public class EventDetailOperation extends OlioOperation
 		}
 		response = this.getHttpTransport().fetchUrl(eventUrl);
 		this.trace(eventUrl);
-		if (this.getUtility().checkHttpResponse(this.getHttpTransport(), response.toString()))
+		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
 			this.getLogger().severe("Problems in performing request to URL: " + eventUrl + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
 			throw new IOException("Problems in performing request to URL: " + eventUrl + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
@@ -158,7 +158,7 @@ public class EventDetailOperation extends OlioOperation
 					}
 					this.trace(attendUrl);
 
-					if (this.getUtility().checkHttpResponse(this.getHttpTransport(), response.toString()))
+					if (!this.getGenerator().checkHttpResponse(response.toString()))
 					{
 						this.getLogger().severe("Problems in performing request to URL: " + attendUrl + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
 						throw new IOException("Problems in performing request to URL: " + attendUrl + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");

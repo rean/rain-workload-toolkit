@@ -83,7 +83,7 @@ public class AddPersonOperation extends OlioOperation
 		{
 			response = this.getHttpTransport().fetchUrl(this.getGenerator().getLogoutURL());
 			this.trace(this.getGenerator().getLogoutURL());
-			if (this.getUtility().checkHttpResponse(this.getHttpTransport(), response.toString()))
+			if (!this.getGenerator().checkHttpResponse(response.toString()))
 			{
 				this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getLogoutURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
 				throw new IOException("Problems in performing request to URL: " + this.getGenerator().getLogoutURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
@@ -93,7 +93,7 @@ public class AddPersonOperation extends OlioOperation
 		// Fetch the new user form.
 		response = this.getHttpTransport().fetchUrl(this.getGenerator().getAddPersonURL());
 		this.trace(this.getGenerator().getAddPersonURL());
-		if (this.getUtility().checkHttpResponse(this.getHttpTransport(), response.toString()))
+		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
 			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getAddPersonURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
 			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getAddPersonURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
@@ -118,7 +118,7 @@ public class AddPersonOperation extends OlioOperation
 				// Check that the username is unique.
 				response = this.getHttpTransport().fetchUrl(this.getGenerator().getCheckNameURL(), "name=" + person.userName);
 				this.trace(this.getGenerator().getCheckNameURL());
-				if (this.getUtility().checkHttpResponse(this.getHttpTransport(), response.toString()))
+				if (!this.getGenerator().checkHttpResponse(response.toString()))
 				{
 					this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getCheckNameURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
 					throw new IOException("Problems in performing request to URL: " + this.getGenerator().getCheckNameURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
@@ -153,7 +153,7 @@ public class AddPersonOperation extends OlioOperation
 		// Make the POST request and verify that it succeeds.
 		response = this.getHttpTransport().fetch(reqPost);
 		this.trace(addPersonResultURL);
-		if (this.getUtility().checkHttpResponse(this.getHttpTransport(), response.toString()))
+		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
 			this.getLogger().severe("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
 			throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
@@ -183,7 +183,7 @@ public class AddPersonOperation extends OlioOperation
 //		// Login with the newly created person
 //		response = this.getHttpTransport().fetchUrl(this.getGenerator().getLoginURL());
 //		this.trace(this.getGenerator().getLoginURL());
-//		if (this.getUtility().checkHttpResponse(this.getHttpTransport(), response.toString()))
+//		if (!this.getGenerator().checkHttpResponse(response.toString()))
 //		{
 //			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getLoginURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
 //			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getLoginURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");

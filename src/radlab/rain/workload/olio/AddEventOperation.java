@@ -91,7 +91,7 @@ public class AddEventOperation extends OlioOperation
 		response = this.getHttpTransport().fetchUrl(this.getGenerator().getAddEventURL());
 		this.trace(this.getGenerator().getAddEventURL());
 		// Verify that the request succeeded. 
-		if (this.getUtility().checkHttpResponse(this.getHttpTransport(), response.toString()))
+		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
 			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getAddEventURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
 			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getAddEventURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
@@ -162,7 +162,7 @@ public class AddEventOperation extends OlioOperation
 		//	response = this.getHttpTransport().fetchURL(redirectUrl);
 		//}
 		// Verify that the request succeeded. 
-		if (this.getUtility().checkHttpResponse(this.getHttpTransport(), response.toString()))
+		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
 			this.getLogger().severe("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
 			throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");

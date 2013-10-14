@@ -90,7 +90,7 @@ public class PersonDetailOperation extends OlioOperation
 
 		StringBuilder response = this.getHttpTransport().fetchUrl(personUrl);
 		this.trace(personUrl);
-		if (this.getUtility().checkHttpResponse(this.getHttpTransport(), response.toString()))
+		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
 			this.getLogger().severe("Problems in performing request to URL: " + personUrl + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
 			throw new IOException("Problems in performing request to URL: " + personUrl + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");

@@ -88,7 +88,7 @@ public class LoginOperation extends OlioOperation
 		{
 			response = this.getHttpTransport().fetchUrl(this.getGenerator().getLogoutURL());
 			this.trace(this.getGenerator().getLogoutURL());
-			if (this.getUtility().checkHttpResponse(this.getHttpTransport(), response.toString()))
+			if (!this.getGenerator().checkHttpResponse(response.toString()))
 			{
 				this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getLogoutURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
 				throw new IOException("Problems in performing request to URL: " + this.getGenerator().getLogoutURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
@@ -132,7 +132,7 @@ public class LoginOperation extends OlioOperation
 		response = this.getHttpTransport().fetch(reqPost);
 		this.trace(reqPost.getURI().toString());
 		// Check that the request succeeded
-		if (this.getUtility().checkHttpResponse(this.getHttpTransport(), response.toString()))
+		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
 			this.getLogger().severe("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
 			throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
