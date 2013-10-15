@@ -1,5 +1,5 @@
 {
-	"cloudstone-001": {
+	"olio-001": {
 		"generator": "radlab.rain.workload.olio.OlioGenerator",
         "track": "radlab.rain.DefaultScenarioTrack",
         "resourcePath": "resources/",
