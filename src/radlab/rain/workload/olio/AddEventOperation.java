@@ -169,11 +169,22 @@ public class AddEventOperation extends OlioOperation
 			throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 		// Verify that the operation succeeded. 
-		int index = response.toString().toLowerCase().indexOf("success");
-		if (index == -1)
+		switch (this.getConfiguration().getIncarnation())
 		{
-			this.getLogger().severe("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "): Could not find success message in result body. Server response: " + response);
-			throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "): Could not find success message in result body");
+			case OlioConfiguration.JAVA_INCARNATION:
+				// No check to do
+				break;
+			case OlioConfiguration.PHP_INCARNATION:
+				// No check to do
+				break;
+			case OlioConfiguration.RAILS_INCARNATION:
+				int index = response.toString().toLowerCase().indexOf("event was successfully created.");
+				if (index == -1)
+				{
+					this.getLogger().severe("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "): Could not find success message in result body. Server response: " + response);
+					throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "): Could not find success message in result body");
+				}
+				break;
 		}
 
 		// Save session data
