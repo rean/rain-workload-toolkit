@@ -121,6 +121,7 @@ public class AddEventOperation extends OlioOperation
 		
 		// Generate a new Olio social event
 		OlioSocialEvent event = this.getUtility().newSocialEvent();
+		event.submitterUserName = loggedPerson.userName;
 
 		// Submit the add event form to create the event.
 		HttpPost reqPost = new HttpPost(this.getGenerator().getAddEventResultURL());
