@@ -51,7 +51,7 @@ import radlab.rain.workload.rubbos.model.RubbosCategory;
  */
 public class BrowseStoriesByCategoryOperation extends RubbosOperation 
 {
-	public SearchItemsByCategoryOperation(boolean interactive, IScoreboard scoreboard) 
+	public BrowseStoriesByCategoryOperation(boolean interactive, IScoreboard scoreboard) 
 	{
 		super(interactive, scoreboard);
 
