@@ -44,9 +44,6 @@ import radlab.rain.IScoreboard;
 /**
  * Older-Stories operation.
  *
- * Emulates the following requests:
- * 1. Emulate a click on a category
- *
  * @author <a href="mailto:marco.guazzone@gmail.com">Marco Guazzone</a>
  */
 public class OlderStoriesOperation extends RubbosOperation 
@@ -64,18 +61,8 @@ public class OlderStoriesOperation extends RubbosOperation
 	{
 		StringBuilder response = null;
 
-		// Extract a random category from last response
-		RubbosCategory category = this.getUtility().findCategoryInHtml(this.getSessionState().getLastResponse());
-		if (!this.getUtility().isValidCategory(category))
-		{
-			this.getLogger().warning("No valid category has been found. Operation interrupted.");
-			this.setFailed(true);
-			return;
-		}
-
 		int[] date = this.generateDate();
 
-		// Emulate a click on a category
 		URIBuilder uri = new URIBuilder(this.getGenerator().getOlderStoriesURL());
 		uri.setParameter("day", Integer.toString(date[0]));
 		uri.setParameter("month", Integer.toString(date[1]));
