@@ -38,7 +38,6 @@ import java.io.IOException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import radlab.rain.IScoreboard;
-import radlab.rain.workload.rubbos.model.RubbosCategory;
 
 
 /**
