@@ -42,21 +42,21 @@ import radlab.rain.workload.rubbos.model.RubbosCategory;
 
 
 /**
- * Browse-Stories-By-Category operation.
+ * View-Story operation.
  *
  * Emulates the following requests:
  * 1. Emulate a click on a category
  *
  * @author <a href="mailto:marco.guazzone@gmail.com">Marco Guazzone</a>
  */
-public class BrowseStoriesByCategoryOperation extends RubbosOperation 
+public class ViewStoryOperation extends RubbosOperation 
 {
-	public BrowseStoriesByCategoryOperation(boolean interactive, IScoreboard scoreboard) 
+	public ViewStoryOperation(boolean interactive, IScoreboard scoreboard) 
 	{
 		super(interactive, scoreboard);
 
-		this._operationName = "Browse-Stories-By-Category";
-		this._operationIndex = RubbosGenerator.BROWSE_STORIES_BY_CATEGORY_OP;
+		this._operationName = "View-Story";
+		this._operationIndex = RubbosGenerator.VIEW_STORY_OP;
 	}
 
 	@Override
@@ -64,25 +64,22 @@ public class BrowseStoriesByCategoryOperation extends RubbosOperation
 	{
 		StringBuilder response = null;
 
-		// Extract a random category from last response
-		RubbosCategory category = this.getUtility().findCategoryInHtml(this.getSessionState().getLastResponse());
-		if (!this.getUtility().isValidCategory(category))
+		// Extract a random story from last response
+		int storyId = this.getUtility().findStoryIdInHtml(this.getSessionState().getLastResponse());
+		if (!this.getUtility().isValidStory(storyId))
 		{
-			category = this.getSessionState().getCategory();
-			if (!this.getUtility().isValidCategory(category))
+			storyId = this.getSessionState().getStoryId();
+			if (!this.getUtility().isValidStory(storyId))
 			{
-				this.getLogger().warning("No valid category has been found. Operation interrupted.");
+				this.getLogger().warning("No valid story has been found. Operation interrupted.");
 				this.setFailed(true);
 				return;
 			}
 		}
 
 		// Emulate a click on a category
-		URIBuilder uri = new URIBuilder(this.getGenerator().getBrowseStoriesByCategoryURL());
-		uri.setParameter("category", Integer.toString(category.id));
-		uri.setParameter("categoryName", category.name);
-		uri.setParameter("page", Integer.toString(this.getUtility().findPageInHtml(this.getSessionState().getLastResponse())));
-		uri.setParameter("nbOfStories", Integer.toString(this.getConfiguration().getNumOfStoriesPerPage()));
+		URIBuilder uri = new URIBuilder(this.getGenerator().getViewStoryURL());
+		uri.setParameter("storyId", Integer.toString(storyId));
 		HttpGet reqGet = new HttpGet(uri.build());
 		response = this.getHttpTransport().fetch(reqGet);
 		this.trace(reqGet.getURI().toString());
@@ -94,7 +91,7 @@ public class BrowseStoriesByCategoryOperation extends RubbosOperation
 
 		// Save session data
 		this.getSessionState().setLastResponse(response.toString());
-		this.getSessionState().setCategory(category);
+		this.getSessionState().setStoryId(storyId);
 
 		this.setFailed(!this.getUtility().checkRubbosResponse(response.toString()));
 	}
