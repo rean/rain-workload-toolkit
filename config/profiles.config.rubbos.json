@@ -1,0 +1,77 @@
+{
+	"rubbos-001": {
+		"generator": "radlab.rain.workload.rubbos.RubbosGenerator",
+        "generatorParameters": {
+            "rubbos.dictionaryFile": "resources/rubbos-dictionary.txt",
+            "rubbos.incarnation": "php",
+            "rubbos.maxCommentLen": 1024,
+            "rubbos.numStoriesPerPage": 20,
+            "rubbos.oldestStoryMonth": 1,
+            "rubbos.oldestStoryYear": 1998,
+            "rubbos.rngSeed": 5489,
+            "rubbos.serverHtmlPath": "/",
+            "rubbos.serverScriptPath": "/",
+#            "rubbos.maxWordLen": 12,
+#            "rubbos.maxItemReservePrice": 1000,
+#            "rubbos.maxItemBuyNow": 1000,
+#            "rubbos.maxItemDuration": 7,
+#            "rubbos.nextAvailUserId": 1,
+#            "rubbos.nextAvailItemId": 1
+        },
+        "track": "radlab.rain.DefaultScenarioTrack",
+        "metricSnapshots": true,
+        "resourcePath": "resources/",
+		"behavior": {
+			"default" : [
+				[0.1, 0.3, 0.0, 0.3, 0.2, 0.1],
+				[0.1, 0.3, 0.0, 0.3, 0.2, 0.1],
+				[0.1, 0.3, 0.0, 0.3, 0.2, 0.1],
+				[0.1, 0.3, 0.0, 0.3, 0.2, 0.1],
+				[0.1, 0.3, 0.0, 0.3, 0.2, 0.1],
+				[0.1, 0.3, 0.0, 0.3, 0.2, 0.1]
+			],
+			"sell" : [
+				[0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
+				[0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
+				[0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
+				[0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
+				[0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
+				[0.0, 0.0, 0.0, 0.0, 1.0, 0.0]
+			],
+			"bid" : [
+				[0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
+				[0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
+				[0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
+				[0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
+				[0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
+				[0.0, 0.0, 0.0, 0.0, 0.0, 1.0]
+			]			
+		},
+		"loadProfile": [
+		{
+			"interval": 20,
+			"users": 100,
+			"mix": "bid"
+		},
+		{
+			"interval": 15,
+			"users": 100,
+			"mix": "bid"
+		},
+		{
+			"interval": 25,
+			"users": 100,
+			"mix": "bid"
+		}
+		],
+		"target": {
+		  "hostname": "10.0.0.141",
+		  "port": 80
+		},
+		"pLogSampling": 0.0,
+		"pOpenLoop": 0.0,
+		"meanCycleTime": 1,
+		"meanThinkTime": 5,
+		"interactive": true
+	}
+}

@@ -1,0 +1,8 @@
+{
+    "profiles": "config/profiles.config.rubbos.json",
+    "timing": {
+        "rampUp": 30,
+        "duration": 180,
+        "rampDown": 30
+    }
+}
