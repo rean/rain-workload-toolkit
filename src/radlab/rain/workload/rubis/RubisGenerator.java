@@ -970,28 +970,28 @@ public class RubisGenerator extends Generator
 	{
 		String scriptPath = this.getConfiguration().getServerScriptPath();
 
-		this._registerUserURL = this._baseURL + scriptPath + "/RegisterUser";
-		this._browseCategoriesURL = this._baseURL + scriptPath + "/BrowseCategories";
-		this._searchItemsByCategoryURL = this._baseURL + scriptPath + "/SearchItemsByCategory";
-		this._browseRegionsURL = this._baseURL + scriptPath + "/BrowseRegions";
+		this._registerUserURL = this._baseURL + scriptPath + "/RegisterUser.php";
+		this._browseCategoriesURL = this._baseURL + scriptPath + "/BrowseCategories.php";
+		this._searchItemsByCategoryURL = this._baseURL + scriptPath + "/SearchItemsByCategory.php";
+		this._browseRegionsURL = this._baseURL + scriptPath + "/BrowseRegions.php";
 		this._browseCategoriesByRegionURL = this._browseCategoriesURL;
-		this._searchItemsByRegionURL = this._baseURL + scriptPath + "/SearchItemsByRegion";
-		this._viewItemURL = this._baseURL + scriptPath + "/ViewItem";
-		this._viewUserInfoURL = this._baseURL + scriptPath + "/ViewUserInfo";
-		this._viewBidHistoryURL = this._baseURL + scriptPath + "/ViewBidHistory";
-		this._buyNowAuthURL = this._baseURL + scriptPath + "/BuyNowAuth";
-		this._buyNowURL = this._baseURL + scriptPath + "/BuyNow";
-		this._storeBuyNowURL = this._baseURL + scriptPath + "/StoreBuyNow";
-		this._putBidAuthURL = this._baseURL + scriptPath + "/PutBidAuth";
-		this._putBidURL = this._baseURL + scriptPath + "/PutBid";
-		this._storeBidURL = this._baseURL + scriptPath + "/StoreBid";
-		this._putCommentAuthURL = this._baseURL + scriptPath + "/PutCommentAuth";
-		this._putCommentURL = this._baseURL + scriptPath + "/PutComment";	
-		this._storeCommentURL = this._baseURL + scriptPath + "/StoreComment";
-		this._selectCategoryToSellItemURL = this._baseURL + scriptPath + "/BrowseCategories";
-		this._sellItemFormURL = this._baseURL + scriptPath + "/SellItemForm";
-		this._registerItemURL = this._baseURL + scriptPath + "/RegisterItem";
-		this._aboutMeURL = this._baseURL + scriptPath + "/AboutMe";
+		this._searchItemsByRegionURL = this._baseURL + scriptPath + "/SearchItemsByRegion.php";
+		this._viewItemURL = this._baseURL + scriptPath + "/ViewItem.php";
+		this._viewUserInfoURL = this._baseURL + scriptPath + "/ViewUserInfo.php";
+		this._viewBidHistoryURL = this._baseURL + scriptPath + "/ViewBidHistory.php";
+		this._buyNowAuthURL = this._baseURL + scriptPath + "/BuyNowAuth.php";
+		this._buyNowURL = this._baseURL + scriptPath + "/BuyNow.php";
+		this._storeBuyNowURL = this._baseURL + scriptPath + "/StoreBuyNow.php";
+		this._putBidAuthURL = this._baseURL + scriptPath + "/PutBidAuth.php";
+		this._putBidURL = this._baseURL + scriptPath + "/PutBid.php";
+		this._storeBidURL = this._baseURL + scriptPath + "/StoreBid.php";
+		this._putCommentAuthURL = this._baseURL + scriptPath + "/PutCommentAuth.php";
+		this._putCommentURL = this._baseURL + scriptPath + "/PutComment.php";	
+		this._storeCommentURL = this._baseURL + scriptPath + "/StoreComment.php";
+		this._selectCategoryToSellItemURL = this._baseURL + scriptPath + "/BrowseCategories.php";
+		this._sellItemFormURL = this._baseURL + scriptPath + "/SellItemForm.php";
+		this._registerItemURL = this._baseURL + scriptPath + "/RegisterItem.php";
+		this._aboutMeURL = this._baseURL + scriptPath + "/AboutMe.php";
 	}
 
 	/**
