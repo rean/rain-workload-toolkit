@@ -101,7 +101,7 @@
 		],
 		"target": {
 		  "hostname": "localhost",
-		  "port": 8080
+		  "port": 80
 		},
 		"pLogSampling": 0.0,
 		"pOpenLoop": 0.0,
