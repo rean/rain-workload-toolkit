@@ -49,11 +49,11 @@ import radlab.rain.Operation;
 import radlab.rain.ScenarioTrack;
 import radlab.rain.util.HttpTransport;
 import radlab.rain.util.NegativeExponential;
-import radlab.rain.workload.rubis.model.RubbosCategory;
-import radlab.rain.workload.rubis.model.RubbosComment;
-import radlab.rain.workload.rubis.model.RubbosItem;
-import radlab.rain.workload.rubis.model.RubbosRegion;
-import radlab.rain.workload.rubis.model.RubbosUser;
+import radlab.rain.workload.rubbos.model.RubbosCategory;
+import radlab.rain.workload.rubbos.model.RubbosComment;
+import radlab.rain.workload.rubbos.model.RubbosItem;
+import radlab.rain.workload.rubbos.model.RubbosRegion;
+import radlab.rain.workload.rubbos.model.RubbosUser;
 
 
 /**
@@ -70,7 +70,7 @@ public class RubbosGenerator extends Generator
 	public static final int REGISTER_USER_OP = 2;
 	public static final int BROWSE_OP = 3;
 	public static final int BROWSE_CATEGORIES_OP = 4;
-	public static final int BROWSE_STORIES_IN_CATEGORY_OP = 5;
+	public static final int BROWSE_STORIES_BY_CATEGORY_OP = 5;
 	public static final int OLDER_STORIES_OP = 6;
 	public static final int VIEW_STORY_OP = 7;
 	public static final int POST_COMMENT_OP = 8;
@@ -111,7 +111,7 @@ public class RubbosGenerator extends Generator
 	private String _registerUserURL;
 	private String _browseURL;
 	private String _browseCategoriesURL; 
-	private String _browseStoriesInCategoryURL;
+	private String _browseStoriesByCategoryURL;
 	private String _olderStoriesURL;
 	private String _viewStoryURL;
 	private String _postCommentURL;
@@ -415,9 +415,9 @@ public class RubbosGenerator extends Generator
 		return this._browseCategoriesURL; 
 	}
 
-	public String getBrowseStoriesInCategoryURL()
+	public String getBrowseStoriesByCategoryURL()
 	{
-		return this._browseStoriesInCategoryURL;
+		return this._browseStoriesByCategoryURL;
 	}
 
 	public String getOlderStoriesURL()
@@ -573,11 +573,11 @@ public class RubbosGenerator extends Generator
 	/**
 	 * Factory method.
 	 * 
-	 * @return  A prepared BrowseStoriesInCategoryOperation.
+	 * @return  A prepared BrowseStoriesByCategoryOperation.
 	 */
-	public BrowseStoriesInCategoryOperation createBrowseStoriesInCategoryOperation()
+	public BrowseStoriesByCategoryOperation createBrowseStoriesByCategoryOperation()
 	{
-		BrowseStoriesInCategoryOperation op = new BrowseStoriesInCategoryOperation(this.getTrack().getInteractive(), this.getScoreboard());
+		BrowseStoriesByCategoryOperation op = new BrowseStoriesByCategoryOperation(this.getTrack().getInteractive(), this.getScoreboard());
 		op.prepare(this);
 		return op;
 	}
@@ -818,8 +818,8 @@ public class RubbosGenerator extends Generator
 				return this.createBrowseOperation();
 			case BROWSE_CATEGORIES_OP:
 				return this.createBrowseCategoriesOperation();
-			case BROWSE_STORIES_IN_CATEGORY_OP:
-				return this.createBrowseStoriesInCategoryOperation();
+			case BROWSE_STORIES_BY_CATEGORY_OP:
+				return this.createBrowseStoriesByCategoryOperation();
 			case OLDER_STORIES_OP:
 				return this.createOlderStoriesOperation();
 			case VIEW_STORY_OP:
@@ -867,9 +867,15 @@ public class RubbosGenerator extends Generator
 	 */
 	private void initializeUrls()
 	{
+		this.initializeCommonUrls();
+
 		int incarnation = this.getConfiguration().getIncarnation();
 
 		if (incarnation == RubbosConfiguration.PHP_INCARNATION)
+		{
+			this.initializePhpUrls();
+		}
+		else if (incarnation == RubbosConfiguration.SERVLET_INCARNATION)
 		{
 			this.initializeServletUrls();
 		}
@@ -881,37 +887,75 @@ public class RubbosGenerator extends Generator
 	}
 
 	/**
+	 * Initialize the roots/anchors of the URLs that are common to all incarnations.
+	 */
+	private void initializeCommonUrls()
+	{
+		final String htmlPath = this.getConfiguration().getServerHtmlPath();
+
+		this._baseURL = "http://" + this.getTrack().getTargetHostName() + ":" + this.getTrack().getTargetHostPort();
+		this._registerURL = this._baseURL + htmlPath + "/register.html";
+		this._browseURL = this._baseURL + htmlPath + "/browse.html";
+		this._authorLoginURL = this._baseURL + htmlPath + "/author.html";
+	}
+
+	/**
+	 * Initialize the roots/anchors of the URLs for the PHP incarnation.
+	 */
+	private void initializePhpUrls()
+	{
+		final String scriptPath = this.getConfiguration().getServerScriptPath();
+
+		this._storyOfTheDayURL = this._baseURL + scriptPath + "/StoriesOfTheDay.php";
+		this._registerUserURL = this._baseURL + scriptPath + "/RegisterUser.php";
+		this._browseCategoriesURL = this._baseURL + scriptPath + "/BrowseCategories.php";
+		this._browseStoriesByCategoryURL = this._baseURL + scriptPath + "/BrowseStoriesByCategory.php";
+		this._olderStoriesURL = this._baseURL + scriptPath + "/OlderStories.php";
+		this._viewStoryURL = this._baseURL + scriptPath + "/ViewStory.php";
+		this._postCommentURL = this._baseURL + scriptPath + "/PostComment.php";
+		this._storeCommentURL = this._baseURL + scriptPath + "/StoreComment.php";
+		this._viewCommentURL = this._baseURL + scriptPath + "/ViewComment.php";
+		this._moderateCommentURL = this._baseURL + scriptPath + "/ModerateComment.php";
+		this._storeModerateLogURL = this._baseURL + scriptPath + "/StoreModeratorLog.php";
+		this._submitStoryURL = this._baseURL + scriptPath + "/SubmitStory.php";
+		this._storeStoryURL = this._baseURL + scriptPath + "/StoryStore.php";
+		this._searchURL = this._baseURL + scriptPath + "/Search.php";
+		this._searchInStoriesURL = this._searchURL + "?type=0&";
+		this._searchInCommentsURL = searchURL + "?type=1&";
+		this._searchInUsersURL = searchURL + "?type=2&";
+		this._authorTaskURL = this._baseURL + scriptPath + "/Author.php";
+		this._reviewStoriesURL = this._baseURL + scriptPath + "/ReviewStories.php";
+		this._acceptStoryURL = this._baseURL + scriptPath + "/AcceptStory.php";
+		this._rejectStoryURL = this._baseURL + scriptPath + "/RejectStory.php";
+	}
+
+	/**
 	 * Initialize the roots/anchors of the URLs for the servlet incarnation.
 	 */
 	private void initializeServletUrls()
 	{
-		this._baseURL = "http://" + this.getTrack().getTargetHostName() + ":" + this.getTrack().getTargetHostPort();
-		this._homeURL = this._baseURL + "/rubis_servlets/";
-		this._registerURL = this._baseURL + "/rubis_servlets/register.html";
-		this._registerUserURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.RegisterUser";
-		this._browseURL = this._baseURL + "/rubis_servlets/browse.html";
-		this._browseCategoriesURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.BrowseCategories";
-		this._searchItemsByCategoryURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.SearchItemsByCategory";
-		this._browseRegionsURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.BrowseRegions";
-		this._browseCategoriesByRegionURL = this._browseCategoriesURL;
-		this._searchItemsByRegionURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.SearchItemsByRegion";
-		this._viewItemURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.ViewItem";
-		this._viewUserInfoURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.ViewUserInfo";
-		this._viewBidHistoryURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.ViewBidHistory";
-		this._buyNowAuthURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.BuyNowAuth";
-		this._buyNowURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.BuyNow";
-		this._storeBuyNowURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.StoreBuyNow";
-		this._putBidAuthURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.PutBidAuth";
-		this._putBidURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.PutBid";
-		this._storeBidURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.StoreBid";
-		this._putCommentAuthURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.PutCommentAuth";
-		this._putCommentURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.PutComment";	
-		this._storeCommentURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.StoreComment";
-		this._sellURL = this._baseURL + "/rubis_servlets/sell.html";
-		this._selectCategoryToSellItemURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.BrowseCategories";
-		this._sellItemFormURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.SellItemForm";
-		this._registerItemURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.RegisterItem";
-		this._aboutMeAuthURL = this._baseURL + "/rubis_servlets/about_me.html";
-		this._aboutMeURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.AboutMe";
+		final String scriptPath = this.getConfiguration().getServerScriptPath();
+
+		this._storyOfTheDayURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.StoriesOfTheDay";
+		this._registerUserURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.RegisterUser";
+		this._browseCategoriesURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.BrowseCategories";
+		this._browseStoriesByCategoryURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.BrowseStoriesByCategory";
+		this._olderStoriesURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.OlderStories";
+		this._viewStoryURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.ViewStory";
+		this._postCommentURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.PostComment";
+		this._storeCommentURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.StoreComment";
+		this._viewCommentURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.ViewComment";
+		this._moderateCommentURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.ModerateComment";
+		this._storeModerateLogURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.StoreModeratorLog";
+		this._submitStoryURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.SubmitStory";
+		this._storeStoryURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.StoryStore";
+		this._searchURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.Search";
+		this._searchInStoriesURL = this._searchURL + "?type=0&";
+		this._searchInCommentsURL = searchURL + "?type=1&";
+		this._searchInUsersURL = searchURL + "?type=2&";
+		this._authorTaskURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.Author";
+		this._reviewStoriesURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.ReviewStories";
+		this._acceptStoryURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.AcceptStory";
+		this._rejectStoryURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.RejectStory";
 	}
 }
