@@ -390,11 +390,11 @@ public final class RubisConfiguration
 		}
 		if (config.has(CFG_SERVER_HTML_PATH_KEY))
 		{
-			this._regionsFile = config.getString(CFG_SERVER_HTML_PATH_KEY);
+			this._serverHtmlPath = config.getString(CFG_SERVER_HTML_PATH_KEY);
 		}
 		if (config.has(CFG_SERVER_SCRIPT_PATH_KEY))
 		{
-			this._regionsFile = config.getString(CFG_SERVER_SCRIPT_PATH_KEY);
+			this._serverScriptPath = config.getString(CFG_SERVER_SCRIPT_PATH_KEY);
 		}
 
 		try
