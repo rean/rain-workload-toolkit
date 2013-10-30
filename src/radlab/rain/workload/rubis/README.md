@@ -146,6 +146,7 @@ Currently, the supported configuration properties are the following:
   Default value is: */*.
 - **rubis.serverScriptPath**: the URL path pointing to the base location where script files on the RUBiS server.
   Default value is: */*.
+
 The order of the operations in the traffic mix matrix is the same of the one specified in the previous section (i.e., 0 is the *Home Page* operation, 1 is the *Register* operation, and so on).
 
 ### Assumptions
