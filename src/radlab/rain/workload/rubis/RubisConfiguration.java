@@ -52,7 +52,9 @@ public final class RubisConfiguration
 {
 	// RUBiS incarnations
 	public static final int SERVLET_INCARNATION = 0;
+	public static final int PHP_INCARNATION = 1;
 	// RUBiS incarnation names
+	private static final String PHP_INCARNATION_NAME = "php";
 	private static final String SERVLET_INCARNATION_NAME = "servlet";
 
 	// RUBiS operation names
@@ -106,6 +108,8 @@ public final class RubisConfiguration
 	private static final String CFG_PERCENT_ITEMS_BUY_NOW_KEY = "rubis.percentItemsBuyNow";
 	private static final String CFG_REGIONS_FILE_KEY = "rubis.regionsFile";
 	private static final String CFG_RNG_SEED_KEY = "rubis.rngSeed";
+	private static final String CFG_SERVER_HTML_PATH_KEY = "rubis.serverHtmlPath";
+	private static final String CFG_SERVER_SCRIPT_PATH_KEY = "rubis.serverScriptPath";
 
 	// Default values
 	private static final String DEFAULT_CATEGORIES_FILE = "resources/rubis-ebay_full_categories.txt";
@@ -129,6 +133,8 @@ public final class RubisConfiguration
 	private static final float DEFAULT_PERCENTAGE_ITEMS_BUY_NOW = 10;
 	private static final String DEFAULT_REGIONS_FILE = "resources/rubis-ebay_regions.txt";
 	private static final long DEFAULT_RNG_SEED = -1;
+	private static final String DEFAULT_SERVER_HTML_PATH = "/";
+	private static final String DEFAULT_SERVER_SCRIPT_PATH = "/";
 
 
 	// Members to hold configuration values
@@ -156,6 +162,8 @@ public final class RubisConfiguration
 	private List<String> _regions = null; /*Arrays.asList(DEFAULT_REGIONS)*/; ///< A collection of categories
 	private String _regionsFile = DEFAULT_REGIONS_FILE; ///< File name of the RUBiS regions file
     private long _rngSeed = DEFAULT_RNG_SEED; ///< The seed used for the Random Number Generator; a value <= 0 means that no special seed is used.
+    private String _serverHtmlPath = DEFAULT_SERVER_HTML_PATH; ///< The URL path pointing to the location where HTML files reside
+    private String _serverScriptPath = DEFAULT_SERVER_HTML_PATH; ///< The URL path pointing to the location where script files reside
 	private int _totActiveItems = 0/*DEFAULT_TOTAL_ACTIVE_ITEMS*/; ///< The total number of items to generate
 
 
@@ -178,7 +186,11 @@ public final class RubisConfiguration
 		{
 			String str = config.getString(CFG_INCARNATION_KEY).toLowerCase();
 
-			if (str.equals(SERVLET_INCARNATION_NAME))
+			if (str.equals(PHP_INCARNATION_NAME))
+			{
+				this._incarnation = PHP_INCARNATION;
+			}
+			else if (str.equals(SERVLET_INCARNATION_NAME))
 			{
 				this._incarnation = SERVLET_INCARNATION;
 			}
@@ -375,6 +387,14 @@ public final class RubisConfiguration
 		if (config.has(CFG_RNG_SEED_KEY))
 		{
 			this._rngSeed = config.getLong(CFG_RNG_SEED_KEY);
+		}
+		if (config.has(CFG_SERVER_HTML_PATH_KEY))
+		{
+			this._regionsFile = config.getString(CFG_SERVER_HTML_PATH_KEY);
+		}
+		if (config.has(CFG_SERVER_SCRIPT_PATH_KEY))
+		{
+			this._regionsFile = config.getString(CFG_SERVER_SCRIPT_PATH_KEY);
 		}
 
 		try
@@ -658,6 +678,26 @@ public final class RubisConfiguration
 	}
 
 	/**
+	 * Get the URL path to the location where HTML files reside
+	 *
+	 * @return the path to HTML files
+	 */
+	public String getServerHtmlPath()
+	{
+		return this._serverHtmlPath;
+	}
+
+	/**
+	 * Get the URL path to the location where script files reside
+	 *
+	 * @return the path to script files
+	 */
+	public String getServerScriptPath()
+	{
+		return this._serverScriptPath;
+	}
+
+	/**
 	 * Get the total number of items computed from information found in the
 	 * categories file given in the categories_file field
 	 * 
@@ -692,6 +732,8 @@ public final class RubisConfiguration
 		sb.append(", Regions: " + this.getRegions());
 		sb.append(", Regions File Name: " + this.getRegionsFileName());
 		sb.append(", Random Number Generator Seed: " + this.getRngSeed());
+		sb.append(", Server HTML Path: " + this.getServerHtmlPath());
+		sb.append(", Server Script Path: " + this.getServerScriptPath());
 		sb.append(", Total Active Items: " + this.getTotalActiveItems());
 
 		return sb.toString();

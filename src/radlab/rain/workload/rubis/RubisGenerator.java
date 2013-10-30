@@ -930,17 +930,68 @@ public class RubisGenerator extends Generator
 	 */
 	private void initializeUrls()
 	{
-		int incarnation = this.getConfiguration().getIncarnation();
+		this.initializeCommonUrls();
 
-		if (incarnation == RubisConfiguration.SERVLET_INCARNATION)
+		int incarnation = this.getConfiguration().getIncarnation();
+		switch (incarnation)
 		{
-			this.initializeServletUrls();
+			case RubisConfiguration.PHP_INCARNATION:
+				this.initializePhpUrls();
+				break;
+			case RubisConfiguration.SERVLET_INCARNATION:
+				this.initializeServletUrls();
+				break;
+			default:
+				this.getLogger().warning("RUBiS incarnation '" + incarnation + "' has not been implemented yet. Default to 'servlet'");
+				this.initializeServletUrls();
+				break;
 		}
-		else
-		{
-			this.getLogger().warning("RUBiS incarnation '" + incarnation + "' has not been implemented yet. Default to 'servlet'");
-			this.initializeServletUrls();
-		}
+	}
+
+	/**
+	 * Initialize the roots/anchors of the URLs for the PHP incarnation.
+	 */
+	private void initializeCommonUrls()
+	{
+		String htmlPath = this.getConfiguration().getServerHtmlPath();
+
+		this._baseURL = "http://" + this.getTrack().getTargetHostName() + ":" + this.getTrack().getTargetHostPort();
+		this._homeURL = this._baseURL + htmlPath + "/";
+		this._registerURL = this._baseURL + htmlPath + "/register.html";
+		this._browseURL = this._baseURL + htmlPath + "/browse.html";
+		this._sellURL = this._baseURL + htmlPath + "/sell.html";
+		this._aboutMeAuthURL = this._baseURL + htmlPath + "/about_me.html";
+	}
+
+	/**
+	 * Initialize the roots/anchors of the URLs for the PHP incarnation.
+	 */
+	private void initializePhpUrls()
+	{
+		String scriptPath = this.getConfiguration().getServerScriptPath();
+
+		this._registerUserURL = this._baseURL + scriptPath + "/RegisterUser";
+		this._browseCategoriesURL = this._baseURL + scriptPath + "/BrowseCategories";
+		this._searchItemsByCategoryURL = this._baseURL + scriptPath + "/SearchItemsByCategory";
+		this._browseRegionsURL = this._baseURL + scriptPath + "/BrowseRegions";
+		this._browseCategoriesByRegionURL = this._browseCategoriesURL;
+		this._searchItemsByRegionURL = this._baseURL + scriptPath + "/SearchItemsByRegion";
+		this._viewItemURL = this._baseURL + scriptPath + "/ViewItem";
+		this._viewUserInfoURL = this._baseURL + scriptPath + "/ViewUserInfo";
+		this._viewBidHistoryURL = this._baseURL + scriptPath + "/ViewBidHistory";
+		this._buyNowAuthURL = this._baseURL + scriptPath + "/BuyNowAuth";
+		this._buyNowURL = this._baseURL + scriptPath + "/BuyNow";
+		this._storeBuyNowURL = this._baseURL + scriptPath + "/StoreBuyNow";
+		this._putBidAuthURL = this._baseURL + scriptPath + "/PutBidAuth";
+		this._putBidURL = this._baseURL + scriptPath + "/PutBid";
+		this._storeBidURL = this._baseURL + scriptPath + "/StoreBid";
+		this._putCommentAuthURL = this._baseURL + scriptPath + "/PutCommentAuth";
+		this._putCommentURL = this._baseURL + scriptPath + "/PutComment";	
+		this._storeCommentURL = this._baseURL + scriptPath + "/StoreComment";
+		this._selectCategoryToSellItemURL = this._baseURL + scriptPath + "/BrowseCategories";
+		this._sellItemFormURL = this._baseURL + scriptPath + "/SellItemForm";
+		this._registerItemURL = this._baseURL + scriptPath + "/RegisterItem";
+		this._aboutMeURL = this._baseURL + scriptPath + "/AboutMe";
 	}
 
 	/**
@@ -948,33 +999,29 @@ public class RubisGenerator extends Generator
 	 */
 	private void initializeServletUrls()
 	{
-		this._baseURL = "http://" + this.getTrack().getTargetHostName() + ":" + this.getTrack().getTargetHostPort();
-		this._homeURL = this._baseURL + "/rubis_servlets/";
-		this._registerURL = this._baseURL + "/rubis_servlets/register.html";
-		this._registerUserURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.RegisterUser";
-		this._browseURL = this._baseURL + "/rubis_servlets/browse.html";
-		this._browseCategoriesURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.BrowseCategories";
-		this._searchItemsByCategoryURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.SearchItemsByCategory";
-		this._browseRegionsURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.BrowseRegions";
+		String scriptPath = this.getConfiguration().getServerScriptPath();
+
+		this._registerUserURL = this._baseURL + scriptPath + "/edu.rice.rubis.servlets.RegisterUser";
+		this._browseCategoriesURL = this._baseURL + scriptPath + "/edu.rice.rubis.servlets.BrowseCategories";
+		this._searchItemsByCategoryURL = this._baseURL + scriptPath + "/edu.rice.rubis.servlets.SearchItemsByCategory";
+		this._browseRegionsURL = this._baseURL + scriptPath + "/edu.rice.rubis.servlets.BrowseRegions";
 		this._browseCategoriesByRegionURL = this._browseCategoriesURL;
-		this._searchItemsByRegionURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.SearchItemsByRegion";
-		this._viewItemURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.ViewItem";
-		this._viewUserInfoURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.ViewUserInfo";
-		this._viewBidHistoryURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.ViewBidHistory";
-		this._buyNowAuthURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.BuyNowAuth";
-		this._buyNowURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.BuyNow";
-		this._storeBuyNowURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.StoreBuyNow";
-		this._putBidAuthURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.PutBidAuth";
-		this._putBidURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.PutBid";
-		this._storeBidURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.StoreBid";
-		this._putCommentAuthURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.PutCommentAuth";
-		this._putCommentURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.PutComment";	
-		this._storeCommentURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.StoreComment";
-		this._sellURL = this._baseURL + "/rubis_servlets/sell.html";
-		this._selectCategoryToSellItemURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.BrowseCategories";
-		this._sellItemFormURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.SellItemForm";
-		this._registerItemURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.RegisterItem";
-		this._aboutMeAuthURL = this._baseURL + "/rubis_servlets/about_me.html";
-		this._aboutMeURL = this._baseURL + "/rubis_servlets/servlet/edu.rice.rubis.servlets.AboutMe";
+		this._searchItemsByRegionURL = this._baseURL + scriptPath + "/edu.rice.rubis.servlets.SearchItemsByRegion";
+		this._viewItemURL = this._baseURL + scriptPath + "/edu.rice.rubis.servlets.ViewItem";
+		this._viewUserInfoURL = this._baseURL + scriptPath + "/edu.rice.rubis.servlets.ViewUserInfo";
+		this._viewBidHistoryURL = this._baseURL + scriptPath + "/edu.rice.rubis.servlets.ViewBidHistory";
+		this._buyNowAuthURL = this._baseURL + scriptPath + "/edu.rice.rubis.servlets.BuyNowAuth";
+		this._buyNowURL = this._baseURL + scriptPath + "/edu.rice.rubis.servlets.BuyNow";
+		this._storeBuyNowURL = this._baseURL + scriptPath + "/edu.rice.rubis.servlets.StoreBuyNow";
+		this._putBidAuthURL = this._baseURL + scriptPath + "/edu.rice.rubis.servlets.PutBidAuth";
+		this._putBidURL = this._baseURL + scriptPath + "/edu.rice.rubis.servlets.PutBid";
+		this._storeBidURL = this._baseURL + scriptPath + "/edu.rice.rubis.servlets.StoreBid";
+		this._putCommentAuthURL = this._baseURL + scriptPath + "/edu.rice.rubis.servlets.PutCommentAuth";
+		this._putCommentURL = this._baseURL + scriptPath + "/edu.rice.rubis.servlets.PutComment";	
+		this._storeCommentURL = this._baseURL + scriptPath + "/edu.rice.rubis.servlets.StoreComment";
+		this._selectCategoryToSellItemURL = this._baseURL + scriptPath + "/edu.rice.rubis.servlets.BrowseCategories";
+		this._sellItemFormURL = this._baseURL + scriptPath + "/edu.rice.rubis.servlets.SellItemForm";
+		this._registerItemURL = this._baseURL + scriptPath + "/edu.rice.rubis.servlets.RegisterItem";
+		this._aboutMeURL = this._baseURL + scriptPath + "/edu.rice.rubis.servlets.AboutMe";
 	}
 }

@@ -22,7 +22,7 @@ An EJB server provides a number of services such as database access (JDBC), tran
 ## Implementation in RAIN
 
 The current implementation of the RUBiS workload in RAIN is based on the version 1.4.3 of the [OW2 RUBiS](http://rubis.ow2.org/) (which, at the time of writing, is the last available version).
-Specifically, the implementation is currently based on the Java servlets version of RUBiS (but it shouldn't be too difficult to adapt it to work with other RUBiS incarnations).
+Specifically, the implementation is currently based on the PHP and Java servlets versions of RUBiS (but it shouldn't be too difficult to adapt it to work with other RUBiS incarnations).
 
 As a final remark, since the OW2 RUBiS seems to be an abandoned project, I strongly suggest you to use the following RUBiS version:
 
@@ -70,7 +70,10 @@ Currently, the supported configuration properties are the following:
 - **rubis.categoriesFile**: a string representing the path to the RUBiS categories file; this is the RAIN counterpart of the *database\_regions\_file* RUBiS property.
   Default value is: *"resources/rubis-ebay_full_categories.txt"*.
 - **rubis.incarnation**: a case-insensitive string representing the RUBiS incarnation one wants to use.
-  Possible values are: *"servlet"*.
+  Possible values are:
+  - *"php"*,
+  - *"servlet"*.
+
   Default value is: *"servlet"*.
 - **rubis.initOp**: a case-insensitive string representing the RUBiS operation from which a user session starts.
   Possible values are:
@@ -139,6 +142,10 @@ Currently, the supported configuration properties are the following:
   Default value is: *"resources/rubis-ebay_regions.txt"*.
 - **rubis.rngSeed**: an integer number representing the seed used to initialize the random number generator used by the RUBiS generator; if set to `-1`, the random number generator will be initialized with the Java's default (i.e., to a value very likely to be distinct from any other invocation of the `java.util.Random` default constructor).
   Default value is: *-1*.
+- **rubis.serverHtmlPath**: the URL path pointing to the base location where HTML files on the RUBiS server.
+  Default value is: */*.
+- **rubis.serverScriptPath**: the URL path pointing to the base location where script files on the RUBiS server.
+  Default value is: */*.
 The order of the operations in the traffic mix matrix is the same of the one specified in the previous section (i.e., 0 is the *Home Page* operation, 1 is the *Register* operation, and so on).
 
 ### Assumptions
