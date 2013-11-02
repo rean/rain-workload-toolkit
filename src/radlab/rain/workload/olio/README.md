@@ -50,15 +50,15 @@ All the 7 Olio operations are supported, specifically:
 The Olio workload can be customized by means of a set of properties inside the *generatorParameters* key of the *profiles.config.olio.json*.
 Currently, the supported configuration properties are the following:
 - **olio.incarnation**: a case-insensitive string representing the Olio incarnation one wants to use. Possible values are:
- - "php",
- - "rails",
- - "java".
+ - *php*,
+ - *java*,
+ - *rails*.
 
-Default value is: "rails".
-- **olio.numPreloadedEvents**: a non-negative integer value representing the number of social events that have been already preloaded inside the Olio database. Default value is "0".
-- **olio.numPreloadedPersons**: a non-negative integer value representing the number of user that have been already preloaded inside the Olio database. Default value is "0".
-- **olio.numPreloadedTags**: a non-negative integer value representing the number of social event tags that have been already preloaded inside the Olio database. Default value is "0".
-- **olio.rngSeed**: an integer number representing the seed used to initialize the random number generator used by the Olio generator; if set to `-1`, the random number generator will be initialized with the Java's default (i.e., to a value very likely to be distinct from any other invocation of the `java.util.Random` default constructor). Default value is "-1".
+Default value is: *rails*.
+- **olio.numPreloadedEvents**: a non-negative integer value representing the number of social events that have been already preloaded inside the Olio database. Default value is *0*.
+- **olio.numPreloadedPersons**: a non-negative integer value representing the number of user that have been already preloaded inside the Olio database. Default value is *0*.
+- **olio.numPreloadedTags**: a non-negative integer value representing the number of social event tags that have been already preloaded inside the Olio database. Default value is *0*.
+- **olio.rngSeed**: an integer number representing the seed used to initialize the random number generator used by the Olio generator; if set to `-1`, the random number generator will be initialized with the Java's default (i.e., to a value very likely to be distinct from any other invocation of the `java.util.Random` default constructor). Default value is *-1*.
 
 The order of the operations in the traffic mix matrix is the same of the one specified in the previous section (i.e., 0 is the *Home Page* operation, 1 is the *Login* operation, and so on).
 
