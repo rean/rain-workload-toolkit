@@ -5,7 +5,7 @@ Olio Workload
 ## Overview
 
 Olio is a Web 2.0 toolkit to help evaluate the suitability, functionality and performance of web technologies.
-Olio defines an example Web 2.0 application (a social event site somewhat like to the already died [Yahoo! Upcoming](yahoo.com/upcoming) service - see the [ArchiveTeam](http://archiveteam.org/index.php?title=Yahoo!_Upcoming) to get an idea about it) and provides three initial implementations: PHP, Java Enterprise Edition, and Ruby-On-Rails.
+Olio defines an example Web 2.0 application (a social event site somewhat like to the already died [Yahoo! Upcoming](http://yahoo.com/upcoming) service - see the [ArchiveTeam](http://archiveteam.org/index.php?title=Yahoo!_Upcoming) to get an idea about it) and provides three initial implementations: PHP, Java Enterprise Edition, and Ruby-On-Rails.
 The toolkit also defines ways to drive load against the application in order to measure performance.
 
 Olio can be used for several purpose, for instance:
