@@ -30,7 +30,7 @@ Specifically, the current implementation has been tested against the PHP and Jav
 
 As a final remark, since the Apache Olio seems to be an abandoned project, I strongly suggest you to use the following Olio version:
 
-[dcsj-rubis](https://github.com/sguazt/olio)
+[olio](https://github.com/sguazt/olio)
 
 which is a my patched and possibly enhanced version of Apache Olio version 0.2.
 
