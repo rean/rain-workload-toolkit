@@ -39,16 +39,30 @@ public class EmpiricalCDF
 	// <cdf summary> = [<pctilemark,value>,...,<pctilemark,value>]
 	private TreeMap<Double,Double> _cdfSummary = null;
 	private double[] _rawCdf = null;
-	private Random _random = new Random();
+	private Random _random;
 	
 	public EmpiricalCDF( double[] rawCdf )
 	{
 		this._rawCdf = rawCdf;
+		this._random = new Random();
 	}
 	
 	public EmpiricalCDF( TreeMap<Double,Double> cdfSummary )
 	{
 		this._cdfSummary = cdfSummary;
+		this._random = new Random();
+	}
+	
+	public EmpiricalCDF( double[] rawCdf, Random rng )
+	{
+		this._rawCdf = rawCdf;
+		this._random = rng;
+	}
+	
+	public EmpiricalCDF( TreeMap<Double,Double> cdfSummary, Random rng )
+	{
+		this._cdfSummary = cdfSummary;
+		this._random = rng;
 	}
 	
 	public double nextDouble()
