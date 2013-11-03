@@ -118,7 +118,7 @@ Currently, the supported configuration properties are the following:
   Default value is: *1000*.
 - **rubis.maxItemDescrLen**: a string value representing the maximum length for the description of an item; this is the RAIN counterpart of the *item\_description\_length* RUBiS property.
   Default value is: *8192*.
-- **rubis.maxItemDuration**: a non-negative interger value representing the maximum duration (in days) of an item.
+- **rubis.maxItemDuration**: a non-negative integer value representing the maximum duration (in days) of an item.
   Default value is: *7*.
 - **rubis.maxItemInitPrice**: a non-negative real value representing the maximum initial price for an item.
   Default value is: *5000*.
