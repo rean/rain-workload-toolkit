@@ -37,12 +37,20 @@ public class Pareto
 {
 	private double _alpha = 0.0;
 	private double _beta = 0.0;
-	private Random _random = new Random();
+	private Random _random;
 	
 	public Pareto( double alpha, double beta )
 	{
 		this._alpha = alpha;
 		this._beta = beta;
+		this._random = new Random();
+	}
+	
+	public Pareto( double alpha, double beta, Random rng )
+	{
+		this._alpha = alpha;
+		this._beta = beta;
+		this._random = rng;
 	}
 	
 	// Courtesy: http://www.sitmo.com/eq/521 - Generating Pareto distributed random number
