@@ -386,6 +386,11 @@ public abstract class ScenarioTrack
 			this._loadGenerationStrategyClassName = ScenarioTrack.DEFAULT_LOAD_GENERATION_STRATEGY_CLASS;
 			this._loadGenerationStrategyParams = new JSONObject();
 		}
+		// 15 Look for a resource path
+		if (config.has(ScenarioTrack.CFG_RESOURCE_PATH))
+		{
+			this._resourcePath = config.getString(ScenarioTrack.CFG_RESOURCE_PATH);
+		}
 	}
 	
 	// Factory methods

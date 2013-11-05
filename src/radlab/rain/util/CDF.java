@@ -113,6 +113,40 @@ public class CDF<T>
 		this.normalize();
 	}
 	
+	@SuppressWarnings("unchecked")
+	public CDF( Random rng, JSONArray labels, JSONArray counts ) throws JSONException
+	{
+		this._random = rng;
+		this._rawCounts = new long[counts.length()];
+		this._cdf = new double[counts.length()];
+		
+		this._sum = 0.0;
+		for( int i = 0; i < counts.length(); i++ )
+		{
+			this._labels.add( (T) labels.get(i) );
+			this._rawCounts[i] = counts.getLong(i);
+			this._sum += counts.getDouble(i);
+			this._cdf[i] = this._sum;
+		}
+		this.normalize();
+	}
+	
+	public CDF( Random rng, T[] labels, double[] counts )
+	{
+		this._random = rng;
+		this._rawCounts = new long[counts.length];
+		this._cdf = new double[counts.length];
+		this._sum = 0.0;
+		for( int i = 0; i < counts.length; i++ )
+		{
+			this._labels.add( (T) labels[i] );
+			this._rawCounts[i] = new Double(counts[i]).longValue();
+			this._sum += counts[i];
+			this._cdf[i] = this._sum;
+		}
+		this.normalize();
+	}
+	
 	public void normalize()
 	{
 		double sum = this._cdf[this._cdf.length-1];

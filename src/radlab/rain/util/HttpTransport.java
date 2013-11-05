@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.net.URI;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -663,7 +664,25 @@ public class HttpTransport
 					{
 						start = System.currentTimeMillis();
 						// TODO: Is it safe to assume all redirects are GET requests?
-						httpRequest = new HttpGet( locationHeaders[0].getValue() );
+						//httpRequest = new HttpGet( locationHeaders[0].getValue() );
+						URI redirURI = null;
+						try
+						{
+							redirURI = new URI(locationHeaders[0].getValue());
+							if (!redirURI.isAbsolute())
+							{
+								redirURI = httpRequest.getURI().resolve(redirURI);
+							}
+							httpRequest = new HttpGet(redirURI.toString());
+						}
+						catch (Throwable t)
+						{
+							if (this._debug)
+							{
+								System.out.println("Unable to create URI from redirect location: " + locationHeaders[0].getValue() + " (" + t + "). Try to use redirect location directly.");
+							}
+							httpRequest = new HttpGet(locationHeaders[0].getValue());
+						}
 						end = System.currentTimeMillis();
 						if( this._debug )
 							System.out.println( "HttpClient request get redirect: " + httpRequest.getRequestLine() + " (" +  (end - start)/1000.0 + ")" );

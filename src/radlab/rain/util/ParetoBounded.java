@@ -38,13 +38,22 @@ public class ParetoBounded
 	private double _alpha = 0.0;
 	private double _lowerBound = 0.0;
 	private double _upperBound = 0.0;
-	private Random _random = new Random();
+	private Random _random;
 	
 	public ParetoBounded( double alpha, double L, double H )
 	{
 		this._alpha = alpha;
 		this._lowerBound = L;
 		this._upperBound = H;
+		this._random = new Random();
+	}
+
+	public ParetoBounded( double alpha, double L, double H, Random rng )
+	{
+		this._alpha = alpha;
+		this._lowerBound = L;
+		this._upperBound = H;
+		this._random = rng;
 	}
 
 	// Courtesy: http://en.wikipedia.org/wiki/Pareto_distribution
