@@ -39,7 +39,7 @@ public class Zipf
 	long _upperBound = 0;
 	double _a = 0.0;
 	double _r = 0.0;
-	private Random _random = new Random();
+	private Random _random;
 	
 	private boolean _first = true;
 	private double _c = 0; // Normalization constant
@@ -50,6 +50,16 @@ public class Zipf
 		this._r = r;
 		this._lowerBound = L;
 		this._upperBound = H + 1;
+		this._random = new Random();
+	}
+	
+	public Zipf( double a, double r, long L, long H, Random rng )
+	{
+		this._a = a;
+		this._r = r;
+		this._lowerBound = L;
+		this._upperBound = H + 1;
+		this._random = rng;
 	}
 	
 	public double nextDouble2()
