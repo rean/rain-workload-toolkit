@@ -4,8 +4,8 @@
 		"generatorParameters":{
         	"usePooling": "true",
         	"rngSeed": 67510,
-        	"dbName": "rain",
-			"collectionName": "rain-ns",
+        	"dbName": "test",
+			"collectionName": "test-ns",
 			"debug":"false"
         },
 		"track": "radlab.rain.DefaultScenarioTrack",

@@ -33,6 +33,7 @@ package radlab.rain.util;
 
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.Random;
 
 public class PoissonSamplingStrategy implements ISamplingStrategy
 {
@@ -58,6 +59,13 @@ public class PoissonSamplingStrategy implements ISamplingStrategy
 	{
 		this._meanSamplingInterval = meanSamplingInterval;
 		this._expRandom = new NegativeExponential(this._meanSamplingInterval);
+		this.reset();
+	}
+
+	public PoissonSamplingStrategy(double meanSamplingInterval, Random rng) 
+	{
+		this._meanSamplingInterval = meanSamplingInterval;
+		this._expRandom = new NegativeExponential(this._meanSamplingInterval, rng);
 		this.reset();
 	}
 

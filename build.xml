@@ -12,83 +12,19 @@
     <path id="rain.classpath">
     	<pathelement location="."/>
     	<pathelement location="bin"/>
-<!--
-        <pathelement location="thirdparty/httpcomponents-client-4.2.5/lib/commons-codec-1.6.jar"/>
-        <pathelement location="thirdparty/httpcomponents-client-4.2.5/lib/fluent-hc-4.2.5.jar"/>
-        <pathelement location="thirdparty/httpcomponents-client-4.2.5/lib/httpclient-cache-4.2.5.jar"/>
--->
-        <pathelement location="thirdparty/httpcomponents-client-4.2.5/lib/commons-logging-1.1.1.jar"/>
-        <pathelement location="thirdparty/httpcomponents-client-4.2.5/lib/httpclient-4.2.5.jar"/>
-        <pathelement location="thirdparty/httpcomponents-client-4.2.5/lib/httpcore-4.2.4.jar"/>
-        <pathelement location="thirdparty/httpcomponents-client-4.2.5/lib/httpmime-4.2.5.jar"/>
+        <pathelement location="thirdparty/httpcomponents-client-4.3.1/lib/commons-codec-1.6.jar"/>
+        <pathelement location="thirdparty/httpcomponents-client-4.3.1/lib/commons-logging-1.1.3.jar"/>
+        <pathelement location="thirdparty/httpcomponents-client-4.3.1/lib/fluent-hc-4.3.1.jar"/>
+        <pathelement location="thirdparty/httpcomponents-client-4.3.1/lib/httpclient-4.3.1.jar"/>
+        <pathelement location="thirdparty/httpcomponents-client-4.3.1/lib/httpclient-cache-4.3.1.jar"/>
+        <pathelement location="thirdparty/httpcomponents-client-4.3.1/lib/httpcore-4.3.jar"/>
+        <pathelement location="thirdparty/httpcomponents-client-4.3.1/lib/httpmime-4.3.1.jar"/>
         <pathelement location="thirdparty/json-20090211.jar"/>
     	<pathelement location="thirdparty/colt-1.2.0/colt.jar"/>
     	<!-- zookeeper stuff -->
     	<pathelement location="thirdparty/zookeeper-3.3.2/zookeeper-3.3.2.jar"/>
     	<pathelement location="thirdparty/zookeeper-3.3.2/lib/jline-0.9.94.jar"/>
     	<pathelement location="thirdparty/zookeeper-3.3.2/lib/log4j-1.2.15.jar"/>
-    	<!-- mysql stuff -->
-    	<pathelement location="thirdparty/mysql-connector-java-5.1.14/mysql-connector-java-5.1.14-bin.jar"/>
-    	<!-- Mongo stuff -->
-    	<pathelement location="thirdparty/mongo-2.5.3/mongo-2.5.3.jar"/>
-    	<!-- Riak stuff -->
-    	<pathelement location="thirdparty/riak-java-client/target/riak-client-1.0.6-SNAPSHOT-jar-with-dependencies.jar"/>
-    	<!-- Redis stuff -->
-    	<pathelement location="thirdparty/jedis/target/jedis-1.5.3-SNAPSHOT.jar"/>
-    	<pathelement location="thirdparty/commons-pool-1.5.6/commons-pool-1.5.6.jar"/>
-    	<!-- S3 stuff -->
-    	<pathelement location="thirdparty/jets3t-0.8.1/jars/jets3t-0.8.1.jar"/>
-    	<pathelement location="thirdparty/jets3t-0.8.1/libs/commons-codec/commons-codec-1.3.jar"/>
-    	<pathelement location="thirdparty/jets3t-0.8.1/libs/commons-httpclient/commons-httpclient-3.1.jar"/>
-    	<pathelement location="thirdparty/jets3t-0.8.1/libs/commons-logging/commons-logging-1.1.1.jar"/>
-    	<!--  HBase stuff  -->
-    	<pathelement location="thirdparty/hbase-0.92.1/hbase-0.92.1.jar"/>
-    	<fileset dir="thirdparty/hbase-0.92.1/lib/" includes="*.jar"/>
-    	<!-- Cassandra stuff -->
-    	<fileset dir="thirdparty/hector-core-1.0-1/" includes="*.jar"/>
-    </path>
-	<path id="rain.classpath.with.mr">
-        <pathelement location="bin"/>
-<!--
-        <pathelement location="thirdparty/httpcomponents-client-4.2.5/lib/commons-codec-1.6.jar"/>
-        <pathelement location="thirdparty/httpcomponents-client-4.2.5/lib/fluent-hc-4.2.5.jar"/>
-        <pathelement location="thirdparty/httpcomponents-client-4.2.5/lib/httpclient-cache-4.2.5.jar"/>
--->
-        <pathelement location="thirdparty/httpcomponents-client-4.2.5/lib/commons-logging-1.1.1.jar"/>
-        <pathelement location="thirdparty/httpcomponents-client-4.2.5/lib/httpclient-4.2.5.jar"/>
-        <pathelement location="thirdparty/httpcomponents-client-4.2.5/lib/httpcore-4.2.4.jar"/>
-        <pathelement location="thirdparty/httpcomponents-client-4.2.5/lib/httpmime-4.2.5.jar"/>
-        <pathelement location="thirdparty/json-20090211.jar"/>
-    	<pathelement location="thirdparty/colt-1.2.0/colt.jar"/>
-		<!-- zookeeper stuff -->
-    	<pathelement location="thirdparty/zookeeper-3.3.2/zookeeper-3.3.2.jar"/>
-    	<pathelement location="thirdparty/zookeeper-3.3.2/lib/jline-0.9.94.jar"/>
-    	<pathelement location="thirdparty/zookeeper-3.3.2/lib/log4j-1.2.15.jar"/>
-		<!-- hadoop stuff -->
-		<pathelement location="thirdparty/hadoop-0.20.2/hadoop-0.20.2-core.jar"/>
-		<pathelement location="thirdparty/hadoop-0.20.2/hadoop-0.20.2-examples.jar"/>
-		<pathelement location="thirdparty/hadoop-0.20.2/hadoop-0.20.2-tools.jar"/>
-		<pathelement location="thirdparty/hadoop-0.20.2/lib/commons-cli-1.2.jar"/>
-		<pathelement location="thirdparty/hadoop-0.20.2/lib/commons-httpclient-3.0.1.jar"/>
-		<!-- mysql stuff -->
-		<pathelement location="thirdparty/mysql-connector-java-5.1.14/mysql-connector-java-5.1.14-bin.jar"/>
-		<!-- Mongo stuff -->
-		<pathelement location="thirdparty/mongo-2.5.3/mongo-2.5.3.jar"/>
-		<!-- Riak stuff -->
-		<pathelement location="thirdparty/riak-java-client/target/riak-client-1.0.6-SNAPSHOT-jar-with-dependencies.jar"/>
-		<!-- Redis stuff -->
-		<pathelement location="thirdparty/jedis/target/jedis-1.5.3-SNAPSHOT.jar"/>
-		<pathelement location="thirdparty/commons-pool-1.5.6/commons-pool-1.5.6.jar"/>
-		<!-- S3 stuff -->
-		<pathelement location="thirdparty/jets3t-0.8.1/jars/jets3t-0.8.1.jar"/>
-		<pathelement location="thirdparty/jets3t-0.8.1/libs/commons-codec/commons-codec-1.3.jar"/>
-		<pathelement location="thirdparty/jets3t-0.8.1/libs/commons-httpclient/commons-httpclient-3.1.jar"/>
-		<pathelement location="thirdparty/jets3t-0.8.1/libs/commons-logging/commons-logging-1.1.1.jar"/>
-		<!--  HBase stuff  -->
-    	<pathelement location="thirdparty/hbase-0.92.1/hbase-0.92.1.jar"/>
-    	<pathelement location="thirdparty/hbase-0.92.1/lib/*.jar"/>
-    	<!-- Cassandra stuff -->
-    	<fileset dir="thirdparty/hector-core-1.0-1/" includes="*.jar"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>
@@ -107,16 +43,9 @@
     <target name="build-subprojects"/>
     <target depends="init" name="build-project">
         <echo message="${ant.project.name}: ${ant.file}"/>
-        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}" excludes="radlab/rain/workload/mapreduce/**">
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}" excludes="radlab/rain/workload/**">
             <src path="src"/>
             <classpath refid="rain.classpath"/>
-        </javac>
-    </target>
-	<target depends="init" name="build-with-mr">
-        <echo message="${ant.project.name}: ${ant.file}"/>
-        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
-            <src path="src"/>
-            <classpath refid="rain.classpath.with.mr"/>
         </javac>
     </target>
     <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
@@ -151,124 +80,51 @@
                 <arg file="config/rain.config.null.json"/>
         </java>
     </target>
-	<target depends="build" name="Benchmark-olio">
+	<target depends="build" name="Benchmark-memprof">
         <java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
-            <classpath refid="rain.classpath"/>
-                <jvmarg value="-Xmx1g" />
-                <jvmarg value="-Xms256m" />
-                <jvmarg value="-XX:+DisableExplicitGC"/>
-                <arg file="config/rain.config.olio.json"/>
+	        <classpath refid="rain.classpath"/>
+	        <jvmarg value="-Xmx1g" />
+	        <jvmarg value="-Xms256m" />
+	        <jvmarg value="-XX:+DisableExplicitGC"/>
+	        <jvmarg value="-agentlib:hprof=heap=sites,file=mem.log,depth=6" />
+	        <arg file="config/rain.config.null.json"/>
         </java>
+    </target>  
+    <target depends="build" name="package">
+        <jar destfile="rain.jar" filesetmanifest="mergewithoutmain">
+            <manifest>
+                <attribute name="Main-Class" value="radlab.rain.Benchmark"/>
+            </manifest>
+            <fileset dir="bin" excludes="radlab/rain/workload/** radlab/rain/test/**"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.3.1/lib/commons-codec-1.6.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.3.1/lib/commons-logging-1.1.3.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.3.1/lib/fluent-hc-4.3.1.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.3.1/lib/httpclient-4.3.1.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.3.1/lib/httpclient-cache-4.3.1.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.3.1/lib/httpcore-4.3.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.3.1/lib/httpmime-4.3.1.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/json-20090211.jar"/>
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/colt-1.2.0/colt.jar"/>
+        	<!-- Zookeeper stuff -->
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/zookeeper-3.3.2/zookeeper-3.3.2.jar"/>
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/zookeeper-3.3.2/lib/jline-0.9.94.jar"/>
+        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/zookeeper-3.3.2/lib/log4j-1.2.15.jar"/>
+        </jar>
     </target>
-	<target depends="build" name="Benchmark-httptest">
-		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
-	    	<classpath refid="rain.classpath"/>
-	    	<jvmarg value="-Xmx1g" />
-	    	<jvmarg value="-Xms256m" />
-	    	<jvmarg value="-XX:+DisableExplicitGC"/>
-	        <arg file="config/rain.config.ac.json"/>
-	    </java>
-	</target>
-	<target depends="build" name="Benchmark-scadr">
-		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
-	    	<classpath refid="rain.classpath"/>
-	    	<jvmarg value="-Xmx1g" />
-	    	<jvmarg value="-Xms256m" />
-	    	<jvmarg value="-XX:+DisableExplicitGC"/>
-	        <arg file="config/rain.config.scadr.json"/>
-	    </java>
-	</target>
-	<target depends="build" name="Benchmark-scadr-wiki">
-		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
-	    	<classpath refid="rain.classpath"/>
-	    	<jvmarg value="-Xmx1g" />
-	    	<jvmarg value="-Xms256m" />
-	    	<jvmarg value="-XX:+DisableExplicitGC"/>
-	        <arg file="config/rain.config.scadr.wiki.json"/>
-	    </java>
-	</target>
-	<target depends="build" name="Benchmark-gradit">
-		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
-	    	<classpath refid="rain.classpath"/>
-	    	<jvmarg value="-Xmx1g" />
-	    	<jvmarg value="-Xms256m" />
-	    	<jvmarg value="-XX:+DisableExplicitGC"/>
-	        <arg file="config/rain.config.gradit.json"/>
-	    </java>
-	</target>
-	<target depends="build-with-mr" name="Benchmark-mapreduce">
-		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
-	    	<classpath refid="rain.classpath.with.mr"/>
-	    	<jvmarg value="-Xmx1g" />
-	    	<jvmarg value="-Xms256m" />
-	    	<jvmarg value="-XX:+DisableExplicitGC"/>
-	        <arg file="config/rain.config.mapreduce.json"/>
-	    </java>
-	</target>
-	<target depends="build" name="Benchmark-mongodb">
-		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
-	    	<classpath refid="rain.classpath"/>
-	    	<jvmarg value="-Xmx1g" />
-	    	<jvmarg value="-Xms256m" />
-	    	<jvmarg value="-XX:+DisableExplicitGC"/>
-	        <arg file="config/rain.config.mongo.json"/>
-	    </java>
-	</target>
-	<target depends="build" name="Benchmark-mongodb-diurnal">
-		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
-	    	<classpath refid="rain.classpath"/>
-	    	<jvmarg value="-Xmx1g" />
-	    	<jvmarg value="-Xms256m" />
-	    	<jvmarg value="-XX:+DisableExplicitGC"/>
-	        <arg file="config/rain.config.mongo.diurnal.json"/>
-	    </java>
-	</target>
-	<target depends="build" name="Benchmark-riak">
-		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
-	    	<classpath refid="rain.classpath"/>
-	    	<jvmarg value="-Xmx1g" />
-	    	<jvmarg value="-Xms256m" />
-	    	<jvmarg value="-XX:+DisableExplicitGC"/>
-	        <arg file="config/rain.config.riak.json"/>
-	    </java>
-	</target>
-	<target depends="build" name="Benchmark-redis">
-		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
-	    	<classpath refid="rain.classpath"/>
-	    	<jvmarg value="-Xmx1g" />
-	    	<jvmarg value="-Xms256m" />
-	    	<jvmarg value="-XX:+DisableExplicitGC"/>
-	        <arg file="config/rain.config.redis.json"/>
-	    </java>
-	</target>
-	<target depends="build" name="Benchmark-s3">
-		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
-	    	<classpath refid="rain.classpath"/>
-	    	<jvmarg value="-Xmx1g" />
-	    	<jvmarg value="-Xms256m" />
-	    	<jvmarg value="-XX:+DisableExplicitGC"/>
-	        <arg file="config/rain.config.s3.json"/>
-	    </java>
-	</target>
-	<target depends="build" name="Benchmark-hbase">
-		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
+	<!-- Cassandra workload -->
+    <target depends="build" name="build-cassandra">
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}" includes="radlab/rain/workload/cassandra/**">
+            <src path="src"/>
+            <classpath refid="rain.classpath"/>
 	    	<classpath>
-	    	    <pathelement location="rain.jar"/>
-	    	    <pathelement location="workloads/hbase.jar"/>
-	    	    <pathelement location="thirdparty/hbase-0.92.1/hbase-0.92.1.jar"/>
-    			<fileset dir="thirdparty/hbase-0.92.1/lib/" includes="*.jar"/>
+	    	    <fileset dir="thirdparty/hector-core-1.0-1/" includes="*.jar"/>
 	    	</classpath>
-	    	<jvmarg value="-Xmx1g" />
-	    	<jvmarg value="-Xms256m" />
-	    	<jvmarg value="-XX:+DisableExplicitGC"/>
-	        <arg file="config/rain.config.hbase.json"/>
-	    </java>
+        </javac>
 	</target>
-	<target depends="build" name="Benchmark-cassandra">
+	<target depends="build-cassandra" name="Benchmark-cassandra">
 		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
+            <classpath refid="rain.classpath"/>
 	    	<classpath>
-	    	    <pathelement location="rain.jar"/>
-	    	    <pathelement location="workloads/cassandra.jar"/>
 	    	    <fileset dir="thirdparty/hector-core-1.0-1/" includes="*.jar"/>
 	    	</classpath>
 	    	<jvmarg value="-Xmx1g" />
@@ -277,211 +133,466 @@
 	        <arg file="config/rain.config.cassandra.json"/>
 	    </java>
 	</target>
-    <target depends="build" name="package">
-        <jar destfile="rain.jar" filesetmanifest="mergewithoutmain">
-            <manifest>
-                <attribute name="Main-Class" value="radlab.rain.Benchmark"/>
-            </manifest>
-            <fileset dir="bin" excludes="radlab/rain/workload/** radlab/rain/test/**"/>
-<!--
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.5/lib/commons-codec-1.6.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.5/lib/fluent-hc-4.2.5.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.5/lib/httpclient-cache-4.2.5.jar"/>
--->
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.5/lib/commons-logging-1.1.1.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.5/lib/httpclient-4.2.5.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.5/lib/httpcore-4.2.4.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.5/lib/httpmime-4.2.5.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/json-20090211.jar"/>
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/colt-1.2.0/colt.jar"/>
-        	<!-- Zookeeper stuff -->
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/zookeeper-3.3.2/zookeeper-3.3.2.jar"/>
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/zookeeper-3.3.2/lib/jline-0.9.94.jar"/>
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/zookeeper-3.3.2/lib/log4j-1.2.15.jar"/>
-        	<!-- MySQL stuff -->
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/mysql-connector-java-5.1.14/mysql-connector-java-5.1.14-bin.jar"/>
+    <target depends="build-cassandra" name="package-cassandra">
+        <mkdir dir="workloads"/>
+        <jar destfile="workloads/cassandra.jar" filesetmanifest="mergewithoutmain">
+            <fileset dir="bin" includes="radlab/rain/workload/cassandra/**"/>
+        	<!-- Bake the configuration files into the jar -->
+        	<fileset dir="." includes="config/*cassandra*.json"/>
+            <!-- Bake class dependencies into the jar -->
+    	    <zipfileset dir="thirdparty/hector-core-1.0-1/" includes="*.jar" excludes="META-INF/*.SF"/>
         </jar>
     </target>
-	<target depends="build-with-mr" name="package-with-mr">
-        <jar destfile="rain.jar" filesetmanifest="mergewithoutmain">
-            <manifest>
-                <attribute name="Main-Class" value="radlab.rain.Benchmark"/>
-            </manifest>
-            <fileset dir="bin" excludes="radlab/rain/workload/** radlab/rain/test/**"/>
-<!--
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.5/lib/commons-codec-1.6.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.5/lib/fluent-hc-4.2.5.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.5/lib/httpclient-cache-4.2.5.jar"/>
--->
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.5/lib/commons-logging-1.1.1.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.5/lib/httpclient-4.2.5.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.5/lib/httpcore-4.2.4.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/httpcomponents-client-4.2.5/lib/httpmime-4.2.5.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/json-20090211.jar"/>
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/colt-1.2.0/colt.jar"/>
-        	<!-- zookeeper stuff -->
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/zookeeper-3.3.2/zookeeper-3.3.2.jar"/>
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/zookeeper-3.3.2/lib/jline-0.9.94.jar"/>
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/zookeeper-3.3.2/lib/log4j-1.2.15.jar"/>
-        	<!-- hadoop stuff -->
+	<!-- CloudstoneNull workload -->
+    <target depends="build" name="build-cloudstoneNull">
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}" includes="radlab/rain/workload/cloudstoneNull/**">
+            <src path="src"/>
+            <classpath refid="rain.classpath"/>
+        </javac>
+    </target>
+    <target depends="build-cloudstoneNull" name="package-cloudstoneNull">
+        <mkdir dir="workloads"/>
+        <jar destfile="workloads/cloudstoneNull.jar" filesetmanifest="mergewithoutmain">
+            <fileset dir="bin" includes="radlab/rain/workload/cloudstoneNull/**"/>
+        	<!-- Bake the configuration files into the jar -->
+        	<fileset dir="." includes="config/*cloudstoneNull*.json"/>
+        </jar>
+    </target>
+	<!-- Comrades workload -->
+    <target depends="build" name="build-comrades">
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}" includes="radlab/rain/workload/comrades/**">
+            <src path="src"/>
+            <classpath refid="rain.classpath"/>
+        </javac>
+    </target>
+	<target depends="build-comrades" name="package-comrades">
+        <mkdir dir="workloads"/>
+        <jar destfile="workloads/comrades.jar" filesetmanifest="mergewithoutmain">
+            <fileset dir="bin" includes="radlab/rain/workload/comrades/**"/>
+        	<!-- Bake the configuration files into the jar -->
+        	<fileset dir="." includes="config/*comrades*.json"/>
+            <!-- Bake the resource files into the jar -->
+        	<fileset dir="." includes="resources/comrades_names.txt"/>
+        </jar>
+    </target>
+	<!-- Daytrader workload -->
+    <target depends="build" name="build-daytrader">
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}" includes="radlab/rain/workload/daytrader/**">
+            <src path="src"/>
+            <classpath refid="rain.classpath"/>
+        </javac>
+    </target>
+	<target depends="build-daytrader" name="package-daytrader">
+		<mkdir dir="workloads"/>
+	    <jar destfile="workloads/daytrader.jar" filesetmanifest="mergewithoutmain">
+	    	<fileset dir="bin" includes="radlab/rain/workload/daytrader/**"/>
+        	<!-- Bake the configuration files into the jar -->
+        	<fileset dir="." includes="config/*daytrader*.json"/>
+	    </jar>
+	</target>
+	<!-- Gradit workload -->
+    <target depends="build" name="build-gradit">
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}" includes="radlab/rain/workload/gradit/**">
+            <src path="src"/>
+            <classpath refid="rain.classpath"/>
+        </javac>
+    </target>
+	<target depends="build-gradit" name="Benchmark-gradit">
+		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
+	    	<classpath refid="rain.classpath"/>
+	    	<jvmarg value="-Xmx1g" />
+	    	<jvmarg value="-Xms256m" />
+	    	<jvmarg value="-XX:+DisableExplicitGC"/>
+	        <arg file="config/rain.config.gradit.json"/>
+	    </java>
+	</target>
+	<target depends="build-gradit" name="package-gradit">
+        <mkdir dir="workloads"/>
+        <jar destfile="workloads/gradit.jar" filesetmanifest="mergewithoutmain">
+            <fileset dir="bin" includes="radlab/rain/workload/gradit/**"/>
+        	<!-- Bake the configuration files into the jar -->
+        	<fileset dir="." includes="config/*gradit*.json"/>
+        </jar>
+    </target>
+	<!-- HBase workload -->
+    <target depends="build" name="build-hbase">
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}" includes="radlab/rain/workload/hbase/**">
+            <src path="src"/>
+            <classpath refid="rain.classpath"/>
+	    	<classpath>
+	    	    <pathelement location="thirdparty/hbase-0.92.1/hbase-0.92.1.jar"/>
+	    	    <fileset dir="thirdparty/hbase-0.92.1/lib/" includes="*.jar"/>
+	    	</classpath>
+        </javac>
+    </target>
+	<target depends="build-hbase" name="Benchmark-hbase">
+		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
+	    	<classpath refid="rain.classpath"/>
+	    	<classpath>
+	    	    <pathelement location="thirdparty/hbase-0.92.1/hbase-0.92.1.jar"/>
+	    	    <fileset dir="thirdparty/hbase-0.92.1/lib/" includes="*.jar"/>
+	    	</classpath>
+	    	<jvmarg value="-Xmx1g" />
+	    	<jvmarg value="-Xms256m" />
+	    	<jvmarg value="-XX:+DisableExplicitGC"/>
+	        <arg file="config/rain.config.hbase.json"/>
+	    </java>
+	</target>
+    <target depends="build-hbase" name="package-hbase">
+        <mkdir dir="workloads"/>
+        <jar destfile="workloads/hbase.jar" filesetmanifest="mergewithoutmain">
+            <fileset dir="bin" includes="radlab/rain/workload/hbase/**"/>
+        	<!-- Bake the configuration files into the jar -->
+        	<fileset dir="." includes="config/*hbase*.json"/>
+            <!-- Bake class dependencies into the jar -->
+    	    <zipfileset excludes="META-INF/*.SF" src="thirdparty/hbase-0.92.1/hbase-0.92.1.jar"/>
+    	    <zipfileset dir="thirdparty/hbase-0.92.1/lib/" includes="*.jar" excludes="META-INF/*.SF"/>
+        </jar>
+    </target>
+	<!-- HTTPTest workload -->
+    <target depends="build" name="build-httptest">
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}" includes="radlab/rain/workload/httptest/**">
+            <src path="src"/>
+            <classpath refid="rain.classpath"/>
+        </javac>
+    </target>
+	<target depends="build-httptest" name="Benchmark-httptest">
+		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
+	    	<classpath refid="rain.classpath"/>
+	    	<jvmarg value="-Xmx1g" />
+	    	<jvmarg value="-Xms256m" />
+	    	<jvmarg value="-XX:+DisableExplicitGC"/>
+	        <arg file="config/rain.config.ac.json"/>
+	    </java>
+	</target>
+	<target depends="build-httptest" name="package-httptest">
+		<mkdir dir="workloads"/>
+	    <jar destfile="workloads/httptest.jar" filesetmanifest="mergewithoutmain">
+	    	<fileset dir="bin" includes="radlab/rain/workload/httptest/**"/>
+        	<!-- Bake the configuration files into the jar -->
+        	<fileset dir="." includes="config/*httptest*.json"/>
+	    </jar>
+	</target>
+	<!-- MapReduce workload -->
+    <target depends="build" name="build-mapreduce">
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}" includes="radlab/rain/workload/mapreduce/**">
+            <src path="src"/>
+            <classpath refid="rain.classpath"/>
+	    	<classpath>
+	    	    <pathelement location="thirdparty/hadoop-0.20.2/hadoop-0.20.2-core.jar"/>
+	    	    <pathelement location="thirdparty/hadoop-0.20.2/hadoop-0.20.2-examples.jar"/>
+	    	    <pathelement location="thirdparty/hadoop-0.20.2/hadoop-0.20.2-tools.jar"/>
+	    	    <pathelement location="thirdparty/hadoop-0.20.2/lib/commons-cli-1.2.jar"/>
+	    	    <pathelement location="thirdparty/hadoop-0.20.2/lib/commons-httpclient-3.0.1.jar"/>
+	    	</classpath>
+        </javac>
+    </target>
+	<target depends="build-mapreduce" name="Benchmark-mapreduce">
+		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
+	    	<classpath refid="rain.classpath"/>
+	    	<classpath>
+	    	    <pathelement location="thirdparty/hadoop-0.20.2/hadoop-0.20.2-core.jar"/>
+	    	    <pathelement location="thirdparty/hadoop-0.20.2/hadoop-0.20.2-examples.jar"/>
+	    	    <pathelement location="thirdparty/hadoop-0.20.2/hadoop-0.20.2-tools.jar"/>
+	    	    <pathelement location="thirdparty/hadoop-0.20.2/lib/commons-cli-1.2.jar"/>
+	    	    <pathelement location="thirdparty/hadoop-0.20.2/lib/commons-httpclient-3.0.1.jar"/>
+	    	</classpath>
+	    	<jvmarg value="-Xmx1g" />
+	    	<jvmarg value="-Xms256m" />
+	    	<jvmarg value="-XX:+DisableExplicitGC"/>
+	        <arg file="config/rain.config.mapreduce.json"/>
+	    </java>
+	</target>
+	<target depends="build-mapreduce" name="package-mapreduce">
+        <mkdir dir="workloads"/>
+        <jar destfile="workloads/mapreduce.jar" filesetmanifest="mergewithoutmain">
+            <fileset dir="bin" includes="radlab/rain/workload/mapreduce/**"/>
+        	<!-- Bake the configuration files into the jar -->
+        	<fileset dir="." includes="config/*mapreduce*.json"/>
+            <!-- Bake class dependencies into the jar -->
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/hadoop-0.20.2/hadoop-0.20.2-core.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/hadoop-0.20.2/hadoop-0.20.2-examples.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/hadoop-0.20.2/hadoop-0.20.2-tools.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/hadoop-0.20.2/lib/commons-cli-1.2.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="thirdparty/hadoop-0.20.2/lib/commons-httpclient-3.0.1.jar"/>
-        	<!-- mysql stuff -->
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/mysql-connector-java-5.1.14/mysql-connector-java-5.1.14-bin.jar"/>
         </jar>
     </target>
-	<target depends="build-with-mr" name="package-mapreduce">
-        <mkdir dir="workloads"/>
-        <jar destfile="workloads/mapreduce.jar" filesetmanifest="mergewithoutmain">
-            <fileset dir="bin" includes="radlab/rain/workload/mapreduce/**"/>
-        </jar>
+	<!-- MongoDB workload -->
+    <target depends="build" name="build-mongodb">
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}" includes="radlab/rain/workload/mongodb/**">
+            <src path="src"/>
+            <classpath refid="rain.classpath"/>
+	    	<classpath>
+	    	    <pathelement location="thirdparty/mongo-2.5.3/mongo-2.5.3.jar"/>
+	    	</classpath>
+        </javac>
     </target>
-	<target depends="build" name="package-olio">
-        <mkdir dir="workloads"/>
-        <jar destfile="workloads/olio.jar" filesetmanifest="mergewithoutmain">
-            <fileset dir="bin" includes="radlab/rain/workload/olio/**"/>
-        </jar>
-    </target>
-    <target depends="build" name="package-cloudstoneNull">
-        <mkdir dir="workloads"/>
-        <jar destfile="workloads/cloudstoneNull.jar" filesetmanifest="mergewithoutmain">
-            <fileset dir="bin" includes="radlab/rain/workload/cloudstoneNull/**"/>
-        </jar>
-    </target>
-    <target depends="build" name="package-raddit">
-        <mkdir dir="workloads"/>
-        <jar destfile="workloads/raddit.jar" filesetmanifest="mergewithoutmain">
-            <fileset dir="bin" includes="radlab/rain/workload/raddit/**"/>
-        </jar>
-    </target>
-    <target depends="build" name="package-sample">
-        <mkdir dir="workloads"/>
-        <jar destfile="workloads/sample.jar" filesetmanifest="mergewithoutmain">
-            <fileset dir="bin" includes="radlab/rain/workload/sample/**"/>
-        </jar>
-    </target>
-	<target depends="build" name="package-httptest">
-		<mkdir dir="workloads"/>
-	    <jar destfile="workloads/httptest.jar" filesetmanifest="mergewithoutmain">
-	    	<fileset dir="bin" includes="radlab/rain/workload/httptest/**"/>
-	    </jar>
+	<target depends="build-mongodb" name="Benchmark-mongodb">
+		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
+	    	<classpath refid="rain.classpath"/>
+	    	<classpath>
+	    	    <pathelement location="thirdparty/mongo-2.5.3/mongo-2.5.3.jar"/>
+	    	</classpath>
+	    	<jvmarg value="-Xmx1g" />
+	    	<jvmarg value="-Xms256m" />
+	    	<jvmarg value="-XX:+DisableExplicitGC"/>
+	        <arg file="config/rain.config.mongo.json"/>
+	    </java>
 	</target>
-    <target depends="build" name="package-scads">
-        <mkdir dir="workloads"/>
-        <jar destfile="workloads/scads.jar" filesetmanifest="mergewithoutmain">
-            <fileset dir="bin" includes="radlab/rain/workload/scads/**"/>
-        </jar>
-    </target>
-	<target depends="build" name="package-scadr">
-        <mkdir dir="workloads"/>
-        <jar destfile="workloads/scadr.jar" filesetmanifest="mergewithoutmain">
-            <fileset dir="bin" includes="radlab/rain/workload/scadr/**"/>
-        	<!-- Bake the configuration files into the jar -->
-        	<fileset dir="config" includes="*scadr*.json"/>
-        </jar>
-    </target>
-	<target depends="build" name="package-gradit">
-        <mkdir dir="workloads"/>
-        <jar destfile="workloads/gradit.jar" filesetmanifest="mergewithoutmain">
-            <fileset dir="bin" includes="radlab/rain/workload/gradit/**"/>
-        	<!-- Bake the configuration files into the jar -->
-        	<fileset dir="config" includes="*gradit*.json"/>
-        </jar>
-    </target>
-	<target depends="build" name="package-comrades">
-        <mkdir dir="workloads"/>
-        <jar destfile="workloads/comrades.jar" filesetmanifest="mergewithoutmain">
-            <fileset dir="bin" includes="radlab/rain/workload/comrades/**"/>
-        	<!-- Bake the configuration files into the jar -->
-        	<fileset dir="config" includes="*comrades*.json"/>
-        	<fileset dir="resources" includes="comrades_names.txt"/>
-        </jar>
-    </target>
-	<target depends="build" name="package-daytrader">
-		<mkdir dir="workloads"/>
-	    <jar destfile="workloads/daytrader.jar" filesetmanifest="mergewithoutmain">
-	    	<fileset dir="bin" includes="radlab/rain/workload/daytrader/**"/>
-	    </jar>
+	<target depends="build-mongodb" name="Benchmark-mongodb-diurnal">
+		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
+	    	<classpath refid="rain.classpath"/>
+	    	<classpath>
+	    	    <pathelement location="thirdparty/mongo-2.5.3/mongo-2.5.3.jar"/>
+	    	</classpath>
+	    	<jvmarg value="-Xmx1g" />
+	    	<jvmarg value="-Xms256m" />
+	    	<jvmarg value="-XX:+DisableExplicitGC"/>
+	        <arg file="config/rain.config.mongo.diurnal.json"/>
+	    </java>
 	</target>
-	<target depends="build" name="package-rubis">
-		<mkdir dir="workloads"/>
-	    <jar destfile="workloads/rubis.jar" filesetmanifest="mergewithoutmain">
-	    	<fileset dir="bin" includes="radlab/rain/workload/rubis/**"/>
-	    </jar>
-	</target>	
-	<target depends="build" name="package-mongodb">
+	<target depends="build-mongodb" name="package-mongodb">
         <mkdir dir="workloads"/>
         <jar destfile="workloads/mongodb.jar" filesetmanifest="mergewithoutmain">
             <fileset dir="bin" includes="radlab/rain/workload/mongodb/**"/>
         	<!-- Bake the configuration files into the jar -->
-        	<fileset dir="config" includes="*mongo*.json"/>
-			<!-- Mongo stuff -->
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/mongo-2.5.3/mongo-2.5.3.jar"/>
+        	<fileset dir="." includes="config/*mongo*.json"/>
+            <!-- Bake class dependencies into the jar -->
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/mongo-2.5.3/mongo-2.5.3.jar"/>
         </jar>
     </target>
-	<target depends="build" name="package-riak">
+	<!-- Olio workload -->
+    <target depends="build" name="build-olio">
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}" includes="radlab/rain/workload/olio/**">
+            <src path="src"/>
+            <classpath refid="rain.classpath"/>
+        </javac>
+    </target>
+	<target depends="build-olio" name="Benchmark-olio">
+        <java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
+            <classpath refid="rain.classpath"/>
+            <jvmarg value="-Xmx1g" />
+            <jvmarg value="-Xms256m" />
+            <jvmarg value="-XX:+DisableExplicitGC"/>
+            <arg file="config/rain.config.olio.json"/>
+        </java>
+    </target>
+	<target depends="build-olio" name="package-olio">
         <mkdir dir="workloads"/>
-        <jar destfile="workloads/riak.jar" filesetmanifest="mergewithoutmain">
-            <fileset dir="bin" includes="radlab/rain/workload/riak/**"/>
-        	<!-- Bake the configuration files into the jar -->
-        	<fileset dir="config" includes="*riak*.json"/>
-        	<!-- Riak stuff -->
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/riak-java-client/target/riak-client-1.0.6-SNAPSHOT-jar-with-dependencies.jar"/>
+        <jar destfile="workloads/olio.jar" filesetmanifest="mergewithoutmain">
+            <fileset dir="bin" includes="radlab/rain/workload/olio/**"/>
+            <!-- Bake the configuration files into the jar -->
+            <fileset dir="." includes="config/*olio*.json"/>
+            <!-- Bake the resource files into the jar -->
+            <fileset dir="." includes="resources/event.pdf"/>
+            <fileset dir="." includes="resources/event.jpg"/>
+            <fileset dir="." includes="resources/event_thumb.jpg"/>
+            <fileset dir="." includes="resources/person.jpg"/>
+            <fileset dir="." includes="resources/person_thumb.jpg"/>
         </jar>
     </target>
-	<target depends="build" name="package-redis">
+	<!-- Raddit workload -->
+    <target depends="build" name="build-raddit">
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}" includes="radlab/rain/workload/raddit/**">
+            <src path="src"/>
+            <classpath refid="rain.classpath"/>
+        </javac>
+    </target>
+    <target depends="build-raddit" name="package-raddit">
+        <mkdir dir="workloads"/>
+        <jar destfile="workloads/raddit.jar" filesetmanifest="mergewithoutmain">
+            <fileset dir="bin" includes="radlab/rain/workload/raddit/**"/>
+            <!-- Bake the configuration files into the jar -->
+            <fileset dir="." includes="config/*raddit*.json"/>
+        </jar>
+    </target>
+	<!-- Redis workload -->
+    <target depends="build" name="build-redis">
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}" includes="radlab/rain/workload/redis/**">
+            <src path="src"/>
+            <classpath refid="rain.classpath"/>
+	    	<classpath>
+	    	    <pathelement location="thirdparty/jedis/target/jedis-1.5.3-SNAPSHOT.jar"/>
+	    	    <pathelement location="thirdparty/commons-pool-1.5.6/commons-pool-1.5.6.jar"/>
+	    	</classpath>
+        </javac>
+    </target>
+	<target depends="build-redis" name="Benchmark-redis">
+		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
+	    	<classpath refid="rain.classpath"/>
+	    	<classpath>
+	    	    <pathelement location="thirdparty/jedis/target/jedis-1.5.3-SNAPSHOT.jar"/>
+	    	    <pathelement location="thirdparty/commons-pool-1.5.6/commons-pool-1.5.6.jar"/>
+	    	</classpath>
+	    	<jvmarg value="-Xmx1g" />
+	    	<jvmarg value="-Xms256m" />
+	    	<jvmarg value="-XX:+DisableExplicitGC"/>
+	        <arg file="config/rain.config.redis.json"/>
+	    </java>
+	</target>
+	<target depends="build-redis" name="package-redis">
         <mkdir dir="workloads"/>
         <jar destfile="workloads/redis.jar" filesetmanifest="mergewithoutmain">
             <fileset dir="bin" includes="radlab/rain/workload/redis/**"/>
         	<!-- Bake the configuration files into the jar -->
-        	<fileset dir="config" includes="*redis*.json"/>
-        	<!-- Redis stuff -->
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jedis/target/jedis-1.5.3-SNAPSHOT.jar"/>
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/commons-pool-1.5.6/commons-pool-1.5.6.jar"/>
+        	<fileset dir="." includes="config/*redis*.json"/>
+            <!-- Bake class dependencies into the jar -->
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/jedis/target/jedis-1.5.3-SNAPSHOT.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/commons-pool-1.5.6/commons-pool-1.5.6.jar"/>
         </jar>
     </target>
-	<target depends="build" name="package-s3">
+	<!-- Riak workload -->
+    <target depends="build" name="build-riak">
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}" includes="radlab/rain/workload/riak/**">
+            <src path="src"/>
+            <classpath refid="rain.classpath"/>
+	    	<classpath>
+	    	    <pathelement location="thirdparty/riak-java-client/target/riak-client-1.0.6-SNAPSHOT-jar-with-dependencies.jar"/>
+	    	</classpath>
+        </javac>
+    </target>
+	<target depends="build-riak" name="Benchmark-riak">
+		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
+	    	<classpath refid="rain.classpath"/>
+	    	<classpath>
+	    	    <pathelement location="thirdparty/riak-java-client/target/riak-client-1.0.6-SNAPSHOT-jar-with-dependencies.jar"/>
+	    	</classpath>
+	    	<jvmarg value="-Xmx1g" />
+	    	<jvmarg value="-Xms256m" />
+	    	<jvmarg value="-XX:+DisableExplicitGC"/>
+	        <arg file="config/rain.config.riak.json"/>
+	    </java>
+	</target>
+	<target depends="build-riak" name="package-riak">
+        <mkdir dir="workloads"/>
+        <jar destfile="workloads/riak.jar" filesetmanifest="mergewithoutmain">
+            <fileset dir="bin" includes="radlab/rain/workload/riak/**"/>
+        	<!-- Bake the configuration files into the jar -->
+        	<fileset dir="." includes="config/*riak*.json"/>
+            <!-- Bake class dependencies into the jar -->
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/riak-java-client/target/riak-client-1.0.6-SNAPSHOT-jar-with-dependencies.jar"/>
+        </jar>
+    </target>
+	<!-- RUBiS workload -->
+    <target depends="build" name="build-rubis">
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}" includes="radlab/rain/workload/rubis/**">
+            <src path="src"/>
+            <classpath refid="rain.classpath"/>
+        </javac>
+    </target>
+	<target depends="build-rubis" name="package-rubis">
+		<mkdir dir="workloads"/>
+	    <jar destfile="workloads/rubis.jar" filesetmanifest="mergewithoutmain">
+	    	<fileset dir="bin" includes="radlab/rain/workload/rubis/**"/>
+        	<!-- Bake the configuration files into the jar -->
+        	<fileset dir="." includes="config/*rubis*.json"/>
+	    </jar>
+	</target>	
+	<!-- S3 workload -->
+    <target depends="build" name="build-s3">
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}" includes="radlab/rain/workload/s3/**">
+            <src path="src"/>
+            <classpath refid="rain.classpath"/>
+	    	<classpath>
+	    	    <pathelement location="thirdparty/jets3t-0.8.1/jars/jets3t-0.8.1.jar"/>
+	    	    <pathelement location="thirdparty/jets3t-0.8.1/libs/commons-codec/commons-codec-1.3.jar"/>
+	    	    <pathelement location="thirdparty/jets3t-0.8.1/libs/commons-httpclient/commons-httpclient-3.1.jar"/>
+	    	    <pathelement location="thirdparty/jets3t-0.8.1/libs/commons-logging/commons-logging-1.1.1.jar"/>
+	    	</classpath>
+        </javac>
+    </target>
+	<target depends="build-s3" name="Benchmark-s3">
+		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
+	    	<classpath refid="rain.classpath"/>
+	    	<classpath>
+	    	    <pathelement location="thirdparty/jets3t-0.8.1/jars/jets3t-0.8.1.jar"/>
+	    	    <pathelement location="thirdparty/jets3t-0.8.1/libs/commons-codec/commons-codec-1.3.jar"/>
+	    	    <pathelement location="thirdparty/jets3t-0.8.1/libs/commons-httpclient/commons-httpclient-3.1.jar"/>
+	    	    <pathelement location="thirdparty/jets3t-0.8.1/libs/commons-logging/commons-logging-1.1.1.jar"/>
+	    	</classpath>
+	    	<jvmarg value="-Xmx1g" />
+	    	<jvmarg value="-Xms256m" />
+	    	<jvmarg value="-XX:+DisableExplicitGC"/>
+	        <arg file="config/rain.config.s3.json"/>
+	    </java>
+	</target>
+	<target depends="build-s3" name="package-s3">
         <mkdir dir="workloads"/>
         <jar destfile="workloads/s3.jar" filesetmanifest="mergewithoutmain">
             <fileset dir="bin" includes="radlab/rain/workload/s3/**"/>
         	<!-- Bake the configuration files into the jar -->
-        	<fileset dir="config" includes="*s3*.json"/>
+        	<fileset dir="." includes="config/*s3*.json"/>
+            <!-- Bake class dependencies into the jar -->
+    	    <zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/jars/jets3t-0.8.1.jar"/>
+    	    <zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/libs/commons-codec/commons-codec-1.3.jar"/>
+    	    <zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/libs/commons-httpclient/commons-httpclient-3.1.jar"/>
+    	    <zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/libs/commons-logging/commons-logging-1.1.1.jar"/>
         </jar>
     </target>
-    <target depends="build" name="package-hbase">
+	<!-- Sample workload -->
+    <target depends="build" name="build-sample">
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}" includes="radlab/rain/workload/sample/**">
+            <src path="src"/>
+            <classpath refid="rain.classpath"/>
+        </javac>
+    </target>
+    <target depends="build-sample" name="package-sample">
         <mkdir dir="workloads"/>
-        <jar destfile="workloads/hbase.jar" filesetmanifest="mergewithoutmain">
-            <fileset dir="bin" includes="radlab/rain/workload/hbase/**"/>
+        <jar destfile="workloads/sample.jar" filesetmanifest="mergewithoutmain">
+            <fileset dir="bin" includes="radlab/rain/workload/sample/**"/>
         	<!-- Bake the configuration files into the jar -->
-        	<fileset dir="config" includes="*hbase*.json"/>
+        	<fileset dir="." includes="config/*sample*.json"/>
         </jar>
     </target>
-    <target depends="build" name="package-cassandra">
+	<!-- Scadr workload -->
+    <target depends="build" name="build-scadr">
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}" includes="radlab/rain/workload/scadr/**">
+            <src path="src"/>
+            <classpath refid="rain.classpath"/>
+        </javac>
+    </target>
+	<target depends="build-scadr" name="Benchmark-scadr">
+		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
+	    	<classpath refid="rain.classpath"/>
+	    	<jvmarg value="-Xmx1g" />
+	    	<jvmarg value="-Xms256m" />
+	    	<jvmarg value="-XX:+DisableExplicitGC"/>
+	        <arg file="config/rain.config.scadr.json"/>
+	    </java>
+	</target>
+	<target depends="build-scadr" name="Benchmark-scadr-wiki">
+		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
+	    	<classpath refid="rain.classpath"/>
+	    	<jvmarg value="-Xmx1g" />
+	    	<jvmarg value="-Xms256m" />
+	    	<jvmarg value="-XX:+DisableExplicitGC"/>
+	        <arg file="config/rain.config.scadr.wiki.json"/>
+	    </java>
+	</target>
+	<target depends="build-scadr" name="package-scadr">
         <mkdir dir="workloads"/>
-        <jar destfile="workloads/cassandra.jar" filesetmanifest="mergewithoutmain">
-            <fileset dir="bin" includes="radlab/rain/workload/cassandra/**"/>
+        <jar destfile="workloads/scadr.jar" filesetmanifest="mergewithoutmain">
+            <fileset dir="bin" includes="radlab/rain/workload/scadr/**"/>
         	<!-- Bake the configuration files into the jar -->
-        	<fileset dir="config" includes="*cassandra*.json"/>
-        	<!-- S3 stuff -->
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/jars/jets3t-0.8.1.jar"/>
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/libs/commons-codec/commons-codec-1.3.jar"/>
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/libs/commons-httpclient/commons-httpclient-3.1.jar"/>
-        	<zipfileset excludes="META-INF/*.SF" src="thirdparty/jets3t-0.8.1/libs/commons-logging/commons-logging-1.1.1.jar"/>
+        	<fileset dir="." includes="config/*scadr*.json"/>
         </jar>
     </target>
-	<target depends="build" name="Benchmark-memprof">
-      <java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
-	<classpath refid="rain.classpath"/>
-	<jvmarg value="-Xmx1g" />
-	<jvmarg value="-Xms256m" />
-	<jvmarg value="-XX:+DisableExplicitGC"/>
-	<jvmarg value="-agentlib:hprof=heap=sites,file=mem.log,depth=6" />
-	<arg file="config/rain.config.null.json"/>
-      </java>
-    </target>  
+	<!-- Scads workload -->
+    <target depends="build" name="build-scads">
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}" includes="radlab/rain/workload/scads/**">
+            <src path="src"/>
+            <classpath refid="rain.classpath"/>
+        </javac>
+    </target>
+    <target depends="build-scads" name="package-scads">
+        <mkdir dir="workloads"/>
+        <jar destfile="workloads/scads.jar" filesetmanifest="mergewithoutmain">
+            <fileset dir="bin" includes="radlab/rain/workload/scads/**"/>
+        	<!-- Bake the configuration files into the jar -->
+        	<fileset dir="." includes="config/*scads*.json"/>
+        </jar>
+    </target>
+	<!-- Tests -->
     <target name="OlioOperationsTest">
         <mkdir dir="${junit.output.dir}"/>
         <junit fork="yes" printsummary="withOutAndErr">

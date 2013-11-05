@@ -19,6 +19,7 @@ public class HBaseUtil
 		int minKey = 1;
 		int maxKey = 100000;
 		int size = 1024;//16384;//4096;
+		int numRegions = -1;
 		
 		// HBaseUtil <host> <port> <table> <column family> <min key> <max key> <size>
 		if( args.length == 7 )
@@ -31,6 +32,18 @@ public class HBaseUtil
 			maxKey = Integer.parseInt( args[5] );
 			size = Integer.parseInt( args[6] );
 		}
+		else if( args.length == 8 )
+		{
+			// HBaseUtil <host> <port> <table> <column family> <min key> <max key> <size> <num regions>
+			host = args[0];
+			port = Integer.parseInt( args[1] );
+			tableName = args[2];
+			columnFamilyName = args[3];
+			minKey = Integer.parseInt( args[4] );
+			maxKey = Integer.parseInt( args[5] );
+			size = Integer.parseInt( args[6] );
+			numRegions = Integer.parseInt( args[7] );
+		}
 		else if( args.length == 0 )
 		{
 			
@@ -38,7 +51,9 @@ public class HBaseUtil
 		else
 		{
 			System.out.println( "Usage   : HBaseUtil <host> <port> <tableName> <column family> <min key> <max key> <size>" );
+			System.out.println( "Usage   : HBaseUtil <host> <port> <tableName> <column family> <min key> <max key> <size> <num regions>" );
 			System.out.println( "Example : HBaseUtil localhost 60000 raintbl raincf 1 100000 4096" );
+			System.out.println( "Example : HBaseUtil localhost 60000 raintbl raincf 1 100000 4096 4" );
 			System.exit( -1 );
 		}
 	
@@ -48,7 +63,13 @@ public class HBaseUtil
 		
 		int keyBlockSize = (int) Math.ceil( keyCount/loaderThreads );//10000;
 		
-		HBaseTransport adminClient = new HBaseTransport( host, port, HBaseTransport.DEFAULT_ZOOKEEPER_PORT );
+		HBaseTransport adminClient = null;
+		
+		// Check whether the user specified the number of regions to create, if so, then pass that on to the transport
+		if( numRegions == -1 )
+			adminClient = new HBaseTransport( host, port, HBaseTransport.DEFAULT_ZOOKEEPER_PORT );
+		else adminClient = new HBaseTransport( host, port, HBaseTransport.DEFAULT_ZOOKEEPER_PORT, KEY_FORMATTER.format( minKey ).getBytes(), KEY_FORMATTER.format( maxKey ).getBytes(), numRegions );
+		
 		// Before we start the load, delete the table and then re-create it
 		try
 		{

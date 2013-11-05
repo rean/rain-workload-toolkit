@@ -48,8 +48,8 @@ public class MongoUtil
 		// Need the name of a server, a db to use and a collection
 		int port = MongoTransport.DEFAULT_MONGO_PORT;
 		String host = "localhost";
-		String dbName = "rain";
-		String dbCollection = "rain-ns";
+		String dbName = "test";
+		String dbCollection = "test-ns";
 		int minKey = 1;
 		int maxKey = 100000;
 		int size = 1024;
