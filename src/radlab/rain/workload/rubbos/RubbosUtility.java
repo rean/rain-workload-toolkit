@@ -45,10 +45,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.http.HttpStatus;
 import radlab.rain.util.HttpTransport;
-//import radlab.rain.workload.rubbos.model.RubbosComment;
 import radlab.rain.workload.rubbos.model.RubbosCategory;
+import radlab.rain.workload.rubbos.model.RubbosComment;
+import radlab.rain.workload.rubbos.model.RubbosStory;
 import radlab.rain.workload.rubbos.model.RubbosUser;
-//import radlab.rain.workload.rubbos.util.DiscreteDistribution;
 
 
 /**

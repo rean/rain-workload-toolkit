@@ -35,6 +35,8 @@ package radlab.rain.workload.rubbos;
 
 
 import java.io.IOException;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
 import radlab.rain.IScoreboard;
 
 
@@ -57,7 +59,7 @@ public class AcceptStoryOperation extends RubbosOperation
 	public void execute() throws Throwable
 	{
 		int storyId = this.getUtility().findStoryIdInHtml(this.getSessionState().getLastResponse());
-		if (storyId == INVALID_STORY_ID)
+		if (storyId == RubbosUtility.INVALID_STORY_ID)
 		{
 			//FIXME: in this case, the native RUBBoS client goes back to home page
 			this.getLogger().warning("No more stories to process. Operation interrupted.");

@@ -35,21 +35,23 @@ package radlab.rain.workload.rubbos;
 
 
 import java.io.IOException;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
 import radlab.rain.IScoreboard;
 
 
 /**
- * The 'Search-Stories' operation.
+ * The 'Search-In-Stories' operation.
  *
  * @author <a href="mailto:marco.guazzone@gmail.com">Marco Guazzone</a>
  */
-public class SearchStoriesOperation extends RubbosOperation 
+public class SearchInStoriesOperation extends RubbosOperation 
 {
-	public SearchStoriesOperation(boolean interactive, IScoreboard scoreboard) 
+	public SearchInStoriesOperation(boolean interactive, IScoreboard scoreboard) 
 	{
 		super(interactive, scoreboard);
 
-		this._operationName = "Search-Stories";
+		this._operationName = "Search-In-Stories";
 		this._operationIndex = RubbosGenerator.SEARCH_IN_STORIES_OP;
 	}
 

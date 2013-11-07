@@ -78,11 +78,11 @@ public abstract class RubbosOperation extends Operation
 		}
 
 		// Reset last-search state if we aren't in a search operation
-		if (this._operationIndex != RubbosGenerator.SEARCH_IN_STORIES
-			&& this._operationIndex != RubbosGenerator.SEARCH_IN_COMMENTS
-			&& this._operationIndex != RubbosGenerator.SEARCH_IN_USERS)
+		if (this._operationIndex != RubbosGenerator.SEARCH_IN_STORIES_OP
+			&& this._operationIndex != RubbosGenerator.SEARCH_IN_COMMENTS_OP
+			&& this._operationIndex != RubbosGenerator.SEARCH_IN_USERS_OP)
 		{
-			this.getSessionState().setLastSearchOperation(RubbisUtility.INVALID_STORY_ID);
+			this.getSessionState().setLastSearchOperation(RubbosUtility.INVALID_STORY_ID);
 		}
 
 //		// Select a random user for current session (if needed)

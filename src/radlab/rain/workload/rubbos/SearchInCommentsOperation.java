@@ -35,21 +35,23 @@ package radlab.rain.workload.rubbos;
 
 
 import java.io.IOException;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
 import radlab.rain.IScoreboard;
 
 
 /**
- * The 'Search-Comments' operation.
+ * The 'Search-In-Comments' operation.
  *
  * @author <a href="mailto:marco.guazzone@gmail.com">Marco Guazzone</a>
  */
-public class SearchCommentsOperation extends RubbosOperation 
+public class SearchInCommentsOperation extends RubbosOperation 
 {
-	public SearchCommentsOperation(boolean interactive, IScoreboard scoreboard) 
+	public SearchInCommentsOperation(boolean interactive, IScoreboard scoreboard) 
 	{
 		super(interactive, scoreboard);
 
-		this._operationName = "Search-Comments";
+		this._operationName = "Search-In-Comments";
 		this._operationIndex = RubbosGenerator.SEARCH_IN_COMMENTS_OP;
 	}
 

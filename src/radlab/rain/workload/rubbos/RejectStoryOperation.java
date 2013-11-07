@@ -35,6 +35,8 @@ package radlab.rain.workload.rubbos;
 
 
 import java.io.IOException;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
 import radlab.rain.IScoreboard;
 
 

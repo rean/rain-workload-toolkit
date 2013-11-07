@@ -133,7 +133,7 @@ public final class RubbosSessionState
 		this._loggedUserId = RubbosUtility.ANONYMOUS_USER_ID;
 		this._lastOp = RubbosUtility.INVALID_OPERATION_ID;
 		this._lastSearchOp = RubbosUtility.INVALID_OPERATION_ID;
-		this._storyId = RubbosUtility.INVALID_ITEM_ID;
+		this._storyId = RubbosUtility.INVALID_STORY_ID;
 		this._lastSearchWord = null;
 		this._lastResponse = null;
 	}

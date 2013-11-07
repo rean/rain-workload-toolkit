@@ -101,7 +101,7 @@ public class RubbosGenerator extends Generator
 	private double _cycleTime = -1; ///< The mean cycle time; a value <= 0 means that no cycle time is used.
 	private NegativeExponential _cycleTimeRng;
 	private String _baseURL;
-	private String _storyOfTheDayURL; 
+	private String _storiesOfTheDayURL; 
 	private String _registerURL;
 	private String _registerUserURL;
 	private String _browseURL;
@@ -121,7 +121,7 @@ public class RubbosGenerator extends Generator
 	private String _searchInCommentsURL;
 	private String _searchInUsersURL;
 	private String _authorLoginURL;
-	private String _authorTaskURL;
+	private String _authorTasksURL;
 	private String _reviewStoriesURL;
 	private String _acceptStoryURL;
 	private String _rejectStoryURL;
@@ -760,11 +760,11 @@ public class RubbosGenerator extends Generator
 	/**
 	 * Factory method.
 	 * 
-	 * @return  A prepared ReviewStoryOperation.
+	 * @return  A prepared ReviewStoriesOperation.
 	 */
-	public ReviewStoryOperation createReviewStoryOperation()
+	public ReviewStoriesOperation createReviewStoriesOperation()
 	{
-		ReviewStoryOperation op = new ReviewStoryOperation(this.getTrack().getInteractive(), this.getScoreboard());
+		ReviewStoriesOperation op = new ReviewStoriesOperation(this.getTrack().getInteractive(), this.getScoreboard());
 		op.prepare(this);
 		return op;
 	}
@@ -845,8 +845,8 @@ public class RubbosGenerator extends Generator
 				return this.createAuthorLoginOperation();
 			case AUTHOR_TASKS_OP:
 				return this.createAuthorTasksOperation();
-			case REVIEW_STORY_OP:
-				return this.createReviewStoryOperation();
+			case REVIEW_STORIES_OP:
+				return this.createReviewStoriesOperation();
 			case ACCEPT_STORY_OP:
 				return this.createAcceptStoryOperation();
 			case REJECT_STORY_OP:
@@ -901,7 +901,7 @@ public class RubbosGenerator extends Generator
 	{
 		final String scriptPath = this.getConfiguration().getServerScriptPath();
 
-		this._storyOfTheDayURL = this._baseURL + scriptPath + "/StoriesOfTheDay.php";
+		this._storiesOfTheDayURL = this._baseURL + scriptPath + "/StoriesOfTheDay.php";
 		this._registerUserURL = this._baseURL + scriptPath + "/RegisterUser.php";
 		this._browseCategoriesURL = this._baseURL + scriptPath + "/BrowseCategories.php";
 		this._browseStoriesByCategoryURL = this._baseURL + scriptPath + "/BrowseStoriesByCategory.php";
@@ -915,10 +915,10 @@ public class RubbosGenerator extends Generator
 		this._submitStoryURL = this._baseURL + scriptPath + "/SubmitStory.php";
 		this._storeStoryURL = this._baseURL + scriptPath + "/StoryStore.php";
 		this._searchURL = this._baseURL + scriptPath + "/Search.php";
-		this._searchInStoriesURL = this._searchURL + "?type=0&";
-		this._searchInCommentsURL = searchURL + "?type=1&";
-		this._searchInUsersURL = searchURL + "?type=2&";
-		this._authorTaskURL = this._baseURL + scriptPath + "/Author.php";
+		this._searchInStoriesURL = this._searchURL; // + "?type=0&";
+		this._searchInCommentsURL = this._searchURL; // + "?type=1&";
+		this._searchInUsersURL = this._searchURL; // + "?type=2&";
+		this._authorTasksURL = this._baseURL + scriptPath + "/Author.php";
 		this._reviewStoriesURL = this._baseURL + scriptPath + "/ReviewStories.php";
 		this._acceptStoryURL = this._baseURL + scriptPath + "/AcceptStory.php";
 		this._rejectStoryURL = this._baseURL + scriptPath + "/RejectStory.php";
@@ -931,7 +931,7 @@ public class RubbosGenerator extends Generator
 	{
 		final String scriptPath = this.getConfiguration().getServerScriptPath();
 
-		this._storyOfTheDayURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.StoriesOfTheDay";
+		this._storiesOfTheDayURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.StoriesOfTheDay";
 		this._registerUserURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.RegisterUser";
 		this._browseCategoriesURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.BrowseCategories";
 		this._browseStoriesByCategoryURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.BrowseStoriesByCategory";
@@ -945,10 +945,10 @@ public class RubbosGenerator extends Generator
 		this._submitStoryURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.SubmitStory";
 		this._storeStoryURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.StoryStore";
 		this._searchURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.Search";
-		this._searchInStoriesURL = this._searchURL + "?type=0&";
-		this._searchInCommentsURL = searchURL + "?type=1&";
-		this._searchInUsersURL = searchURL + "?type=2&";
-		this._authorTaskURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.Author";
+		this._searchInStoriesURL = this._searchURL; // + "?type=0&";
+		this._searchInCommentsURL = this._searchURL; // + "?type=1&";
+		this._searchInUsersURL = this._searchURL; // + "?type=2&";
+		this._authorTasksURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.Author";
 		this._reviewStoriesURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.ReviewStories";
 		this._acceptStoryURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.AcceptStory";
 		this._rejectStoryURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.RejectStory";
