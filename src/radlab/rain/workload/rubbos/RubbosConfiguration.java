@@ -96,26 +96,14 @@ public final class RubbosConfiguration
 	private static final String CFG_DICTIONARY_FILE_KEY = "rubbos.dictionaryFile";
 	private static final String CFG_INITIAL_OPERATION_KEY = "rubbos.initOp";
 	private static final String CFG_INCARNATION_KEY = "rubbos.incarnation";
-//	private static final String CFG_MAX_BIDS_PER_ITEM_KEY = "rubbos.maxBidsPerItem";
 	private static final String CFG_MAX_COMMENT_LENGTH_KEY = "rubbos.maxCommentLen";
-	private static final String CFG_MAX_STORY_LENGTH_KEY = "rubbos.maxStoryLen";
-//	private static final String CFG_MAX_ITEM_BASE_BID_PRICE_KEY = "rubbos.maxItemBaseBidPrice";
-//	private static final String CFG_MAX_ITEM_BASE_BUY_NOW_PRICE_KEY = "rubbos.maxItemBaseBuyNowPrice";
-//	private static final String CFG_MAX_ITEM_BASE_RESERVE_PRICE_KEY = "rubbos.maxItemBaseReservePrice";
-//	private static final String CFG_MAX_ITEM_DESCR_LENGTH_KEY = "rubbos.maxItemDescrLen";
-//	private static final String CFG_MAX_ITEM_DURATION_KEY = "rubbos.maxItemDuration";
-//	private static final String CFG_MAX_ITEM_INIT_PRICE_KEY = "rubbos.maxItemInitPrice";
-//	private static final String CFG_MAX_ITEM_QUANTITY_KEY = "rubbos.maxItemQuantity";
 //	private static final String CFG_MAX_WORD_LENGTH_KEY = "rubbos.maxWordLen";
 	private static final String CFG_NUM_STORIES_PER_PAGE_KEY = "rubbos.numStoriesPerPage";
-//	private static final String CFG_NUM_OLD_ITEMS_KEY = "rubbos.numOldItems";
-//	private static final String CFG_NUM_PRELOADED_USERS_KEY = "rubbos.numPreloadedUsers";
+/	private static final String CFG_NUM_PRELOADED_AUTHORS_KEY = "rubbos.numPreloadedAuthors";
+/	private static final String CFG_NUM_PRELOADED_USERS_KEY = "rubbos.numPreloadedUsers";
 	private static final String CFG_OLDEST_STORY_MONTH_KEY = "rubbos.oldestStoryMonth";
 	private static final String CFG_OLDEST_STORY_YEAR_KEY = "rubbos.oldestStoryYear";
 //	private static final String CFG_PERCENT_UNIQUE_ITEMS_KEY = "rubbos.percentUniqueItems";
-//	private static final String CFG_PERCENT_ITEMS_RESERVE_KEY = "rubbos.percentItemsReserve";
-//	private static final String CFG_PERCENT_ITEMS_BUY_NOW_KEY = "rubbos.percentItemsBuyNow";
-//	private static final String CFG_REGIONS_FILE_KEY = "rubbos.regionsFile";
 	private static final String CFG_RNG_SEED_KEY = "rubbos.rngSeed";
 	private static final String CFG_SERVER_HTML_PATH_KEY = "rubbos.serverHtmlPath";
 	private static final String CFG_SERVER_SCRIPT_PATH_KEY = "rubbos.serverScriptPath";
@@ -124,62 +112,37 @@ public final class RubbosConfiguration
 	private static final String DEFAULT_DICTIONARY_FILE = "resources/rubbos-dictionary.txt";
 	private static final int DEFAULT_INCARNATION = PHP_INCARNATION;
 	private static final int DEFAULT_INITIAL_OPERATION = RubbosGenerator.HOME_OP;
-//	private static final int DEFAULT_MAX_BIDS_PER_ITEM = 20;
 	private static final int DEFAULT_MAX_COMMENT_LENGTH = 1024;
 	private static final int DEFAULT_MAX_STORY_LENGTH = 1024;
-//	private static final float DEFAULT_MAX_ITEM_BASE_BID_PRICE = 10;
-//	private static final float DEFAULT_MAX_ITEM_BASE_BUY_NOW_PRICE = 1000;
-//	private static final float DEFAULT_MAX_ITEM_BASE_RESERVE_PRICE = 1000;
-//	private static final int DEFAULT_MAX_ITEM_DESCRIPTION_LENGTH = 8192;
-//	private static final int DEFAULT_MAX_ITEM_DURATION = 7;
-//	private static final int DEFAULT_MAX_ITEM_INIT_PRICE = 5000;
-//	private static final int DEFAULT_MAX_ITEM_QUANTITY = 10;
 //	private static final int DEFAULT_MAX_WORD_LENGTH = 12;
 	private static final int DEFAULT_NUM_STORIES_PER_PAGE = 20;
-//	private static final int DEFAULT_NUM_OLD_ITEMS = 1000000;
-//	private static final int DEFAULT_NUM_PRELOADED_USERS = 1;
+	private static final int DEFAULT_NUM_PRELOADED_AUTHORS = 1;
+	private static final int DEFAULT_NUM_PRELOADED_USERS = 1;
 	private static final int DEFAULT_OLDEST_STORY_MONTH = 1;
 	private static final int DEFAULT_OLDEST_STORY_YEAR = 1998;
 //	private static final float DEFAULT_PERCENTAGE_UNIQUE_ITEMS = 80;
-//	private static final float DEFAULT_PERCENTAGE_ITEMS_RESERVE = 40;
-//	private static final float DEFAULT_PERCENTAGE_ITEMS_BUY_NOW = 10;
-//	private static final String DEFAULT_REGIONS_FILE = "resources/rubbos-ebay_regions.txt";
 	private static final long DEFAULT_RNG_SEED = -1;
 	private static final String DEFAULT_SERVER_HTML_PATH = "/";
 	private static final String DEFAULT_SERVER_SCRIPT_PATH = "/";
 
 
-//	// Members to hold configuration values
+	// Members to hold configuration values
 	private Map<String,Integer> _dictionary = null; ///< A collection of name-frequency pairs
-//	private List<Integer> _numItemsPerCategory = null; ///< Number of items for each category
 	private String _dictionaryFile = DEFAULT_DICTIONARY_FILE; ///< File name of the RUBBoS dictionary file
 	private int _incarnation = DEFAULT_INCARNATION; ///< RUBBoS incarnation
 	private int _initOp = DEFAULT_INITIAL_OPERATION; ///< RUBBoS incarnation
 	private int _maxCommentLen = DEFAULT_MAX_COMMENT_LENGTH; ///< Maximum comment length
 	private int _maxStoryLen = DEFAULT_MAX_STORY_LENGTH; ///< Maximum story length
-//	private float _maxItemBaseBidPrice = DEFAULT_MAX_ITEM_BASE_BID_PRICE; ///< Maximum base bid price for an item
-//	private float _maxItemBaseBuyNowPrice = DEFAULT_MAX_ITEM_BASE_BUY_NOW_PRICE; ///< Maximum base buy now price for an item
-//	private float _maxItemBaseReservePrice = DEFAULT_MAX_ITEM_BASE_RESERVE_PRICE; ///< Maximum base reserve price for an item
-//	private int _maxItemBids = DEFAULT_MAX_BIDS_PER_ITEM; ///< Maximum number of bids per item
-//	private int _maxItemDescrLen = DEFAULT_MAX_ITEM_DESCRIPTION_LENGTH; ///< Maximum item description length
-//	private int _maxItemDuration = DEFAULT_MAX_ITEM_DURATION; ///< Maximum duration of an item
-//	private float _maxItemInitPrice= DEFAULT_MAX_ITEM_INIT_PRICE; ///< Maximum initial price for an item
-//	private int _maxItemQty = DEFAULT_MAX_ITEM_QUANTITY; ///< Maximum quantity for multiple items
 //	private int _maxWordLen = DEFAULT_MAX_WORD_LENGTH; ///< Maximum length of a word
 	private int _numStoriesPerPage = DEFAULT_NUM_STORIES_PER_PAGE; ///< Number of items per page
-//	private int _numOldItems = DEFAULT_NUM_OLD_ITEMS; ///< The total number of old items (i.e., whose auction date is over) to be inserted in the database
-//	private int _numPreloadUsers = DEFAULT_NUM_PRELOADED_USERS; ///< Number of users that have been already preloaded in the RUBBoS database
+	private int _numPreloadAuthors = DEFAULT_NUM_PRELOADED_AUTHORS; ///< Number of authors that have been already preloaded in the RUBBoS database
+	private int _numPreloadUsers = DEFAULT_NUM_PRELOADED_USERS; ///< Number of users that have been already preloaded in the RUBBoS database
 	private int _oldestStoryMonth = DEFAULT_OLDEST_STORY_MONTH; ///< The month that the oldest story in the RUBBoS database can have
 	private int _oldestStoryYear = DEFAULT_OLDEST_STORY_YEAR; ///< The year that the oldest story in the RUBBoS database can have
-//	private float _percItemsBuyNow = DEFAULT_PERCENTAGE_ITEMS_BUY_NOW; ///< Percentage of items that users can 'buy now'
-//	private float _percItemsReserve = DEFAULT_PERCENTAGE_ITEMS_RESERVE; ///< Percentage of items with a reserve price
-//	private float _percUniqueItems = DEFAULT_PERCENTAGE_UNIQUE_ITEMS; ///< Percentage of unique items
-//	private List<String> _regions = null; /*Arrays.asList(DEFAULT_REGIONS)*/; ///< A collection of categories
-//	private String _regionsFile = DEFAULT_REGIONS_FILE; ///< File name of the RUBBoS regions file
+//	private float _percUniqueItems = DEFAULT_PERCENTAGE_UNIQUE_ITEMS; ///< Percentage of items that users can 'buy now'
     private long _rngSeed = DEFAULT_RNG_SEED; ///< The seed used for the Random Number Generator; a value <= 0 means that no special seed is used.
 	private String _serverHtmlPath = DEFAULT_SERVER_HTML_PATH; ///< The path to HTML pages on the RUBBoS Web server
 	private String _serverScriptPath = DEFAULT_SERVER_SCRIPT_PATH; ///< The path to script pages on the RUBBoS Web server
-//	private int _totActiveItems = 0/*DEFAULT_TOTAL_ACTIVE_ITEMS*/; ///< The total number of items to generate
 
 
 	public RubbosConfiguration()
@@ -319,10 +282,6 @@ public final class RubbosConfiguration
 				throw new JSONException("Unknown RUBBoS operation: '" + str + "'");
 			}
 		}
-//		if (config.has(CFG_MAX_BIDS_PER_ITEM_KEY))
-//		{
-//			this._maxItemBids = config.getInt(CFG_MAX_BIDS_PER_ITEM_KEY);
-//		}
 		if (config.has(CFG_MAX_COMMENT_LENGTH_KEY))
 		{
 			this._maxCommentLen = config.getInt(CFG_MAX_COMMENT_LENGTH_KEY);
@@ -331,34 +290,6 @@ public final class RubbosConfiguration
 		{
 			this._maxStoryLen = config.getInt(CFG_MAX_STORY_LENGTH_KEY);
 		}
-//		if (config.has(CFG_MAX_ITEM_BASE_BID_PRICE_KEY))
-//		{
-//			this._maxItemBaseBidPrice = (float) config.getDouble(CFG_MAX_ITEM_BASE_BID_PRICE_KEY);
-//		}
-//		if (config.has(CFG_MAX_ITEM_BASE_BUY_NOW_PRICE_KEY))
-//		{
-//			this._maxItemBaseBuyNowPrice = (float) config.getDouble(CFG_MAX_ITEM_BASE_BUY_NOW_PRICE_KEY);
-//		}
-//		if (config.has(CFG_MAX_ITEM_BASE_RESERVE_PRICE_KEY))
-//		{
-//			this._maxItemBaseReservePrice = (float) config.getDouble(CFG_MAX_ITEM_BASE_RESERVE_PRICE_KEY);
-//		}
-//		if (config.has(CFG_MAX_ITEM_DESCR_LENGTH_KEY))
-//		{
-//			this._maxItemDescrLen = config.getInt(CFG_MAX_ITEM_DESCR_LENGTH_KEY);
-//		}
-//		if (config.has(CFG_MAX_ITEM_DURATION_KEY))
-//		{
-//			this._maxItemDuration = config.getInt(CFG_MAX_ITEM_DURATION_KEY);
-//		}
-//		if (config.has(CFG_MAX_ITEM_INIT_PRICE_KEY))
-//		{
-//			this._maxItemInitPrice = (float) config.getDouble(CFG_MAX_ITEM_INIT_PRICE_KEY);
-//		}
-//		if (config.has(CFG_MAX_ITEM_QUANTITY_KEY))
-//		{
-//			this._maxItemQty = config.getInt(CFG_MAX_ITEM_QUANTITY_KEY);
-//		}
 //		if (config.has(CFG_MAX_WORD_LENGTH_KEY))
 //		{
 //			this._maxWordLen = config.getInt(CFG_MAX_WORD_LENGTH_KEY);
@@ -367,14 +298,14 @@ public final class RubbosConfiguration
 		{
 			this._numStoriesPerPage = config.getInt(CFG_NUM_STORIES_PER_PAGE_KEY);
 		}
-//		if (config.has(CFG_NUM_OLD_ITEMS_KEY))
-//		{
-//			this._numOldItems = config.getInt(CFG_NUM_OLD_ITEMS_KEY);
-//		}
-//		if (config.has(CFG_NUM_PRELOADED_USERS_KEY))
-//		{
-//			this._numPreloadUsers = config.getInt(CFG_NUM_PRELOADED_USERS_KEY);
-//		}
+		if (config.has(CFG_NUM_PRELOADED_AUTHORS_KEY))
+		{
+			this._numPreloadAuthors = config.getInt(CFG_NUM_PRELOADED_AUTHORS_KEY);
+		}
+		if (config.has(CFG_NUM_PRELOADED_USERS_KEY))
+		{
+			this._numPreloadUsers = config.getInt(CFG_NUM_PRELOADED_USERS_KEY);
+		}
 		if (config.has(CFG_OLDEST_STORY_MONTH_KEY))
 		{
 			this._oldestStoryMonth = config.getInt(CFG_OLDEST_STORY_MONTH_KEY);
@@ -386,18 +317,6 @@ public final class RubbosConfiguration
 //		if (config.has(CFG_PERCENT_UNIQUE_ITEMS_KEY))
 //		{
 //			this._percUniqueItems = (float) config.getDouble(CFG_PERCENT_UNIQUE_ITEMS_KEY);
-//		}
-//		if (config.has(CFG_PERCENT_ITEMS_RESERVE_KEY))
-//		{
-//			this._percItemsReserve = (float) config.getDouble(CFG_PERCENT_ITEMS_RESERVE_KEY);
-//		}
-//		if (config.has(CFG_PERCENT_ITEMS_BUY_NOW_KEY))
-//		{
-//			this._percItemsBuyNow = (float) config.getDouble(CFG_PERCENT_ITEMS_BUY_NOW_KEY);
-//		}
-//		if (config.has(CFG_REGIONS_FILE_KEY))
-//		{
-//			this._regionsFile = config.getString(CFG_REGIONS_FILE_KEY);
 //		}
 		if (config.has(CFG_RNG_SEED_KEY))
 		{
@@ -415,7 +334,6 @@ public final class RubbosConfiguration
 		try
 		{
 			this.parseDictionaryFile();
-//			this.parseRegionsFile();
 		}
 		catch (Throwable t)
 		{
@@ -508,81 +426,6 @@ public final class RubbosConfiguration
 	}
 
 //	/**
-//	 * Get the maximum base reserve price for an item.
-//	 *
-//	 * @return the maximum base reserve price for an item
-//	 */
-//	public float getMaxItemBaseReservePrice()
-//	{
-//		return this._maxItemBaseReservePrice;
-//	}
-
-//	/**
-//	 * Get the maximum base bid price for an item
-//	 * 
-//	 * @return maximum base bid price for an item
-//	 */
-//	public float getMaxItemBaseBidPrice()
-//	{
-//		return this._maxItemBaseBidPrice;
-//	}
-
-//	/**
-//	 * Get the maximum base buy now price for an item.
-//	 *
-//	 * @return the maximum base buy now price for an item
-//	 */
-//	public float getMaxItemBaseBuyNowPrice()
-//	{
-//		return this._maxItemBaseBuyNowPrice;
-//	}
-
-//	/**
-//	 * Get the maximum item description length.
-//	 *
-//	 * This is the RAIN counterpart of the item_description_length RUBBoS
-//	 * property.
-//	 * 
-//	 * @return maximum item description length
-//	 */
-//	public int getMaxItemDescriptionLength()
-//	{
-//		return this._maxItemDescrLen;
-//	}
-
-//	/**
-//	 * Get the maximum item duration in days
-//	 *
-//	 * @return the maximum item duration in days
-//	 */
-//	public int getMaxItemDuration()
-//	{
-//		return this._maxItemDuration;
-//	}
-
-//	/**
-//	 * Get the maximum initial price for an item.
-//	 *
-//	 * @return the maximum initial price for an item
-//	 */
-//	public float getMaxItemInitialPrice()
-//	{
-//		return this._maxItemInitPrice;
-//	}
-
-//	/**
-//	 * Get the maximum quantity for multiple items.
-//	 * 
-//	 * This is the RAIN counterpart of the max_quantity_for_multiple_items RUBBoS property.
-//	 *
-//	 * @return maximum quantity for multiple items
-//	 */
-//	public int getMaxItemQuantity()
-//	{
-//		return this._maxItemQty;
-//	}
-
-//	/**
 //	 * Get the maximum length of a word.
 //	 *
 //	 * @return the maximum length of a word
@@ -590,18 +433,6 @@ public final class RubbosConfiguration
 //	public int getMaxWordLength()
 //	{
 //		return this._maxWordLen;
-//	}
-
-//	/**
-//	 * Get the number of items for the given category.
-//	 *
-//	 * @param categoryId The category identifier for which the number of items has
-//	 *  to be returned.
-//	 * @return number of items for the given category
-//	 */
-//	public int getNumOfItemsPerCategory(int categoryId)
-//	{
-//		return this._numItemsPerCategory.get(categoryId);
 //	}
 
 	/**
@@ -617,27 +448,27 @@ public final class RubbosConfiguration
 		return this._numStoriesPerPage;
 	}
 
-//	/**
-//	 * Get the total number of old items (i.e. whose auction date is over) to be
-//	 * inserted in the database.
-//	 * 
-//	 * @return total number of old items
-//	 */
-//	public int getNumOfOldItems()
-//	{
-//		return this._numOldItems;
-//	}
+	/**
+	 * Get the number of authors that have been already preloaded inside the
+	 * RUBBoS database.
+	 *
+	 * @return the number of preloaded authors.
+	 */
+	public int getNumOfPreloadedAuthors()
+	{
+		return this._numPreloadAuthors;
+	}
 
-//	/**
-//	 * Get the number of users that have been already preloaded inside the
-//	 * RUBBoS database.
-//	 *
-//	 * @return the number of preloaded users.
-//	 */
-//	public int getNumOfPreloadedUsers()
-//	{
-//		return this._numPreloadUsers;
-//	}
+	/**
+	 * Get the number of users that have been already preloaded inside the
+	 * RUBBoS database.
+	 *
+	 * @return the number of preloaded users.
+	 */
+	public int getNumOfPreloadedUsers()
+	{
+		return this._numPreloadUsers;
+	}
 
 	/**
 	 * Get the month that the oldest RUBBoS story can have
@@ -666,30 +497,6 @@ public final class RubbosConfiguration
 	}
 
 //	/**
-//	 * Get the percentage of items that users can 'buy now'.
-//	 * 
-//	 * This is the RAIN counterpart of the percentage_of_buy_now_items RUBBoS property.
-//	 *
-//	 * @return percentage of items that users can 'buy now'.
-//	 */
-//	public float getPercentageOfItemsBuyNow()
-//	{
-//		return this._percItemsBuyNow;
-//	}
-
-//	/**
-//	 * Get the percentage of items with a reserve price.
-//	 * 
-//	 * This is the RAIN counterpart of the percentage_of_items_with_reserve_price RUBBoS property.
-//	 *
-//	 * @return percentage of items with a reserve price
-//	 */
-//	public float getPercentageOfItemsReserve()
-//	{
-//		return this._percItemsReserve;
-//	}
-
-//	/**
 //	 * Get the percentage of unique items.
 //	 * 
 //	 * This is the RAIN counterpart of the percentage_of_unique_items RUBBoS property.
@@ -699,26 +506,6 @@ public final class RubbosConfiguration
 //	public float getPercentageOfUniqueItems()
 //	{
 //		return this._percUniqueItems;
-//	}
-
-//	/**
-//	 * Get the list of regions.
-//	 *
-//	 * @return a list of regions
-//	 */
-//	public List<String> getRegions()
-//	{
-//		return this._regions;
-//	}
-
-//	/**
-//	 * Get the regions file name.
-//	 *
-//	 * @return the regions file name
-//	 */
-//	public String getRegionsFileName()
-//	{
-//		return this._regionsFile;
 //	}
 
 	/**
@@ -751,17 +538,6 @@ public final class RubbosConfiguration
 		return this._serverScriptPath;
 	}
 
-//	/**
-//	 * Get the total number of items computed from information found in the
-//	 * categories file given in the categories_file field
-//	 * 
-//	 * @return total number of active items (auction date is not passed)
-//	 */
-//	public int getTotalActiveItems()
-//	{
-//		return this._totActiveItems;
-//	}
-
 	public String toString()
 	{
 		StringBuffer sb = new StringBuffer();
@@ -769,27 +545,16 @@ public final class RubbosConfiguration
 		sb.append( " Dictionary: " + this.getDictionary());
 		sb.append(", Dictionary File Name: " + this.getDictionarysFileName());
 		sb.append( " Incarnation: " + this.getIncarnation());
-//		sb.append(", Max Bids per Item: " + this.getMaxBidsPerItem());
 		sb.append(", Max Comment Length: " + this.getMaxCommentLength());
 		sb.append(", Max Story Length: " + this.getMaxStoryLength());
-//		sb.append(", Max Item Base Reserve Price: " + this.getMaxItemBaseReservePrice());
-//		sb.append(", Max Item Base Buy Now: " + this.getMaxItemBaseBuyNowPrice());
-//		sb.append(", Max Item Duration: " + this.getMaxItemDuration());
-//		sb.append(", Max Item Initial Price: " + this.getMaxItemInitialPrice());
-//		sb.append(", Max Item Quantity: " + this.getMaxItemQuantity());
 //		sb.append(", Max Word Length: " + this.getMaxWordLength());
 		sb.append(", Number of Stories per Page: " + this.getNumOfStoriesPerPage());
-//		sb.append(", Number of Old Items: " + this.getNumOfOldItems());
-//		sb.append(", Number of Preloaded Users: " + this.getNumOfPreloadedUsers());
+		sb.append(", Number of Preloaded Authors: " + this.getNumOfPreloadedAuthors());
+		sb.append(", Number of Preloaded Users: " + this.getNumOfPreloadedUsers());
 		sb.append(", Oldest Story Month: " + this.getOldestStoryMonth());
 		sb.append(", Oldest Story Year: " + this.getOldestStoryYear());
-//		sb.append(", Percentage of Items that Users Can Buy Now: " + this.getPercentageOfItemsBuyNow());
-//		sb.append(", Percentage of Items with a Reserve Price: " + this.getPercentageOfItemsReserve());
 //		sb.append(", Percentage of Unique Items: " + this.getPercentageOfUniqueItems());
-//		sb.append(", Regions: " + this.getRegions());
-//		sb.append(", Regions File Name: " + this.getRegionsFileName());
 		sb.append(", Random Number Generator Seed: " + this.getRngSeed());
-//		sb.append(", Total Active Items: " + this.getTotalActiveItems());
 		sb.append(", Server HTML Path: " + this.getServerHtmlPath());
 		sb.append(", Server Script Path: " + this.getServerScriptPath());
 
@@ -831,29 +596,4 @@ public final class RubbosConfiguration
 			}
 		}
 	}
-
-//	/**
-//	 * Parse the regions file and store the regions.
-//	 */
-//	private void parseRegionsFile() throws Throwable
-//	{
-//		this._regions = new ArrayList<String>();
-//
-//		BufferedReader rd = null;
-//		try
-//		{
-//			rd = new BufferedReader(new FileReader(this._regionsFile));
-//			while (rd.ready())
-//			{
-//				this._regions.add(rd.readLine());
-//			}
-//		}
-//		finally
-//		{
-//			if (rd != null)
-//			{
-//				rd.close();
-//			}
-//		}
-//	}
 }
