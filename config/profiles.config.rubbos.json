@@ -13,13 +13,9 @@
             "rubbos.oldestStoryYear": 1998,
             "rubbos.rngSeed": 5489,
             "rubbos.serverHtmlPath": "/",
-            "rubbos.serverScriptPath": "/",
+            "rubbos.serverScriptPath": "/"
 #            "rubbos.maxWordLen": 12,
-#            "rubbos.maxItemReservePrice": 1000,
-#            "rubbos.maxItemBuyNow": 1000,
-#            "rubbos.maxItemDuration": 7,
-#            "rubbos.nextAvailUserId": 1,
-#            "rubbos.nextAvailItemId": 1
+#            "rubbos.nextAvailUserId": 1
         },
         "track": "radlab.rain.DefaultScenarioTrack",
         "metricSnapshots": true,
