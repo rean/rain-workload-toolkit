@@ -66,7 +66,7 @@ public final class RubbosConfiguration
 	private static final String SERVLET_INCARNATION_NAME = "servlet";
 
 	// RUBBoS operation names
-	private static final String STORIES_OF_DAY_OP_NAME = "storiesoftheday";
+	private static final String STORIES_OF_THE_DAY_OP_NAME = "storiesoftheday";
 	private static final String REGISTER_OP_NAME = "register";
 	private static final String REGISTER_USER_OP_NAME = "registeruser";
 	private static final String BROWSE_OP_NAME = "browse";
@@ -97,10 +97,11 @@ public final class RubbosConfiguration
 	private static final String CFG_INITIAL_OPERATION_KEY = "rubbos.initOp";
 	private static final String CFG_INCARNATION_KEY = "rubbos.incarnation";
 	private static final String CFG_MAX_COMMENT_LENGTH_KEY = "rubbos.maxCommentLen";
+	private static final String CFG_MAX_STORY_LENGTH_KEY = "rubbos.maxStoryLen";
 //	private static final String CFG_MAX_WORD_LENGTH_KEY = "rubbos.maxWordLen";
 	private static final String CFG_NUM_STORIES_PER_PAGE_KEY = "rubbos.numStoriesPerPage";
-/	private static final String CFG_NUM_PRELOADED_AUTHORS_KEY = "rubbos.numPreloadedAuthors";
-/	private static final String CFG_NUM_PRELOADED_USERS_KEY = "rubbos.numPreloadedUsers";
+	private static final String CFG_NUM_PRELOADED_AUTHORS_KEY = "rubbos.numPreloadedAuthors";
+	private static final String CFG_NUM_PRELOADED_USERS_KEY = "rubbos.numPreloadedUsers";
 	private static final String CFG_OLDEST_STORY_MONTH_KEY = "rubbos.oldestStoryMonth";
 	private static final String CFG_OLDEST_STORY_YEAR_KEY = "rubbos.oldestStoryYear";
 //	private static final String CFG_PERCENT_UNIQUE_ITEMS_KEY = "rubbos.percentUniqueItems";
@@ -111,7 +112,7 @@ public final class RubbosConfiguration
 	// Default values
 	private static final String DEFAULT_DICTIONARY_FILE = "resources/rubbos-dictionary.txt";
 	private static final int DEFAULT_INCARNATION = PHP_INCARNATION;
-	private static final int DEFAULT_INITIAL_OPERATION = RubbosGenerator.HOME_OP;
+	private static final int DEFAULT_INITIAL_OPERATION = RubbosGenerator.STORIES_OF_THE_DAY_OP;
 	private static final int DEFAULT_MAX_COMMENT_LENGTH = 1024;
 	private static final int DEFAULT_MAX_STORY_LENGTH = 1024;
 //	private static final int DEFAULT_MAX_WORD_LENGTH = 12;
@@ -158,7 +159,7 @@ public final class RubbosConfiguration
 	{
 		if (config.has(CFG_DICTIONARY_FILE_KEY))
 		{
-			this._dictionarysFile = config.getString(CFG_DICTIONARY_FILE_KEY);
+			this._dictionaryFile = config.getString(CFG_DICTIONARY_FILE_KEY);
 		}
 		if (config.has(CFG_INCARNATION_KEY))
 		{
@@ -543,7 +544,7 @@ public final class RubbosConfiguration
 		StringBuffer sb = new StringBuffer();
 
 		sb.append( " Dictionary: " + this.getDictionary());
-		sb.append(", Dictionary File Name: " + this.getDictionarysFileName());
+		sb.append(", Dictionary File Name: " + this.getDictionaryFileName());
 		sb.append( " Incarnation: " + this.getIncarnation());
 		sb.append(", Max Comment Length: " + this.getMaxCommentLength());
 		sb.append(", Max Story Length: " + this.getMaxStoryLength());
@@ -584,7 +585,7 @@ public final class RubbosConfiguration
 					throw new Exception("Syntax error in categories file on line " + nc + ": " + line);
 				}
 				String name = m.group(1);
-				int freq = m.group(2);
+				int freq = Integer.parseInt(m.group(2));
 				this._dictionary.put(name, freq);
 			}
 		}

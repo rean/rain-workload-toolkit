@@ -63,9 +63,9 @@ public class PostCommentOperation extends RubbosOperation
 
 		// Extract a Post-Comment parameters from last response
 		String scriptName = this.getGenerator().getPostCommentURL();
-		int pos = scriptName.lastIndex('/');
+		int pos = scriptName.lastIndexOf('/');
 		scriptName = scriptName.substring(pos >= 0 ? pos : 0);
-		Map<String,String> params = this.getUtility().findPostCommentParamsIdInHtml(this.getSessionState().getLastResponse(), scriptName);
+		Map<String,String> params = this.getUtility().findPostCommentParamsInHtml(this.getSessionState().getLastResponse(), scriptName);
 		if (params == null)
 		{
 			this.getLogger().warning("No valid parameter has been found. Operation interrupted.");

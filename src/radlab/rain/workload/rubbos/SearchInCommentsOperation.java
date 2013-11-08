@@ -72,18 +72,18 @@ public class SearchInCommentsOperation extends RubbosOperation
 			keyword = this.getSessionState().getLastSearchWord();
 		}
 
-        URIBuilder uri = new URIBuilder(this.getGenerator().getSearchCommentsURL());
+        URIBuilder uri = new URIBuilder(this.getGenerator().getSearchInCommentsURL());
         uri.setParameter("type", "1");
         uri.setParameter("search", keyword);
         uri.setParameter("page", Integer.toString(this.getUtility().findPageInHtml(this.getSessionState().getLastResponse())));
-        uri.setParameter("nbOfStories", this.getConfiguration().getNumOfStoriesPerPage());
+        uri.setParameter("nbOfStories", Integer.toString(this.getConfiguration().getNumOfStoriesPerPage()));
         HttpGet reqGet = new HttpGet(uri.build());
         response = this.getHttpTransport().fetch(reqGet);
-		this.trace(this.getGenerator().getSearchCommentsURL());
+		this.trace(this.getGenerator().getSearchInCommentsURL());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getSearchCommentsURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getSearchCommentsURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			this.getLogger().severe("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+			throw new IOException("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		// Save session data

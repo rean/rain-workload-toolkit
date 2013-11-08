@@ -35,7 +35,7 @@ package radlab.rain.workload.rubbos;
 
 
 import java.io.IOException;
-import java.util.GregorianCalendar;
+import java.util.Calendar;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import radlab.rain.IScoreboard;
@@ -48,6 +48,9 @@ import radlab.rain.IScoreboard;
  */
 public class OlderStoriesOperation extends RubbosOperation 
 {
+	private final static int THIS_YEAR = Calendar.getInstance().get(Calendar.YEAR);
+
+
 	public OlderStoriesOperation(boolean interactive, IScoreboard scoreboard) 
 	{
 		super(interactive, scoreboard);
@@ -103,7 +106,7 @@ public class OlderStoriesOperation extends RubbosOperation
 		else
 		{
 			// Some date in the past week
-			GregorianCalendar y = new GregorianCalendar();
+			Calendar cal = Calendar.getInstance();
 			when /= 10;
 			if (when == 0)
 			{
@@ -115,15 +118,15 @@ public class OlderStoriesOperation extends RubbosOperation
 			}
 			for (int i = 0; i < when; ++i)
 			{
-				y.roll(GregorianCalendar.DAY_OF_MONTH, false);
+				cal.roll(Calendar.DAY_OF_MONTH, false);
 			}
-			day = y.get(GregorianCalendar.DAY_OF_MONTH);
-			month = y.get(GregorianCalendar.MONTH)+1; // Month start at 0
-			year = y.get(GregorianCalendar.YEAR);
+			day = cal.get(Calendar.DAY_OF_MONTH);
+			month = cal.get(Calendar.MONTH)+1; // Month start at 0
+			year = cal.get(Calendar.YEAR);
 		}
-		if (year > thisYear)
+		if (year > THIS_YEAR)
 		{
-			year = thisYear;
+			year = THIS_YEAR;
 		}
 		if (year == this.getConfiguration().getOldestStoryYear())
 		{

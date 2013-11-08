@@ -58,7 +58,11 @@ public class AcceptStoryOperation extends RubbosOperation
 	@Override
 	public void execute() throws Throwable
 	{
-		int storyId = this.getUtility().findStoryIdInHtml(this.getSessionState().getLastResponse());
+		// Extracft Accept-Story parameters from last response
+		String scriptName = this.getGenerator().getAcceptStoryURL();
+		int pos = scriptName.lastIndexOf('/');
+		scriptName = scriptName.substring(pos >= 0 ? pos : 0);
+		int storyId = this.getUtility().findAcceptRejectStoryIdInHtml(this.getSessionState().getLastResponse(), scriptName);
 		if (storyId == RubbosUtility.INVALID_STORY_ID)
 		{
 			//FIXME: in this case, the native RUBBoS client goes back to home page

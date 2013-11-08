@@ -61,7 +61,7 @@ public class StoreModerateLogOperation extends RubbosOperation
 	public void execute() throws Throwable
 	{
 		// Need a logged user
-		RubisUser loggedUser = this.getUtility().getUser(this.getSessionState().getLoggedUserId());
+		RubbosUser loggedUser = this.getUtility().getUser(this.getSessionState().getLoggedUserId());
 		if (!this.getUtility().isRegisteredUser(loggedUser))
 		{
 			this.getLogger().warning("No valid user has been found to log-in. Operation interrupted.");
@@ -71,13 +71,15 @@ public class StoreModerateLogOperation extends RubbosOperation
 
 		final String lastResponse = this.getSessionState().getLastResponse();
 
-		// Extract a Moderate-Comment parameters from last response
+		// Extract parameters from last response
 		String  commentTable;
 		int commentId;
 		int[] pos = this.getUtility().findRandomLastIndexInHtml(lastResponse, "name=comment_table value=", false);
 		if (pos == null)
 		{
-			return null;
+			this.getLogger().warning("No valid parameters has been found from last response. Operation interrupted.");
+			this.setFailed(true);
+			return;
 		}
 		commentTable = lastResponse.substring(pos[0], pos[1]);
 		commentId = this.getUtility().findIntInHtml(lastResponse, "name=commentId value=");

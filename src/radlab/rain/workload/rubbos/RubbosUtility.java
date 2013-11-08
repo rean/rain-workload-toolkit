@@ -66,30 +66,8 @@ public final class RubbosUtility
 	public static final int INVALID_USER_ID = -1;
 	public static final int MIN_RATING_VALUE = -1;
 	public static final int MAX_RATING_VALUE = 1;
-//	public static final int MILLISECS_PER_DAY = 1000*60*60*24;
 
 
-//	private static final char[] ALNUM_CHARS = { '0', '1', '2', '3', '4', '5',
-//												'6', '7', '8', '9', 'A', 'B',
-//												'C', 'D', 'E', 'F', 'G', 'H',
-//												'I', 'J', 'K', 'L', 'M', 'N',
-//												'O', 'P', 'Q', 'R', 'S', 'T',
-//												'U', 'V', 'W', 'X', 'Y', 'Z',
-//												'a', 'b', 'c', 'd', 'e', 'f',
-//												'g', 'h', 'i', 'j', 'k', 'l',
-//												'm', 'n', 'o', 'p', 'q', 'r',
-//												's', 't', 'u', 'v', 'w', 'x',
-//												'y', 'z'}; ///< The set of alphanumeric characters
-//	private static final String[] COMMENTS = {"This is a very bad comment. Stay away from this seller!!",
-//											  "This is a comment below average. I don't recommend this user!!",
-//											  "This is a neutral comment. It is neither a good or a bad seller!!",
-//											  "This is a comment above average. You can trust this seller even if it is not the best deal!!",
-//											  "This is an excellent comment. You can make really great deals with this seller!!"}; ///< Descriptions associated to comment ratings
-//	private static final int[] COMMENT_RATINGS = {-5, // Bad
-//												  -3, // Below average
-//												   0, // Neutral
-//												   3, // Average
-//												   5  /* Excellent */ }; ///< Possible comment ratings
 	private static final int MIN_USER_ID = 1; ///< Mininum value for user IDs
 	private static final int MAX_COMMENT_SUBJECT_LENGTH = 100; ///< Maximum length for a comment's subject
 	private static final int MAX_STORY_TITLE_LENGTH = 100; ///< Maximum length for a story's title
@@ -173,7 +151,27 @@ public final class RubbosUtility
 
 	public boolean isValidUser(RubbosUser user)
 	{
-		return null != user && (MIN_USER_ID <= user.id || this.isAnonymousUser(user.id));
+		return null != user && INVALID_USER_ID != user.id && (MIN_USER_ID <= user.id || this.isAnonymousUser(user.id));
+	}
+
+	public boolean isValidCategory(RubbosCategory category)
+	{
+		return null != category && INVALID_CATEGORY_ID != category.id;
+	}
+
+	public boolean isValidStory(RubbosStory story)
+	{
+		return null != story && INVALID_STORY_ID != story.id;
+	}
+
+	public boolean isValidStory(int storyId)
+	{
+		return INVALID_STORY_ID != storyId;
+	}
+
+	public boolean isValidComment(RubbosComment comment)
+	{
+		return null != comment && INVALID_COMMENT_ID != comment.id;
 	}
 
 	public boolean checkHttpResponse(HttpTransport httpTransport, String response)
@@ -240,7 +238,8 @@ public final class RubbosUtility
 		user.nickname = "user" + user.id;
 		user.email = user.firstname + "." + user.lastname + "@rubbos.com";
 		user.password = "password" + user.id;
-		user.region = this.generateRegion().id;
+		user.rating = MIN_RATING_VALUE;
+		user.access = 0;
 		Calendar cal = Calendar.getInstance();
 		user.creationDate = cal.getTime();
 
@@ -259,7 +258,7 @@ public final class RubbosUtility
 		}
 		while ((subject != null) && (subject.length() < size));
 
-		size = this._rng.nextInt(this._cfg.getMaxCommentLength()) + 1;
+		size = this._rng.nextInt(this._conf.getMaxCommentLength()) + 1;
 		do
 		{
 			body += this.generateWord(true);
@@ -294,7 +293,7 @@ public final class RubbosUtility
 		}
 		while ((title != null) && (title.length() < size));
 
-		size = this._rng.nextInt(this._cfg.getMaxStoryLength()) + 1;
+		size = this._rng.nextInt(this._conf.getMaxStoryLength()) + 1;
 		do
 		{
 			body += this.generateWord(true);
@@ -331,15 +330,44 @@ public final class RubbosUtility
 			return INVALID_STORY_ID;
 		}
 
-		int[] pos = this.findRandomLastIndexInHtml(hrml, "storyId=", false);
+		int[] pos = this.findRandomLastIndexInHtml(html, "storyId=", false);
 		if (pos == null)
 		{
-			return lastStoryId;
+			return INVALID_STORY_ID;
 		}
 
 		String str = html.substring(pos[0], pos[1]);
 
 		return Integer.parseInt(str);
+	}
+
+	/**
+	 * Extract the story identifier from the review story page for an accept or reject.
+	 * If several entries are found, one of them is picked up randomly.
+	 *
+	 * @return the selected story identifier
+	 */
+	public Integer findAcceptRejectStoryIdInHtml(String html, String scriptName)
+	{
+		if (html == null)
+		{
+			return INVALID_STORY_ID;
+		}
+
+		int[] pos = this.findRandomLastIndexInHtml(html, scriptName, false);
+		if (pos == null)
+		{
+			return INVALID_STORY_ID;
+		}
+
+		int storyId = INVALID_STORY_ID;
+		int newLast = this.findLastIndexInHtml(html, "storyId=", pos[1]);
+		if (newLast != pos[1])
+		{
+			storyId = Integer.parseInt(html.substring(pos[1]+"storyId=".length()+1, newLast));
+		}
+
+		return storyId;
 	}
 
 	/**
@@ -405,8 +433,8 @@ public final class RubbosUtility
 
 		// Now we have chosen a 'scriptName?...' we can extract the parameters
 		String  commentTable = null;
-		int storyId;
-		int parent;
+		int storyId = INVALID_STORY_ID;
+		int parent = INVALID_COMMENT_ID;
 
 		int newLast = this.findLastIndexInHtml(html, "comment_table=", pos[1]);
 		if (newLast != pos[1])
@@ -427,9 +455,11 @@ public final class RubbosUtility
 		}
 
 		Map<String,String> result = new HashMap(3);
+
 		result.put("comment_table", commentTable);
-		result.add("storyId", Integer.toString(storyId));
-		result.add("parent", Integer.toString(parent));
+		result.put("storyId", Integer.toString(storyId));
+		result.put("parent", Integer.toString(parent));
+
 		return result;
 	}
 
@@ -455,10 +485,10 @@ public final class RubbosUtility
 
 		// Now we have chosen a 'scriptName?...' we can extract the parameters
 		String  commentTable = null;
-		int storyId;
-		int commentId;
-		int filter;
-		int display;
+		int storyId = INVALID_STORY_ID;
+		int commentId = INVALID_COMMENT_ID;
+		int filter = 0;
+		int display = 0;
 
 		int newLast = this.findLastIndexInHtml(html, "comment_table=", pos[1]);
 		if (newLast != pos[1])
@@ -491,11 +521,13 @@ public final class RubbosUtility
 		}
 
 		Map<String,String> result = new HashMap(5);
+
 		result.put("comment_table", commentTable);
-		result.add("storyId", Integer.toString(storyId));
-		result.add("commentId", Integer.toString(commentId));
-		result.add("filter", Integer.toString(filter));
-		result.add("display", Integer.toString(display));
+		result.put("storyId", Integer.toString(storyId));
+		result.put("commentId", Integer.toString(commentId));
+		result.put("filter", Integer.toString(filter));
+		result.put("display", Integer.toString(display));
+
 		return result;
 	}
 
@@ -521,7 +553,7 @@ public final class RubbosUtility
 
 		// Now we have chosen a 'scriptName?...' we can extract the parameters
 		String  commentTable = null;
-		int commentId;
+		int commentId = INVALID_COMMENT_ID;
 
 		int newLast = this.findLastIndexInHtml(html, "comment_table=", pos[1]);
 		if (newLast != pos[1])
@@ -537,8 +569,10 @@ public final class RubbosUtility
 		pos[1] = newLast;
 
 		Map<String,String> result = new HashMap(2);
+
 		result.put("comment_table", commentTable);
-		result.add("commentId", Integer.toString(commentId));
+		result.put("commentId", Integer.toString(commentId));
+
 		return result;
 	}
 
@@ -565,99 +599,12 @@ public final class RubbosUtility
 		}
 
 		int lastIndex = html.indexOf('\"', keyIndex+key.length());
-		lastIndex = isMin(lastIndex, html.indexOf('?', keyIndex+key.length()));
-		lastIndex = isMin(lastIndex, html.indexOf('&', keyIndex+key.length()));
-		lastIndex = isMin(lastIndex, html.indexOf('>', keyIndex+key.length()));
+		lastIndex = minIndex(lastIndex, html.indexOf('?', keyIndex+key.length()));
+		lastIndex = minIndex(lastIndex, html.indexOf('&', keyIndex+key.length()));
+		lastIndex = minIndex(lastIndex, html.indexOf('>', keyIndex+key.length()));
 
 		return Integer.parseInt(html.substring(keyIndex+key.length(), lastIndex));
 	}
-
-//	/**
-//	 * Parses the given HTML text to find the value of the given parameter.
-//	 *
-//	 * @param html The HTML string where to look for the parameter.
-//	 * @param paramName The name of the parameter to look for.
-//	 * @return The value of the parameter as a string, or null if
-//	 *  no parameter is found.
-//	 *
-//	 * This method is based on the edu.rice.rubbos.client.UserSession#extractIntFromHTML
-//	 * and edu.rice.rubbos.client.UserSession#extractFloatFromHTML.
-//	 */
-//	public String findParamInHtml(String html, String paramName)
-//	{
-//		if (html == null)
-//		{
-//			return null;
-//		}
-//
-//		// Look for the parameter
-////		int paramIdx = html.indexOf(paramName);
-////		if (paramIdx == -1)
-////		{
-////			return null;
-////		}
-////		int lastIdx = minIndex(Integer.MAX_VALUE, html.indexOf('=', paramIdx + paramName.length()));
-////		lastIdx = minIndex(lastIdx, html.indexOf('\"', paramIdx + paramName.length()));
-////		lastIdx = minIndex(lastIdx, html.indexOf('?', paramIdx + paramName.length()));
-////		lastIdx = minIndex(lastIdx, html.indexOf('&', paramIdx + paramName.length()));
-////		lastIdx = minIndex(lastIdx, html.indexOf('>', paramIdx + paramName.length()));
-//
-////		return html.substring(paramIdx + paramName.length(), lastIdx);
-//
-//		Pattern p = Pattern.compile("^.*?[&?]" + paramName + "=([^\"?&\\s>]*).*$");
-//		Matcher m = p.matcher(html);
-//		if (m.matches())
-//		{
-//			return m.group(1);
-//		}
-//
-//		return null;
-//	}
-
-//	/**
-//	 * Parses the given HTML text to find the value of the given form parameter.
-//	 *
-//	 * @param html The HTML string where to look for the form parameter.
-//	 * @param paramName The name of the form parameter to look for.
-//	 * @return The value of the form parameter as a string, or null if
-//	 *  no parameter is found.
-//	 *
-//	 * This method is based on the edu.rice.rubbos.client.UserSession#extractIntFromHTML
-//	 * and edu.rice.rubbos.client.UserSession#extractFloatFromHTML.
-//	 */
-//	public String findFormParamInHtml(String html, String paramName)
-//	{
-//		if (html == null)
-//		{
-//			return null;
-//		}
-//
-//		// Look for the parameter
-////		String key = "name=" + paramName + " value=";
-////		int keyIdx = html.indexOf(key);
-////		if (keyIdx == -1)
-////		{
-////			return null;
-////		}
-////		int lastIdx = minIndex(Integer.MAX_VALUE, html.indexOf('=', keyIdx + key.length()));
-////		lastIdx = minIndex(lastIdx, html.indexOf('\"', keyIdx + key.length()));
-////		lastIdx = minIndex(lastIdx, html.indexOf('?', keyIdx + key.length()));
-////		lastIdx = minIndex(lastIdx, html.indexOf('&', keyIdx + key.length()));
-////		lastIdx = minIndex(lastIdx, html.indexOf('>', keyIdx + key.length()));
-////
-////		return html.substring(keyIdx + key.length(), lastIdx);
-//
-//		//Pattern p = Pattern.compile("^.*?<(?i:input)\\s+(?:.+?\\s)?(?i:name)=" + paramName + "\\s+(?:.+?\\s)?(?i:value)=([^\"?&>]+).+$");
-//		Pattern p = Pattern.compile("^.*?<(?i:input)\\s+(?:.+?\\s)?(?i:name)=" + paramName + "\\s+(?i:value)=([^\"?&>\\s]+).+$");
-//		Matcher m = p.matcher(html);
-//		if (m.matches())
-//		{
-//			return m.group(1);
-//		}
-//
-//		return null;
-//	}
-
 
 	/**
 	 * Parses the given HTML text to find the page value.
@@ -727,39 +674,6 @@ public final class RubbosUtility
 
 		return 0;
 	}
-
-//	/**
-//	 * Get the number of days between the two input dates.
-//	 *
-//	 * @param from The first date
-//	 * @param to The second date
-//	 * @return The number of days between from and to.
-//	 *  A negative number means that the second date is earlier then the first
-//	 *  date.
-//	 */
-//	public int getDaysBetween(Date from, Date to)
-//	{
-//		Calendar cal = Calendar.getInstance();
-//
-//		cal.setTime(from);
-//		long fromTs = cal.getTimeInMillis();
-//		cal.setTime(to);
-//		long toTs = cal.getTimeInMillis();
-//
-//		//long diffTs = Math.abs(toTs-fromTs);
-//		long diffTs = toTs-fromTs;
-//
-//		return Math.round(diffTs/MILLISECS_PER_DAY);
-//	}
-
-//	public Date addDays(Date date, int n)
-//	{
-//		Calendar cal = Calendar.getInstance();
-//		cal.setTime(date);
-//		cal.add(Calendar.DATE, n);
-//
-//		return cal.getTime();
-//	}
 
 	/**
 	 * Compute the index of the end character of a key value.
@@ -850,12 +764,13 @@ public final class RubbosUtility
 	 */
 	public String generateWord(boolean withPunctuation)
 	{
+		final int maxSize = this._conf.getDictionary().size();
+
 		String word = null;
 
-		int maxSize = this._cfg.getDictionary().size();
-		int pos = this._rng.nextInt(maxSize());
+		int pos = this._rng.nextInt(maxSize);
 		int n = 0;
-		for (String s : this._cfg.getDictionary().keySet())
+		for (String s : this._conf.getDictionary().keySet())
 		{
 			if (n == pos)
 			{
@@ -921,32 +836,4 @@ public final class RubbosUtility
 		}
 		return ix2;
 	}
-
-//	/**
-//	 * Generates a random text.
-//	 *
-//	 * @param minLen The minimum length of the text.
-//	 * @param maxLen The maximum length of the text.
-//	 * @return The generated text.
-//	 */
-//	private String generateText(int minLen, int maxLen)
-//	{
-//		int len = minLen+this._rng.nextInt(maxLen-minLen+1);
-//		StringBuilder buf = new StringBuilder(len);
-//		int left = len;
-//		while (left > 0)
-//		{
-//			if (buf.length() > 0)
-//			{
-//				buf.append(' ');
-//				--left;
-//			}
-//
-//			String word = this.generateWord(1, left < this._conf.getMaxWordLength() ? left : this._conf.getMaxWordLength());
-//			buf.append(word);
-//			left -= word.length();
-//		}
-//
-//		return buf.toString();
-//	}
 }

@@ -64,7 +64,7 @@ public class StoreCommentOperation extends RubbosOperation
 	public void execute() throws Throwable
 	{
 		// Need a logged user
-		RubisUser loggedUser = this.getUtility().getUser(this.getSessionState().getLoggedUserId());
+		RubbosUser loggedUser = this.getUtility().getUser(this.getSessionState().getLoggedUserId());
 		if (!this.getUtility().isRegisteredUser(loggedUser))
 		{
 			this.getLogger().warning("No valid user has been found to log-in. Operation interrupted.");
@@ -88,7 +88,7 @@ public class StoreCommentOperation extends RubbosOperation
 		String commentTable = lastResponse.substring(pos[0], pos[1]);
 
 		comment.storyId = this.getUtility().findIntInHtml(lastResponse, "name=storyId value=");
-		comment.parentId = this.getUtility().findIntInHtml(lastResponse, "name=parent value=");
+		comment.parent = this.getUtility().findIntInHtml(lastResponse, "name=parent value=");
 
 		// Post the comment
 

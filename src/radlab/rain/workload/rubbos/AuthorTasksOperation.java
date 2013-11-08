@@ -61,7 +61,7 @@ public class AuthorTasksOperation extends RubbosOperation
 	public void execute() throws Throwable
 	{
 		// Need a logged user
-		RubisUser loggedUser = this.getUtility().getUser(this.getSessionState().getLoggedUserId());
+		RubbosUser loggedUser = this.getUtility().getUser(this.getSessionState().getLoggedUserId());
 		if (!this.getUtility().isRegisteredUser(loggedUser))
 		{
 			this.getLogger().warning("No valid user has been found to log-in. Operation interrupted.");

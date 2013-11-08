@@ -92,7 +92,7 @@ public final class RubbosSessionState
 		return this._category;
 	}
 
-	public void setCategoryId(RubbosCategory value)
+	public void setCategory(RubbosCategory value)
 	{
 		this._category = value;
 	}

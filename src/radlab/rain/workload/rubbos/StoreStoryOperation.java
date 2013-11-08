@@ -64,7 +64,7 @@ public class StoreStoryOperation extends RubbosOperation
 	public void execute() throws Throwable
 	{
 		// Need a logged user
-		RubisUser loggedUser = this.getUtility().getUser(this.getSessionState().getLoggedUserId());
+		RubbosUser loggedUser = this.getUtility().getUser(this.getSessionState().getLoggedUserId());
 		if (!this.getUtility().isRegisteredUser(loggedUser))
 		{
 			this.getLogger().warning("No valid user has been found to log-in. Operation interrupted.");
@@ -72,7 +72,7 @@ public class StoreStoryOperation extends RubbosOperation
 			return;
 		}
 
-		// Retrieve the comment to post in the last HTML response
+		// Retrieve the story to post in the last HTML response
 
 		final String lastResponse = this.getSessionState().getLastResponse();
 
@@ -87,7 +87,7 @@ public class StoreStoryOperation extends RubbosOperation
 		}
 		story.category = Integer.parseInt(lastResponse.substring(pos[0], pos[1]));
 
-		// Post the comment
+		// Post the story
 
 		StringBuilder response = null;
 
@@ -95,8 +95,8 @@ public class StoreStoryOperation extends RubbosOperation
 		uri.setParameter("nickname", loggedUser.nickname);
 		uri.setParameter("password", loggedUser.password);
 		uri.setParameter("category", Integer.toString(story.category));
-		uri.setParameter("title", comment.title);
-		uri.setParameter("body", comment.body);
+		uri.setParameter("title", story.title);
+		uri.setParameter("body", story.body);
 		HttpGet reqGet = new HttpGet(uri.build());
 		response = this.getHttpTransport().fetch(reqGet);
 		this.trace(reqGet.getURI().toString());

@@ -58,8 +58,12 @@ public class RejectStoryOperation extends RubbosOperation
 	@Override
 	public void execute() throws Throwable
 	{
-		int storyId = this.getUtility().findStoryIdInHtml(this.getSessionState().getLastResponse());
-		if (storyId == INVALID_STORY_ID)
+		// Extracft Accept-Story parameters from last response
+		String scriptName = this.getGenerator().getRejectStoryURL();
+		int pos = scriptName.lastIndexOf('/');
+		scriptName = scriptName.substring(pos >= 0 ? pos : 0);
+		int storyId = this.getUtility().findAcceptRejectStoryIdInHtml(this.getSessionState().getLastResponse(), scriptName);
+		if (storyId == RubbosUtility.INVALID_STORY_ID)
 		{
 			//FIXME: in this case, the native RUBBoS client goes back to home page
 			this.getLogger().warning("No more stories to process. Operation interrupted.");

@@ -63,9 +63,9 @@ public class ModerateCommentOperation extends RubbosOperation
 
 		// Extract a Moderate-Comment parameters from last response
 		String scriptName = this.getGenerator().getModerateCommentURL();
-		int pos = scriptName.lastIndex('/');
+		int pos = scriptName.lastIndexOf('/');
 		scriptName = scriptName.substring(pos >= 0 ? pos : 0);
-		Map<String,String> params = this.getUtility().findModerateCommentParamsIdInHtml(this.getSessionState().getLastResponse(), scriptName);
+		Map<String,String> params = this.getUtility().findModerateCommentParamsInHtml(this.getSessionState().getLastResponse(), scriptName);
 		if (params == null)
 		{
 			this.getLogger().warning("No valid parameter has been found. Operation interrupted.");
