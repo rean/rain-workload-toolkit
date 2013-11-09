@@ -74,7 +74,7 @@ public class RegisterUserOperation extends RubbosOperation
 		RubbosUser user = this.getUtility().newUser();
 		if (!this.getUtility().isValidUser(user) || this.getUtility().isAnonymousUser(user))
 		{
-			this.getLogger().warning("No valid user has been found. Operation interrupted.");
+			this.getLogger().warning("Unable to create a valid user. Operation interrupted.");
 			this.setFailed(true);
 			return;
 		}
