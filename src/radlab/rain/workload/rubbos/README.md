@@ -113,16 +113,20 @@ Currently, the supported configuration properties are the following:
   Default value is: *1024*.
 - **rubbos.maxStoryLen**: a non-negative integer value representing the maximum length of a story; this is the RAIN counterpart of the *database\_story\_max\_length* RUBBoS property.
   Default value is: *1024*.
+- **rubbos.newestStoryMonth**: a non-negative integer value between 1 and 31 (inclusive) representing the month of the newest story in the RUBBoS database; this is the RAIN counterpart of the *database\_oldest\_story\_month* RUBBoS property.
+  Default value is: *1*.
+- **rubbos.newestStoryYear**: a non-negative integer value representing the year of the newest story in the RUBBoS database; this is the RAIN counterpart of the *database\_oldest\_story\_year* RUBBoS property.
+  Default value is: *this year*.
+- **rubbos.numPreloadedAuthors**: a non-negative integer value representing the number of authors that have been already preloaded inside the RUBBoS database; this is the RAIN counterpart of the *database\_number\_of\_authors* RUBBoS property.
+  Default value is: *1*.
+- **rubbos.numPreloadedUsers**: a non-negative integer value representing the number of users that have been already preloaded inside the RUBBoS database; this is the RAIN counterpart of the *database\_number\_of\_users* RUBBoS property.
+  Default value is: *1*.
 - **rubbos.numStoriesPerPage**: a non-negative integer value representing the maximum number of stories to display in a single page; this is the RAIN counterpart of the *workload\_number\_of\_stories\_per\_page* RUBBoS property.
   Default value is: *20*.
 - **rubbos.oldestStoryMonth**: a non-negative integer value between 1 and 31 (inclusive) representing the month of the oldest story in the RUBBoS database; this is the RAIN counterpart of the *database\_oldest\_story\_month* RUBBoS property.
   Default value is: *1*.
 - **rubbos.oldestStoryYear**: a non-negative integer value representing the year of the oldest story in the RUBBoS database; this is the RAIN counterpart of the *database\_oldest\_story\_year* RUBBoS property.
   Default value is: *1998*.
-- **rubbos.numPreloadedAuthors**: a non-negative integer value representing the number of authors that have been already preloaded inside the RUBBoS database; this is the RAIN counterpart of the *database\_number\_of\_authors* RUBBoS property.
-  Default value is: *1*.
-- **rubbos.numPreloadedUsers**: a non-negative integer value representing the number of users that have been already preloaded inside the RUBBoS database; this is the RAIN counterpart of the *database\_number\_of\_users* RUBBoS property.
-  Default value is: *1*.
 - **rubbos.rngSeed**: an integer number representing the seed used to initialize the random number generator used by the RUBBoS generator; if set to `-1`, the random number generator will be initialized with the Java's default (i.e., to a value very likely to be distinct from any other invocation of the `java.util.Random` default constructor).
   Default value is: *-1*.
 - **rubbos.serverHtmlPath**: the URL path pointing to the base location where HTML files on the RUBBoS server.
@@ -144,3 +148,5 @@ The current implementation assumes that:
 - In the native client, it is possible to dynamically switch from a user workload profile to an author workload profile and back.
   This is not currently possible in the RAIN version of RUBBoS.
   Instead, you have to decide which workload profiles to use before you run the RAIN experiment by properly configuring the the *behavior* section of the configuration file.
+- In the native client, in some situations (e.g., when an error happens) there is a transition back to the previously visited operation; in other situations (e.g., no more story to review), the user session is reinitialized.
+  Instead, in RAIN, we currently set the operation as failed and let the user session restart.
