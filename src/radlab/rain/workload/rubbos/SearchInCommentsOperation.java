@@ -79,7 +79,7 @@ public class SearchInCommentsOperation extends RubbosOperation
         uri.setParameter("nbOfStories", Integer.toString(this.getConfiguration().getNumOfStoriesPerPage()));
         HttpGet reqGet = new HttpGet(uri.build());
         response = this.getHttpTransport().fetch(reqGet);
-		this.trace(this.getGenerator().getSearchInCommentsURL());
+		this.trace(reqGet.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
 			this.getLogger().severe("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
