@@ -66,8 +66,15 @@ public class ViewCommentOperation extends RubbosOperation
 		int pos = scriptName.lastIndexOf('/');
 		scriptName = scriptName.substring(pos >= 0 ? pos : 0);
 		Map<String,String> params = this.getUtility().findViewCommentParamsInHtml(this.getSessionState().getLastResponse(), scriptName);
-		if (params == null)
+		if (params == null
+			|| params.isEmpty()
+			|| !params.containsKey("commentId")
+			|| !params.containsKey("filter")
+			|| !params.containsKey("display")
+			|| !params.containsKey("storyId")
+			|| !params.containsKey("comment_table"))
 		{
+			//FIXME: In this case, the native RUBBoS client go back to the previous operation
 			this.getLogger().warning("No valid parameter has been found. Operation interrupted.");
 			this.setFailed(true);
 			return;

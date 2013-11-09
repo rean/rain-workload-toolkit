@@ -66,8 +66,13 @@ public class PostCommentOperation extends RubbosOperation
 		int pos = scriptName.lastIndexOf('/');
 		scriptName = scriptName.substring(pos >= 0 ? pos : 0);
 		Map<String,String> params = this.getUtility().findPostCommentParamsInHtml(this.getSessionState().getLastResponse(), scriptName);
-		if (params == null)
+		if (params == null
+			|| params.isEmpty()
+			|| !params.containsKey("storyId")
+			|| !params.containsKey("parent")
+			|| !params.containsKey("comment_table"))
 		{
+			//FIXME: In this case, the native RUBBoS client go back to the previous operation
 			this.getLogger().warning("No valid parameter has been found. Operation interrupted.");
 			this.setFailed(true);
 			return;
