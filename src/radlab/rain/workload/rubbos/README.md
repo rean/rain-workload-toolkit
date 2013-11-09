@@ -54,7 +54,7 @@ All the 24 RUBBoS operations are supported, included the two special operations 
 - **Store Comment**: store the comment for a selected story in the database.
 - **View Comment**: view a comment for a selected story.
 - **Moderate Comment**: moderate the comment for a selected story.
-- **Store Moderator Log**: store the moderation to a comment for a selected storyi in the database.
+- **Store Moderate Log**: store the moderation to a comment for a selected storyi in the database.
 - **Submit Story**: insert a new story.
 - **Store Story**: store the new story in the database.
 - **Search**: search in RUBBoS according to different filters.
@@ -73,8 +73,8 @@ All the 24 RUBBoS operations are supported, included the two special operations 
 
 The RUBBoS workload can be customized by means of a set of properties inside the *generatorParameters* key of the *profiles.config.rubbos.json*.
 Currently, the supported configuration properties are the following:
-- **rubbos.dictionaryFile**: a string representing the path to the RUBBoS dictionary file; this is the RAIN counterpart of the *database\_regions\_file* RUBBoS property.
-  Default value is: *"resources/rubbos-ebay_full_categories.txt"*.
+- **rubbos.dictionaryFile**: a string representing the path to the RUBBoS dictionary file; this is the RAIN counterpart of the *database\_story\_dictionary* RUBBoS property.
+  Default value is: *"resources/rubbos-dictionary.txt"*.
 - **rubbos.incarnation**: a case-insensitive string representing the RUBBoS incarnation one wants to use.
   Possible values are:
   - *"php"*,
@@ -83,78 +83,55 @@ Currently, the supported configuration properties are the following:
   Default value is: *"servlet"*.
 - **rubbos.initOp**: a case-insensitive string representing the RUBBoS operation from which a user session starts.
   Possible values are:
-  - *"Home"*,
+  - *"StoriesOfTheDay"*,
   - *"Register"*,
   - *"RegisterUser"*,
   - *"Browse"*,
   - *"BrowseCategories"*,
-  - *"SearchItemsByCategory"*,
-  - *"BrowseRegions"*,
-  - *"BrowseCategoriesByRegions"*,
-  - *"SearchItemsByRegion"*,
-  - *"ViewItem"*,
-  - *"ViewUserInfo"*,
-  - *"ViewBidHistory"*,
-  - *"BuyNowAuth"*,
-  - *"BuyNow"*,
-  - *"StoreBuyNow"*,
-  - *"PutBidAuth"*,
-  - *"PutBid"*,
-  - *"StoreBid"*,
-  - *"PutCommentAuth"*,
-  - *"PutComment"*,
+  - *"BrowseStoriesByCategory"*,
+  - *"OlderStories"*,
+  - *"ViewStory"*,
+  - *"PostComment"*,
   - *"StoreComment"*,
-  - *"Sell"*,
-  - *"SelectCategoryToSellItem"*,
-  - *"SellItemForm"*,
-  - *"RegisterItem"*,
-  - *"AboutMeAuth"*,
-  - *"AboutMe"*.
+  - *"ViewComment"*,
+  - *"ModerateComment"*,
+  - *"StoreModerateLog"*,
+  - *"SubmitStory"*,
+  - *"StoreStory"*,
+  - *"Search"*,
+  - *"SearchInStories"*,
+  - *"SearchInComments"*,
+  - *"SearchInUsers"*,
+  - *"AuthorLogin"*,
+  - *"AuthorTasks"*,
+  - *"ReviewStories"*,
+  - *"AcceptStory"*,
+  - *"RejectStory"*.
 
-  Default value is: *"Home"*.
-- **rubbos.maxBidsPerItem**: a non-negative integer value representing the maximum number of bids per item; this is the RAIN counterpart of the *max\_bids\_per\_item* RUBBoS property.
+  Default value is: *"StoriesOfTheDay"*.
+- **rubbos.maxCommentLen**: a non-negative integer value representing the maximum length of a comment to a story; this is the RAIN counterpart of the *database\_comment\_max\_length* RUBBoS property.
+  Default value is: *1024*.
+- **rubbos.maxStoryLen**: a non-negative integer value representing the maximum length of a story; this is the RAIN counterpart of the *database\_story\_max\_length* RUBBoS property.
+  Default value is: *1024*.
+- **rubbos.numStoriesPerPage**: a non-negative integer value representing the maximum number of stories to display in a single page; this is the RAIN counterpart of the *workload\_number\_of\_stories\_per\_page* RUBBoS property.
   Default value is: *20*.
-- **rubbos.maxCommentLen**: a non-negative integer value representing the maximum length of a comment to an item; this is the RAIN counterpart of the *comment\_max\_length* RUBBoS property.
-  Default value is: *2048*.
-- **rubbos.maxItemBaseBidPrice**: a non-negative real value representing the maximum base "bid" price for an item.
-  Default value is: *10*.
-- **rubbos.maxItemBaseBuyNowPrice**: a non-negative real value representing the maximum base "buy now" price for an item.
-  Default value is: *1000*.
-- **rubbos.maxItemBaseReservePrice**: a non-negative real value representing the maximum base reserve price for an item.
-  Default value is: *1000*.
-- **rubbos.maxItemDescrLen**: a string value representing the maximum length for the description of an item; this is the RAIN counterpart of the *item\_description\_length* RUBBoS property.
-  Default value is: *8192*.
-- **rubbos.maxItemDuration**: a non-negative integer value representing the maximum duration (in days) of an item.
-  Default value is: *7*.
-- **rubbos.maxItemInitPrice**: a non-negative real value representing the maximum initial price for an item.
-  Default value is: *5000*.
-- **rubbos.maxItemQuantity**: a non-negative integer value representing the maximum quantity for multiple items; this is the RAIN counterpart of the *max\_quantity\_for_multiple\_items* RUBBoS property.
-  Default value is: *10*.
-- **rubbos.maxWordLen**: a non-negative integer value representing the maximum length of a randomly generated word.
-  Default value is: *12*.
-- **rubbos.numItemsPerPage**: a non-negative integer value representing the maximum number of items to display in a single page; this is the RAIN counterpart of the *workload\_number\_of\_items\_per\_page* RUBBoS property.
-  Default value is: *20*.
-- **rubbos.numOldItems**: a non-negative integer value representing the number of items whose auction date is over; this is the RAIN counterpart of the *database\_number\_of\_old\_items* RUBBoS property.
-  Default value is: *1000000*.
-- **rubbos.numPreloadedUsers**: a non-negative integer value representing the number of user that have been already preloaded inside the RUBBoS database; this is the RAIN counterpart of the *database\_number\_of\_users* RUBBoS property.
+- **rubbos.oldestStoryMonth**: a non-negative integer value between 1 and 31 (inclusive) representing the month of the oldest story in the RUBBoS database; this is the RAIN counterpart of the *database\_oldest\_story\_month* RUBBoS property.
   Default value is: *1*.
-- **rubbos.percentItemsBuyNow**: a non-negative real value between 0 and 100 (inclusive) represnting the percentage of items that users can "buy now"; this is the RAIN couterpart of the *percentage\_of_items\_with\_reserve\_price* RUBBoS property.
-  Default value is: *80*.
-- **rubbos.percentItemsReserve**: a non-negative real value between 0 and 100 (inclusive) representing the percentage of items with a reserve price; this is the RAIN counterpart of the *percentage\_of\_buy\_now\_items* RUBBoS property.
-  Default value is: *40*.
-- **rubbos.percentUniqueItems**: a non-negative real value between 0 and 100 (inclusive) representing the percentage of unique items; this is the RAIN counterpart of the *percentage\_of\_unique\_items* RUBBoS property.
-  Default value is: *10*.
-- **rubbos.regionsFile**: a string representing the path to the RUBBoS regions file; this is the RAIN counterpart of the *database\_regions\_file* RUBBoS property.
-  Default value is: *"resources/rubbos-ebay_regions.txt"*.
+- **rubbos.oldestStoryYear**: a non-negative integer value representing the year of the oldest story in the RUBBoS database; this is the RAIN counterpart of the *database\_oldest\_story\_year* RUBBoS property.
+  Default value is: *1998*.
+- **rubbos.numPreloadedAuthors**: a non-negative integer value representing the number of authors that have been already preloaded inside the RUBBoS database; this is the RAIN counterpart of the *database\_number\_of\_authors* RUBBoS property.
+  Default value is: *1*.
+- **rubbos.numPreloadedUsers**: a non-negative integer value representing the number of users that have been already preloaded inside the RUBBoS database; this is the RAIN counterpart of the *database\_number\_of\_users* RUBBoS property.
+  Default value is: *1*.
 - **rubbos.rngSeed**: an integer number representing the seed used to initialize the random number generator used by the RUBBoS generator; if set to `-1`, the random number generator will be initialized with the Java's default (i.e., to a value very likely to be distinct from any other invocation of the `java.util.Random` default constructor).
   Default value is: *-1*.
 - **rubbos.serverHtmlPath**: the URL path pointing to the base location where HTML files on the RUBBoS server.
-  Default value is: */*.
+  Default value is: */PHP*.
 - **rubbos.serverScriptPath**: the URL path pointing to the base location where script files on the RUBBoS server.
-  Default value is: */*.
+  Default value is: */PHP*.
 
 
-The order of the operations in the traffic mix matrix is the same of the one specified in the previous section (i.e., 0 is the *Home Page* operation, 1 is the *Register* operation, and so on).
+The order of the operations in the traffic mix matrix is the same of the one specified in the previous section (i.e., 0 is the *Stories of the Day* operation, 1 is the *Register* operation, and so on).
 
 ### Assumptions
 
