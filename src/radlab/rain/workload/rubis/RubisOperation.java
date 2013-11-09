@@ -34,8 +34,12 @@
 package radlab.rain.workload.rubis;
 
 
-import java.util.Random;
+import java.util.LinkedHashSet;
 import java.util.logging.Logger;
+import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.Set;
 import radlab.rain.Generator;
 import radlab.rain.IScoreboard;
 import radlab.rain.LoadProfile;
@@ -98,6 +102,18 @@ public abstract class RubisOperation extends Operation
 			this.getSessionState().setLastResponse(null);
 			this.setFailed(true);
 		}
+		else
+		{
+			// Look for any image to download
+			try
+			{
+				this.loadImages(this.parseImagesInHtml(this.getSessionState().getLastResponse()));
+			}
+			catch (Throwable t)
+			{
+				this.getLogger().severe("Unable to load images");
+			}
+		}
 	}
 
 	@Override
@@ -139,5 +155,56 @@ public abstract class RubisOperation extends Operation
 	public RubisConfiguration getConfiguration()
 	{
 		return this.getGenerator().getConfiguration();
+	}
+
+	/**
+	 * Parses an HTML document for image URLs specified by IMG tags.
+	 *
+	 * @param buffer The HTTP response; expected to be an HTML document.
+	 * @return An unordered set of image URLs.
+	 */
+	protected Set<String> parseImagesInHtml(String html)
+	{
+		String regex = null;
+		regex = ".*?<img\\s+.*?src=\"([^\"]+?)\".*";
+
+		this.getLogger().finest( "Parsing images from buffer" );
+		Pattern pattern = Pattern.compile(regex, Pattern.DOTALL | Pattern.UNIX_LINES | Pattern.CASE_INSENSITIVE);
+		Set<String> urlSet = new LinkedHashSet<String>();
+
+		Matcher match = pattern.matcher(html);
+		while (match.find())
+		{
+			String url = match.group(1);
+			this.getLogger().finest("Adding " + url);
+			urlSet.add(url);
+		}
+
+		return urlSet;
+	}
+
+	/**
+	 * Load the image files specified by the image URLs.
+	 *
+	 * @param imageURLs The set of image URLs.
+	 * @return The number of images loaded.
+	 *
+	 * @throws Throwable
+	 */
+	protected long loadImages(Set<String> imageUrls) throws Throwable
+	{
+		long imagesLoaded = 0;
+
+		if (imageUrls != null)
+		{
+			for (String imageUrl : imageUrls)
+			{
+				this.getLogger().finer("Loading image: " + imageUrl);
+				this.getHttpTransport().fetchUrl(imageUrl);
+				++imagesLoaded;
+			}
+		}
+
+		return imagesLoaded;
 	}
 }
