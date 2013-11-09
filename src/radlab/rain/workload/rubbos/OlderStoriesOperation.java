@@ -48,9 +48,6 @@ import radlab.rain.IScoreboard;
  */
 public class OlderStoriesOperation extends RubbosOperation 
 {
-	private final static int THIS_YEAR = Calendar.getInstance().get(Calendar.YEAR);
-
-
 	public OlderStoriesOperation(boolean interactive, IScoreboard scoreboard) 
 	{
 		super(interactive, scoreboard);
@@ -107,6 +104,9 @@ public class OlderStoriesOperation extends RubbosOperation
 		{
 			// Some date in the past week
 			Calendar cal = Calendar.getInstance();
+			day = cal.get(Calendar.DAY_OF_MONTH);
+			cal.clear();
+			cal.set(this.getConfiguration().getNewestStoryYear(), this.getConfiguration().getNewestStoryMonth(), day);
 			when /= 10;
 			if (when == 0)
 			{
@@ -121,12 +121,12 @@ public class OlderStoriesOperation extends RubbosOperation
 				cal.roll(Calendar.DAY_OF_MONTH, false);
 			}
 			day = cal.get(Calendar.DAY_OF_MONTH);
-			month = cal.get(Calendar.MONTH)+1; // Month start at 0
+			month = cal.get(Calendar.MONTH)+1; // In Calendar class, month start at 0
 			year = cal.get(Calendar.YEAR);
 		}
-		if (year > THIS_YEAR)
+		if (year > this.getConfiguration().getNewestStoryYear())
 		{
-			year = THIS_YEAR;
+			year = this.getConfiguration().getNewestStoryYear();
 		}
 		if (year == this.getConfiguration().getOldestStoryYear())
 		{
