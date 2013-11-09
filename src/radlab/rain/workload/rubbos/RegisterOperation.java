@@ -51,7 +51,6 @@ public class RegisterOperation extends RubbosOperation
 
 		this._operationName = "Register";
 		this._operationIndex = RubbosGenerator.REGISTER_OP;
-		this._mustBeSync = true;
 	}
 
 	@Override
