@@ -35,9 +35,6 @@ package radlab.rain.workload.rubbos;
 
 
 import java.util.Arrays;
-//import java.util.Calendar;
-//import java.util.concurrent.atomic.AtomicInteger;
-//import java.util.concurrent.Semaphore;
 import java.util.logging.Logger;
 import java.util.Random;
 import org.apache.http.HttpStatus;
@@ -54,7 +51,7 @@ import radlab.rain.util.NegativeExponential;
 /**
  * Operation generator for the RUBBoS workload.
  *
- * @author Marco Guazzone (marco.guazzone@gmail.com)
+ * @author <a href="mailto:marco.guazzone@gmail.com">Marco Guazzone</a>
  */
 public class RubbosGenerator extends Generator
 {
@@ -79,13 +76,13 @@ public class RubbosGenerator extends Generator
 	public static final int SEARCH_IN_STORIES_OP = 16;
 	public static final int SEARCH_IN_COMMENTS_OP = 17;
 	public static final int SEARCH_IN_USERS_OP = 18;
-	public static final int AUTHOR_LOGIN_OP = 20;
-	public static final int AUTHOR_TASKS_OP = 21;
-	public static final int REVIEW_STORIES_OP = 22;
-	public static final int ACCEPT_STORY_OP = 23;
-	public static final int REJECT_STORY_OP = 24;
-	public static final int BACK_SPECIAL_OP = 25; ///< Emulate a click on the "Back" button of the browser
-	public static final int EOS_SPECIAL_OP = 26; ///< Terminate the current user session
+	public static final int AUTHOR_LOGIN_OP = 19;
+	public static final int AUTHOR_TASKS_OP = 20;
+	public static final int REVIEW_STORIES_OP = 21;
+	public static final int ACCEPT_STORY_OP = 22;
+	public static final int REJECT_STORY_OP = 23;
+	public static final int BACK_SPECIAL_OP = 24; ///< Emulate a click on the "Back" button of the browser
+	public static final int EOS_SPECIAL_OP = 25; ///< Terminate the current user session
 
 	// Static members shared among all instances
 	private static Random _rng; ///< The Random Number Generator
