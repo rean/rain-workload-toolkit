@@ -65,7 +65,7 @@ public class AcceptStoryOperation extends RubbosOperation
 		int storyId = this.getUtility().findAcceptRejectStoryIdInHtml(this.getSessionState().getLastResponse(), scriptName);
 		if (storyId == RubbosUtility.INVALID_STORY_ID)
 		{
-			//FIXME: in this case, the native RUBBoS client goes back to home page
+			//FIXME: in this case, the native RUBBoS client goes back to the home page
 			this.getLogger().warning("No more stories to process. Operation interrupted.");
 			this.setFailed(true);
 			return;
