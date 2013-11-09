@@ -150,6 +150,17 @@ Currently, the supported configuration properties are the following:
 
 The order of the operations in the traffic mix matrix is the same of the one specified in the previous section (i.e., 0 is the *Home Page* operation, 1 is the *Register* operation, and so on).
 
+### Compilation and Execution
+
+To compile the RUBiS workload, simply enter the following command:
+
+    $ ant package-rubis
+
+To run the RUBiS workload, simply enter the following command:
+
+    $ java -Xmx1g -Xms256m -cp rain.jar:workloads/rubis.jar radlab.rain.Benchmark config/rain.config.rubis.json
+
+
 ### Assumptions
 
 The current implementation assumes that:
