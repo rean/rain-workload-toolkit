@@ -67,7 +67,7 @@ All the 29 RUBiS operations are supported, included the two special operations *
 
 The RUBiS workload can be customized by means of a set of properties inside the *generatorParameters* key of the *profiles.config.rubis.json*.
 Currently, the supported configuration properties are the following:
-- **rubis.categoriesFile**: a string representing the path to the RUBiS categories file; this is the RAIN counterpart of the *database\_regions\_file* RUBiS property.
+- **rubis.categoriesFile**: a string representing the path to the RUBiS categories file; this is the RAIN counterpart of the *database\_categories\_file* RUBiS property.
   Default value is: *"resources/rubis-ebay_full_categories.txt"*.
 - **rubis.incarnation**: a case-insensitive string representing the RUBiS incarnation one wants to use.
   Possible values are:
