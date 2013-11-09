@@ -99,12 +99,13 @@ public final class RubbosConfiguration
 	private static final String CFG_MAX_COMMENT_LENGTH_KEY = "rubbos.maxCommentLen";
 	private static final String CFG_MAX_STORY_LENGTH_KEY = "rubbos.maxStoryLen";
 //	private static final String CFG_MAX_WORD_LENGTH_KEY = "rubbos.maxWordLen";
+	private static final String CFG_NEWEST_STORY_MONTH_KEY = "rubbos.newestStoryMonth";
+	private static final String CFG_NEWEST_STORY_YEAR_KEY = "rubbos.newestStoryYear";
 	private static final String CFG_NUM_STORIES_PER_PAGE_KEY = "rubbos.numStoriesPerPage";
 	private static final String CFG_NUM_PRELOADED_AUTHORS_KEY = "rubbos.numPreloadedAuthors";
 	private static final String CFG_NUM_PRELOADED_USERS_KEY = "rubbos.numPreloadedUsers";
 	private static final String CFG_OLDEST_STORY_MONTH_KEY = "rubbos.oldestStoryMonth";
 	private static final String CFG_OLDEST_STORY_YEAR_KEY = "rubbos.oldestStoryYear";
-//	private static final String CFG_PERCENT_UNIQUE_ITEMS_KEY = "rubbos.percentUniqueItems";
 	private static final String CFG_RNG_SEED_KEY = "rubbos.rngSeed";
 	private static final String CFG_SERVER_HTML_PATH_KEY = "rubbos.serverHtmlPath";
 	private static final String CFG_SERVER_SCRIPT_PATH_KEY = "rubbos.serverScriptPath";
@@ -116,15 +117,16 @@ public final class RubbosConfiguration
 	private static final int DEFAULT_MAX_COMMENT_LENGTH = 1024;
 	private static final int DEFAULT_MAX_STORY_LENGTH = 1024;
 //	private static final int DEFAULT_MAX_WORD_LENGTH = 12;
+	private static final int DEFAULT_NEWEST_STORY_MONTH = 1;
+	private static final int DEFAULT_NEWEST_STORY_YEAR = 2004;
 	private static final int DEFAULT_NUM_STORIES_PER_PAGE = 20;
 	private static final int DEFAULT_NUM_PRELOADED_AUTHORS = 1;
 	private static final int DEFAULT_NUM_PRELOADED_USERS = 1;
 	private static final int DEFAULT_OLDEST_STORY_MONTH = 1;
 	private static final int DEFAULT_OLDEST_STORY_YEAR = 1998;
-//	private static final float DEFAULT_PERCENTAGE_UNIQUE_ITEMS = 80;
 	private static final long DEFAULT_RNG_SEED = -1;
-	private static final String DEFAULT_SERVER_HTML_PATH = "/";
-	private static final String DEFAULT_SERVER_SCRIPT_PATH = "/";
+	private static final String DEFAULT_SERVER_HTML_PATH = "/PHP";
+	private static final String DEFAULT_SERVER_SCRIPT_PATH = "/PHP";
 
 
 	// Members to hold configuration values
@@ -135,12 +137,13 @@ public final class RubbosConfiguration
 	private int _maxCommentLen = DEFAULT_MAX_COMMENT_LENGTH; ///< Maximum comment length
 	private int _maxStoryLen = DEFAULT_MAX_STORY_LENGTH; ///< Maximum story length
 //	private int _maxWordLen = DEFAULT_MAX_WORD_LENGTH; ///< Maximum length of a word
+	private int _newestStoryMonth = DEFAULT_NEWEST_STORY_MONTH; ///< The month of the newest story in the RUBBoS database
+	private int _newestStoryYear = DEFAULT_NEWEST_STORY_YEAR; ///< The year of the newest story in the RUBBoS database
 	private int _numStoriesPerPage = DEFAULT_NUM_STORIES_PER_PAGE; ///< Number of items per page
 	private int _numPreloadAuthors = DEFAULT_NUM_PRELOADED_AUTHORS; ///< Number of authors that have been already preloaded in the RUBBoS database
 	private int _numPreloadUsers = DEFAULT_NUM_PRELOADED_USERS; ///< Number of users that have been already preloaded in the RUBBoS database
-	private int _oldestStoryMonth = DEFAULT_OLDEST_STORY_MONTH; ///< The month that the oldest story in the RUBBoS database can have
-	private int _oldestStoryYear = DEFAULT_OLDEST_STORY_YEAR; ///< The year that the oldest story in the RUBBoS database can have
-//	private float _percUniqueItems = DEFAULT_PERCENTAGE_UNIQUE_ITEMS; ///< Percentage of items that users can 'buy now'
+	private int _oldestStoryMonth = DEFAULT_OLDEST_STORY_MONTH; ///< The month of the oldest story in the RUBBoS database
+	private int _oldestStoryYear = DEFAULT_OLDEST_STORY_YEAR; ///< The year of the oldest story in the RUBBoS database
     private long _rngSeed = DEFAULT_RNG_SEED; ///< The seed used for the Random Number Generator; a value <= 0 means that no special seed is used.
 	private String _serverHtmlPath = DEFAULT_SERVER_HTML_PATH; ///< The path to HTML pages on the RUBBoS Web server
 	private String _serverScriptPath = DEFAULT_SERVER_SCRIPT_PATH; ///< The path to script pages on the RUBBoS Web server
@@ -295,6 +298,14 @@ public final class RubbosConfiguration
 //		{
 //			this._maxWordLen = config.getInt(CFG_MAX_WORD_LENGTH_KEY);
 //		}
+		if (config.has(CFG_NEWEST_STORY_MONTH_KEY))
+		{
+			this._newestStoryMonth = config.getInt(CFG_NEWEST_STORY_MONTH_KEY);
+		}
+		if (config.has(CFG_NEWEST_STORY_YEAR_KEY))
+		{
+			this._newestStoryYear = config.getInt(CFG_NEWEST_STORY_YEAR_KEY);
+		}
 		if (config.has(CFG_NUM_STORIES_PER_PAGE_KEY))
 		{
 			this._numStoriesPerPage = config.getInt(CFG_NUM_STORIES_PER_PAGE_KEY);
@@ -315,10 +326,6 @@ public final class RubbosConfiguration
 		{
 			this._oldestStoryYear = config.getInt(CFG_OLDEST_STORY_YEAR_KEY);
 		}
-//		if (config.has(CFG_PERCENT_UNIQUE_ITEMS_KEY))
-//		{
-//			this._percUniqueItems = (float) config.getDouble(CFG_PERCENT_UNIQUE_ITEMS_KEY);
-//		}
 		if (config.has(CFG_RNG_SEED_KEY))
 		{
 			this._rngSeed = config.getLong(CFG_RNG_SEED_KEY);
@@ -437,6 +444,26 @@ public final class RubbosConfiguration
 //	}
 
 	/**
+	 * Get the month of the newest RUBBoS story
+	 *
+	 * @return month of the newest story
+	 */
+	public int getNewestStoryMonth()
+	{
+		return this._newestStoryMonth;
+	}
+
+	/**
+	 * Get the year of the newest RUBBoS story
+	 *
+	 * @return year of the newest story
+	 */
+	public int getNewestStoryYear()
+	{
+		return this._newestStoryYear;
+	}
+
+	/**
 	 * Get the maximum number of stories per page.
 	 *
 	 * This is the RAIN counterpart of the workload_number_of_stories_per_page
@@ -472,7 +499,7 @@ public final class RubbosConfiguration
 	}
 
 	/**
-	 * Get the month that the oldest RUBBoS story can have
+	 * Get the month that the oldest RUBBoS story
 	 *
 	 * This is the RAIN counterpart of the database_oldest_story_month
 	 * RUBBoS property.
@@ -485,7 +512,7 @@ public final class RubbosConfiguration
 	}
 
 	/**
-	 * Get the year that the oldest RUBBoS story can have
+	 * Get the year that the oldest RUBBoS story
 	 *
 	 * This is the RAIN counterpart of the database_oldest_story_year
 	 * RUBBoS property.
@@ -496,18 +523,6 @@ public final class RubbosConfiguration
 	{
 		return this._oldestStoryYear;
 	}
-
-//	/**
-//	 * Get the percentage of unique items.
-//	 * 
-//	 * This is the RAIN counterpart of the percentage_of_unique_items RUBBoS property.
-//	 *
-//	 * @return percentage of unique items
-//	 */
-//	public float getPercentageOfUniqueItems()
-//	{
-//		return this._percUniqueItems;
-//	}
 
 	/**
 	 * Get the seed for the random number generator used by the RUBBoS generator.
@@ -549,12 +564,13 @@ public final class RubbosConfiguration
 		sb.append(", Max Comment Length: " + this.getMaxCommentLength());
 		sb.append(", Max Story Length: " + this.getMaxStoryLength());
 //		sb.append(", Max Word Length: " + this.getMaxWordLength());
+		sb.append(", Newest Story Month: " + this.getNewestStoryMonth());
+		sb.append(", Newest Story Year: " + this.getNewestStoryYear());
 		sb.append(", Number of Stories per Page: " + this.getNumOfStoriesPerPage());
 		sb.append(", Number of Preloaded Authors: " + this.getNumOfPreloadedAuthors());
 		sb.append(", Number of Preloaded Users: " + this.getNumOfPreloadedUsers());
 		sb.append(", Oldest Story Month: " + this.getOldestStoryMonth());
 		sb.append(", Oldest Story Year: " + this.getOldestStoryYear());
-//		sb.append(", Percentage of Unique Items: " + this.getPercentageOfUniqueItems());
 		sb.append(", Random Number Generator Seed: " + this.getRngSeed());
 		sb.append(", Server HTML Path: " + this.getServerHtmlPath());
 		sb.append(", Server Script Path: " + this.getServerScriptPath());
