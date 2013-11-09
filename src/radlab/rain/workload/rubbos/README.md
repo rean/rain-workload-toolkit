@@ -126,7 +126,7 @@ Currently, the supported configuration properties are the following:
 - **rubbos.oldestStoryMonth**: a non-negative integer value between 1 and 31 (inclusive) representing the month of the oldest story in the RUBBoS database; this is the RAIN counterpart of the *database\_oldest\_story\_month* RUBBoS property.
   Default value is: *1*.
 - **rubbos.oldestStoryYear**: a non-negative integer value representing the year of the oldest story in the RUBBoS database; this is the RAIN counterpart of the *database\_oldest\_story\_year* RUBBoS property.
-  Default value is: *1998*.
+  Default value is: *this year*.
 - **rubbos.rngSeed**: an integer number representing the seed used to initialize the random number generator used by the RUBBoS generator; if set to `-1`, the random number generator will be initialized with the Java's default (i.e., to a value very likely to be distinct from any other invocation of the `java.util.Random` default constructor).
   Default value is: *-1*.
 - **rubbos.serverHtmlPath**: the URL path pointing to the base location where HTML files on the RUBBoS server.

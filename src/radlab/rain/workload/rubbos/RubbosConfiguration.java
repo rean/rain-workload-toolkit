@@ -36,9 +36,7 @@ package radlab.rain.workload.rubbos;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-//import java.util.ArrayList;
-//import java.util.Arrays;
-//import java.util.List;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -118,12 +116,12 @@ public final class RubbosConfiguration
 	private static final int DEFAULT_MAX_STORY_LENGTH = 1024;
 //	private static final int DEFAULT_MAX_WORD_LENGTH = 12;
 	private static final int DEFAULT_NEWEST_STORY_MONTH = 1;
-	private static final int DEFAULT_NEWEST_STORY_YEAR = 2004;
+	private static final int DEFAULT_NEWEST_STORY_YEAR = Calendar.getInstance().get(Calendar.YEAR);
 	private static final int DEFAULT_NUM_STORIES_PER_PAGE = 20;
 	private static final int DEFAULT_NUM_PRELOADED_AUTHORS = 1;
 	private static final int DEFAULT_NUM_PRELOADED_USERS = 1;
 	private static final int DEFAULT_OLDEST_STORY_MONTH = 1;
-	private static final int DEFAULT_OLDEST_STORY_YEAR = 1998;
+	private static final int DEFAULT_OLDEST_STORY_YEAR = Calendar.getInstance().get(Calendar.YEAR);
 	private static final long DEFAULT_RNG_SEED = -1;
 	private static final String DEFAULT_SERVER_HTML_PATH = "/PHP";
 	private static final String DEFAULT_SERVER_SCRIPT_PATH = "/PHP";
