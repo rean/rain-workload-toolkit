@@ -137,6 +137,16 @@ Currently, the supported configuration properties are the following:
 
 The order of the operations in the traffic mix matrix is the same of the one specified in the previous section (i.e., 0 is the *Stories of the Day* operation, 1 is the *Register* operation, and so on).
 
+### Compilation and Execution
+
+To compile the RUBBoS workload, simply enter the following command:
+
+	$ ant package-rubbos
+
+To run the RUBBoS workload, simply enter the following command:
+
+	$ java -Xmx1g -Xms256m -cp rain.jar:workloads/rubbos.jar radlab.rain.Benchmark config/rain.config.rubbos.json
+
 ### Assumptions
 
 The current implementation assumes that:
