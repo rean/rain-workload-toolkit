@@ -209,8 +209,8 @@ public abstract class RubbosOperation extends Operation
 		{
 			for (String imageUrl : imageUrls)
 			{
-				URI uri = new URI(imageUrl);
-				String url = uri.resolve(this.getGenerator().getBaseURL()).toString();
+				URI uri = new URI(this.getGenerator().getBaseURL());
+				String url = uri.resolve(imageUrl).toString();
 				this.getLogger().finer("Loading image: " + url);
 				this.getHttpTransport().fetchUrl(url);
 				++imagesLoaded;
