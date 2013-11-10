@@ -71,7 +71,7 @@ public class ViewStoryOperation extends RubbosOperation
 			if (!this.getUtility().isValidStory(storyId))
 			{
 				//FIXME: in this case, the native RUBBoS client goes back to the previous operation
-				this.getLogger().warning("No valid story has been found. Operation interrupted.");
+				this.getLogger().warning("No valid story has been found in the last HTML response. Last response is: " + this.getSessionState().getLastResponse() + ". Operation interrupted.");
 				this.setFailed(true);
 				return;
 			}

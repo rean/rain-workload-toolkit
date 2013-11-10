@@ -77,7 +77,7 @@ public class StoreModerateLogOperation extends RubbosOperation
 		int[] pos = this.getUtility().findRandomLastIndexInHtml(lastResponse, "name=comment_table value=", false);
 		if (pos == null)
 		{
-			this.getLogger().warning("No valid parameters has been found from last response. Operation interrupted.");
+			this.getLogger().warning("No valid parameter has been found in the last HTML response. Last response is: " + this.getSessionState().getLastResponse() + ". Operation interrupted.");
 			this.setFailed(true);
 			return;
 		}

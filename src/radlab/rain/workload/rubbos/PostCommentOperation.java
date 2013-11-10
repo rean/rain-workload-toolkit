@@ -73,7 +73,7 @@ public class PostCommentOperation extends RubbosOperation
 			|| !params.containsKey("comment_table"))
 		{
 			//FIXME: In this case, the native RUBBoS client go back to the previous operation
-			this.getLogger().warning("No valid parameter has been found. Operation interrupted.");
+			this.getLogger().warning("No valid parameter has been found in the last HTML response. Last response is: " + this.getSessionState().getLastResponse() + ". Operation interrupted.");
 			this.setFailed(true);
 			return;
 		}

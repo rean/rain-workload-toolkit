@@ -66,7 +66,7 @@ public class AcceptStoryOperation extends RubbosOperation
 		if (storyId == RubbosUtility.INVALID_STORY_ID)
 		{
 			//FIXME: in this case, the native RUBBoS client goes back to the home page
-			this.getLogger().warning("No more stories to process. Operation interrupted.");
+			this.getLogger().warning("No more stories to process in the last HTML response. Last response is: " + this.getSessionState().getLastResponse() + ". Operation interrupted.");
 			this.setFailed(true);
 			return;
 		}
