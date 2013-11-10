@@ -689,6 +689,11 @@ public final class RubbosUtility
 	 */
 	public int findLastIndexInHtml(String html, String key, int lastIndex)
 	{
+		if (html == null)
+		{
+			return -1;
+		}
+
 		int keyIndex = html.indexOf(key, lastIndex);
 		if (keyIndex != -1)
 		{
@@ -716,6 +721,11 @@ public final class RubbosUtility
 	 */
 	public int[] findRandomLastIndexInHtml(String html, String key, boolean skipFirst)
 	{
+		if (html == null)
+		{
+			return null;
+		}
+
 		int count = 0;
 		int keyIndex = html.indexOf(key);
 
