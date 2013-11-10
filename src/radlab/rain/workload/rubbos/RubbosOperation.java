@@ -120,7 +120,7 @@ public abstract class RubbosOperation extends Operation
 			}
 			catch (Throwable t)
 			{
-				this.getLogger().severe("Unable to load images");
+				this.getLogger().severe("Unable to load images: " + t);
 			}
 		}
 	}
@@ -175,7 +175,7 @@ public abstract class RubbosOperation extends Operation
 	protected Set<String> parseImagesInHtml(String html)
 	{
 		String regex = null;
-		regex = ".*?<img\\s+.*?src=\"([^\"]+?)\".*";
+		regex = "^.*?<img\\s+.*?src=\"([^\"]+?)\".*$";
 
 		this.getLogger().finest( "Parsing images from buffer" );
 		Pattern pattern = Pattern.compile(regex, Pattern.DOTALL | Pattern.UNIX_LINES | Pattern.CASE_INSENSITIVE);
