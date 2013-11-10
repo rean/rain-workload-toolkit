@@ -34,6 +34,7 @@
 package radlab.rain.workload.rubis;
 
 
+import java.net.URI;
 import java.util.LinkedHashSet;
 import java.util.logging.Logger;
 import java.util.Random;
@@ -199,8 +200,10 @@ public abstract class RubisOperation extends Operation
 		{
 			for (String imageUrl : imageUrls)
 			{
-				this.getLogger().finer("Loading image: " + imageUrl);
-				this.getHttpTransport().fetchUrl(imageUrl);
+				URI uri = new URI(this.getGenerator().getBaseURL());
+				String url = uri.resolve(imageUrl).toString();
+				this.getLogger().finer("Loading image: " + url);
+				this.getHttpTransport().fetchUrl(url);
 				++imagesLoaded;
 			}
 		}
