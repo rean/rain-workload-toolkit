@@ -910,7 +910,7 @@ public class RubbosGenerator extends Generator
 		this._moderateCommentURL = this._baseURL + scriptPath + "/ModerateComment.php";
 		this._storeModerateLogURL = this._baseURL + scriptPath + "/StoreModeratorLog.php";
 		this._submitStoryURL = this._baseURL + scriptPath + "/SubmitStory.php";
-		this._storeStoryURL = this._baseURL + scriptPath + "/StoryStore.php";
+		this._storeStoryURL = this._baseURL + scriptPath + "/StoreStory.php";
 		this._searchURL = this._baseURL + scriptPath + "/Search.php";
 		this._searchInStoriesURL = this._searchURL; // + "?type=0&";
 		this._searchInCommentsURL = this._searchURL; // + "?type=1&";
@@ -940,7 +940,7 @@ public class RubbosGenerator extends Generator
 		this._moderateCommentURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.ModerateComment";
 		this._storeModerateLogURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.StoreModeratorLog";
 		this._submitStoryURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.SubmitStory";
-		this._storeStoryURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.StoryStore";
+		this._storeStoryURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.StoreStory";
 		this._searchURL = this._baseURL + scriptPath + "/edu.rice.rubbos.servlets.Search";
 		this._searchInStoriesURL = this._searchURL; // + "?type=0&";
 		this._searchInCommentsURL = this._searchURL; // + "?type=1&";
