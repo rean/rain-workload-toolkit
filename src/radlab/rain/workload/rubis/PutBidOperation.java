@@ -82,7 +82,7 @@ public class PutBidOperation extends RubisOperation
 			{
 				//NOTE: in the original RUBiS client, a transition to the previous page is performed.
 				//      Currently, it seems there is no way to do the same thing with RAIN
-				this.getLogger().warning("No valid item has been found. Operation interrupted.");
+				this.getLogger().warning("No valid item has been found neither in last HTML response nor in session. Last response is: " + this.getSessionState().getLastResponse() + ". Operation interrupted.");
 				this.setFailed(true);
 				return;
 			}

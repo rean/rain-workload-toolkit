@@ -81,7 +81,7 @@ public class StoreCommentOperation extends RubisOperation
 			item = this.getUtility().getItem(this.getSessionState().getItemId(), this.getSessionState().getLoggedUserId());
 			if (!this.getUtility().isValidItem(item))
 			{
-				this.getLogger().warning("No valid item has been found. Operation interrupted.");
+				this.getLogger().warning("No valid item has been found neither in last HTML response nor in session. Last response is: " + this.getSessionState().getLastResponse() + ". Operation interrupted.");
 				this.setFailed(true);
 				return;
 			}
@@ -99,7 +99,7 @@ public class StoreCommentOperation extends RubisOperation
 		RubisUser toUser = this.getUtility().getUser(toUserId);
 		if (!this.getUtility().isRegisteredUser(toUser))
 		{
-			this.getLogger().warning("No valid user has been found. Operation interrupted.");
+			this.getLogger().warning("No valid user has been found in last HTML response. Last response is: " + this.getSessionState().getLastResponse() + ". Operation interrupted.");
 			this.setFailed(true);
 			return;
 		}
