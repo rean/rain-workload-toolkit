@@ -72,13 +72,14 @@ public abstract class RubisOperation extends Operation
 			this.setGeneratedDuringProfile(currentLoadProfile);
 		}
 
-//		// Select a random user for current session (if needed)
-//		RubisUser loggedUser = this.getGenerator().getUser(this.getSessionState().getLoggedUserId());
-//		if (this.getUtility().isAnonymousUser(loggedUser))
-//		{
-//			loggedUser = this.getGenerator().generateUser();
-//			this.getSessionState().setLoggedUserId(loggedUser.id);
-//		}
+		final String lastResponse = this.getSessionState().getLastResponse();
+
+		if (lastResponse != null && lastResponse.indexOf("Sorry") != -1)
+		{
+			// FIXME: Nothing matched the request, we have to go back to the previous operation
+//			this.getLogger().warning("Operation completed with warnings. Last response is: " + lastResponse);
+//			//this.setFailed(true);
+		}
 	}
 
 	@Override
@@ -112,12 +113,6 @@ public abstract class RubisOperation extends Operation
 				// A logic error happened on the server-side
 				this.getLogger().severe("Operation completed with server-side errors. Last response is: " + lastResponse);
 				this.getSessionState().setLastResponse(null);
-				this.setFailed(true);
-			}
-			else if (lastResponse.indexOf("Sorry") != -1)
-			{
-				// Nothing matched the request, we have to go back
-				this.getLogger().warning("Operation completed with warnings. Last response is: " + lastResponse);
 				this.setFailed(true);
 			}
 		}
