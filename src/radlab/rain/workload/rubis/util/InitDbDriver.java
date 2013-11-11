@@ -1098,8 +1098,6 @@ final class InitDb
 	{
 		PreparedStatement comStmt = null;
 
-		comStmt = this._dbConn.prepareStatement(SQL_INSERT_COMMENT, Statement.RETURN_GENERATED_KEYS);
-
 		double nextProgress = 0;
 		double stepProgress = 0.1;
 
@@ -1117,7 +1115,8 @@ final class InitDb
 
 			}
 
-			comStmt = this._dbConn.prepareStatement(SQL_INSERT_BID, Statement.RETURN_GENERATED_KEYS);
+			comStmt = this._dbConn.prepareStatement(SQL_INSERT_COMMENT, Statement.RETURN_GENERATED_KEYS);
+
 
 			int n = 0;
 			for (RubisItem item : this._items)
