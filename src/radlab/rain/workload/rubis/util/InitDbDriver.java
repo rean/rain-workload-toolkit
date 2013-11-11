@@ -68,20 +68,22 @@ import radlab.rain.workload.rubis.RubisUtility;
  */
 final class InitDb
 {
-	private static final String SQL_DELETE_REGIONS = "DELETE FROM regions";
-	private static final String SQL_INSERT_REGION = "INSERT INTO regions (id,name) VALUES (?,?)";
+	private static final String SQL_DELETE_BIDS = "DELETE FROM bids";
+	private static final String SQL_INSERT_BID = "INSERT INTO bids (id,user_id,item_id,qty,bid,max_bid,date) VALUES (NULL,?,?,?,?,?,?)";
+	private static final String SQL_DELETE_BUY_NOWS = "DELETE FROM buy_now";
+	private static final String SQL_INSERT_BUY_NOW = "INSERT INTO buy_now (id,buyer_id,item_id,qty,date) VALUES (NULL,?,?,?,?)";
 	private static final String SQL_DELETE_CATEGORIES = "DELETE FROM categories";
 	private static final String SQL_INSERT_CATEGORY = "INSERT INTO categories (id,name) VALUES (?,?)";
-	private static final String SQL_DELETE_USERS = "DELETE FROM users";
-	private static final String SQL_INSERT_USER = "INSERT INTO users (id,firstname,lastname,nickname,password,email,rating,balance,creation_date,region) VALUES (?,?,?,?,?,?,?,?,?,?)";
+	private static final String SQL_DELETE_COMMENTS = "DELETE FROM comments";
+	private static final String SQL_INSERT_COMMENT = "INSERT INTO comments (id,from_user_id,to_user_id,item_id,rating,date,comment) VALUES (NULL,?,?,?,?,?,?)";
 	private static final String SQL_DELETE_ITEMS = "DELETE FROM items";
 	private static final String SQL_INSERT_ITEM = "INSERT INTO items (id,name,description,initial_price,quantity,reserve_price,buy_now,nb_of_bids,max_bid,start_date,end_date,seller,category) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
 	private static final String SQL_DELETE_OLD_ITEMS = "DELETE FROM old_items";
 	private static final String SQL_INSERT_OLD_ITEM = "INSERT INTO old_items (id,name,description,initial_price,quantity,reserve_price,buy_now,nb_of_bids,max_bid,start_date,end_date,seller,category) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
-	private static final String SQL_DELETE_BIDS = "DELETE FROM bids";
-	private static final String SQL_INSERT_BID = "INSERT INTO bids (id,user_id,item_id,qty,bid,max_bid,date) VALUES (NULL,?,?,?,?,?,?)";
-	private static final String SQL_DELETE_COMMENTS = "DELETE FROM comments";
-	private static final String SQL_INSERT_COMMENT = "INSERT INTO comments (id,from_user_id,to_user_id,item_id,rating,date,comment) VALUES (NULL,?,?,?,?,?,?)";
+	private static final String SQL_DELETE_REGIONS = "DELETE FROM regions";
+	private static final String SQL_INSERT_REGION = "INSERT INTO regions (id,name) VALUES (?,?)";
+	private static final String SQL_DELETE_USERS = "DELETE FROM users";
+	private static final String SQL_INSERT_USER = "INSERT INTO users (id,firstname,lastname,nickname,password,email,rating,balance,creation_date,region) VALUES (?,?,?,?,?,?,?,?,?,?)";
 
 
 	private RubisConfiguration _conf;
@@ -165,6 +167,15 @@ final class InitDb
 	private void deleteEntities() throws Exception
 	{
 		// Entities should be deleted according to a specific order to avoid violating foreign constraints
+		// - USERS depends by REGIONS
+		// - ITEMS depends by USERS and CATEGORIES
+		// - OLD_ITEMS depends by USERS and CATEGORIES
+		// - COMMENTS depends by ITEMS and USERS
+		// - BUY_NOW depends by ITEMS and USERS
+		// - BIDS depends by ITEMS and USERS
+		// - CATEGORIES has no dependencies
+		// - REGIONS has no dependencies
+		// - IDS has no dependencies
 
 		Statement stmt = null;
 
@@ -208,6 +219,21 @@ final class InitDb
 			if (this._pwr != null)
 			{
 				this._pwr.println(this._dbConn.nativeSQL(SQL_DELETE_BIDS));
+			}
+			if (this._verboseFlag)
+			{
+				System.err.print("..");
+				System.err.flush();
+			}
+			// Delete all existing buy_nows
+			if (!this._testFlag)
+			{
+				stmt = this._dbConn.createStatement();
+				stmt.executeUpdate(SQL_DELETE_BUY_NOWS);
+			}
+			if (this._pwr != null)
+			{
+				this._pwr.println(this._dbConn.nativeSQL(SQL_DELETE_BUY_NOWS));
 			}
 			if (this._verboseFlag)
 			{
