@@ -162,19 +162,22 @@ To compile the RUBiS workload, simply enter the following command:
 
 If you need to setup the RUBiS database, you can execute the following commands:
 - Download the JDBC driver for the DBMS managing the RUBiS database.
-  For instance, for a MySQL DBMS go to the [MySQL site](http://dev.mysql.com) and download the MySQL Connector/J
+  For instance, for a *MySQL* DBMS go to the [MySQL site](http://dev.mysql.com) and download the *MySQL Connector/J* version 5.1 or greater.
 - Put the JDBC JAR into a readable path (say `./lib`), for instance:
 
-    $ mkdir -p lib
-    $ cd lib
-    $ wget ftp://na.mirror.garr.it/mirrors/MySQL/Downloads/Connector-J/mysql-connector-java-5.1.27.zip
-    $ unzip mysql-connector-java-5.1.27.zip mysql-connector-java-5.1.27/mysql-connector-java-5.1.27-bin.jar
-    $ mv mysql-connector-java-5.1.27/mysql-connector-java-5.1.27-bin.jar .
-    $ rm mysql-connector-java-5.1.27.zip
+	$ mkdir -p lib
+	$ cd lib
+	$ wget ftp://na.mirror.garr.it/mirrors/MySQL/Downloads/Connector-J/mysql-connector-java-5.1.27.zip
+	$ unzip mysql-connector-java-5.1.27.zip mysql-connector-java-5.1.27/mysql-connector-java-5.1.27-bin.jar
+	$ mv mysql-connector-java-5.1.27/mysql-connector-java-5.1.27-bin.jar .
+	$ rm mysql-connector-java-5.1.27.zip
 
-- Run the DB population command to populate the RUBiS database located in the $DBMS\_HOST host:
+- Run the DB population command to populate the RUBiS database:
 
-    $ java -cp rain.jar:workloads/rubis.jar:lib/mysql-connector-java-5.1.27-bin.jar radlab.rain.workload.rubis.util.InitDbDriver -verbose -dburl "jdbc:mysql://$DBMS_HOST/rubis" -dbusr rubis -dbpwd rubis
+	$ java -cp rain.jar:workloads/rubis.jar:lib/mysql-connector-java-5.1.27-bin.jar radlab.rain.workload.rubis.util.InitDbDriver -verbose -dburl "jdbc:mysql://$DBMS_HOST/rubis" -dbusr rubis -dbpwd rubis
+
+  where `$DBMS_HOST` is the name or IP address of the host running the DBMS.
+  Note, if you don't use MySQL you have to suitably adapt the above command.
 
 #### Workload Driver Execution
 
