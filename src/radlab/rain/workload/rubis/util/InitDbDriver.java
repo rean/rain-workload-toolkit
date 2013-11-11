@@ -48,6 +48,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import org.json.JSONObject;
 import org.json.JSONException;
@@ -90,6 +92,7 @@ final class InitDb
 	private RubisUtility _util;
 	private Connection _dbConn;
 	private PrintWriter _pwr;
+	private List<RubisItem> _items;
 	private boolean _verboseFlag;
 	private boolean _testFlag;
 	private boolean _transFlag;
@@ -113,6 +116,7 @@ final class InitDb
 		this._testFlag = false;
 		this._transFlag = false;
 		this._pwr = null;
+		this._items = new ArrayList<RubisItem>();
 	}
 
 	public void setVerboseFlag(boolean value)
@@ -158,10 +162,7 @@ final class InitDb
 	public void initialize() throws Exception
 	{
 		this.deleteEntities();
-		this.initializeRegions();
-		this.initializeCategories();
-		this.initializeUsers();
-		this.initializeItems();
+		this.initializeEntities();
 	}
 
 	private void deleteEntities() throws Exception
@@ -348,6 +349,25 @@ final class InitDb
 		{
 			System.err.println();
 		}
+	}
+
+	private void initializeEntities() throws Exception
+	{
+		// Entities should be initialized according to a specific order to avoid violating foreign constraints
+		// - USERS depends by REGIONS
+		// - ITEMS depends by USERS and CATEGORIES
+		// - OLD_ITEMS depends by USERS and CATEGORIES
+		// - COMMENTS depends by ITEMS and USERS
+		// - BUY_NOW depends by ITEMS and USERS
+		// - BIDS depends by ITEMS and USERS
+		// - CATEGORIES has no dependencies
+		// - REGIONS has no dependencies
+		// - IDS has no dependencies
+
+		this.initializeRegions();
+		this.initializeCategories();
+		this.initializeUsers();
+		this.initializeItems();
 	}
 
 	private void initializeRegions() throws Exception
@@ -704,8 +724,6 @@ final class InitDb
 	{
 		PreparedStatement oldItemStmt = null;
 		PreparedStatement itemStmt = null;
-		PreparedStatement bidStmt = null;
-		PreparedStatement comStmt = null;
 
 		double nextProgress = 0;
 		double stepProgress = 0.1;
@@ -725,14 +743,12 @@ final class InitDb
 			}
 
 			// Generate item
-			final int minId = 1;
-			final int maxId = this._conf.getTotalActiveItems()+this._conf.getNumOfOldItems()+minId-1;
-			final int maxOldItemId = this._conf.getNumOfOldItems()+minId-1;
+			final int minId = this.getMinItemId();
+			final int maxId = this.getMaxActiveItemId();
+			final int maxOldItemId = this.getMaxOldItemId();
 			int count = 0;
 			oldItemStmt = this._dbConn.prepareStatement(SQL_INSERT_OLD_ITEM, Statement.RETURN_GENERATED_KEYS);
 			itemStmt = this._dbConn.prepareStatement(SQL_INSERT_ITEM, Statement.RETURN_GENERATED_KEYS);
-			bidStmt = this._dbConn.prepareStatement(SQL_INSERT_BID, Statement.RETURN_GENERATED_KEYS);
-			comStmt = this._dbConn.prepareStatement(SQL_INSERT_COMMENT, Statement.RETURN_GENERATED_KEYS);
 			for (int id = minId; id <= maxId; ++id)
 			{
 				++count;
@@ -901,9 +917,7 @@ final class InitDb
 					}
 				}
 
-
-				this.initializeBids(item, bidStmt);
-				this.initializeComments(item, comStmt);
+				this._items.add(item);
 
 				if (this._verboseFlag)
 				{
@@ -928,6 +942,7 @@ final class InitDb
 			{
 				this._dbConn.rollback();
 			}
+			this._items.clear();
 
 			throw se;
 		}
@@ -935,17 +950,91 @@ final class InitDb
 		{
 			if (!this._testFlag)
 			{
+				if (oldItemStmt != null)
+				{
+					oldItemStmt.close();
+				}
 				if (itemStmt != null)
 				{
 					itemStmt.close();
 				}
+
+				if (this._transFlag)
+				{
+					this._dbConn.setAutoCommit(true);
+				}
+			}
+		}
+
+		if (this._verboseFlag)
+		{
+			System.err.println();
+		}
+	}
+
+	private void initializeBids() throws Exception
+	{
+		PreparedStatement bidStmt = null;
+
+		double nextProgress = 0;
+		double stepProgress = 0.1;
+
+		if (this._verboseFlag)
+		{
+			System.err.print("[INFO] Initialize Bids: ");
+			System.err.flush();
+		}
+
+		try
+		{
+			if (!this._testFlag && this._transFlag)
+			{
+				this._dbConn.setAutoCommit(false);
+
+			}
+
+			bidStmt = this._dbConn.prepareStatement(SQL_INSERT_BID, Statement.RETURN_GENERATED_KEYS);
+
+			int n = 0;
+			for (RubisItem item : this._items)
+			{
+				this.initializeBids(item, bidStmt);
+
+				if (this._verboseFlag)
+				{
+					double currentProgress = n/((double) this._items.size());
+					++n;
+					if (currentProgress >= nextProgress)
+					{
+						System.err.print(".");
+						System.err.flush();
+						nextProgress += stepProgress;
+					}
+				}
+			}
+
+			if (!this._testFlag && this._transFlag)
+			{
+				this._dbConn.commit();
+			}
+		}
+		catch (SQLException se)
+		{
+			if (!this._testFlag && this._transFlag)
+			{
+				this._dbConn.rollback();
+			}
+			this._items.clear();
+
+			throw se;
+		}
+		finally
+		{
+			if (!this._testFlag)
+			{
 				if (bidStmt != null)
 				{
 					bidStmt.close();
-				}
-				if (comStmt != null)
-				{
-					comStmt.close();
 				}
 
 				if (this._transFlag)
@@ -1001,6 +1090,86 @@ final class InitDb
 		}
 	}
 
+	private void initializeComments() throws Exception
+	{
+		PreparedStatement comStmt = null;
+
+		comStmt = this._dbConn.prepareStatement(SQL_INSERT_COMMENT, Statement.RETURN_GENERATED_KEYS);
+
+		double nextProgress = 0;
+		double stepProgress = 0.1;
+
+		if (this._verboseFlag)
+		{
+			System.err.print("[INFO] Initialize Comments: ");
+			System.err.flush();
+		}
+
+		try
+		{
+			if (!this._testFlag && this._transFlag)
+			{
+				this._dbConn.setAutoCommit(false);
+
+			}
+
+			comStmt = this._dbConn.prepareStatement(SQL_INSERT_BID, Statement.RETURN_GENERATED_KEYS);
+
+			int n = 0;
+			for (RubisItem item : this._items)
+			{
+				this.initializeComments(item, comStmt);
+
+				if (this._verboseFlag)
+				{
+					double currentProgress = n/((double) this._items.size());
+					++n;
+					if (currentProgress >= nextProgress)
+					{
+						System.err.print(".");
+						System.err.flush();
+						nextProgress += stepProgress;
+					}
+				}
+			}
+
+			if (!this._testFlag && this._transFlag)
+			{
+				this._dbConn.commit();
+			}
+		}
+		catch (SQLException se)
+		{
+			if (!this._testFlag && this._transFlag)
+			{
+				this._dbConn.rollback();
+			}
+			this._items.clear();
+
+			throw se;
+		}
+		finally
+		{
+			if (!this._testFlag)
+			{
+				if (comStmt != null)
+				{
+					comStmt.close();
+				}
+
+				if (this._transFlag)
+				{
+					this._dbConn.setAutoCommit(true);
+				}
+			}
+		}
+
+		if (this._verboseFlag)
+		{
+			System.err.println();
+		}
+	}
+
 	private void initializeComments(RubisItem item, PreparedStatement comStmt) throws SQLException
 	{
 		RubisComment comment = this._util.generateComment(this._util.generateUser().id,
@@ -1028,6 +1197,21 @@ final class InitDb
 		{
 			this._pwr.println(comStmt);
 		}
+	}
+
+	private int getMinItemId()
+	{
+		return 1;
+	}
+
+	private int getMaxActiveItemId()
+	{
+		return this._conf.getTotalActiveItems()+this._conf.getNumOfOldItems()+this.getMinItemId()-1;
+	}
+
+	private int getMaxOldItemId()
+	{
+		return this._conf.getNumOfOldItems()+this.getMinItemId()-1;
 	}
 }
 
