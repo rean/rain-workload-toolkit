@@ -170,7 +170,7 @@ If you need to setup the RUBiS database, you can execute the following commands:
 		$ wget ftp://na.mirror.garr.it/mirrors/MySQL/Downloads/Connector-J/mysql-connector-java-5.1.27.zip
 		$ unzip mysql-connector-java-5.1.27.zip mysql-connector-java-5.1.27/mysql-connector-java-5.1.27-bin.jar
 		$ mv mysql-connector-java-5.1.27/mysql-connector-java-5.1.27-bin.jar .
-		$ rm mysql-connector-java-5.1.27.zip
+		$ rm -rf mysql-connector-java-5.1.27 mysql-connector-java-5.1.27.zip
 
 - Run the DB population command to populate the RUBiS database:
 
