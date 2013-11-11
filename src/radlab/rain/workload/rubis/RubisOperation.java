@@ -72,15 +72,6 @@ public abstract class RubisOperation extends Operation
 			this.setGeneratedDuringProfile(currentLoadProfile);
 		}
 
-		String html = this.getSessionState().getLastResponse();
-		if (html != null)
-		{
-			if (html.indexOf("Sorry") != -1)
-			{
-				// Nothing matched the request, we have to go back
-				this.setFailed(true);
-			}
-		}
 //		// Select a random user for current session (if needed)
 //		RubisUser loggedUser = this.getGenerator().getUser(this.getSessionState().getLoggedUserId());
 //		if (this.getUtility().isAnonymousUser(loggedUser))
@@ -94,25 +85,40 @@ public abstract class RubisOperation extends Operation
 	public void postExecute() 
 	{
 		this.getSessionState().setLastOperation(this._operationIndex);
+
+		final String lastResponse = this.getSessionState().getLastResponse();
+
 		if (this.isFailed())
 		{
+			this.getLogger().severe("Operation failed to execute. Last response is: " + lastResponse);
 			this.getSessionState().setLastResponse(null);
 		}
-		else if (this.getSessionState().getLastResponse() != null && this.getSessionState().getLastResponse().indexOf("ERROR") != -1)
-		{
-			this.getSessionState().setLastResponse(null);
-			this.setFailed(true);
-		}
-		else
+		else if (lastResponse != null)
 		{
 			// Look for any image to download
 			try
 			{
-				this.loadImages(this.parseImagesInHtml(this.getSessionState().getLastResponse()));
+				this.loadImages(this.parseImagesInHtml(lastResponse));
 			}
 			catch (Throwable t)
 			{
-				this.getLogger().severe("Unable to load images");
+				this.getLogger().warning("Unable to load images");
+				this.setFailed(true);
+			}
+
+			// Check for possible errors
+			if (lastResponse.indexOf("ERROR") != -1)
+			{
+				// A logic error happened on the server-side
+				this.getLogger().severe("Operation completed with server-side errors. Last response is: " + lastResponse);
+				this.getSessionState().setLastResponse(null);
+				this.setFailed(true);
+			}
+			else if (lastResponse.indexOf("Sorry") != -1)
+			{
+				// Nothing matched the request, we have to go back
+				this.getLogger().warning("Operation completed with warnings. Last response is: " + lastResponse);
+				this.setFailed(true);
 			}
 		}
 	}
