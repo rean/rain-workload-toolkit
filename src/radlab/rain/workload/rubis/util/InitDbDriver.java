@@ -368,6 +368,8 @@ final class InitDb
 		this.initializeCategories();
 		this.initializeUsers();
 		this.initializeItems();
+		this.initializeBids();
+		this.initializeComments();
 	}
 
 	private void initializeRegions() throws Exception
@@ -733,6 +735,8 @@ final class InitDb
 			System.err.print("[INFO] Initialize Items: ");
 			System.err.flush();
 		}
+
+		this._items.clear();
 
 		try
 		{
