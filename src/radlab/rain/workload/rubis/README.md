@@ -24,11 +24,7 @@ An EJB server provides a number of services such as database access (JDBC), tran
 The current implementation of the RUBiS workload in RAIN is based on the version 1.4.3 of the [OW2 RUBiS](http://rubis.ow2.org/) (which, at the time of writing, is the last available version).
 Specifically, the implementation is currently based on the PHP and Java servlets versions of RUBiS (but it shouldn't be too difficult to adapt it to work with other RUBiS incarnations).
 
-As a final remark, since the OW2 RUBiS seems to be an abandoned project, I strongly suggest you to use the following RUBiS version:
-
-[dcsj-rubis](https://github.com/sguazt/dcsj-rubis)
-
-which is a my patched and possibly enhanced version of OW2 RUBiS version 1.4.3.
+As a final remark, since the OW2 RUBiS seems to be an abandoned project, I strongly suggest you to use my personal fork of RUBiS that you can find on [here](https://github.com/sguazt/RUBiS), which is a my patched and possibly enhanced version of OW2 RUBiS version 1.4.3.
 
 ### Type of Operations
 
