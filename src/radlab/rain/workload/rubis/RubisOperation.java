@@ -173,7 +173,7 @@ public abstract class RubisOperation extends Operation
 	protected Set<String> parseImagesInHtml(String html)
 	{
 		String regex = null;
-		regex = ".*?<img\\s+.*?src=\"([^\"]+?)\".*";
+		regex = "<img\\s+.*?src=\"([^\"]+?)\"";
 
 		this.getLogger().finest("Parsing images from buffer: " + html);
 		Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
