@@ -45,6 +45,7 @@ import radlab.rain.Generator;
 import radlab.rain.IScoreboard;
 import radlab.rain.LoadProfile;
 import radlab.rain.Operation;
+import radlab.rain.TraceRecord;
 import radlab.rain.util.HttpTransport;
 import radlab.rain.workload.rubis.model.RubisUser;
 
@@ -91,7 +92,7 @@ public abstract class RubisOperation extends Operation
 
 		if (this.isFailed())
 		{
-			this.getLogger().severe("Operation failed to execute. Last response is: " + lastResponse);
+			this.getLogger().severe("Operation '" + this.getOperationName() + "' failed to execute. Last request is: '" + this.getLastRequest() + "'. Last response is: " + lastResponse);
 			this.getSessionState().setLastResponse(null);
 		}
 		else if (lastResponse != null)
@@ -111,7 +112,7 @@ public abstract class RubisOperation extends Operation
 			if (lastResponse.indexOf("ERROR") != -1)
 			{
 				// A logic error happened on the server-side
-				this.getLogger().severe("Operation completed with server-side errors. Last response is: " + lastResponse);
+				this.getLogger().severe("Operation '" + this.getOperationName() + "' completed with server-side. Last request is: '" + this.getLastRequest() + "'. Last response is: " + lastResponse);
 				this.getSessionState().setLastResponse(null);
 				this.setFailed(true);
 			}
@@ -157,6 +158,21 @@ public abstract class RubisOperation extends Operation
 	public RubisConfiguration getConfiguration()
 	{
 		return this.getGenerator().getConfiguration();
+	}
+
+	/**
+	 * Get the last request issued by this operation.
+	 *
+	 * @return The last request issued by this operation.
+	 */
+	protected String getLastRequest()
+	{
+		final TraceRecord trace = this.getTrace();
+		if (trace._lstRequests == null || trace._lstRequests.isEmpty())
+		{
+			return null;
+		}
+		return trace._lstRequests.get(trace._lstRequests.size()-1);
 	}
 
 	/**
