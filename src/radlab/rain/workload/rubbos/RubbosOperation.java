@@ -84,9 +84,9 @@ public abstract class RubbosOperation extends Operation
 
 		if (lastResponse != null && lastResponse.indexOf("Sorry") != -1)
 		{
-			// FIXME: Nothing matched the request, we have to go back to the previous operation
-			this.getLogger().warning("Operation completed with warnings. Last response is: " + lastResponse);
-			this.setFailed(true);
+//			// FIXME: Nothing matched the request, we have to go back to the previous operation
+//			this.getLogger().warning("Operation completed with warnings. Last response is: " + lastResponse);
+//			this.setFailed(true);
 		}
 	}
 
