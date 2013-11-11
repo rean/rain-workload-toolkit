@@ -76,6 +76,8 @@ final class InitDb
 	private static final String SQL_INSERT_USER = "INSERT INTO users (id,firstname,lastname,nickname,password,email,rating,balance,creation_date,region) VALUES (?,?,?,?,?,?,?,?,?,?)";
 	private static final String SQL_DELETE_ITEMS = "DELETE FROM items";
 	private static final String SQL_INSERT_ITEM = "INSERT INTO items (id,name,description,initial_price,quantity,reserve_price,buy_now,nb_of_bids,max_bid,start_date,end_date,seller,category) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+	private static final String SQL_DELETE_OLD_ITEMS = "DELETE FROM old_items";
+	private static final String SQL_INSERT_OLD_ITEM = "INSERT INTO old_items (id,name,description,initial_price,quantity,reserve_price,buy_now,nb_of_bids,max_bid,start_date,end_date,seller,category) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
 	private static final String SQL_DELETE_BIDS = "DELETE FROM bids";
 	private static final String SQL_INSERT_BID = "INSERT INTO bids (id,user_id,item_id,qty,bid,max_bid,date) VALUES (NULL,?,?,?,?,?,?)";
 	private static final String SQL_DELETE_COMMENTS = "DELETE FROM comments";
@@ -206,6 +208,21 @@ final class InitDb
 			if (this._pwr != null)
 			{
 				this._pwr.println(this._dbConn.nativeSQL(SQL_DELETE_BIDS));
+			}
+			if (this._verboseFlag)
+			{
+				System.err.print("..");
+				System.err.flush();
+			}
+			// Delete all existing old_items
+			if (!this._testFlag)
+			{
+				stmt = this._dbConn.createStatement();
+				stmt.executeUpdate(SQL_DELETE_OLD_ITEMS);
+			}
+			if (this._pwr != null)
+			{
+				this._pwr.println(this._dbConn.nativeSQL(SQL_DELETE_OLD_ITEMS));
 			}
 			if (this._verboseFlag)
 			{
@@ -659,6 +676,7 @@ final class InitDb
 
 	private void initializeItems() throws Exception
 	{
+		PreparedStatement oldItemStmt = null;
 		PreparedStatement itemStmt = null;
 		PreparedStatement bidStmt = null;
 		PreparedStatement comStmt = null;
@@ -685,6 +703,7 @@ final class InitDb
 			final int maxId = this._conf.getTotalActiveItems()+this._conf.getNumOfOldItems()+minId-1;
 			final int maxOldItemId = this._conf.getNumOfOldItems()+minId-1;
 			int count = 0;
+			oldItemStmt = this._dbConn.prepareStatement(SQL_INSERT_OLD_ITEM, Statement.RETURN_GENERATED_KEYS);
 			itemStmt = this._dbConn.prepareStatement(SQL_INSERT_ITEM, Statement.RETURN_GENERATED_KEYS);
 			bidStmt = this._dbConn.prepareStatement(SQL_INSERT_BID, Statement.RETURN_GENERATED_KEYS);
 			comStmt = this._dbConn.prepareStatement(SQL_INSERT_COMMENT, Statement.RETURN_GENERATED_KEYS);
@@ -695,12 +714,12 @@ final class InitDb
 				RubisUser seller = this._util.generateUser();
 				RubisItem item = this._util.getItem(id, seller.id);
 
+				int duration = this._util.getDaysBetween(item.startDate, item.endDate);
 				if (id <= maxOldItemId)
 				{
 					// Generate an old item whereby auction date is over
 
 					// Add a negative duration so that the auctio will be over
-					int duration = this._util.getDaysBetween(item.startDate, item.endDate);
 					item.endDate = this._util.addDays(item.startDate, -duration);
 
 					if (count < (this._conf.getPercentageOfItemsReserve()*this._conf.getNumOfOldItems()/100.0))
@@ -727,54 +746,133 @@ final class InitDb
 					{
 						item.quantity = this._util.getRandomGenerator().nextInt(Math.round(this._conf.getMaxItemQuantity())) + 1;
 					}
-				}
 
-				itemStmt.clearParameters();
-				itemStmt.setInt(1, item.id);
-				itemStmt.setString(2, item.name);
-				itemStmt.setString(3, item.description);
-				itemStmt.setFloat(4, item.initialPrice);
-				itemStmt.setInt(5, item.quantity);
-				itemStmt.setFloat(6, item.reservePrice);
-				itemStmt.setFloat(7, item.buyNow);
-				itemStmt.setInt(8, item.nbOfBids);
-				itemStmt.setFloat(9, item.maxBid);
-				itemStmt.setDate(10, new Date(item.startDate.getTime()));
-				itemStmt.setDate(11, new Date(item.endDate.getTime()));
-				itemStmt.setInt(12, item.seller);
-				itemStmt.setInt(13, item.category);
+					oldItemStmt.clearParameters();
+					oldItemStmt.setInt(1, item.id);
+					oldItemStmt.setString(2, item.name);
+					oldItemStmt.setString(3, item.description);
+					oldItemStmt.setFloat(4, item.initialPrice);
+					oldItemStmt.setInt(5, item.quantity);
+					oldItemStmt.setFloat(6, item.reservePrice);
+					oldItemStmt.setFloat(7, item.buyNow);
+					oldItemStmt.setInt(8, item.nbOfBids);
+					oldItemStmt.setFloat(9, item.maxBid);
+					oldItemStmt.setDate(10, new Date(item.startDate.getTime()));
+					oldItemStmt.setDate(11, new Date(item.endDate.getTime()));
+					oldItemStmt.setInt(12, item.seller);
+					oldItemStmt.setInt(13, item.category);
 
-				if (!this._testFlag)
-				{
-					int affectedRows = itemStmt.executeUpdate();
-
-					// Experimental: use batches instead of execute one query at a time
-					//itemStmt.addBatch();
-					//if ((id % 1000) == 0)
-					//{
-					//	itemStmt.executeBatch();
-					//}
-
-					if (affectedRows == 0)
+					if (!this._testFlag)
 					{
-						throw new SQLException("During item insertion: No rows affected");
-					}
+						int affectedRows = oldItemStmt.executeUpdate();
 
-					ResultSet rs = itemStmt.getGeneratedKeys();
-					if (rs.last())
-					{
-						int genId = rs.getInt(1);
+						// Experimental: use batches instead of execute one query at a time
+						//oldItemStmt.addBatch();
+						//if ((id % 1000) == 0)
+						//{
+						//	itemStmt.executeBatch();
+						//}
 
-						if (id != genId)
+						if (affectedRows == 0)
 						{
-							System.err.println("[WARNING] Expected item ID (" + id + ") is different from the one that has been generated (" + genId + ")");
+							throw new SQLException("During old_item insertion: No rows affected");
 						}
+
+						ResultSet rs = oldItemStmt.getGeneratedKeys();
+						if (rs.last())
+						{
+							int genId = rs.getInt(1);
+
+							if (id != genId)
+							{
+								System.err.println("[WARNING] Expected item ID (" + id + ") is different from the one that has been generated (" + genId + ")");
+							}
+						}
+						rs.close();
 					}
-					rs.close();
+					if (this._pwr != null)
+					{
+						this._pwr.println(oldItemStmt);
+					}
 				}
-				if (this._pwr != null)
+				else
 				{
-					this._pwr.println(itemStmt);
+					// This is a regular item
+
+					item.endDate = this._util.addDays(item.startDate, duration);
+
+					if (count < (this._conf.getPercentageOfItemsReserve()*this._conf.getTotalActiveItems()/100.0))
+					{
+						item.reservePrice = this._util.getRandomGenerator().nextInt(Math.round(this._conf.getMaxItemBaseReservePrice())) + item.initialPrice;
+					}
+					else
+					{
+						item.reservePrice = 0;
+					}
+					if (count < (this._conf.getPercentageOfItemsBuyNow()*this._conf.getTotalActiveItems()/100.0))
+					{
+						item.buyNow = this._util.getRandomGenerator().nextInt(Math.round(this._conf.getMaxItemBaseBuyNowPrice())) + item.initialPrice + item.reservePrice;
+					}
+					else
+					{
+						item.buyNow = 0;
+					}
+					if (count < (this._conf.getPercentageOfUniqueItems()*this._conf.getTotalActiveItems()/100.0))
+					{
+						item.quantity = 1;
+					}
+					else
+					{
+						item.quantity = this._util.getRandomGenerator().nextInt(Math.round(this._conf.getMaxItemQuantity())) + 1;
+					}
+
+					itemStmt.clearParameters();
+					itemStmt.setInt(1, item.id);
+					itemStmt.setString(2, item.name);
+					itemStmt.setString(3, item.description);
+					itemStmt.setFloat(4, item.initialPrice);
+					itemStmt.setInt(5, item.quantity);
+					itemStmt.setFloat(6, item.reservePrice);
+					itemStmt.setFloat(7, item.buyNow);
+					itemStmt.setInt(8, item.nbOfBids);
+					itemStmt.setFloat(9, item.maxBid);
+					itemStmt.setDate(10, new Date(item.startDate.getTime()));
+					itemStmt.setDate(11, new Date(item.endDate.getTime()));
+					itemStmt.setInt(12, item.seller);
+					itemStmt.setInt(13, item.category);
+
+					if (!this._testFlag)
+					{
+						int affectedRows = itemStmt.executeUpdate();
+
+						// Experimental: use batches instead of execute one query at a time
+						//itemStmt.addBatch();
+						//if ((id % 1000) == 0)
+						//{
+						//	itemStmt.executeBatch();
+						//}
+
+						if (affectedRows == 0)
+						{
+							throw new SQLException("During item insertion: No rows affected");
+						}
+
+						ResultSet rs = itemStmt.getGeneratedKeys();
+						if (rs.last())
+						{
+							int genId = rs.getInt(1);
+
+							if (id != genId)
+							{
+								System.err.println("[WARNING] Expected item ID (" + id + ") is different from the one that has been generated (" + genId + ")");
+							}
+						}
+						rs.close();
+					}
+					if (this._pwr != null)
+					{
+						this._pwr.println(itemStmt);
+					}
 				}
 
 
