@@ -152,14 +152,35 @@ The order of the operations in the traffic mix matrix is the same of the one spe
 
 ### Compilation and Execution
 
+#### Compilation
+
 To compile the RUBiS workload, simply enter the following command:
 
     $ ant package-rubis
 
+#### Database Initialization
+
+If you need to setup the RUBiS database, you can execute the following commands:
+- Download the JDBC driver for the DBMS managing the RUBiS database.
+  For instance, for a MySQL DBMS go to the [MySQL site](http://dev.mysql.com) and download the MySQL Connector/J
+- Put the JDBC JAR into a readable path (say `./lib`), for instance:
+
+    $ mkdir -p lib
+    $ cd lib
+    $ wget ftp://na.mirror.garr.it/mirrors/MySQL/Downloads/Connector-J/mysql-connector-java-5.1.27.zip
+    $ unzip mysql-connector-java-5.1.27.zip mysql-connector-java-5.1.27/mysql-connector-java-5.1.27-bin.jar
+    $ mv mysql-connector-java-5.1.27/mysql-connector-java-5.1.27-bin.jar .
+    $ rm mysql-connector-java-5.1.27.zip
+
+- Run the DB population command to populate the RUBiS database located in the $DBMS\_HOST host:
+
+    $ java -cp rain.jar:workloads/rubis.jar:lib/mysql-connector-java-5.1.27-bin.jar radlab.rain.workload.rubis.util.InitDbDriver -verbose -dburl "jdbc:mysql://$DBMS_HOST/rubis" -dbusr rubis -dbpwd rubis
+
+#### Workload Driver Execution
+
 To run the RUBiS workload, simply enter the following command:
 
     $ java -Xmx1g -Xms256m -cp rain.jar:workloads/rubis.jar radlab.rain.Benchmark config/rain.config.rubis.json
-
 
 ### Assumptions
 
