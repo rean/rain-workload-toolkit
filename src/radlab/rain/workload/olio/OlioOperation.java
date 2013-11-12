@@ -36,6 +36,7 @@ package radlab.rain.workload.olio;
 
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -179,31 +180,33 @@ public abstract class OlioOperation extends Operation
 		{
 			case OlioConfiguration.JAVA_INCARNATION:
 				//regex = ".*?<img\\s+.*?src=\"([^\"]+?)\"[^/>]*?(?:/)>.*";
-				regex = ".*?<img\\s+.*?src=\"([^\"]+?)\".*";
+				//regex = ".*?<img\\s+.*?src=\"([^\"]+?)\".*";
+				regex = "<img\\s+.*?src=\"([^\"]+?)\"";
 				break;
 			case OlioConfiguration.PHP_INCARNATION:
 				//regex = ".*?<img\\s+.*?src=\"([^\"]+?)\"[^/>]*?(?:/)>.*";
-				regex = ".*?<img\\s+.*?src=\"([^\"]+?)\".*";
+				//regex = ".*?<img\\s+.*?src=\"([^\"]+?)\".*";
+				regex = "<img\\s+.*?src=\"([^\"]+?)\"";
 				break;
 			case OlioConfiguration.RAILS_INCARNATION:
-				regex = ".*?background:\\s+.*?url\\(([^\\)]+?)\\).*";
+				//regex = ".*?background:\\s+.*?url\\(([^\\)]+?)\\).*";
+				regex = "background:\\s+.*?url\\(([^\\)]+?)\\)";
 				break;
 		}
 
-		this.getLogger().finest( "Parsing images from buffer" );
-		Pattern pattern = Pattern.compile(regex, Pattern.DOTALL | Pattern.UNIX_LINES);
+		this.getLogger().finest("Parsing images from buffer: " + html);
+		Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
 		Set<String> urlSet = new LinkedHashSet<String>();
 
 		Matcher match = pattern.matcher(html);
 		while (match.find())
 		{
 			String url = match.group(1);
-			boolean addUrl = false;
-			if (url.startsWith(this.getGenerator().getImgStoreURL()) && url.contains("jpg"))
-			{
+//			if (url.startsWith(this.getGenerator().getImgStoreURL()) && url.contains("jpg"))
+//			{
 				this.getLogger().finest("Adding " + url);
 				urlSet.add(url);
-			}
+//			}
 		}
 
 		return urlSet;
@@ -256,7 +259,7 @@ public abstract class OlioOperation extends Operation
 	 * 
 	 * @throws IOException
 	 */
-	protected long loadImages(Set<String> imageUrls) throws IOException 
+	protected long loadImages(Set<String> imageUrls) throws Throwable 
 	{
 		long imagesLoaded = 0;
 
@@ -267,8 +270,10 @@ public abstract class OlioOperation extends Operation
 				// Do not load if cached (adding returns false if present).
 				if (this._cachedURLs.add(imageUrl))
 				{
-					this.getLogger().finer("Loading image: " + imageUrl);
-					this.getHttpTransport().fetchUrl(imageUrl);
+					URI uri = new URI(this.getGenerator().getBaseURL());
+					String url = uri.resolve(imageUrl).toString();
+					this.getLogger().finer("Loading image: " + url);
+					this.getHttpTransport().fetchUrl(url);
 					++imagesLoaded;
 				} 
 				else
