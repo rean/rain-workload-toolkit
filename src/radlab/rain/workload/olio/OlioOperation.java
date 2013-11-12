@@ -53,6 +53,7 @@ import radlab.rain.Generator;
 import radlab.rain.IScoreboard;
 import radlab.rain.LoadProfile;
 import radlab.rain.Operation;
+import radlab.rain.TraceRecord;
 import radlab.rain.util.HttpTransport;
 
 
@@ -120,8 +121,11 @@ public abstract class OlioOperation extends Operation
 	@Override
 	public void postExecute()
 	{
+		this.getSessionState().setLastOperation(this._operationIndex);
+
 		if (this.isFailed())
 		{
+			this.getLogger().severe("Operation '" + this.getOperationName() + "' failed to execute. Last request is: '" + this.getLastRequest() + "'. Last response is: " + this.getSessionState().getLastResponse());
 			this.getSessionState().setLastResponse(null);
 		}
 	}
@@ -165,6 +169,21 @@ public abstract class OlioOperation extends Operation
 	public OlioConfiguration getConfiguration()
 	{
 		return this.getGenerator().getConfiguration();
+	}
+
+	/**
+	 * Get the last request issued by this operation.
+	 *
+	 * @return The last request issued by this operation.
+	 */
+	protected String getLastRequest()
+	{
+		final TraceRecord trace = this.getTrace();
+		if (trace._lstRequests == null || trace._lstRequests.isEmpty())
+		{
+			return null;
+		}
+		return trace._lstRequests.get(trace._lstRequests.size()-1);
 	}
 
 	/**
@@ -294,21 +313,23 @@ public abstract class OlioOperation extends Operation
 	 * 
 	 * @throws IOException
 	 */
-	protected long loadStatics(String[] urls) throws IOException 
+	protected long loadStatics(String[] staticUrls) throws Throwable 
 	{
 		long staticsLoaded = 0;
 
-		for (String url : urls)
+		for (String staticUrl : staticUrls)
 		{
-			if (this._cachedURLs.add(url)) 
+			if (this._cachedURLs.add(staticUrl)) 
 			{
-				this.getLogger().finer("Loading URL: " + url);
+				URI uri = new URI(this.getGenerator().getBaseURL());
+				String url = uri.resolve(staticUrl).toString();
+				this.getLogger().finer("Loading image: " + url);
 				this.getHttpTransport().fetchUrl(url, this._cachedHeaders);
 				++staticsLoaded;
 			}
 			else 
 			{
-				this.getLogger().finer("URL already cached: " + url);
+				this.getLogger().finer("URL already cached: " + staticUrl);
 			}
 		}
 
