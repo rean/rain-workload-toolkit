@@ -168,7 +168,7 @@ public abstract class RubisOperation extends Operation
 	protected String getLastRequest()
 	{
 		final TraceRecord trace = this.getTrace();
-		if (trace._lstRequests == null || trace._lstRequests.isEmpty())
+		if (trace == null || trace._lstRequests == null || trace._lstRequests.isEmpty())
 		{
 			return null;
 		}
