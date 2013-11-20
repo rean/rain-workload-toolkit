@@ -158,5 +158,3 @@ The current implementation assumes that:
 - In the native client, it is possible to dynamically switch from a user workload profile to an author workload profile and back.
   This is not currently possible in the RAIN version of RUBBoS.
   Instead, you have to decide which workload profiles to use before you run the RAIN experiment by properly configuring the the *behavior* section of the configuration file.
-- In the native client, in some situations (e.g., when an error happens) there is a transition back to the previously visited operation; in other situations (e.g., no more story to review), the user session is reinitialized.
-  Instead, in RAIN, we currently set the operation as failed and let the user session restart.
