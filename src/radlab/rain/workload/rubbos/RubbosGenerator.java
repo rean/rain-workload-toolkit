@@ -57,6 +57,7 @@ public class RubbosGenerator extends Generator
 {
 	// Operation indices used in the mix matrix.
 	// Use the same order of the native RUBBoS mix matrix
+	private static final int INVALID_OP = -1;
 	public static final int STORIES_OF_THE_DAY_OP = 0;
 	public static final int REGISTER_OP = 1;
 	public static final int REGISTER_USER_OP = 2;
@@ -89,6 +90,7 @@ public class RubbosGenerator extends Generator
 	private static RubbosConfiguration _conf; ///< The RUBBoS-related configuration found in the JSON profile file
 
 
+	private int _nextOp = INVALID_OP; ///< The next operation that should be deterministically executed at the next schedule
 	private HttpTransport _http;
 	private Logger _logger;
 	private RubbosSessionState _sessionState; ///< Holds user session data
@@ -250,9 +252,15 @@ public class RubbosGenerator extends Generator
 	public Operation nextRequest(int lastOperation)
 	{
 		LoadProfile currentLoad = this.getTrack().getCurrentLoadProfile();
-		int nextOperation = -1;
+		int nextOperation = INVALID_OP;
 
-		if (lastOperation == -1)
+		if (this._nextOp != INVALID_OP)
+		{
+			lastOperation = this._nextOp;
+			this._nextOp = INVALID_OP;
+		}
+
+		if (lastOperation == INVALID_OP)
 		{
 			nextOperation = this.getConfiguration().getInitialOperation();
 		}
@@ -375,6 +383,11 @@ public class RubbosGenerator extends Generator
 	public boolean checkHttpResponse(String response)
 	{
 		return this.getUtility().checkHttpResponse(this.getHttpTransport(), response);
+	}
+
+	public void forceNextOperation(int operationId)
+	{
+		this._nextOp = operationId;
 	}
 
 	public String getBaseURL()

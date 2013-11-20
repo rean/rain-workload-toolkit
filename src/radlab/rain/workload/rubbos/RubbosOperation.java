@@ -80,15 +80,6 @@ public abstract class RubbosOperation extends Operation
 		{
 			this.getSessionState().setLastSearchOperation(RubbosUtility.INVALID_STORY_ID);
 		}
-
-		final String lastResponse = this.getSessionState().getLastResponse();
-
-		if (lastResponse != null && lastResponse.indexOf("Sorry") != -1)
-		{
-//			// FIXME: Nothing matched the request, we have to go back to the previous operation
-//			this.getLogger().warning("Operation completed with warnings. Last response is: " + lastResponse);
-//			this.setFailed(true);
-		}
 	}
 
 	@Override
@@ -123,6 +114,11 @@ public abstract class RubbosOperation extends Operation
 				this.getLogger().severe("Operation '" + this.getOperationName() + "' completed with server-side errors. Last request is: '" + this.getLastRequest() + "'. Last response is: " + lastResponse);
 				this.getSessionState().setLastResponse(null);
 				this.setFailed(true);
+			}
+			else if (lastResponse.indexOf("Sorry") != -1)
+			{
+				this.getGenerator().forceNextOperation(RubbosGenerator.BACK_SPECIAL_OP);
+				this.setFailed(false);
 			}
 		}
 	}
