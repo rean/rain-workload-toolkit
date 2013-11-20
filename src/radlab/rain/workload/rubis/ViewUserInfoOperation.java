@@ -75,11 +75,9 @@ public class ViewUserInfoOperation extends RubisOperation
 		RubisUser user = this.getUtility().getUser(userId);
 		if (!this.getUtility().isRegisteredUser(user))
 		{
-			//NOTE: The official RUBiS client goes back to the previous operation.
-			//      Currently, it seems there is no way to instruct RAIN to do a
-			//      similar thing.
-			this.getLogger().warning("No valid user has been found in last HTML response. Last response is: " + this.getSessionState().getLastResponse() + ". Operation interrupted.");
-			this.setFailed(true);
+			//this.getLogger().warning("No valid user has been found in last HTML response. Last response is: " + this.getSessionState().getLastResponse() + ". Operation interrupted.");
+			//this.setFailed(true);
+			this.getGenerator().forceNextOperation(RubisGenerator.BACK_SPECIAL_OP);
 			return;
 		}
 
