@@ -71,8 +71,8 @@ public class ViewItemOperation extends RubisOperation
 			if (!this.getUtility().isValidItem(item))
 			{
 				//this.getLogger().warning("No valid item has been found neither in last HTML response nor in session. Last response is: " + this.getSessionState().getLastResponse() + ". Operation interrupted.");
-				//this.setFailed(true);
 				this.getGenerator().forceNextOperation(RubisGenerator.BACK_SPECIAL_OP);
+				this.setFailed(false);
 				return;
 			}
 		}

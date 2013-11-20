@@ -76,7 +76,7 @@ public class ViewUserInfoOperation extends RubisOperation
 		if (!this.getUtility().isRegisteredUser(user))
 		{
 			//this.getLogger().warning("No valid user has been found in last HTML response. Last response is: " + this.getSessionState().getLastResponse() + ". Operation interrupted.");
-			//this.setFailed(true);
+			this.setFailed(false);
 			this.getGenerator().forceNextOperation(RubisGenerator.BACK_SPECIAL_OP);
 			return;
 		}
