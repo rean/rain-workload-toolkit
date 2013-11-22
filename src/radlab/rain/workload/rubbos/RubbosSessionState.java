@@ -47,6 +47,7 @@ public final class RubbosSessionState
 	private RubbosCategory _category; ///< The current category
 	private int _loggedUserId = RubbosUtility.ANONYMOUS_USER_ID; ///< The current logged user identifier
 	private int _lastOp = RubbosUtility.INVALID_OPERATION_ID; ///< The identifier of the last terminated operation
+	private int _curOp = RubbosUtility.INVALID_OPERATION_ID; ///< The identifier of the currently running operation
 	private int _storyId = RubbosUtility.INVALID_STORY_ID; ///< The current story identifier
 	private int _lastSearchOp = RubbosUtility.INVALID_OPERATION_ID; ///< The identifier of the last terminated search operation
 	private String _lastSearchWord; ///< The word looked for in the last terminated search operation
@@ -65,6 +66,16 @@ public final class RubbosSessionState
 	public void setLastOperation(int value)
 	{
 		this._lastOp = value;
+	}
+
+	public int getCurrentOperation()
+	{
+		return this._curOp;
+	}
+
+	public void setCurrentOperation(int value)
+	{
+		this._curOp = value;
 	}
 
 	public void setLastResponse(String value)
@@ -132,6 +143,7 @@ public final class RubbosSessionState
 		this._category = null;
 		this._loggedUserId = RubbosUtility.ANONYMOUS_USER_ID;
 		this._lastOp = RubbosUtility.INVALID_OPERATION_ID;
+		this._curOp = RubbosUtility.INVALID_OPERATION_ID;
 		this._lastSearchOp = RubbosUtility.INVALID_OPERATION_ID;
 		this._storyId = RubbosUtility.INVALID_STORY_ID;
 		this._lastSearchWord = null;
