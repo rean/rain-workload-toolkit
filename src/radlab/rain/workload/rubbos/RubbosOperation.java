@@ -85,6 +85,8 @@ public abstract class RubbosOperation extends Operation
 	@Override
 	public void postExecute() 
 	{
+		int prevOp = this.getSessionState().getLastOperation();
+
 		this.getSessionState().setLastOperation(this._operationIndex);
 
 		final String lastResponse = this.getSessionState().getLastResponse();
@@ -117,7 +119,7 @@ public abstract class RubbosOperation extends Operation
 			}
 			else if (lastResponse.indexOf("Sorry") != -1)
 			{
-				this.getGenerator().forceNextOperation(RubbosGenerator.BACK_SPECIAL_OP);
+				this.getGenerator().forceNextOperation(prevOp != RubbosUtility.INVALID_OPERATION_ID ? prevOp : RubbosGenerator.BACK_SPECIAL_OP);
 				this.setFailed(false);
 			}
 		}
