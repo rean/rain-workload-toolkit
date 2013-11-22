@@ -72,7 +72,11 @@ public abstract class RubbosOperation extends Operation
 		{
 			this.setGeneratedDuringProfile(currentLoadProfile);
 		}
+	}
 
+	@Override
+	public void preExecute() 
+	{
 		// Reset last-search state if we aren't in a search operation
 		if (this._operationIndex != RubbosGenerator.SEARCH_IN_STORIES_OP
 			&& this._operationIndex != RubbosGenerator.SEARCH_IN_COMMENTS_OP
