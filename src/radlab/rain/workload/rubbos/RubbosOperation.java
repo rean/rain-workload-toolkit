@@ -119,6 +119,7 @@ public abstract class RubbosOperation extends Operation
 			}
 			else if (lastResponse.indexOf("Sorry") != -1)
 			{
+				//this.getLogger().warning("Operation '" + this.getOperationName() + "' completed with warnings. Last request is: '" + this.getLastRequest() + "'. Last response is: " + lastResponse);
 				this.getGenerator().forceNextOperation(prevOp != RubbosUtility.INVALID_OPERATION_ID ? prevOp : RubbosGenerator.BACK_SPECIAL_OP);
 				this.setFailed(false);
 			}
