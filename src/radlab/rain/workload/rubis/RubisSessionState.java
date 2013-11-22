@@ -43,6 +43,7 @@ public final class RubisSessionState
 {
 	private int _loggedUserId = RubisUtility.ANONYMOUS_USER_ID; ///< The current logged user identifier
 	private int _lastOp = RubisUtility.INVALID_OPERATION_ID; ///< The identifier of the last terminated operation
+	private int _curOp = RubisUtility.INVALID_OPERATION_ID; ///< The identifier of the currently running operation
 	private int _itemId = RubisUtility.INVALID_ITEM_ID; ///< The current item identifier
 	private String _lastResponse; ///< The response of the last terminated operation
 
@@ -59,6 +60,16 @@ public final class RubisSessionState
 	public void setLastOperation(int value)
 	{
 		this._lastOp = value;
+	}
+
+	public int getCurrentOperation()
+	{
+		return this._curOp;
+	}
+
+	public void setCurrentOperation(int value)
+	{
+		this._curOp = value;
 	}
 
 	public void setLastResponse(String value)
@@ -95,6 +106,7 @@ public final class RubisSessionState
 	{
 		this._loggedUserId = RubisUtility.ANONYMOUS_USER_ID;
 		this._lastOp = RubisUtility.INVALID_OPERATION_ID;
+		this._curOp = RubisUtility.INVALID_OPERATION_ID;
 		this._itemId = RubisUtility.INVALID_ITEM_ID;
 		this._lastResponse = null;
 	}

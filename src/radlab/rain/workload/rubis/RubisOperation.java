@@ -74,9 +74,9 @@ public abstract class RubisOperation extends Operation
 		}
 	}
 
-//	@Override
-//	public void preExecute()
-//	{
+	@Override
+	public void preExecute()
+	{
 //		final String lastResponse = this.getSessionState().getLastResponse();
 //
 //		if (lastResponse != null && lastResponse.indexOf("Sorry") != -1)
@@ -86,12 +86,15 @@ public abstract class RubisOperation extends Operation
 ////			//this.setFailed(true);
 //			this.getGenerator().forceNextOperation(RubisGenerator.BACK_SPECIAL_OP);
 //		}
-//	}
+
+		this.getSessionState().setLastOperation(this.getSessionState().getCurrentOperation());
+		this.getSessionState().setCurrentOperation(this._operationIndex);
+	}
 
 	@Override
 	public void postExecute() 
 	{
-		this.getSessionState().setLastOperation(this._operationIndex);
+		//this.getSessionState().setLastOperation(this._operationIndex);
 
 		final String lastResponse = this.getSessionState().getLastResponse();
 
