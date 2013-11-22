@@ -58,20 +58,24 @@ public class SearchOperation extends RubbosOperation
 	@Override
 	public void execute() throws Throwable
 	{
-        StringBuilder response = null;
+        //StringBuilder response = null;
 
-        URIBuilder uri = new URIBuilder(this.getGenerator().getSearchURL());
-        uri.setParameter("type", "");
-        uri.setParameter("search", "");
-        uri.setParameter("page", Integer.toString(0));
-        uri.setParameter("nbOfStories", Integer.toString(0));
-        HttpGet reqGet = new HttpGet(uri.build());
-        response = this.getHttpTransport().fetch(reqGet);
-		this.trace(reqGet.getURI().toString());
+        //URIBuilder uri = new URIBuilder(this.getGenerator().getSearchURL());
+        //uri.setParameter("type", "");
+        //uri.setParameter("search", "");
+        //uri.setParameter("page", Integer.toString(0));
+        //uri.setParameter("nbOfStories", Integer.toString(0));
+        //HttpGet reqGet = new HttpGet(uri.build());
+        //response = this.getHttpTransport().fetch(reqGet);
+		//this.trace(reqGet.getURI().toString());
+		StringBuilder response = this.getHttpTransport().fetchUrl(this.getGenerator().getSearchURL());
+		this.trace(this.getGenerator().getSearchURL());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			this.getLogger().severe("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
-			throw new IOException("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			//this.getLogger().severe("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+			//throw new IOException("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getSearchURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getSearchURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		// Save session data
