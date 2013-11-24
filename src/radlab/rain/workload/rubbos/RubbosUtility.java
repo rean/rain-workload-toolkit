@@ -481,7 +481,9 @@ public final class RubbosUtility
 			return null;
 		}
 
-		int[] pos = this.findRandomLastIndexInHtml(html, scriptName, false);
+		// The second parameter is 'true' since we don't want to pick the first
+		// occurrence of scriptName which is used for redisplaying stories.
+		int[] pos = this.findRandomLastIndexInHtml(html, scriptName, true);
 		if (pos == null)
 		{
 			return null;
