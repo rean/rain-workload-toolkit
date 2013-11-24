@@ -334,7 +334,7 @@ public final class RubbosUtility
 			return INVALID_STORY_ID;
 		}
 
-		int[] pos = this.findRandomLastIndexInHtml(html, "storyId=", false);
+		int[] pos = this.findRandomLastIndexInHtml(html, "storyId=", false, false);
 		if (pos == null)
 		{
 			return INVALID_STORY_ID;
@@ -358,7 +358,7 @@ public final class RubbosUtility
 			return INVALID_STORY_ID;
 		}
 
-		int[] pos = this.findRandomLastIndexInHtml(html, scriptName, false);
+		int[] pos = this.findRandomLastIndexInHtml(html, scriptName, false, true);
 		if (pos == null)
 		{
 			return INVALID_STORY_ID;
@@ -392,7 +392,7 @@ public final class RubbosUtility
 		}
 
 		// Randomly choose a category
-		int[] pos = this.findRandomLastIndexInHtml(html, "category=", false);
+		int[] pos = this.findRandomLastIndexInHtml(html, "category=", false, false);
 		if (pos == null)
 		{
 			return null;
@@ -429,7 +429,7 @@ public final class RubbosUtility
 			return null;
 		}
 
-		int[] pos = this.findRandomLastIndexInHtml(html, scriptName, false);
+		int[] pos = this.findRandomLastIndexInHtml(html, scriptName, false, true);
 		if (pos == null)
 		{
 			return null;
@@ -483,7 +483,7 @@ public final class RubbosUtility
 
 		// The second parameter is 'true' since we don't want to pick the first
 		// occurrence of scriptName which is used for redisplaying stories.
-		int[] pos = this.findRandomLastIndexInHtml(html, scriptName, true);
+		int[] pos = this.findRandomLastIndexInHtml(html, scriptName, true, true);
 		if (pos == null)
 		{
 			return null;
@@ -551,7 +551,7 @@ public final class RubbosUtility
 			return null;
 		}
 
-		int[] pos = this.findRandomLastIndexInHtml(html, scriptName, false);
+		int[] pos = this.findRandomLastIndexInHtml(html, scriptName, false, true);
 		if (pos == null)
 		{
 			return null;
@@ -723,9 +723,10 @@ public final class RubbosUtility
 	 * @param html the string where looking for
 	 * @param key the key to look for
 	 * @param skipFirst true if the first occurence of key must be ignored
+	 * @param skipLast true if the last occurence of key must be ignored
 	 * @return new lastIndex value
 	 */
-	public int[] findRandomLastIndexInHtml(String html, String key, boolean skipFirst)
+	public int[] findRandomLastIndexInHtml(String html, String key, boolean skipFirst, boolean skipLast)
 	{
 		if (html == null)
 		{
@@ -741,7 +742,8 @@ public final class RubbosUtility
 			++count;
 			keyIndex = html.indexOf(key, keyIndex+key.length());
 		}
-		if ((count == 0) || (skipFirst && (count <= 1)))
+		//if ((count == 0) || (skipFirst && (count <= 1)))
+		if ((count == 0) || (skipFirst && (count == 1)) || (skipLast && ((count == 1) || (skipFirst && (count == 2)))))
 		{
 			return null;
 		}
@@ -753,6 +755,10 @@ public final class RubbosUtility
 		{
 			++count; // Force to skip the first element
 		}
+		if (skipLast)
+		{
+			--count; // Force to skip the last element
+		}
 		while (count > 0)
 		{
 			keyIndex = html.indexOf(key, keyIndex+key.length());
@@ -760,7 +766,8 @@ public final class RubbosUtility
 		}
 		keyIndex += key.length();
 
-		int lastIndex = minIndex(Integer.MAX_VALUE, html.indexOf('\"', keyIndex));
+		//int lastIndex = minIndex(Integer.MAX_VALUE, html.indexOf('\"', keyIndex));
+		int lastIndex = html.indexOf('\"', keyIndex);
 		lastIndex = minIndex(lastIndex, html.indexOf('?', keyIndex));
 		lastIndex = minIndex(lastIndex, html.indexOf('&', keyIndex));
 		lastIndex = minIndex(lastIndex, html.indexOf('>', keyIndex));

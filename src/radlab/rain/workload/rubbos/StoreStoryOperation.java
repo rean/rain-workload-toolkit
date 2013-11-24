@@ -78,7 +78,7 @@ public class StoreStoryOperation extends RubbosOperation
 
 		RubbosStory story = this.getUtility().newStory();
 
-		int[] pos = this.getUtility().findRandomLastIndexInHtml(lastResponse, "OPTION value=\"", false);
+		int[] pos = this.getUtility().findRandomLastIndexInHtml(lastResponse, "OPTION value=\"", false, false);
 		if (pos == null)
 		{
 			this.getLogger().warning("No 'category' parameter has been found in the last HTML response. Last response is: " + this.getSessionState().getLastResponse() + ". Operation interrupted.");

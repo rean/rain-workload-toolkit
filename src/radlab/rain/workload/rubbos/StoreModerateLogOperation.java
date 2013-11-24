@@ -74,7 +74,7 @@ public class StoreModerateLogOperation extends RubbosOperation
 		// Extract parameters from last response
 		String  commentTable;
 		int commentId;
-		int[] pos = this.getUtility().findRandomLastIndexInHtml(lastResponse, "name=comment_table value=", false);
+		int[] pos = this.getUtility().findRandomLastIndexInHtml(lastResponse, "name=comment_table value=", false, false);
 		if (pos == null)
 		{
 			this.getLogger().warning("No valid parameter has been found in the last HTML response. Last response is: " + this.getSessionState().getLastResponse() + ". Operation interrupted.");

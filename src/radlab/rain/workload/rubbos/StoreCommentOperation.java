@@ -78,7 +78,7 @@ public class StoreCommentOperation extends RubbosOperation
 
 		RubbosComment comment = this.getUtility().newComment();
 
-		int[] pos = this.getUtility().findRandomLastIndexInHtml(lastResponse, "name=comment_table value=", false);
+		int[] pos = this.getUtility().findRandomLastIndexInHtml(lastResponse, "name=comment_table value=", false, false);
 		if (pos == null)
 		{
 			this.getLogger().warning("No 'comment_table' parameter has been found in the last HTML response. Last response is: " + this.getSessionState().getLastResponse() + ". Operation interrupted.");
