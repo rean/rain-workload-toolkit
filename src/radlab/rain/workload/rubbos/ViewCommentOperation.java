@@ -64,7 +64,7 @@ public class ViewCommentOperation extends RubbosOperation
 		// Extract a View-Comment parameters from last response
 		String scriptName = this.getGenerator().getViewCommentURL();
 		int pos = scriptName.lastIndexOf('/');
-		scriptName = scriptName.substring(pos >= 0 ? pos : 0);
+		scriptName = scriptName.substring(pos >= 0 ? (pos+1) : 0);
 		Map<String,String> params = this.getUtility().findViewCommentParamsInHtml(this.getSessionState().getLastResponse(), scriptName);
 		if (params == null
 			|| params.isEmpty()
