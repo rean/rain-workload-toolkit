@@ -248,22 +248,24 @@ public final class RubbosUtility
 
 	public RubbosComment newComment()
 	{
-		String subject = "";
-		String body = "";
+		StringBuffer subject = new StringBuffer();
+		StringBuffer body = new StringBuffer();
 
 		int size = this._rng.nextInt(MAX_COMMENT_SUBJECT_LENGTH) + 1;
 		do
 		{
-			subject += this.generateWord(true);
+			subject.append(this.generateWord(true));
 		}
 		while ((subject != null) && (subject.length() < size));
+		subject.setLength(size); // Make sure the subject is exactly of 'size' chars
 
 		size = this._rng.nextInt(this._conf.getMaxCommentLength()) + 1;
 		do
 		{
-			body += this.generateWord(true);
+			body.append(this.generateWord(true));
 		}
 		while ((body != null) && (body.length() < size));
+		body.setLength(size); // Make sure the body is exactly of 'size' chars
 
 		RubbosComment comment = new RubbosComment();
 
@@ -275,36 +277,38 @@ public final class RubbosUtility
 		Calendar cal = Calendar.getInstance();
 		comment.rating = 0;
 		comment.date = cal.getTime();
-		comment.subject = subject;
-		comment.body = body;
+		comment.subject = subject.toString();
+		comment.body = body.toString();
 
 		return comment;
 	}
 
 	public RubbosStory newStory()
 	{
-		String title = "";
-		String body = "";
+		StringBuffer title = new StringBuffer();
+		StringBuffer body = new StringBuffer();
 
 		int size = this._rng.nextInt(MAX_STORY_TITLE_LENGTH) + 1;
 		do
 		{
-			title += this.generateWord(true);
+			title.append(this.generateWord(true));
 		}
 		while ((title != null) && (title.length() < size));
+		title.setLength(size); // Make sure the title is exactly of 'size' chars
 
 		size = this._rng.nextInt(this._conf.getMaxStoryLength()) + 1;
 		do
 		{
-			body += this.generateWord(true);
+			body.append(this.generateWord(true));
 		}
 		while ((body != null) && (body.length() < size));
+		body.setLength(size); // Make sure the body is exactly of 'size' chars
 
 		RubbosStory story = new RubbosStory();
 
 		story.id = INVALID_STORY_ID;
-		story.title = title;
-		story.body = body;
+		story.title = title.toString();
+		story.body = body.toString();
 		Calendar cal = Calendar.getInstance();
 		story.date = cal.getTime();
 		story.writer = INVALID_USER_ID;
