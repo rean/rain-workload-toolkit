@@ -36,12 +36,18 @@ public class RedisUtil
 	public static void main(String[] args) 
 	{
 		// Need the name of a server and a bucket
+		
+		//int port = RedisTransport.DEFAULT_REDIS_PORT;
+		/*String host = "localhost";
+		*/
+		
 		int port = RedisTransport.DEFAULT_REDIS_PORT;
 		String host = "localhost";
-				
+		//String host = "localhost:7000,localhost:7001,localhost:7002";
+		
 		int minKey = 1;
 		int maxKey = 100000;
-		int size = 16384;//32768;//16384;//4096;
+		int size = 1024;//16384;//32768;//16384;//4096;
 		
 		// RiakUtil <host> <port> <min key> <max key>
 		if( args.length == 5 )
@@ -68,7 +74,9 @@ public class RedisUtil
 		long start = System.currentTimeMillis();
 		RedisUtil.loadDbCollection( redisClient, minKey, maxKey, size );
 		long end = System.currentTimeMillis();
-		System.out.println( "Load finished: " + (end-start)/1000.0 + " seconds" );
+		long duration = end - start;
+		double rate = ((maxKey - minKey) + 1)/((double)duration/1000.0);
+		System.out.println( "Load finished: " + (duration)/1000.0 + " seconds. Rate: " + rate + " request/sec" );
 	}
 
 }
