@@ -1,5 +1,8 @@
 package radlab.rain.workload.redis;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Random;
 
 public class RedisUtil 
@@ -33,7 +36,7 @@ public class RedisUtil
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) 
+	public static void main(String[] args) throws Exception 
 	{
 		// Need the name of a server and a bucket
 		
@@ -68,7 +71,43 @@ public class RedisUtil
 			System.out.println( "Example : RedisUtil localhost 6379 1 100000 4096" );
 			System.exit( -1 );
 		}
+	
+		// Do data loads in parallel, shoot for using 10 threads
+		int keyCount = (maxKey - minKey) + 1;
+		int keyBlockSize = 10000;
+		int loaderThreads = new Double( Math.ceil( (double) keyCount / (double) keyBlockSize ) ).intValue();
 		
+		ArrayList<RedisLoaderThread> threads = new ArrayList<RedisLoaderThread>();
+		for( int i = 0; i < loaderThreads; i++ )
+		{
+			RedisTransport client = new RedisTransport( host, port );
+			int startKey = (i * keyBlockSize) + 1;
+			int endKey = Math.min( (startKey + keyCount) -1 , (startKey + keyBlockSize) - 1 );//(startKey + keyBlockSize) - 1;
+			System.out.println( "Start key: " + startKey + " end key: " + endKey );
+			RedisLoaderThread thread = new RedisLoaderThread( client, startKey, endKey, size );
+			threads.add( thread );
+		}
+		
+		long start = System.currentTimeMillis();
+		// Start all the loader threads
+		for( RedisLoaderThread thread : threads )
+			thread.start();
+		
+		// Wait on them to finish
+		for( RedisLoaderThread thread : threads )
+			thread.join();
+		
+		//MongoUtil.loadDbCollection( mongoClient, dbName, dbCollection, minKey, maxKey, size );
+		long end = System.currentTimeMillis();
+		double durationSecs = (end-start)/1000.0; 
+		double avgResponseTimeSecs = durationSecs/keyCount;
+		
+		System.out.println( "Load finished: " + (end-start)/1000.0 + " seconds" );
+		System.out.println( "Rate [" + size + "]    : " +  keyCount/durationSecs + " puts/sec" );
+		NumberFormat formatter = new DecimalFormat( "#0.0000" );
+		System.out.println( "Avg resp time [" + size + "]: " +  formatter.format( avgResponseTimeSecs ) + "secs" );
+		
+		/*
 		RedisTransport redisClient = new RedisTransport( host, port );
 		System.out.println( "Loading: " + ((maxKey - minKey)+1) + " keys with " + size + " byte(s) values each." );
 		long start = System.currentTimeMillis();
@@ -77,6 +116,7 @@ public class RedisUtil
 		long duration = end - start;
 		double rate = ((maxKey - minKey) + 1)/((double)duration/1000.0);
 		System.out.println( "Load finished: " + (duration)/1000.0 + " seconds. Rate: " + rate + " request/sec" );
+		*/
 	}
 
 }
