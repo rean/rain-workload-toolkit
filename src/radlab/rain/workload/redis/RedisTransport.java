@@ -93,45 +93,26 @@ public class RedisTransport
 	public boolean getDebug() { return this._debug; }
 	public void setDebug( boolean val ) { this._debug = val; }
 	
-	public String setOld( String key, byte[] value )
+	public String set( String key, byte[] value )
 	{
 		if( this._usingCluster )
 		{
-			return this._redisCluster.set( key, new String(value) );
+			String retVal = this._redisCluster.set( key, new String(value) );
+			value = null;
+			return retVal;
 		}
 		else 
 		{
 			String retVal = this._redis.set( key.getBytes(), value );
-			//this._redis.zadd("_indices", key.hashCode(), key);
+			value = null;
 			return retVal;
 		}
-	}
-	
-	public byte[] getOld( String key )
-	{
-		if( this._usingCluster )
-			return this._redisCluster.get( key ).getBytes();
-		else return this._redis.get( key.getBytes() );
-	}
-	
-	public String set( String key, byte[] value )
-	{ 
-		if( this._usingCluster )
-		{
-			this._redisCluster.hset(key, "data", new String(value) );
-		}
-		else
-		{
-			this._redis.hset(key.getBytes(), "data".getBytes(), value);
-			//this._redis.zadd("_indices", key.hashCode(), key);
-		}
-		return "ok";
 	}
 	
 	public byte[] get( String key )
 	{
 		if( this._usingCluster )
-			return this._redisCluster.hget(key, "data").getBytes();
-		return this._redis.hget(key.getBytes(), "data".getBytes());
+			return this._redisCluster.get( key ).getBytes();
+		else return this._redis.get( key.getBytes() );
 	}	
 }

@@ -427,6 +427,7 @@
 	    	<jvmarg value="-Xmx1g" />
 	    	<jvmarg value="-Xms256m" />
 	    	<jvmarg value="-XX:+DisableExplicitGC"/>
+			<!--<jvmarg value="-agentlib:hprof=heap=sites,file=redis-mem.log,depth=6" />-->
 	        <arg file="config/rain.config.redis.json"/>
 	    </java>
 	</target>
