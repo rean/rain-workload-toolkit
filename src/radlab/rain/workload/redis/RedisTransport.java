@@ -1,5 +1,6 @@
 package radlab.rain.workload.redis;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -54,7 +55,10 @@ public class RedisTransport
 		}
 		
 		if(!this._usingCluster)
+		{
 			this._redis = new Jedis( host, port, this._timeout );
+			this._redis.connect();
+		}
 	}
 	
 	// Can be used to modify the timeouts on the fly (ideally) if supported
@@ -89,17 +93,45 @@ public class RedisTransport
 	public boolean getDebug() { return this._debug; }
 	public void setDebug( boolean val ) { this._debug = val; }
 	
-	public String set( String key, byte[] value )
+	public String setOld( String key, byte[] value )
 	{
 		if( this._usingCluster )
-			return this._redisCluster.set( key, String.valueOf(value) );
-		else return this._redis.set( key.getBytes(), value );
+		{
+			return this._redisCluster.set( key, new String(value) );
+		}
+		else 
+		{
+			String retVal = this._redis.set( key.getBytes(), value );
+			//this._redis.zadd("_indices", key.hashCode(), key);
+			return retVal;
+		}
 	}
 	
-	public byte[] get( String key )
+	public byte[] getOld( String key )
 	{
 		if( this._usingCluster )
 			return this._redisCluster.get( key ).getBytes();
 		else return this._redis.get( key.getBytes() );
 	}
+	
+	public String set( String key, byte[] value )
+	{ 
+		if( this._usingCluster )
+		{
+			this._redisCluster.hset(key, "data", new String(value) );
+		}
+		else
+		{
+			this._redis.hset(key.getBytes(), "data".getBytes(), value);
+			//this._redis.zadd("_indices", key.hashCode(), key);
+		}
+		return "ok";
+	}
+	
+	public byte[] get( String key )
+	{
+		if( this._usingCluster )
+			return this._redisCluster.hget(key, "data").getBytes();
+		return this._redis.hget(key.getBytes(), "data".getBytes());
+	}	
 }
