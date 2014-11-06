@@ -751,7 +751,7 @@ public final class RubbosUtility
 		// 2. Pickup randomly a key
 		keyIndex = -key.length();
 		count = this._rng.nextInt(count)+1;
-		if ((skipFirst) && (count == 1))
+		if (skipFirst && (count == 1))
 		{
 			++count; // Force to skip the first element
 		}

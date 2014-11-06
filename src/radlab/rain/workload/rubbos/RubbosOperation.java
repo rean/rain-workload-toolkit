@@ -87,6 +87,8 @@ public abstract class RubbosOperation extends Operation
 
 		this.getSessionState().setLastOperation(this.getSessionState().getCurrentOperation());
 		this.getSessionState().setCurrentOperation(this._operationIndex);
+
+		//this.getLogger().warning("["+this.getOperationName()+"] Last request is: "+this.getLastRequest()+". Last response is: "+this.getSessionState().getLastResponse());//XXX
 	}
 
 	@Override

@@ -65,13 +65,15 @@ public class BrowseStoriesByCategoryOperation extends RubbosOperation
 		StringBuilder response = null;
 
 		// Extract a random category from last response
+		//this.getLogger().warning("No valid category has been found in the last HTML response. Last response is: " + this.getSessionState().getLastResponse() + ". Operation interrupted.");//XXX
 		RubbosCategory category = this.getUtility().findCategoryInHtml(this.getSessionState().getLastResponse());
 		if (!this.getUtility().isValidCategory(category))
 		{
+			this.getLogger().warning("No valid category has been found in the last HTML response. Last response is: " + this.getSessionState().getLastResponse() + ". Operation interrupted.");
 			category = this.getSessionState().getCategory();
 			if (!this.getUtility().isValidCategory(category))
 			{
-				this.getLogger().warning("No valid category has been found in the last HTML response. Last response is: " + this.getSessionState().getLastResponse() + ". Operation interrupted.");
+				this.getLogger().warning("No valid category has been found in the last HTML response and in session. Last response is: " + this.getSessionState().getLastResponse() + ". Operation interrupted.");
 				this.setFailed(true);
 				return;
 			}
