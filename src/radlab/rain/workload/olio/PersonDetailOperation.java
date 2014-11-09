@@ -27,53 +27,85 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Author: Original authors
+ * Author: Marco Guazzone (marco.guazzone@gmail.com), 2013
  */
 
 package radlab.rain.workload.olio;
 
-import radlab.rain.IScoreboard;
 
 import java.io.IOException;
-	
+import java.util.Set;
+import radlab.rain.IScoreboard;
+import radlab.rain.workload.olio.model.OlioPerson;
+
+
 /**
  * The PersonDetailOperation is an operation that shows the details of a
  * randomly selected user. The user must be logged in to see the details.
+ * <br/>
+ * NOTE: Code based on {@code org.apache.olio.workload.driver.UIDriver} class
+ * and adapted for RAIN.
+ *
+ * @author Original authors
+ * @author <a href="mailto:marco.guazzone@gmail.com">Marco Guazzone</a>
  */
 public class PersonDetailOperation extends OlioOperation 
 {
-	public PersonDetailOperation( boolean interactive, IScoreboard scoreboard ) 
+	public PersonDetailOperation(boolean interactive, IScoreboard scoreboard) 
 	{
-		super( interactive, scoreboard );
-		this._operationName = "PersonDetails";
-		this._operationIndex = OlioGenerator.PERSON_DETAIL;
+		super(interactive, scoreboard);
+		this._operationName = OlioGenerator.PERSON_DETAIL_OP_NAME;
+		this._operationIndex = OlioGenerator.PERSON_DETAIL_OP;
 	}
-	
+
 	@Override
 	public void execute() throws Throwable
 	{
-		if ( this.isLoggedOn() )
+		///XXX
+		//OlioPerson loggedPerson = this.getUtility().getPerson(this.getSessionState().getLoggedPersonId());
+		//if (!this.getUtility().isRegisteredPerson(loggedPerson))
+		//{
+		//	this.getLogger().warning("No valid user has been found to log-in. Operation interrupted.");
+		//	this.setFailed(true);
+		//	return;
+		//}
+
+		OlioPerson person = this.getUtility().generatePerson();
+
+		String personUrl = null;
+		switch (this.getConfiguration().getIncarnation())
 		{
-			int userId = this._random.random( 1, ScaleFactors.loadedUsers );
-			
-			String personUrl = this.getGenerator().personDetailURL + userId;
-			StringBuilder personResponse = this._http.fetchUrl( personUrl );
-			this.trace( personUrl );
-			if (personResponse.length() == 0)
-			{
-				throw new IOException("Received empty response");
-			}
+			case OlioConfiguration.JAVA_INCARNATION:
+				personUrl = this.getGenerator().getPersonDetailURL() + person.userName;
+				break;
+			case OlioConfiguration.PHP_INCARNATION:
+				personUrl = this.getGenerator().getPersonDetailURL() + person.userName;
+				break;
+			case OlioConfiguration.RAILS_INCARNATION:
+				personUrl = this.getGenerator().getPersonDetailURL() + person.id;
+				break;
 		}
-		else
+
+		StringBuilder response = this.getHttpTransport().fetchUrl(personUrl);
+		this.trace(personUrl);
+		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			if ( this.checkIsLoggedIn() )
-			{
-				this._logger.warning( "isLoggedOn() returned false but checkIsLoggedIn() returned true" );
-			}
-			// TODO: What's the best way to handle this case?
-			this._logger.warning( "Login required for " + this._operationName );
+			this.getLogger().severe("Problems in performing request to URL: " + personUrl + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+			throw new IOException("Problems in performing request to URL: " + personUrl + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
-		
-		this.setFailed( false );
+
+		this.loadStatics(this.getGenerator().getPersonStatics());
+		this.trace(this.getGenerator().getPersonStatics());
+
+		Set<String> imageUrls = this.parseImages(response.toString());
+		this.loadImages(imageUrls);
+		this.trace(imageUrls);
+
+		// Save session state
+		this.getSessionState().setLastResponse(response.toString());
+
+		this.setFailed(false);
 	}
-	
 }
