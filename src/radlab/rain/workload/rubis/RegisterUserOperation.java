@@ -35,24 +35,32 @@ package radlab.rain.workload.rubis;
 
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.NameValuePair;
 import radlab.rain.IScoreboard;
+import radlab.rain.workload.rubis.model.RubisUser;
 
 
 /**
- * Register operation.
+ * Register-User operation.
  *
  * Emulates the following operations:
  * 1. Go the the user registration page
+ * 2. Fill-in the form and click on the 'Register now!' button
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
-public class RegisterOperation extends RubisOperation 
+public class RegisterUserOperation extends RubisOperation 
 {
-	public RegisterOperation(boolean interactive, IScoreboard scoreboard)
+	public RegisterUserOperation(boolean interactive, IScoreboard scoreboard)
 	{
 		super( interactive, scoreboard );
-		this._operationName = "Register";
-		this._operationIndex = RubisGenerator.REGISTER_OP;
+		this._operationName = "Register-User";
+		this._operationIndex = RubisGenerator.REGISTER_USER_OP;
 		this._mustBeSync = true;
 	}
 
@@ -61,13 +69,32 @@ public class RegisterOperation extends RubisOperation
 	{
 		StringBuilder response = null;
 
-		// Go the the user registration page
-		response = this.getHttpTransport().fetchUrl( this.getGenerator().getRegisterURL() );
-		this.trace( this.getGenerator().getRegisterURL() );
+		// Generate a new user
+		RubisUser user = this.getUtility().newUser();
+		if (!this.getUtility().isValidUser(user) || this.getUtility().isAnonymousUser(user))
+		{
+			this.getLogger().warning("No valid user has been found. Operation interrupted.");
+			this.setFailed(true);
+			return;
+		}
+
+		// Fill-in the form and click on the 'Register now!' button
+		HttpPost reqPost = new HttpPost(this.getGenerator().getRegisterUserURL());
+		List<NameValuePair> form = new ArrayList<NameValuePair>();
+		form.add(new BasicNameValuePair("firstname", user.firstname));
+		form.add(new BasicNameValuePair("lastname", user.lastname));
+		form.add(new BasicNameValuePair("nickname", user.nickname));
+		form.add(new BasicNameValuePair("email", user.email));
+		form.add(new BasicNameValuePair("password", user.password));
+		form.add(new BasicNameValuePair("region", this.getUtility().getRegion(user.region).name));
+		UrlEncodedFormEntity entity = new UrlEncodedFormEntity(form, "UTF-8");
+		reqPost.setEntity(entity);
+		response = this.getHttpTransport().fetch(reqPost);
+		this.trace(reqPost.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getRegisterURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getRegisterURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			this.getLogger().severe("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+			throw new IOException("Problems in performing request to URL: " + reqPost.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		// Save session data

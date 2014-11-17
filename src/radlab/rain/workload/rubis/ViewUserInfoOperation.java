@@ -35,39 +35,62 @@ package radlab.rain.workload.rubis;
 
 
 import java.io.IOException;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
 import radlab.rain.IScoreboard;
+import radlab.rain.workload.rubis.model.RubisUser;
 
 
 /**
- * Register operation.
+ * View-User-Information operation.
  *
- * Emulates the following operations:
- * 1. Go the the user registration page
+ * Emulates the following requests:
+ * 1. Click on the user name link (representing the seller of an item)
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
-public class RegisterOperation extends RubisOperation 
+public class ViewUserInfoOperation extends RubisOperation 
 {
-	public RegisterOperation(boolean interactive, IScoreboard scoreboard)
+	public ViewUserInfoOperation(boolean interactive, IScoreboard scoreboard) 
 	{
-		super( interactive, scoreboard );
-		this._operationName = "Register";
-		this._operationIndex = RubisGenerator.REGISTER_OP;
-		this._mustBeSync = true;
+		super(interactive, scoreboard);
+		this._operationName = "View-User-Information";
+		this._operationIndex = RubisGenerator.VIEW_USER_INFO_OP;
 	}
 
 	@Override
 	public void execute() throws Throwable
 	{
-		StringBuilder response = null;
+//		// Need a logged user
+		int userId = RubisUtility.ANONYMOUS_USER_ID;
+		try
+		{
+			userId = Integer.parseInt(this.getUtility().findParamInHtml(this.getSessionState().getLastResponse(), "userId"));
+		}
+		catch (NumberFormatException nfe)
+		{
+			// ignore: use session user
+			userId = this.getSessionState().getLoggedUserId();
+		}
+		RubisUser user = this.getUtility().getUser(userId);
+		if (!this.getUtility().isRegisteredUser(user))
+		{
+			//this.getLogger().warning("No valid user has been found in last HTML response. Last response is: " + this.getSessionState().getLastResponse() + ". Operation interrupted.");
+			this.setFailed(false);
+			this.getGenerator().forceNextOperation(RubisGenerator.BACK_SPECIAL_OP);
+			return;
+		}
 
-		// Go the the user registration page
-		response = this.getHttpTransport().fetchUrl( this.getGenerator().getRegisterURL() );
-		this.trace( this.getGenerator().getRegisterURL() );
+		// Click on the user name link (representing the seller of an item)
+		URIBuilder uri = new URIBuilder(this.getGenerator().getViewUserInfoURL());
+		uri.setParameter("userId", Integer.toString(user.id));
+		HttpGet reqGet = new HttpGet(uri.build());
+		StringBuilder response = this.getHttpTransport().fetch(reqGet);
+		this.trace(reqGet.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getRegisterURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getRegisterURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			this.getLogger().severe("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+			throw new IOException("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		// Save session data

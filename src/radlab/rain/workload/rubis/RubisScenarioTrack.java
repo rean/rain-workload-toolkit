@@ -34,45 +34,45 @@
 package radlab.rain.workload.rubis;
 
 
-import java.io.IOException;
-import radlab.rain.IScoreboard;
+import radlab.rain.DefaultScenarioTrack;
+import radlab.rain.LoadProfile;
+import radlab.rain.Scenario;
 
 
 /**
- * Register operation.
- *
- * Emulates the following operations:
- * 1. Go the the user registration page
+ * Scenario tracker for the RUBiS workload.
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
-public class RegisterOperation extends RubisOperation 
+public class RubisScenarioTrack extends DefaultScenarioTrack
 {
-	public RegisterOperation(boolean interactive, IScoreboard scoreboard)
+	public RubisScenarioTrack(Scenario scenario)
 	{
-		super( interactive, scoreboard );
-		this._operationName = "Register";
-		this._operationIndex = RubisGenerator.REGISTER_OP;
-		this._mustBeSync = true;
+		super(scenario);
 	}
 
-	@Override
-	public void execute() throws Throwable
+	public RubisScenarioTrack(String name, Scenario scenario)
 	{
-		StringBuilder response = null;
+		super(name, scenario);
+	}
 
-		// Go the the user registration page
-		response = this.getHttpTransport().fetchUrl( this.getGenerator().getRegisterURL() );
-		this.trace( this.getGenerator().getRegisterURL() );
-		if (!this.getGenerator().checkHttpResponse(response.toString()))
+	public LoadProfile getCurrentLoadProfile()
+	{
+		LoadProfile profile = super.getCurrentLoadProfile();
+
+		if (profile instanceof RubisLoadProfile)
 		{
-			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getRegisterURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getRegisterURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			RubisLoadProfile rubisProfile = (RubisLoadProfile) profile;
+			if (rubisProfile.getMeanThinkTime() >= 0)
+			{
+				this.setMeanThinkTime(rubisProfile.getMeanThinkTime());
+			}
+			if (rubisProfile.getMeanCycleTime() >= 0)
+			{
+				this.setMeanCycleTime(rubisProfile.getMeanCycleTime());
+			}
 		}
 
-		// Save session data
-		this.getSessionState().setLastResponse(response.toString());
-
-		this.setFailed(!this.getUtility().checkRubisResponse(response.toString()));
+		return profile;
 	}
 }

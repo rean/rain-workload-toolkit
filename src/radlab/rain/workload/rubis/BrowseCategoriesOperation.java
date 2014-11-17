@@ -27,40 +27,52 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Author: Marco Guazzone (marco.guazzone@gmail.com), 2013.
  */
 
 package radlab.rain.workload.rubis;
 
-import java.io.IOException;
 
+import java.io.IOException;
 import radlab.rain.IScoreboard;
 
+
 /**
- * BrowseCategories operation.
+ * Browse-Categories operation.
+ *
+ * Emulates the following requests:
+ * 1. Click on the 'Browse all items in a category'
+ *
+ * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
 public class BrowseCategoriesOperation extends RubisOperation 
 {
-	
-	public BrowseCategoriesOperation( boolean interactive, IScoreboard scoreboard ) 
+	public BrowseCategoriesOperation(boolean interactive, IScoreboard scoreboard) 
 	{
-		super( interactive, scoreboard );
-		this._operationName = "Browse Categories";
-		this._operationIndex = RubisGenerator.BROWSE_CATEGORIES;
-		this._mustBeSync = true;
+		super(interactive, scoreboard);
+
+		this._operationName = "Browse-Categories";
+		this._operationIndex = RubisGenerator.BROWSE_CATEGORIES_OP;
 	}
-	
+
 	@Override
 	public void execute() throws Throwable
 	{
+		StringBuilder response = null;
 
-		StringBuilder response = this._http.fetchUrl( this.getGenerator().browseCategoriesURL );
-		this.trace( this.getGenerator().browseCategoriesURL );
-		if ( response.length() == 0 )
+		// Emulate a click on the "Browse all items in a category" link
+		response = this.getHttpTransport().fetchUrl(this.getGenerator().getBrowseCategoriesURL());
+		this.trace(this.getGenerator().getBrowseCategoriesURL());
+		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			throw new IOException( "Received empty response" );
+			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getBrowseCategoriesURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getBrowseCategoriesURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
-		
-		this.setFailed( false );
+
+		// Save session data
+		this.getSessionState().setLastResponse(response.toString());
+
+		this.setFailed(!this.getUtility().checkRubisResponse(response.toString()));
 	}
-	
 }

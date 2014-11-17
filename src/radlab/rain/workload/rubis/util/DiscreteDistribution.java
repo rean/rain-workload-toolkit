@@ -31,48 +31,66 @@
  * Author: Marco Guazzone (marco.guazzone@gmail.com), 2013.
  */
 
-package radlab.rain.workload.rubis;
+package radlab.rain.workload.rubis.util;
 
 
-import java.io.IOException;
-import radlab.rain.IScoreboard;
+import java.util.Arrays;
+import java.util.Random;
 
 
 /**
- * Register operation.
- *
- * Emulates the following operations:
- * 1. Go the the user registration page
+ * Generate random numbers according to the given probability table.
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
-public class RegisterOperation extends RubisOperation 
+public final class DiscreteDistribution
 {
-	public RegisterOperation(boolean interactive, IScoreboard scoreboard)
+	private double[] _cdf;
+
+	public DiscreteDistribution(double[] probs)
 	{
-		super( interactive, scoreboard );
-		this._operationName = "Register";
-		this._operationIndex = RubisGenerator.REGISTER_OP;
-		this._mustBeSync = true;
+		if (probs.length > 0)
+		{
+			final int np = probs.length;
+
+			this._cdf = new double[np];
+
+			// Compute CDF
+			double cumProb = probs[0];
+			this._cdf[0] = probs[0];
+			for (int i = 1; i < np; ++i)
+			{
+				//this._cdf[i] = this._cdf[i-1]+probs[i];
+				cumProb += probs[i];
+				this._cdf[i] = cumProb;
+			}
+			// Normalize
+			for (int i = 0; i < np; ++i)
+			{
+				this._cdf[i] /= cumProb;
+			}
+
+			// Adjust lower and upper bound
+			this._cdf[0] = 0;
+			this._cdf[np-1] = 1;
+		}
 	}
 
-	@Override
-	public void execute() throws Throwable
+	public int nextInt(Random rng)
 	{
-		StringBuilder response = null;
+		double p = rng.nextDouble();
 
-		// Go the the user registration page
-		response = this.getHttpTransport().fetchUrl( this.getGenerator().getRegisterURL() );
-		this.trace( this.getGenerator().getRegisterURL() );
-		if (!this.getGenerator().checkHttpResponse(response.toString()))
-		{
-			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getRegisterURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getRegisterURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
-		}
+//		for (int x = 0; x < this._cdf.length; ++x)
+//		{
+//			if (p > this._cdf[x])
+//			{
+//				return x;
+//			}
+//		}
+//		return this._cdf.length-1;
 
-		// Save session data
-		this.getSessionState().setLastResponse(response.toString());
+		int x = Arrays.binarySearch(this._cdf, p);
 
-		this.setFailed(!this.getUtility().checkRubisResponse(response.toString()));
+		return (x >= 0 ? x : -x-1);
 	}
 }

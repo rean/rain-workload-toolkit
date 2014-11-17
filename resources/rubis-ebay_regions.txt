@@ -1,0 +1,62 @@
+AZ--Phoenix
+CA--Los Angeles
+CA--Oakland
+CA--Sacramento
+CA--San Diego
+CA--San Francisco
+CA--San Jose
+CO--Denver
+CT--Hartford
+DC--Washington
+FL--Jacksonville
+FL--Miami
+FL--Orlando
+FL--Tampa-St. Pete
+FL--West Palm Beach
+GA--Atlanta
+HI--Honolulu
+ID--Billings-Boise
+IL--Chicago
+IN--Indianapolis
+KS--Kansas City
+KY--Louisville
+LA--New Orleans
+MA--Boston 
+MD--Baltimore
+MI--Detroit
+MI--Grand Rapids
+MN--Minn-St. Paul
+MO--Kansas City
+MO--St. Louis
+MT--Billings-Boise
+NC--Charlotte
+NC--Greensboro
+NC--Raleigh-Durham
+ND--Bismarck-Pierre
+NM--Albuquerque
+NV--Las Vegas
+NY--Albany
+NY--Buffalo
+NY--New York
+NY--Rochester
+OH--Cincinnati
+OH--Cleveland
+OH--Columbus
+OH--Dayton
+OK--Oklahoma City
+OR--Portland
+PA--Philadelphia
+PA--Pittsburgh
+RI--Providence
+SD--Bismarck-Pierre
+TN--Memphis
+TN--Nashville
+TX--Austin
+TX--Dallas-Fort Worth
+TX--Houston
+TX--San Antonio
+UT--Salt Lake City
+VA--Norfolk-VA Beach
+VA--Richmond
+WA--Seattle-Tacoma
+WI--Milwaukee

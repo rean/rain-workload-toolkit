@@ -39,35 +39,32 @@ import radlab.rain.IScoreboard;
 
 
 /**
- * Register operation.
+ * The 'Home' operation.
  *
- * Emulates the following operations:
- * 1. Go the the user registration page
+ * Emulates the following requests:
+ * 1. Request the 'Home Page' page
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
-public class RegisterOperation extends RubisOperation 
+public class HomeOperation extends RubisOperation 
 {
-	public RegisterOperation(boolean interactive, IScoreboard scoreboard)
+	public HomeOperation(boolean interactive, IScoreboard scoreboard) 
 	{
-		super( interactive, scoreboard );
-		this._operationName = "Register";
-		this._operationIndex = RubisGenerator.REGISTER_OP;
-		this._mustBeSync = true;
+		super(interactive, scoreboard);
+
+		this._operationName = "Home";
+		this._operationIndex = RubisGenerator.HOME_OP;
 	}
 
 	@Override
 	public void execute() throws Throwable
 	{
-		StringBuilder response = null;
-
-		// Go the the user registration page
-		response = this.getHttpTransport().fetchUrl( this.getGenerator().getRegisterURL() );
-		this.trace( this.getGenerator().getRegisterURL() );
+		StringBuilder response = this.getHttpTransport().fetchUrl(this.getGenerator().getHomeURL());
+		this.trace(this.getGenerator().getHomeURL());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getRegisterURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getRegisterURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getHomeURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getHomeURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		// Save session data

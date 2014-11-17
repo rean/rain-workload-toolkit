@@ -34,45 +34,80 @@
 package radlab.rain.workload.rubis;
 
 
-import java.io.IOException;
-import radlab.rain.IScoreboard;
-
-
 /**
- * Register operation.
- *
- * Emulates the following operations:
- * 1. Go the the user registration page
+ * The state of a RUBiS user session.
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
-public class RegisterOperation extends RubisOperation 
+public final class RubisSessionState
 {
-	public RegisterOperation(boolean interactive, IScoreboard scoreboard)
+	private int _loggedUserId = RubisUtility.ANONYMOUS_USER_ID; ///< The current logged user identifier
+	private int _lastOp = RubisUtility.INVALID_OPERATION_ID; ///< The identifier of the last terminated operation
+	private int _curOp = RubisUtility.INVALID_OPERATION_ID; ///< The identifier of the currently running operation
+	private int _itemId = RubisUtility.INVALID_ITEM_ID; ///< The current item identifier
+	private String _lastResponse; ///< The response of the last terminated operation
+
+
+	public RubisSessionState()
 	{
-		super( interactive, scoreboard );
-		this._operationName = "Register";
-		this._operationIndex = RubisGenerator.REGISTER_OP;
-		this._mustBeSync = true;
 	}
 
-	@Override
-	public void execute() throws Throwable
+	public int getLastOperation()
 	{
-		StringBuilder response = null;
+		return this._lastOp;
+	}
 
-		// Go the the user registration page
-		response = this.getHttpTransport().fetchUrl( this.getGenerator().getRegisterURL() );
-		this.trace( this.getGenerator().getRegisterURL() );
-		if (!this.getGenerator().checkHttpResponse(response.toString()))
-		{
-			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getRegisterURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getRegisterURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
-		}
+	public void setLastOperation(int value)
+	{
+		this._lastOp = value;
+	}
 
-		// Save session data
-		this.getSessionState().setLastResponse(response.toString());
+	public int getCurrentOperation()
+	{
+		return this._curOp;
+	}
 
-		this.setFailed(!this.getUtility().checkRubisResponse(response.toString()));
+	public void setCurrentOperation(int value)
+	{
+		this._curOp = value;
+	}
+
+	public void setLastResponse(String value)
+	{
+		this._lastResponse = value;
+	}
+
+	public String getLastResponse()
+	{
+		return this._lastResponse;
+	}
+
+	public int getLoggedUserId()
+	{
+		return this._loggedUserId;
+	}
+
+	public void setLoggedUserId(int value)
+	{
+		this._loggedUserId = value;
+	}
+
+	public int getItemId()
+	{
+		return this._itemId;
+	}
+
+	public void setItemId(int value)
+	{
+		this._itemId = value;
+	}
+
+	public void clear()
+	{
+		this._loggedUserId = RubisUtility.ANONYMOUS_USER_ID;
+		this._lastOp = RubisUtility.INVALID_OPERATION_ID;
+		this._curOp = RubisUtility.INVALID_OPERATION_ID;
+		this._itemId = RubisUtility.INVALID_ITEM_ID;
+		this._lastResponse = null;
 	}
 }

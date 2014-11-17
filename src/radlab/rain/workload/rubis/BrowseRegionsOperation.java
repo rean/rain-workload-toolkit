@@ -39,21 +39,21 @@ import radlab.rain.IScoreboard;
 
 
 /**
- * Register operation.
+ * Browse-Regions operation.
  *
- * Emulates the following operations:
- * 1. Go the the user registration page
+ * Emulates the following requests:
+ * 1. Click on the "Browse all in a region"
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
-public class RegisterOperation extends RubisOperation 
+public class BrowseRegionsOperation extends RubisOperation 
 {
-	public RegisterOperation(boolean interactive, IScoreboard scoreboard)
+	public BrowseRegionsOperation(boolean interactive, IScoreboard scoreboard) 
 	{
-		super( interactive, scoreboard );
-		this._operationName = "Register";
-		this._operationIndex = RubisGenerator.REGISTER_OP;
-		this._mustBeSync = true;
+		super(interactive, scoreboard);
+
+		this._operationName = "Browse-Regions";
+		this._operationIndex = RubisGenerator.BROWSE_REGIONS_OP;
 	}
 
 	@Override
@@ -61,13 +61,13 @@ public class RegisterOperation extends RubisOperation
 	{
 		StringBuilder response = null;
 
-		// Go the the user registration page
-		response = this.getHttpTransport().fetchUrl( this.getGenerator().getRegisterURL() );
-		this.trace( this.getGenerator().getRegisterURL() );
+		// Emulate a click on the "Browse all in a region" link
+		response = this.getHttpTransport().fetchUrl(this.getGenerator().getBrowseRegionsURL());
+		this.trace(this.getGenerator().getBrowseRegionsURL());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getRegisterURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getRegisterURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getBrowseRegionsURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getBrowseRegionsURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		// Save session data

@@ -27,41 +27,51 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Author: Marco Guazzone (marco.guazzone@gmail.com), 2013.
  */
 
 package radlab.rain.workload.rubis;
 
-import java.io.IOException;
 
+import java.io.IOException;
 import radlab.rain.IScoreboard;
 
+
 /**
- * The Home Page operation is a sample operation.
+ * The About-Me Authentitcation operation.
+ *
+ * Emulates the following request:
+ * - Go to the 'About Me Authentitcation' page
+ *
+ * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
-public class HomePageOperation extends RubisOperation 
+public class AboutMeAuthOperation extends RubisOperation 
 {
-	public HomePageOperation( boolean interactive, IScoreboard scoreboard ) 
+	public AboutMeAuthOperation(boolean interactive, IScoreboard scoreboard) 
 	{
-		super( interactive, scoreboard );
-		this._operationName = "Home Page";
-		this._operationIndex = RubisGenerator.HOME_PAGE;
+		super(interactive, scoreboard);
+		this._operationName = "About-Me-Auth";
+		this._operationIndex = RubisGenerator.ABOUT_ME_AUTH_OP;
 	}
-	
+
 	@Override
 	public void execute() throws Throwable
 	{
-		// TODO: Make a request.
-		//this.trace( "Log a retraceable string for the request." );
-		
-		// TODO: Fill me in.
-		StringBuilder homeResponse = this._http.fetchUrl( this.getGenerator().homepageURL );
-		this.trace( this.getGenerator().homepageURL );
-		if( homeResponse.length() == 0 )
+		StringBuilder response = null;
+
+		// Go to the About-Me home page
+		response = this.getHttpTransport().fetchUrl(this.getGenerator().getAboutMeAuthURL());
+		this.trace(this.getGenerator().getAboutMeAuthURL());
+		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			throw new IOException( "Received empty response" );
+			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getAboutMeAuthURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getAboutMeAuthURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
-		
-		this.setFailed( false );
+
+		// Save session data
+		this.getSessionState().setLastResponse(response.toString());
+
+		this.setFailed(!this.getUtility().checkRubisResponse(response.toString()));
 	}
-	
 }

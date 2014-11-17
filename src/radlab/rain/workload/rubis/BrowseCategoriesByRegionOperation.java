@@ -35,25 +35,28 @@ package radlab.rain.workload.rubis;
 
 
 import java.io.IOException;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
 import radlab.rain.IScoreboard;
+import radlab.rain.workload.rubis.model.RubisRegion;
 
 
 /**
- * Register operation.
+ * Browse-Categories-By-Region operation.
  *
- * Emulates the following operations:
- * 1. Go the the user registration page
+ * Emulates the following requests:
+ * 1. Click on a region name to browse all categories in that region
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
-public class RegisterOperation extends RubisOperation 
+public class BrowseCategoriesByRegionOperation extends RubisOperation 
 {
-	public RegisterOperation(boolean interactive, IScoreboard scoreboard)
+	public BrowseCategoriesByRegionOperation(boolean interactive, IScoreboard scoreboard) 
 	{
-		super( interactive, scoreboard );
-		this._operationName = "Register";
-		this._operationIndex = RubisGenerator.REGISTER_OP;
-		this._mustBeSync = true;
+		super(interactive, scoreboard);
+
+		this._operationName = "Browse-Categories-By-Region";
+		this._operationIndex = RubisGenerator.BROWSE_CATEGORIES_BY_REGION_OP;
 	}
 
 	@Override
@@ -61,13 +64,29 @@ public class RegisterOperation extends RubisOperation
 	{
 		StringBuilder response = null;
 
-		// Go the the user registration page
-		response = this.getHttpTransport().fetchUrl( this.getGenerator().getRegisterURL() );
-		this.trace( this.getGenerator().getRegisterURL() );
+		// Generate a random region
+		RubisRegion region = this.getUtility().generateRegion();
+		if (!this.getUtility().isValidRegion(region))
+		{
+			this.getLogger().warning("No valid region has been found. Operation interrupted.");
+			this.setFailed(true);
+			return;
+		}
+
+		URIBuilder uri = null;
+		HttpGet reqGet = null;
+
+		// Emulate a click on a region name to browse all related categories
+		// Send a request with the region as parameter
+		uri = new URIBuilder(this.getGenerator().getBrowseCategoriesByRegionURL());
+		uri.setParameter("region", region.name);
+		reqGet = new HttpGet(uri.build());
+		response = this.getHttpTransport().fetch(reqGet);
+		this.trace(reqGet.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getRegisterURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getRegisterURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			this.getLogger().severe("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+			throw new IOException("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		// Save session data

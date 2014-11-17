@@ -31,48 +31,16 @@
  * Author: Marco Guazzone (marco.guazzone@gmail.com), 2013.
  */
 
-package radlab.rain.workload.rubis;
-
-
-import java.io.IOException;
-import radlab.rain.IScoreboard;
+package radlab.rain.workload.rubis.model;
 
 
 /**
- * Register operation.
- *
- * Emulates the following operations:
- * 1. Go the the user registration page
+ * Models a RUBiS category entity.
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
-public class RegisterOperation extends RubisOperation 
+public class RubisCategory
 {
-	public RegisterOperation(boolean interactive, IScoreboard scoreboard)
-	{
-		super( interactive, scoreboard );
-		this._operationName = "Register";
-		this._operationIndex = RubisGenerator.REGISTER_OP;
-		this._mustBeSync = true;
-	}
-
-	@Override
-	public void execute() throws Throwable
-	{
-		StringBuilder response = null;
-
-		// Go the the user registration page
-		response = this.getHttpTransport().fetchUrl( this.getGenerator().getRegisterURL() );
-		this.trace( this.getGenerator().getRegisterURL() );
-		if (!this.getGenerator().checkHttpResponse(response.toString()))
-		{
-			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getRegisterURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getRegisterURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
-		}
-
-		// Save session data
-		this.getSessionState().setLastResponse(response.toString());
-
-		this.setFailed(!this.getUtility().checkRubisResponse(response.toString()));
-	}
+	public int id;
+	public String name;
 }

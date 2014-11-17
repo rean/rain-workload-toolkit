@@ -3,7 +3,7 @@
 		"generator": "radlab.rain.workload.rubis.RubisGenerator",
         "generatorParameters": {
 			"rubis.categoriesFile": "resources/rubis-ebay_full_categories.txt",
-			"rubis.incarnation": "servlet",
+			"rubis.incarnation": "php",
 			"rubis.maxBidsPerItem": 10,
 			"rubis.maxCommentLen": 2048,
 			"rubis.maxItemBuyNow": 1000,
@@ -23,8 +23,8 @@
 			"rubis.percentUniqueItems": 80,
 			"rubis.regionsFile": "resources/rubis-ebay_regions.txt",
             "rubis.rngSeed": 5489,
-			"rubis.serverHtmlPath": "/rubis_servlets",
-			"rubis.serverScriptPath": "/rubis_servlets/servlet"
+			"rubis.serverHtmlPath": "/PHP",
+			"rubis.serverScriptPath": "/PHP"
         },
         "track": "radlab.rain.DefaultScenarioTrack",
         "resourcePath": "resources/",
@@ -101,7 +101,7 @@
 		],
 		"target": {
 		  "hostname": "localhost",
-		  "port": 8080
+		  "port": 80
 		},
 		"pLogSampling": 0.0,
 		"pOpenLoop": 0.0,

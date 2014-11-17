@@ -36,24 +36,30 @@ package radlab.rain.workload.rubis;
 
 import java.io.IOException;
 import radlab.rain.IScoreboard;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+import radlab.rain.workload.rubis.model.RubisCategory;
+import radlab.rain.workload.rubis.model.RubisUser;
 
 
 /**
- * Register operation.
+ * Sell-Item-Form operation.
  *
- * Emulates the following operations:
- * 1. Go the the user registration page
+ * This is the operation of selling a certain item.
+ *
+ * Emulates the following requests:
+ * 1. Fill-in the form and click on the 'Register item!' button
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
-public class RegisterOperation extends RubisOperation 
+public class SellItemFormOperation extends RubisOperation 
 {
-	public RegisterOperation(boolean interactive, IScoreboard scoreboard)
+	public SellItemFormOperation(boolean interactive, IScoreboard scoreboard) 
 	{
-		super( interactive, scoreboard );
-		this._operationName = "Register";
-		this._operationIndex = RubisGenerator.REGISTER_OP;
-		this._mustBeSync = true;
+		super(interactive, scoreboard);
+		this._operationName = "Sell-Item-Form";
+		this._operationIndex = RubisGenerator.SELL_ITEM_FORM_OP;
+		//this._mustBeSync = true;
 	}
 
 	@Override
@@ -61,13 +67,35 @@ public class RegisterOperation extends RubisOperation
 	{
 		StringBuilder response = null;
 
-		// Go the the user registration page
-		response = this.getHttpTransport().fetchUrl( this.getGenerator().getRegisterURL() );
-		this.trace( this.getGenerator().getRegisterURL() );
+		// Need a logged user
+		RubisUser loggedUser = this.getUtility().getUser(this.getSessionState().getLoggedUserId());
+		if (!this.getUtility().isRegisteredUser(loggedUser))
+		{
+			this.getLogger().warning("No valid user has been found. Operation interrupted.");
+			this.setFailed(true);
+			return;
+		}
+
+		// Generate a random category
+		RubisCategory category = this.getUtility().generateCategory();
+		if (!this.getUtility().isValidCategory(category))
+		{
+			this.getLogger().warning("No valid category has been found. Operation interrupted.");
+			this.setFailed(true);
+			return;
+		}
+
+		// Select the category of the item to sell
+		URIBuilder uri = new URIBuilder(this.getGenerator().getSellItemFormURL());
+		uri.setParameter("user", Integer.toString(loggedUser.id));
+		uri.setParameter("category", Integer.toString(category.id));
+		HttpGet reqGet = new HttpGet(uri.build());
+		response = this.getHttpTransport().fetch(reqGet);
+		this.trace(reqGet.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getRegisterURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getRegisterURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			this.getLogger().severe("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+			throw new IOException("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		// Save session data

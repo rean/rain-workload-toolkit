@@ -36,45 +36,70 @@ package radlab.rain.workload.rubis;
 
 import java.io.IOException;
 import radlab.rain.IScoreboard;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+import radlab.rain.workload.rubis.model.RubisItem;
 
 
 /**
- * Sell operation.
- *
- * This is the operation of selling a certain item.
+ * Puth-Bid-Auth operation.
  *
  * Emulates the following requests:
- * 1. Go to the sell page
+ * 1. Click on the 'Bid Now' image for a certain item
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
-public class SellOperation extends RubisOperation 
+public class PutBidAuthOperation extends RubisOperation 
 {
-	public SellOperation(boolean interactive, IScoreboard scoreboard) 
+	public PutBidAuthOperation(boolean interactive, IScoreboard scoreboard) 
 	{
 		super(interactive, scoreboard);
-		this._operationName = "Sell";
-		this._operationIndex = RubisGenerator.SELL_OP;
-		//this._mustBeSync = true;
+		this._operationName = "Put-Bid-Auth";
+		this._operationIndex = RubisGenerator.PUT_BID_AUTH_OP;
 	}
 
 	@Override
 	public void execute() throws Throwable
 	{
+		//this.getLogger().finest("Begin Put-Bid-Auth execution");
+
 		StringBuilder response = null;
 
-		// Go to the sell home page
-		response = this.getHttpTransport().fetchUrl(this.getGenerator().getSellURL());
-		this.trace(this.getGenerator().getSellURL());
+		// Get an item (from last response or from session)
+		int itemId = this.getUtility().findItemIdInHtml(this.getSessionState().getLastResponse());
+		RubisItem item = this.getUtility().getItem(itemId, this.getSessionState().getLoggedUserId());
+		if (!this.getUtility().isValidItem(item))
+		{
+			// Try to see if there an item in session
+			item = this.getUtility().getItem(this.getSessionState().getItemId(), this.getSessionState().getLoggedUserId());
+			if (!this.getUtility().isValidItem(item))
+			{
+				this.getLogger().warning("No valid item has been found neither in last HTML response nor in session. Last response is: " + this.getSessionState().getLastResponse() + ". Operation interrupted.");
+				this.setFailed(true);
+				return;
+			}
+		}
+
+		// Click on the 'Bid Now' image for a certain item
+		// This will lead to a user authentification.
+		URIBuilder uri = new URIBuilder(this.getGenerator().getPutBidAuthURL());
+		uri.setParameter("itemId", Integer.toString(item.id));
+		HttpGet reqGet = new HttpGet(uri.build());
+		//this.getLogger().finest("Send GET " + reqGet.getURI().toString());
+		response = this.getHttpTransport().fetch(reqGet);
+		this.trace(reqGet.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getSellURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getSellURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			this.getLogger().severe("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+			throw new IOException("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		// Save session data
 		this.getSessionState().setLastResponse(response.toString());
+		this.getSessionState().setItemId(item.id);
 
 		this.setFailed(!this.getUtility().checkRubisResponse(response.toString()));
+
+		//this.getLogger().finest("End Bid execution");
 	}
 }

@@ -34,45 +34,53 @@
 package radlab.rain.workload.rubis;
 
 
-import java.io.IOException;
-import radlab.rain.IScoreboard;
+import org.json.JSONException;
+import org.json.JSONObject;
+import radlab.rain.LoadProfile;
 
 
-/**
- * Register operation.
- *
- * Emulates the following operations:
- * 1. Go the the user registration page
- *
- * @author Marco Guazzone (marco.guazzone@gmail.com)
- */
-public class RegisterOperation extends RubisOperation 
+public class RubisLoadProfile extends LoadProfile
 {
-	public RegisterOperation(boolean interactive, IScoreboard scoreboard)
-	{
-		super( interactive, scoreboard );
-		this._operationName = "Register";
-		this._operationIndex = RubisGenerator.REGISTER_OP;
-		this._mustBeSync = true;
-	}
+	public static String CFG_LOAD_PROFILE_MEAN_THINK_TIME_KEY = "meanThinkTime";
+	public static String CFG_LOAD_PROFILE_MEAN_CYCLE_TIME_KEY = "meanCycleTime";
 
-	@Override
-	public void execute() throws Throwable
-	{
-		StringBuilder response = null;
 
-		// Go the the user registration page
-		response = this.getHttpTransport().fetchUrl( this.getGenerator().getRegisterURL() );
-		this.trace( this.getGenerator().getRegisterURL() );
-		if (!this.getGenerator().checkHttpResponse(response.toString()))
+	protected double _meanThinkTime = -1.0; // A negative number means "not set"
+	protected double _meanCycleTime = -1.0; // A negative number means "not set"
+
+
+	public RubisLoadProfile(JSONObject profileObj) throws JSONException
+	{
+		super(profileObj);
+
+		if (profileObj.has(CFG_LOAD_PROFILE_MEAN_THINK_TIME_KEY))
 		{
-			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getRegisterURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getRegisterURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			this._meanThinkTime = profileObj.getDouble(CFG_LOAD_PROFILE_MEAN_THINK_TIME_KEY);
 		}
-
-		// Save session data
-		this.getSessionState().setLastResponse(response.toString());
-
-		this.setFailed(!this.getUtility().checkRubisResponse(response.toString()));
+		if (profileObj.has(CFG_LOAD_PROFILE_MEAN_CYCLE_TIME_KEY))
+		{
+			this._meanCycleTime = profileObj.getDouble(CFG_LOAD_PROFILE_MEAN_CYCLE_TIME_KEY);
+		}
 	}
+
+	public RubisLoadProfile(long interval, int numberOfUsers, String mixName)
+	{
+		super(interval, numberOfUsers, mixName);
+	}
+
+	public RubisLoadProfile(long interval, int numberOfUsers, String mixName, long transitionTime)
+	{
+		super(interval, numberOfUsers, mixName, transitionTime);
+	}
+
+	public RubisLoadProfile(long interval, int numberOfUsers, String mixName, long transitionTime, String name)
+	{
+		super(interval, numberOfUsers, mixName, transitionTime, name);
+	}
+
+	public double getMeanThinkTime() { return this._meanThinkTime; }
+	public void setMeanThinkTime(double val) { this._meanThinkTime = val; }
+
+	public double getMeanCycleTime() { return this._meanCycleTime; }
+	public void setMeanCycleTime(double val) { this._meanCycleTime = val; }
 }

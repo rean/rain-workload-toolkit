@@ -35,43 +35,63 @@ package radlab.rain.workload.rubis;
 
 
 import java.io.IOException;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
 import radlab.rain.IScoreboard;
+import radlab.rain.workload.rubis.model.RubisItem;
 
 
 /**
- * Register operation.
+ * View-Item operation.
  *
- * Emulates the following operations:
- * 1. Go the the user registration page
+ * Emulates the following requests:
+ * 1. Click on the item name link
  *
  * @author Marco Guazzone (marco.guazzone@gmail.com)
  */
-public class RegisterOperation extends RubisOperation 
+public class ViewItemOperation extends RubisOperation 
 {
-	public RegisterOperation(boolean interactive, IScoreboard scoreboard)
+	public ViewItemOperation(boolean interactive, IScoreboard scoreboard) 
 	{
-		super( interactive, scoreboard );
-		this._operationName = "Register";
-		this._operationIndex = RubisGenerator.REGISTER_OP;
-		this._mustBeSync = true;
+		super(interactive, scoreboard);
+		this._operationName = "View-Item";
+		this._operationIndex = RubisGenerator.VIEW_ITEM_OP;
 	}
 
 	@Override
 	public void execute() throws Throwable
 	{
-		StringBuilder response = null;
+		// Get an item (from last response or from session)
+		int itemId = this.getUtility().findItemIdInHtml(this.getSessionState().getLastResponse());
+		RubisItem item = this.getUtility().getItem(itemId, this.getSessionState().getLoggedUserId());
+		if (!this.getUtility().isValidItem(item))
+		{
+			// Try to see if there an item in session
+			item = this.getUtility().getItem(this.getSessionState().getItemId(), this.getSessionState().getLoggedUserId());
+			if (!this.getUtility().isValidItem(item))
+			{
+				//this.getLogger().warning("No valid item has been found neither in last HTML response nor in session. Last response is: " + this.getSessionState().getLastResponse() + ". Operation interrupted.");
+				this.getGenerator().forceNextOperation(RubisGenerator.BACK_SPECIAL_OP);
+				this.setFailed(false);
+				return;
+			}
+		}
 
-		// Go the the user registration page
-		response = this.getHttpTransport().fetchUrl( this.getGenerator().getRegisterURL() );
-		this.trace( this.getGenerator().getRegisterURL() );
+		// Click on the item name link
+		URIBuilder uri = new URIBuilder(this.getGenerator().getViewItemURL());
+		uri.setParameter("itemId", Integer.toString(item.id));
+		HttpGet reqGet = new HttpGet(uri.build());
+		StringBuilder response = this.getHttpTransport().fetch(reqGet);
+		this.trace(reqGet.getURI().toString());
 		if (!this.getGenerator().checkHttpResponse(response.toString()))
 		{
-			this.getLogger().severe("Problems in performing request to URL: " + this.getGenerator().getRegisterURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
-			throw new IOException("Problems in performing request to URL: " + this.getGenerator().getRegisterURL() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
+			this.getLogger().severe("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + "). Server response: " + response);
+			throw new IOException("Problems in performing request to URL: " + reqGet.getURI() + " (HTTP status code: " + this.getHttpTransport().getStatusCode() + ")");
 		}
 
 		// Save session data
 		this.getSessionState().setLastResponse(response.toString());
+		this.getSessionState().setItemId(item.id);
 
 		this.setFailed(!this.getUtility().checkRubisResponse(response.toString()));
 	}
