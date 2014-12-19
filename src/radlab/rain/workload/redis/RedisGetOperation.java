@@ -23,5 +23,6 @@ public class RedisGetOperation extends RedisOperation
 		// Better checking for what gets returned when attempting to get a nonexistent key
 		if( result != null )
 			this.setFailed( false );
+		result = null;
 	}
 }

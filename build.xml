@@ -412,8 +412,8 @@
             <src path="src"/>
             <classpath refid="rain.classpath"/>
 	    	<classpath>
-	    	    <pathelement location="thirdparty/jedis/target/jedis-1.5.3-SNAPSHOT.jar"/>
-	    	    <pathelement location="thirdparty/commons-pool-1.5.6/commons-pool-1.5.6.jar"/>
+	    	    <pathelement location="thirdparty/jedis/target/jedis-2.5.3-SNAPSHOT.jar"/>
+	    	    <pathelement location="thirdparty/commons-pool2-2.2/commons-pool2-2.2.jar"/>
 	    	</classpath>
         </javac>
     </target>
@@ -421,12 +421,13 @@
 		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
 	    	<classpath refid="rain.classpath"/>
 	    	<classpath>
-	    	    <pathelement location="thirdparty/jedis/target/jedis-1.5.3-SNAPSHOT.jar"/>
-	    	    <pathelement location="thirdparty/commons-pool-1.5.6/commons-pool-1.5.6.jar"/>
+	    		<pathelement location="thirdparty/jedis/target/jedis-2.5.3-SNAPSHOT.jar"/>
+	    		<pathelement location="thirdparty/commons-pool2-2.2/commons-pool2-2.2.jar"/>
 	    	</classpath>
 	    	<jvmarg value="-Xmx1g" />
 	    	<jvmarg value="-Xms256m" />
 	    	<jvmarg value="-XX:+DisableExplicitGC"/>
+			<!--<jvmarg value="-agentlib:hprof=heap=sites,file=redis-mem.log,depth=6" />-->
 	        <arg file="config/rain.config.redis.json"/>
 	    </java>
 	</target>
@@ -437,8 +438,8 @@
         	<!-- Bake the configuration files into the jar -->
         	<fileset dir="." includes="config/*redis*.json"/>
             <!-- Bake class dependencies into the jar -->
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/jedis/target/jedis-1.5.3-SNAPSHOT.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="thirdparty/commons-pool-1.5.6/commons-pool-1.5.6.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/jedis/target/jedis-2.5.3-SNAPSHOT.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/commons-pool2-2.2/commons-pool2-2.2.jar"/>
         </jar>
     </target>
 	<!-- Riak workload -->

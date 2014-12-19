@@ -32,6 +32,7 @@
 package radlab.rain;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -308,22 +309,29 @@ public class Benchmark
 		try
 		{
 			String fileContents = "";
-			// Try to load the config file as a resource first
-			InputStream in = ClassLoader.getSystemClassLoader().getResourceAsStream( filename );
-			if( in != null )
-			{
-				System.out.println( "[BENCHMARK] Reading config file from resource stream." );
-				BufferedReader reader = new BufferedReader( new InputStreamReader( in ) );
-				String line = "";
-				// Read in the entire file and append to the string buffer
-				while( ( line = reader.readLine() ) != null )
-					configData.append( line );
-				fileContents = configData.toString();
-			}
-			else
+			if (new File(filename).exists())
 			{
 				System.out.println( "[BENCHMARK] Reading config file from file system." );
 				fileContents = ConfigUtil.readFileAsString( filename );
+			}
+			else
+			{
+				// Try to load the config file as a resource first
+				InputStream in = ClassLoader.getSystemClassLoader().getResourceAsStream( filename );
+				if( in != null )
+				{
+					System.out.println( "[BENCHMARK] Reading config file from resource stream." );
+					BufferedReader reader = new BufferedReader( new InputStreamReader( in ) );
+					String line = "";
+					// Read in the entire file and append to the string buffer
+					while( ( line = reader.readLine() ) != null )
+						configData.append( line );
+					fileContents = configData.toString();
+				}
+				else
+				{
+					throw new IOException("Config file not found");
+				}
 			}
 			
 			jsonConfig = new JSONObject( fileContents );

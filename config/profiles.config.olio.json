@@ -1,8 +1,15 @@
 {
-	"cloudstone-001": {
+	"olio-001": {
 		"generator": "radlab.rain.workload.olio.OlioGenerator",
         "track": "radlab.rain.DefaultScenarioTrack",
         "resourcePath": "resources/",
+        "generatorParameters": {
+            "olio.incarnation": "rails",
+            "olio.rngSeed": -1,
+            "olio.numPreloadedEvents": 0,
+            "olio.numPreloadedPersons": 0,
+            "olio.numPreloadedTags": 0
+        },
 		"behavior": {
 			"default" : [
 				[ 0.0, 11.0, 52.0,  36.0,   0.0, 1.0,  0.0],
