@@ -733,29 +733,31 @@ public final class RubbosUtility
 			return null;
 		}
 
-		int count = 0;
+		int totCount = 0;
 		int keyIndex = html.indexOf(key);
 
 		// 1. Count the number of times we find key
 		while (keyIndex != -1)
 		{
-			++count;
+			++totCount;
 			keyIndex = html.indexOf(key, keyIndex+key.length());
 		}
-		//if ((count == 0) || (skipFirst && (count <= 1)))
-		if ((count == 0) || (skipFirst && (count == 1)) || (skipLast && ((count == 1) || (skipFirst && (count == 2)))))
-		{
+		//if ((totCount == 0) || (skipFirst && (totCount <= 1)))
+		if (totCount == 0
+			|| (skipFirst && totCount == 1)
+			|| (skipLast && (totCount == 1 || (skipFirst && totCount == 2)))
+		) {
 			return null;
 		}
 
 		// 2. Pickup randomly a key
 		keyIndex = -key.length();
-		count = this._rng.nextInt(count)+1;
-		if (skipFirst && (count == 1))
+		int count = this._rng.nextInt(totCount)+1;
+		if (skipFirst && count == 1)
 		{
 			++count; // Force to skip the first element
 		}
-		if (skipLast)
+		if (skipLast && count == totCount)
 		{
 			--count; // Force to skip the last element
 		}
