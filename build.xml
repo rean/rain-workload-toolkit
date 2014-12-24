@@ -39,6 +39,12 @@
         <delete dir="bin"/>
     </target>
     <target depends="clean" name="cleanall"/>
+    <target depends="cleanall" name="distclean">
+        <delete file="rain.jar"/>
+        <delete>
+            <fileset dir="workloads" includes="**/*.jar"/>
+        </delete>
+    </target>
     <target depends="build-subprojects,build-project" name="build"/>
     <target name="build-subprojects"/>
     <target depends="init" name="build-project">
