@@ -156,11 +156,11 @@ If you need to setup the RUBBoS database, you can execute the following commands
         $ mysql -uroot rubbos < database/rubbos.sql
 
 - Download data files from the [OW2 RUBBoS](http://jmob.ow2.org/rubbos) web site. Currently, there are two possible data dumps:
-  -# *Small DB*
+  1. *Small DB*
 
         $ wget http://download.forge.ow2.org/rubbos/smallDB-rubbos.tgz
 
-  -# *Expanded data set*
+  2. *Expanded data set*
 
         $ wget http://download.forge.ow2.org/rubbos/rubbos-expanded-dataset.tar.bz2
 
@@ -173,12 +173,12 @@ If you need to setup the RUBBoS database, you can execute the following commands
 
 - Load the data into the `rubbos` database. Two possible methods:
 
-  -# Use the `load.sql` file (before of using it you need to update the path to data files inside it):
+  1. Use the `load.sql` file (before of using it you need to update the path to data files inside it):
 
         $ cd /path/to/RUBBoS.git/database
         $ mysql -uroot rubbos < load.sql
 
-  -# Use the `mysqlimport` command (suggested method):
+  2. Use the `mysqlimport` command (suggested method):
 
         $ mysqlimport -uroot \
                       --local \
