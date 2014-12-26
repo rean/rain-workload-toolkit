@@ -99,9 +99,9 @@ public final class RubbosConfiguration
 //	private static final String CFG_MAX_WORD_LENGTH_KEY = "rubbos.maxWordLen";
 	private static final String CFG_NEWEST_STORY_MONTH_KEY = "rubbos.newestStoryMonth";
 	private static final String CFG_NEWEST_STORY_YEAR_KEY = "rubbos.newestStoryYear";
-	private static final String CFG_NUM_STORIES_PER_PAGE_KEY = "rubbos.numStoriesPerPage";
 	private static final String CFG_NUM_PRELOADED_AUTHORS_KEY = "rubbos.numPreloadedAuthors";
 	private static final String CFG_NUM_PRELOADED_USERS_KEY = "rubbos.numPreloadedUsers";
+	private static final String CFG_NUM_STORIES_PER_PAGE_KEY = "rubbos.numStoriesPerPage";
 	private static final String CFG_OLDEST_STORY_MONTH_KEY = "rubbos.oldestStoryMonth";
 	private static final String CFG_OLDEST_STORY_YEAR_KEY = "rubbos.oldestStoryYear";
 	private static final String CFG_RNG_SEED_KEY = "rubbos.rngSeed";
@@ -114,8 +114,7 @@ public final class RubbosConfiguration
 	private static final int DEFAULT_INITIAL_OPERATION = RubbosGenerator.STORIES_OF_THE_DAY_OP;
 	private static final int DEFAULT_MAX_COMMENT_LENGTH = 1024;
 	private static final int DEFAULT_MAX_STORY_LENGTH = 1024;
-//	private static final int DEFAULT_MAX_WORD_LENGTH = 12;
-	private static final int DEFAULT_NEWEST_STORY_MONTH = 1;
+	private static final int DEFAULT_NEWEST_STORY_MONTH = Calendar.getInstance().get(Calendar.MONTH);
 	private static final int DEFAULT_NEWEST_STORY_YEAR = Calendar.getInstance().get(Calendar.YEAR);
 	private static final int DEFAULT_NUM_STORIES_PER_PAGE = 20;
 	private static final int DEFAULT_NUM_PRELOADED_AUTHORS = 1;
