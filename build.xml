@@ -487,6 +487,8 @@
 	    	<fileset dir="bin" includes="radlab/rain/workload/rubbos/**"/>
         	<!-- Bake the configuration files into the jar -->
         	<fileset dir="." includes="config/*rubbos*.json"/>
+            <!-- Bake the resource files into the jar -->
+            <fileset dir="." includes="resources/rubbos-dictionary.txt"/>
 	    </jar>
 	</target>	
 	<!-- RUBiS workload -->
