@@ -31,11 +31,11 @@ Specifically, the implementation is currently based on the PHP and Java servlets
 
 As a final remark, since the OW2 RUBBoS seems to be an abandoned project, I strongly suggest you to use the following RUBBoS version:
 
-[RUBBoS](https://github.com/michaelmior/RUBBoS)
+[https://github.com/michaelmior/RUBBoS](https://github.com/michaelmior/RUBBoS)
 
 which is a patched and possibly enhanced version of OW2 RUBBoS version 1.2, or maybe the following RUBBoS version:
 
-[RUBBoS](https://github.com/sguazt/RUBBoS)
+[https://github.com/sguazt/RUBBoS](https://github.com/sguazt/RUBBoS)
 
 which is a my fork to the *michealmior*'s RUBBoS version that may contain patches not yet merged with the former project (in fact, as of December 26th, 2014, user *michailmior* has declared that [it is unlikely that he will have the time to test and accept any major changes](https://github.com/michaelmior/RUBBoS/blob/master/CONTRIBUTING.md)).
 
@@ -80,7 +80,7 @@ Currently, the supported configuration properties are the following:
   - *"php"*,
   - *"servlet"*.
 
-  Default value is: *"servlet"*.
+  Default value is: *"php"*.
 - **rubbos.initOp**: a case-insensitive string representing the RUBBoS operation from which a user session starts.
   Possible values are:
   - *"StoriesOfTheDay"*,
@@ -113,9 +113,9 @@ Currently, the supported configuration properties are the following:
   Default value is: *1024*.
 - **rubbos.maxStoryLen**: a non-negative integer value representing the maximum length of a story; this is the RAIN counterpart of the *database\_story\_max\_length* RUBBoS property.
   Default value is: *1024*.
-- **rubbos.newestStoryMonth**: a non-negative integer value between 1 and 31 (inclusive) representing the month of the newest story in the RUBBoS database; this is the RAIN counterpart of the *database\_oldest\_story\_month* RUBBoS property.
-  Default value is: *1*.
-- **rubbos.newestStoryYear**: a non-negative integer value representing the year of the newest story in the RUBBoS database; this is the RAIN counterpart of the *database\_oldest\_story\_year* RUBBoS property.
+- **rubbos.newestStoryMonth**: a non-negative integer value between 1 and 31 (inclusive) representing the month of the newest story in the RUBBoS database.
+  Default value is: *this month*.
+- **rubbos.newestStoryYear**: a non-negative integer value representing the year of the newest story in the RUBBoS database.
   Default value is: *this year*.
 - **rubbos.numPreloadedAuthors**: a non-negative integer value representing the number of authors that have been already preloaded inside the RUBBoS database; this is the RAIN counterpart of the *database\_number\_of\_authors* RUBBoS property.
   Default value is: *1*.
@@ -155,9 +155,16 @@ If you need to setup the RUBBoS database, you can execute the following commands
         $ cd /path/to/RUBBoS.git
         $ mysql -uroot rubbos < database/rubbos.sql
 
-- Download data files from the [OW2 site](http://jmob.ow2.org/rubbos/smallDB.tgz).
+- Download data files from the [OW2 RUBBoS](http://jmob.ow2.org/rubbos) web site. Currently, there are two possible data dumps:
+  -# *Small DB*
 
-        $ wget http://jmob.ow2.org/rubbos/smallDB.tgz
+        $ wget http://download.forge.ow2.org/rubbos/smallDB-rubbos.tgz
+
+  -# *Expanded data set*
+
+        $ wget http://download.forge.ow2.org/rubbos/rubbos-expanded-dataset.tar.bz2
+
+  In the following, we assume you're using the *Small DB* data dump.
 
 - Uncompress the data archive:
 
