@@ -174,10 +174,10 @@ If you need to setup the RUBBoS database, you can execute the following commands
 
 - Uncompress the data archive:
 
-        ```shell
-        $ cd /path/to/RUBBoS.git/database
-        $ tar zxvf smallDB.tgz
-        ```
+    ```shell
+    $ cd /path/to/RUBBoS.git/database
+    $ tar zxvf smallDB.tgz
+    ```
 
 - Load the data into the `rubbos` database. Two possible methods:
 
@@ -210,7 +210,9 @@ If you need to setup the RUBBoS database, you can execute the following commands
 
 To run the RUBBoS workload, simply enter the following command:
 
-	$ java -Xmx1g -Xms256m -cp rain.jar:workloads/rubbos.jar radlab.rain.Benchmark config/rain.config.rubbos.json
+    ```shell
+    $ java -Xmx1g -Xms256m -cp rain.jar:workloads/rubbos.jar radlab.rain.Benchmark config/rain.config.rubbos.json
+    ```
 
 ### Assumptions
 
