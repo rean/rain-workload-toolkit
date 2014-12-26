@@ -152,8 +152,10 @@ If you need to setup the RUBBoS database, you can execute the following commands
 
 - Create the `rubbos` database schema (if not yet done):
 
+        ```shell
         $ cd /path/to/RUBBoS.git
         $ mysql -uroot rubbos < database/rubbos.sql
+        ```
 
 - Download data files from the [OW2 RUBBoS](http://jmob.ow2.org/rubbos) web site. Currently, there are two possible data dumps:
   1. *Small DB*
@@ -195,13 +197,13 @@ If you need to setup the RUBBoS database, you can execute the following commands
                       --delete \
                       --fields-terminated-by="\\t" \
                       rubbos \
-                      $basepath/users.data \
-                      $basepath/stories.data \
-                      $basepath/comments.data \
-                      $basepath/old_stories.data \
-                      $basepath/old_comments.data \
-                      $basepath/submissions.data \
-                      $basepath/moderator_log.data
+                      ./users.data \
+                      ./stories.data \
+                      ./comments.data \
+                      ./old_stories.data \
+                      ./old_comments.data \
+                      ./submissions.data \
+                      ./moderator_log.data
         ```
 
 #### Workload Driver Execution
