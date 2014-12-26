@@ -210,9 +210,7 @@ If you need to setup the RUBBoS database, you can execute the following commands
 
 To run the RUBBoS workload, simply enter the following command:
 
-    ```shell
     $ java -Xmx1g -Xms256m -cp rain.jar:workloads/rubbos.jar radlab.rain.Benchmark config/rain.config.rubbos.json
-    ```
 
 ### Assumptions
 
