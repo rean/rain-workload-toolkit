@@ -3,10 +3,11 @@
 		"generator": "radlab.rain.workload.rubbos.RubbosGenerator",
         "generatorParameters": {
             "rubbos.dictionaryFile": "resources/rubbos-dictionary.txt",
+            "rubbos.initOp": "StoriesOfTheDay",
             "rubbos.incarnation": "php",
             "rubbos.maxCommentLen": 1024,
             "rubbos.maxStoryLen": 1024,
-            "rubbos.newestStoryMonth": 12,
+            "rubbos.newestStoryMonth": 1,
             "rubbos.newestStoryYear": 2000,
             "rubbos.numPreloadedAuthors": 1,
             "rubbos.numPreloadedUsers": 1,
