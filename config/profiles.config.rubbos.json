@@ -15,8 +15,8 @@
             "rubbos.oldestStoryMonth": 1,
             "rubbos.oldestStoryYear": 2000,
             "rubbos.rngSeed": 5489,
-            "rubbos.serverHtmlPath": "/PHP",
-            "rubbos.serverScriptPath": "/PHP"
+            "rubbos.serverHtmlPath": "/php",
+            "rubbos.serverScriptPath": "/php"
         },
         "track": "radlab.rain.DefaultScenarioTrack",
         "metricSnapshots": true,

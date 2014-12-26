@@ -129,10 +129,10 @@ Currently, the supported configuration properties are the following:
   Default value is: *this year*.
 - **rubbos.rngSeed**: an integer number representing the seed used to initialize the random number generator used by the RUBBoS generator; if set to `-1`, the random number generator will be initialized with the Java's default (i.e., to a value very likely to be distinct from any other invocation of the `java.util.Random` default constructor).
   Default value is: *-1*.
-- **rubbos.serverHtmlPath**: the URL path pointing to the base location where HTML files on the RUBBoS server.
-  Default value is: */PHP*.
-- **rubbos.serverScriptPath**: the URL path pointing to the base location where script files on the RUBBoS server.
-  Default value is: */PHP*.
+- **rubbos.serverHtmlPath**: the URL path pointing to the base location where HTML files on the RUBBoS server. Usually, for the *php* incarnation, it should be set to */php*, while for the *servlet* incarnation, it should be set to */rubbos*.
+  Default value is: */php*.
+- **rubbos.serverScriptPath**: the URL path pointing to the base location where script files on the RUBBoS server. Usually, for the *php* incarnation, it should be set to */php*, while for the *servlet* incarnation, it should be set to */rubbos/servlet*.
+  Default value is: */php*.
 
 
 The order of the operations in the traffic mix matrix is the same of the one specified in the previous section (i.e., 0 is the *Stories of the Day* operation, 1 is the *Register* operation, and so on).
