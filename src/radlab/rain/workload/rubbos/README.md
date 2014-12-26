@@ -148,14 +148,14 @@ To compile the RUBBoS workload, simply enter the following command:
 #### Database Initialization
 
 If you need to setup the RUBBoS database, you can execute the following commands (note, we assume you're using the MySQL database and you have root access; if this is not the case, you need to suitably adapt the following commands):
-- Login to the host `$DBMS_HOST` where the DBMS server is running
+- Login to the host where the DBMS server is running.
 
 - Create the `rubbos` database schema (if not yet done):
 
-        ```shell
-        $ cd /path/to/RUBBoS.git
-        $ mysql -uroot rubbos < database/rubbos.sql
-        ```
+    ```shell
+    $ cd /path/to/RUBBoS.git
+    $ mysql -uroot rubbos < database/rubbos.sql
+    ```
 
 - Download data files from the [OW2 RUBBoS](http://jmob.ow2.org/rubbos) web site. Currently, there are two possible data dumps:
   1. *Small DB*
