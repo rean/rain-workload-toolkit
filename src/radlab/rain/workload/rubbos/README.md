@@ -1,5 +1,5 @@
 RUBBoS Workload
-==============
+===============
 
 
 ## Overview
@@ -21,23 +21,19 @@ RUBBoS is a free, open source initiative available at the [OW2 Consortium](http:
 The [OW2 RUBBoS](http://rubbos.ow2.org) web site offers several implementations of the RUBBoS benchmark, that use three different technologies: PHP, Java servlets and Enterprise Java Bean (EJB).
 
 In PHP and Java servlets, the application programmer is responsible for writing the SQL queries.
-An EJB server provides a number of services such as database access (JDBC), transactions (JTA), messaging (JMS), naming (JNDI) and management support (JMX). The EJB server manages one or more EJB containers. The container is responsible for providing component pooling and lifecycle management, client session management, database connection pooling, persistence, transaction management, authentication and access control.EJB containers automatically manage bean persistence, relieving the programmer of writing SQL code.
+An EJB server provides a number of services such as database access (JDBC), transactions (JTA), messaging (JMS), naming (JNDI) and management support (JMX).
+The EJB server manages one or more EJB containers.
+The container is responsible for providing component pooling and lifecycle management, client session management, database connection pooling, persistence, transaction management, authentication and access control.
+EJB containers automatically manage bean persistence, relieving the programmer of writing SQL code.
 
 
 ## Implementation in RAIN
 
-The current implementation of the RUBBoS workload in RAIN is based on the version 1.2 of the [OW2 RUBBoS](http://jmob.ow2.org/rubbos.html) (which, at the time of writing, is the last available version).
+The current implementation of the RUBBoS workload in RAIN is based on the version 1.2.2 of the [OW2 RUBBoS](http://jmob.ow2.org/rubbos.html) (which, at the time of writing, is the last available version).
 Specifically, the implementation is currently based on the PHP and Java servlets versions of RUBBoS.
 
-As a final remark, since the OW2 RUBBoS seems to be an abandoned project, I strongly suggest you to use the following RUBBoS version:
+As a final remark, since the OW2 RUBBoS seems to be an abandoned project, I strongly suggest you to use my personal fork of RUBBoS that you can find on [here](https://github.com/sguazt/RUBBoS), which is a my patched and possibly enhanced version of OW2 RUBBoS version 1.2.2.
 
-[https://github.com/michaelmior/RUBBoS](https://github.com/michaelmior/RUBBoS)
-
-which is a patched and possibly enhanced version of OW2 RUBBoS version 1.2, or maybe the following RUBBoS version:
-
-[https://github.com/sguazt/RUBBoS](https://github.com/sguazt/RUBBoS)
-
-which is a my fork to the *michealmior*'s RUBBoS version that may contain patches not yet merged with the former project (in fact, as of December 26th, 2014, user *michailmior* has declared that [it is unlikely that he will have the time to test and accept any major changes](https://github.com/michaelmior/RUBBoS/blob/master/CONTRIBUTING.md)).
 
 ### Type of Operations
 
@@ -129,10 +125,10 @@ Currently, the supported configuration properties are the following:
   Default value is: *this year*.
 - **rubbos.rngSeed**: an integer number representing the seed used to initialize the random number generator used by the RUBBoS generator; if set to `-1`, the random number generator will be initialized with the Java's default (i.e., to a value very likely to be distinct from any other invocation of the `java.util.Random` default constructor).
   Default value is: *-1*.
-- **rubbos.serverHtmlPath**: the URL path pointing to the base location where HTML files on the RUBBoS server. Usually, for the *php* incarnation, it should be set to */php*, while for the *servlet* incarnation, it should be set to */rubbos*.
-  Default value is: */php*.
-- **rubbos.serverScriptPath**: the URL path pointing to the base location where script files on the RUBBoS server. Usually, for the *php* incarnation, it should be set to */php*, while for the *servlet* incarnation, it should be set to */rubbos/servlet*.
-  Default value is: */php*.
+- **rubbos.serverHtmlPath**: the URL path pointing to the base location where HTML files on the RUBBoS server. Usually, for the *php* incarnation, it is typically set to */PHP*, while for the *servlet* incarnation, it is typically set to */rubbos*.
+  Default value is: */PHP*.
+- **rubbos.serverScriptPath**: the URL path pointing to the base location where script files on the RUBBoS server. Usually, for the *php* incarnation, it is typically set to */PHP*, while for the *servlet* incarnation, it is typically set to */rubbos/servlet*.
+  Default value is: */PHP*.
 
 
 The order of the operations in the traffic mix matrix is the same of the one specified in the previous section (i.e., 0 is the *Stories of the Day* operation, 1 is the *Register* operation, and so on).
