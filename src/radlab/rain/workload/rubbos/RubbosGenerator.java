@@ -298,7 +298,7 @@ public class RubbosGenerator extends Generator
 			nextOperation = j;
 		}
 
-		this.getLogger().info("Last Operation: " + lastOperation + " - Next Operation: " + nextOperation);//XXX
+		//this.getLogger().info("Last Operation: " + lastOperation + " - Next Operation: " + nextOperation);//XXX
 
 		return this.getOperation(nextOperation);
 	}
