@@ -480,6 +480,23 @@
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/riak-java-client/target/riak-client-1.0.6-SNAPSHOT-jar-with-dependencies.jar"/>
         </jar>
     </target>
+	<!-- RUBBoS workload -->
+    <target depends="build" name="build-rubbos">
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}" includes="radlab/rain/workload/rubbos/**">
+            <src path="src"/>
+            <classpath refid="rain.classpath"/>
+        </javac>
+    </target>
+	<target depends="build-rubbos" name="package-rubbos">
+		<mkdir dir="workloads"/>
+	    <jar destfile="workloads/rubbos.jar" filesetmanifest="mergewithoutmain">
+	    	<fileset dir="bin" includes="radlab/rain/workload/rubbos/**"/>
+        	<!-- Bake the configuration files into the jar -->
+        	<fileset dir="." includes="config/*rubbos*.json"/>
+            <!-- Bake the resource files into the jar -->
+            <fileset dir="." includes="resources/rubbos-dictionary.txt"/>
+	    </jar>
+	</target>	
 	<!-- RUBiS workload -->
     <target depends="build" name="build-rubis">
         <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}" includes="radlab/rain/workload/rubis/**">
