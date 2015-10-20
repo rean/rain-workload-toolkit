@@ -418,7 +418,12 @@
             <src path="src"/>
             <classpath refid="rain.classpath"/>
 	    	<classpath>
+<!-- [sguazt] -->
+<!--
 	    	    <pathelement location="thirdparty/jedis/target/jedis-2.5.3-SNAPSHOT.jar"/>
+-->
+	    	    <pathelement location="thirdparty/jedis/target/jedis-2.7.3.jar"/>
+<!-- [/sguazt] -->
 	    	    <pathelement location="thirdparty/commons-pool2-2.2/commons-pool2-2.2.jar"/>
 	    	</classpath>
         </javac>
@@ -427,7 +432,12 @@
 		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
 	    	<classpath refid="rain.classpath"/>
 	    	<classpath>
+<!-- [sguazt] -->
+<!--
 	    		<pathelement location="thirdparty/jedis/target/jedis-2.5.3-SNAPSHOT.jar"/>
+-->
+	    	    <pathelement location="thirdparty/jedis/target/jedis-2.7.3.jar"/>
+<!-- [/sguazt] -->
 	    		<pathelement location="thirdparty/commons-pool2-2.2/commons-pool2-2.2.jar"/>
 	    	</classpath>
 	    	<jvmarg value="-Xmx1g" />
@@ -444,7 +454,12 @@
         	<!-- Bake the configuration files into the jar -->
         	<fileset dir="." includes="config/*redis*.json"/>
             <!-- Bake class dependencies into the jar -->
+<!-- [sguazt] -->
+<!--
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/jedis/target/jedis-2.5.3-SNAPSHOT.jar"/>
+-->
+            <zipfileset excludes="META-INF/*.SF" src="thirdparty/jedis/target/jedis-2.7.3.jar"/>
+<!-- [/sguazt] -->
             <zipfileset excludes="META-INF/*.SF" src="thirdparty/commons-pool2-2.2/commons-pool2-2.2.jar"/>
         </jar>
     </target>
