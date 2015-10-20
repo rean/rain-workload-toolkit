@@ -17,5 +17,7 @@ public class RedisDelOperation extends RedisOperation
 	public void execute() throws Throwable 
 	{
 		this.doDel( this._key );
+
+		this.setFailed( false );
 	}
 }
