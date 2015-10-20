@@ -10,7 +10,7 @@ public class RedisDelOperation extends RedisOperation
 	{
 		super(interactive, scoreboard);
 		this._operationName = NAME;
-		this._operationIndex = RedisGenerator.GET;
+		this._operationIndex = RedisGenerator.DEL;
 	}
 
 	@Override

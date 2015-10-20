@@ -116,12 +116,10 @@ public class RedisTransport
 		else return this._redis.get( key.getBytes() );
 	}	
 	
-	//[sguazt]
 	public void del( String key )
 	{
 		if( this._usingCluster )
 			this._redisCluster.del( key );
 		else this._redis.del( key.getBytes() );
 	}	
-	//[/sguazt]
 }

@@ -9,11 +9,8 @@ public class RedisLoadProfile extends StorageLoadProfile
 {
 	public static final int GET 			= 0; // Read
 	public static final int SET 			= 1; // Write
-	//[sguazt]
-	//public static final int MAX_OPERATIONS 	= 2; // supporting core operations read, write
-	public static final int DEL 			= 2; // Write
+	public static final int DEL 			= 2; // Delete
 	public static final int MAX_OPERATIONS 	= 3; // supporting core operations read, write
-	//[/sguazt]
 	
 	/*
 	public static String CFG_LOAD_PROFILE_REQUEST_SIZE_KEY			= "size"; 
@@ -41,15 +38,6 @@ public class RedisLoadProfile extends StorageLoadProfile
 		*/
 		
 		// Normalize the read/write/update/delete
-		//[sguazt]
-		//double sum = this._readPct + this._writePct;
-		//
-		//this._readPct /= sum;
-		//this._writePct /= sum;
-		//
-		//// Create the selection vector
-		//this._opselect[GET] 	= this._readPct;
-		//this._opselect[SET] 	= this._opselect[GET] + this._writePct;
 		double sum = this._readPct + this._writePct + this._deletePct;
 		
 		this._readPct /= sum;
@@ -60,7 +48,6 @@ public class RedisLoadProfile extends StorageLoadProfile
 		this._opselect[GET] 	= this._readPct;
 		this._opselect[SET] 	= this._opselect[GET] + this._writePct;
 		this._opselect[DEL] 	= this._opselect[SET] + this._deletePct;
-		//[/sguazt]
 	}
 
 	public RedisLoadProfile(long interval, int numberOfUsers, String mixName) 
@@ -88,9 +75,7 @@ public class RedisLoadProfile extends StorageLoadProfile
 	public double getWritePct() { return this._writePct; }
 	public void setWritePct( double value ) { this._writePct = value; }
 	
-	//[sguazt]
 	public double getDeletePct() { return this._deletePct; }
 	public void setDeletePct( double value ) { this._deletePct = value; }
-	//[/sguazt]
 	*/
 }

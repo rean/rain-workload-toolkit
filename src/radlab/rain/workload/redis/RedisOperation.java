@@ -46,10 +46,8 @@ public abstract class RedisOperation extends Operation
 		return this._redis.set( key, value );
 	}
 	
-	//[sguazt]
 	public void doDel( String key )
 	{
 		this._redis.del( key );
 	}
-	//[/sguazt]
 }

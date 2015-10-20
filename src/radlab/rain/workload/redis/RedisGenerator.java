@@ -26,7 +26,7 @@ public class RedisGenerator extends Generator
 	// Main operations GET/SET
 	public static final int GET 			= RedisLoadProfile.GET; // Read
 	public static final int SET 			= RedisLoadProfile.SET; // Write
-	public static final int DEL 			= RedisLoadProfile.DEL; // Delete //[sguazt]
+	public static final int DEL 			= RedisLoadProfile.DEL; // Delete
 	
 	@SuppressWarnings("unused")
 	private RedisRequest<String> _lastRequest 	= null;
@@ -175,10 +175,8 @@ public class RedisGenerator extends Generator
 			return this.createGetOperation( request );
 		else if( request.op == SET )
 			return this.createSetOperation( request );
-		//[sguazt]
 		else if( request.op == DEL )
 			return this.createDelOperation( request );
-		//[/sguazt]
 		else return null; // We don't support updates/deletes explicitly, if an existing key gets re-written then so be it
 	}
 	
@@ -236,7 +234,6 @@ public class RedisGenerator extends Generator
 		return op;
 	}
 
-	//[sguazt]
 	public RedisDelOperation createDelOperation( RedisRequest<String> request )
 	{
 		RedisDelOperation op = null;
@@ -256,5 +253,4 @@ public class RedisGenerator extends Generator
 		op.prepare( this );
 		return op;
 	}
-	//[/sguazt]
 }
