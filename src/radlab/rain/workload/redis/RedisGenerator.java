@@ -13,6 +13,7 @@ import radlab.rain.ObjectPool;
 import radlab.rain.Operation;
 import radlab.rain.ScenarioTrack;
 import radlab.rain.util.Histogram;
+import radlab.rain.util.NegativeExponential;
 import radlab.rain.util.storage.KeyGenerator;
 
 public class RedisGenerator extends Generator 
@@ -38,6 +39,10 @@ public class RedisGenerator extends Generator
 	Histogram<String> _keyHist					= new Histogram<String>();
 	// Debug hot object popularity
 	Histogram<String> _hotObjHist				= new Histogram<String>();
+	private double _thinkTime = -1; ///< The mean think time; a value <= 0 means that no think time is used.
+	private NegativeExponential _thinkTimeRng;
+	private double _cycleTime = -1; ///< The mean cycle time; a value <= 0 means that no cycle time is used.
+	private NegativeExponential _cycleTimeRng;
 	
 	public RedisGenerator(ScenarioTrack track) 
 	{
@@ -57,22 +62,54 @@ public class RedisGenerator extends Generator
 		}
 	}
 
+//	@Override
+	/**
+	 * Returns the current cycle time. The cycle time is duration between
+	 * the execution of an operation and the execution of its succeeding
+	 * operation during asynchronous execution (i.e. open loop).
+	 */
 	@Override
-	public long getCycleTime() 
+	public long getCycleTime()
 	{
-		return 0;
+		if (this._cycleTime <= 0)
+		{
+			return 0;
+		}
+
+		return Math.round(this._cycleTimeRng.nextDouble());
 	}
 
+	/**
+	 * Returns the current think time. The think time is duration between
+	 * receiving the response of an operation and the execution of its
+	 * succeeding operation during synchronous execution (i.e. closed loop).
+	 */
 	@Override
-	public long getThinkTime() 
+	public long getThinkTime()
 	{
-		return 0;
+		if (this._thinkTime <= 0)
+		{
+			return 0;
+		}
+
+		return Math.round(this._thinkTimeRng.nextDouble());
 	}
+
 
 	@Override
 	public void initialize() 
 	{
-		
+		// Setup think and cycle times
+		this._thinkTime = this.getTrack().getMeanThinkTime();
+		if (this._thinkTime > 0)
+		{
+			this._thinkTimeRng = new NegativeExponential(this._thinkTime, this._random);
+		}
+		this._cycleTime = this.getTrack().getMeanCycleTime();
+		if (this._cycleTime > 0)
+		{
+			this._cycleTimeRng = new NegativeExponential(this._cycleTime, this._random);
+		}
 	}
 
 	public RedisTransport getRedisTransport()
