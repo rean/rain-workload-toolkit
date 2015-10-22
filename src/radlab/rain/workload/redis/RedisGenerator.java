@@ -34,7 +34,7 @@ public class RedisGenerator extends Generator
 	private RedisTransport _redis 				= null;
 	private boolean _usePooling					= true;
 	private boolean _debug 						= false;
-	private Random _random						= null;
+	private static Random _random				= null; ///< The Random Number Generator
 	// Debug key popularity
 	Histogram<String> _keyHist					= new Histogram<String>();
 	// Debug hot object popularity
@@ -44,6 +44,45 @@ public class RedisGenerator extends Generator
 	private double _cycleTime = -1; ///< The mean cycle time; a value <= 0 means that no cycle time is used.
 	private NegativeExponential _cycleTimeRng;
 	
+	/**
+	 * Returns the internally used random number generator.
+	 * 
+	 * @return A Random object.
+	 */
+	public static Random getRandomGenerator()
+	{
+		//NOTE: this method is not "synchronized" since java.util.Random is threadsafe.
+		return _random;
+	}
+
+	/**
+	 * Set the internally used random number generator.
+	 * 
+	 * @param value A Random object.
+	 */
+	protected static synchronized void setRandomGenerator(Random value)
+	{
+		_random = value;
+	}
+
+	/**
+	 * Initialize the shared random number generator.
+	 */
+	private static synchronized void initizializeRandomGenerator(long seed)
+	{
+		if (_random == null)
+		{
+			if (seed >= 0)
+			{
+				_random = new Random(seed);
+			}
+			else
+			{
+				_random = new Random();
+			}
+		}
+	}
+
 	public RedisGenerator(ScenarioTrack track) 
 	{
 		super(track);
@@ -131,8 +170,9 @@ public class RedisGenerator extends Generator
 		
 		// Look for a random number seed
 		if( config.has( CFG_RNG_SEED_KEY ) )
-			this._random = new Random( config.getLong( CFG_RNG_SEED_KEY ) );
-		else this._random = new Random();
+			this.initizializeRandomGenerator( config.getLong( CFG_RNG_SEED_KEY ) );
+		else
+			this.initizializeRandomGenerator(-1);
 		
 		this._redis = new RedisTransport( this._loadTrack.getTargetHostName(), this._loadTrack.getTargetHostPort() );
 	}
