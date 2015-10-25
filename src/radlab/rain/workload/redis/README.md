@@ -10,12 +10,13 @@ Redis has built-in replication, Lua scripting, LRU eviction, transactions and di
 
 The benchmark implements the core functionality of a data store: setting, getting, and deleting keys.
 
-Redis is an open source (BDS licensed) software available at the [redis](http://redis.io/) web site.
+Redis is an open source (BDS licensed) software available at the [Redis](http://redis.io/) web site.
 
 
 ## Implementation in RAIN
 
-The current implementation of the Redis workload in RAIN currently supports a limited set of operations and data structures.
+The current implementation of the Redis workload in RAIN only supports a limited set of Redis operations and data structures.
+For instance, lists and hashes are not supported yet.
 
 ### Type of Operations
 
