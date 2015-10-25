@@ -29,6 +29,7 @@ Currently, this implementation supports the following Redis operations:
 
 The Redis workload can be customized by means of a set of properties.
 Of particular interest are properties for the *generatorParameters* and *loadProfile* keys of the *profiles.config.rubis.json*.
+
 For the *generatorParameters* key, the supported configuration properties are the following:
 - **usePooling**: a boolean value (i.e., either as *"true"* or *"false"* string) indicating whether object pooling must be enabled or not.
   Default value is: *"true"*.
@@ -36,6 +37,7 @@ For the *generatorParameters* key, the supported configuration properties are th
   Default value is: *-1*.
 - **debug**: a boolean value (i.e., either as *"true"* or *"false"* string) indicating whether debugging messages must be displayed or not.
   Default value is: *"false"*.
+
 For the *loadProfile* key, there can be one or more *load profile* section (i.e., a piece of JSON code delimited by a pair of braces), each of which represents a specific workload to run against the Redis application.
 The configuration properties supported by each load profile section are the ones defined by the load profile class (see property *loadProfileClass*), which in this case are inherited from both the `radlab.rain.util.storage.StorageLoadProfile` and `radlab.rain.LoadProfile` classes.
 Those of particular interest are the following:
