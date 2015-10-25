@@ -81,7 +81,12 @@ To compile the Redis workload, simply enter the following command:
 
 #### Initialization
 
-Initialization is not necessary Unless your workload is primarily made of GET and DEL operations.
+Initialization is not usually necessary unless your workload is primarily made of GET or DEL operations.
+In such cases, you may want to preload some keys in the Redis data store.
+To this end, you can either load them by means of either the Redis client or the `radlab.rain.workload.redis.RedisUtil` class:
+
+    $ java -Xmx1g -Xms256m -cp rain.jar:workloads/redis.jar radlab.rain.workload.redis.RedisUtil <redis host> <redis port> <min key> max key> <size>
+
 
 #### Workload Driver Execution
 
