@@ -13,6 +13,7 @@ import radlab.rain.ObjectPool;
 import radlab.rain.Operation;
 import radlab.rain.ScenarioTrack;
 import radlab.rain.util.Histogram;
+import radlab.rain.util.NegativeExponential;
 import radlab.rain.util.storage.KeyGenerator;
 
 public class RedisGenerator extends Generator 
@@ -26,18 +27,62 @@ public class RedisGenerator extends Generator
 	// Main operations GET/SET
 	public static final int GET 			= RedisLoadProfile.GET; // Read
 	public static final int SET 			= RedisLoadProfile.SET; // Write
+	public static final int DEL 			= RedisLoadProfile.DEL; // Delete
 	
 	@SuppressWarnings("unused")
 	private RedisRequest<String> _lastRequest 	= null;
 	private RedisTransport _redis 				= null;
 	private boolean _usePooling					= true;
 	private boolean _debug 						= false;
-	private Random _random						= null;
+	private static Random _random				= null; ///< The Random Number Generator
 	// Debug key popularity
 	Histogram<String> _keyHist					= new Histogram<String>();
 	// Debug hot object popularity
 	Histogram<String> _hotObjHist				= new Histogram<String>();
+	private double _thinkTime = -1; ///< The mean think time; a value <= 0 means that no think time is used.
+	private NegativeExponential _thinkTimeRng;
+	private double _cycleTime = -1; ///< The mean cycle time; a value <= 0 means that no cycle time is used.
+	private NegativeExponential _cycleTimeRng;
 	
+	/**
+	 * Returns the internally used random number generator.
+	 * 
+	 * @return A Random object.
+	 */
+	public static Random getRandomGenerator()
+	{
+		//NOTE: this method is not "synchronized" since java.util.Random is threadsafe.
+		return _random;
+	}
+
+	/**
+	 * Set the internally used random number generator.
+	 * 
+	 * @param value A Random object.
+	 */
+	protected static synchronized void setRandomGenerator(Random value)
+	{
+		_random = value;
+	}
+
+	/**
+	 * Initialize the shared random number generator.
+	 */
+	private static synchronized void initizializeRandomGenerator(long seed)
+	{
+		if (_random == null)
+		{
+			if (seed >= 0)
+			{
+				_random = new Random(seed);
+			}
+			else
+			{
+				_random = new Random();
+			}
+		}
+	}
+
 	public RedisGenerator(ScenarioTrack track) 
 	{
 		super(track);
@@ -56,22 +101,54 @@ public class RedisGenerator extends Generator
 		}
 	}
 
+//	@Override
+	/**
+	 * Returns the current cycle time. The cycle time is duration between
+	 * the execution of an operation and the execution of its succeeding
+	 * operation during asynchronous execution (i.e. open loop).
+	 */
 	@Override
-	public long getCycleTime() 
+	public long getCycleTime()
 	{
-		return 0;
+		if (this._cycleTime <= 0)
+		{
+			return 0;
+		}
+
+		return Math.round(this._cycleTimeRng.nextDouble());
 	}
 
+	/**
+	 * Returns the current think time. The think time is duration between
+	 * receiving the response of an operation and the execution of its
+	 * succeeding operation during synchronous execution (i.e. closed loop).
+	 */
 	@Override
-	public long getThinkTime() 
+	public long getThinkTime()
 	{
-		return 0;
+		if (this._thinkTime <= 0)
+		{
+			return 0;
+		}
+
+		return Math.round(this._thinkTimeRng.nextDouble());
 	}
+
 
 	@Override
 	public void initialize() 
 	{
-		
+		// Setup think and cycle times
+		this._thinkTime = this.getTrack().getMeanThinkTime();
+		if (this._thinkTime > 0)
+		{
+			this._thinkTimeRng = new NegativeExponential(this._thinkTime, this._random);
+		}
+		this._cycleTime = this.getTrack().getMeanCycleTime();
+		if (this._cycleTime > 0)
+		{
+			this._cycleTimeRng = new NegativeExponential(this._cycleTime, this._random);
+		}
 	}
 
 	public RedisTransport getRedisTransport()
@@ -93,8 +170,9 @@ public class RedisGenerator extends Generator
 		
 		// Look for a random number seed
 		if( config.has( CFG_RNG_SEED_KEY ) )
-			this._random = new Random( config.getLong( CFG_RNG_SEED_KEY ) );
-		else this._random = new Random();
+			this.initizializeRandomGenerator( config.getLong( CFG_RNG_SEED_KEY ) );
+		else
+			this.initizializeRandomGenerator(-1);
 		
 		this._redis = new RedisTransport( this._loadTrack.getTargetHostName(), this._loadTrack.getTargetHostPort() );
 	}
@@ -174,6 +252,8 @@ public class RedisGenerator extends Generator
 			return this.createGetOperation( request );
 		else if( request.op == SET )
 			return this.createSetOperation( request );
+		else if( request.op == DEL )
+			return this.createDelOperation( request );
 		else return null; // We don't support updates/deletes explicitly, if an existing key gets re-written then so be it
 	}
 	
@@ -226,6 +306,26 @@ public class RedisGenerator extends Generator
 			this._random.nextBytes( op._value );
 		}
 		else op._value = request.value;
+		
+		op.prepare( this );
+		return op;
+	}
+
+	public RedisDelOperation createDelOperation( RedisRequest<String> request )
+	{
+		RedisDelOperation op = null;
+		
+		if( this._usePooling )
+		{
+			ObjectPool pool = this.getTrack().getObjectPool();
+			op = (RedisDelOperation) pool.rentObject( RedisDelOperation.NAME );	
+		}
+		
+		if( op == null )
+			op = new RedisDelOperation( this.getTrack().getInteractive(), this.getScoreboard() );
+		
+		// Set the specific fields
+		op._key = request.key;
 		
 		op.prepare( this );
 		return op;
