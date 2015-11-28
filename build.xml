@@ -128,6 +128,7 @@
 	    	    <fileset dir="thirdparty/hector-core-1.0-1/" includes="*.jar"/>
 -->
 	    	    <fileset dir="thirdparty/" includes="hector-core-2.0-0.jar"/>
+	    	    <fileset dir="thirdparty/" includes="cassandra-thrift-2.1.11.jar"/>
 	    	    <fileset dir="thirdparty/slf4j-1.7.13/" includes="*.jar"/>
 <!-- [/sguazt] -->
 	    	</classpath>
@@ -141,6 +142,7 @@
 	    	    <fileset dir="thirdparty/hector-core-1.0-1/" includes="*.jar"/>
 -->
 	    	    <fileset dir="thirdparty/" includes="hector-core-2.0-0.jar"/>
+	    	    <fileset dir="thirdparty/" includes="cassandra-thrift-2.1.11.jar"/>
 	    	    <fileset dir="thirdparty/slf4j-1.7.13/" includes="*.jar"/>
 	    	</classpath>
 	    	<jvmarg value="-Xmx1g" />
@@ -160,6 +162,7 @@
     	    <zipfileset dir="thirdparty/hector-core-1.0-1/" includes="*.jar" excludes="META-INF/*.SF"/>
 -->
     	    <zipfileset src="thirdparty/hector-core-2.0-0.jar" includes="**" excludes="META-INF/*.SF"/>
+    	    <zipfileset src="thirdparty/cassandra-thrift-2.1.11.jar" includes="**" excludes="META-INF/*.SF"/>
     	    <zipfileset src="thirdparty/slf4j-1.7.13/jcl-over-slf4j-1.7.13.jar" includes="**" excludes="META-INF/*.SF"/>
     	    <zipfileset src="thirdparty/slf4j-1.7.13/jul-to-slf4j-1.7.13.jar" includes="**" excludes="META-INF/*.SF"/>
     	    <zipfileset src="thirdparty/slf4j-1.7.13/log4j-over-slf4j-1.7.13.jar" includes="**" excludes="META-INF/*.SF"/>
