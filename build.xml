@@ -123,15 +123,10 @@
             <src path="src"/>
             <classpath refid="rain.classpath"/>
 	    	<classpath>
-<!-- [sguazt] -->
 <!--
 	    	    <fileset dir="thirdparty/hector-core-1.0-1/" includes="*.jar"/>
 -->
-	    	    <fileset dir="thirdparty/" includes="hector-core-2.0-0.jar"/>
-	    	    <fileset dir="thirdparty/" includes="cassandra-thrift-2.1.11.jar"/>
-	    	    <fileset dir="thirdparty/" includes="libthrift-0.9.3.jar"/>
-	    	    <fileset dir="thirdparty/slf4j-1.7.13/" includes="*.jar"/>
-<!-- [/sguazt] -->
+	    	    <fileset dir="thirdparty/hector-core-2.0-0/" includes="*.jar"/>
 	    	</classpath>
         </javac>
 	</target>
@@ -142,10 +137,7 @@
 <!--
 	    	    <fileset dir="thirdparty/hector-core-1.0-1/" includes="*.jar"/>
 -->
-	    	    <fileset dir="thirdparty/" includes="hector-core-2.0-0.jar"/>
-	    	    <fileset dir="thirdparty/" includes="cassandra-thrift-2.1.11.jar"/>
-	    	    <fileset dir="thirdparty/" includes="libthrift-0.9.3.jar"/>
-	    	    <fileset dir="thirdparty/slf4j-1.7.13/" includes="*.jar"/>
+	    	    <fileset dir="thirdparty/hector-core-2.0-0/" includes="*.jar"/>
 	    	</classpath>
 	    	<jvmarg value="-Xmx1g" />
 	    	<jvmarg value="-Xms256m" />
@@ -163,15 +155,7 @@
 <!--
     	    <zipfileset dir="thirdparty/hector-core-1.0-1/" includes="*.jar" excludes="META-INF/*.SF"/>
 -->
-    	    <zipfileset src="thirdparty/hector-core-2.0-0.jar" includes="**" excludes="META-INF/*.SF"/>
-    	    <zipfileset src="thirdparty/cassandra-thrift-2.1.11.jar" includes="**" excludes="META-INF/*.SF"/>
-    	    <zipfileset src="thirdparty/libthrift-0.9.3.jar" includes="**" excludes="META-INF/*.SF"/>
-    	    <zipfileset src="thirdparty/slf4j-1.7.13/jcl-over-slf4j-1.7.13.jar" includes="**" excludes="META-INF/*.SF"/>
-    	    <zipfileset src="thirdparty/slf4j-1.7.13/jul-to-slf4j-1.7.13.jar" includes="**" excludes="META-INF/*.SF"/>
-    	    <zipfileset src="thirdparty/slf4j-1.7.13/log4j-over-slf4j-1.7.13.jar" includes="**" excludes="META-INF/*.SF"/>
-    	    <zipfileset src="thirdparty/slf4j-1.7.13/slf4j-api-1.7.13.jar" includes="**" excludes="META-INF/*.SF"/>
-    	    <zipfileset src="thirdparty/slf4j-1.7.13/slf4j-jcl-1.7.13.jar" includes="**" excludes="META-INF/*.SF"/>
-    	    <zipfileset src="thirdparty/slf4j-1.7.13/slf4j-log4j12-1.7.13.jar" includes="**" excludes="META-INF/*.SF"/>
+			<zipgroupfileset dir="thirdparty/hector-core-2.0-0" includes="*.jar"/>
         </jar>
     </target>
 	<!-- CloudstoneNull workload -->
