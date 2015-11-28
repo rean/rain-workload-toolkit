@@ -123,7 +123,12 @@
             <src path="src"/>
             <classpath refid="rain.classpath"/>
 	    	<classpath>
+<!-- [sguazt] -->
+<!--
 	    	    <fileset dir="thirdparty/hector-core-1.0-1/" includes="*.jar"/>
+-->
+	    	    <fileset dir="thirdparty/" includes="hector-core-2.0-0.jar"/>
+<!-- [/sguazt] -->
 	    	</classpath>
         </javac>
 	</target>
@@ -131,7 +136,10 @@
 		<java classname="radlab.rain.Benchmark" failonerror="true" fork="yes">
             <classpath refid="rain.classpath"/>
 	    	<classpath>
+<!--
 	    	    <fileset dir="thirdparty/hector-core-1.0-1/" includes="*.jar"/>
+-->
+	    	    <fileset dir="thirdparty/" includes="hector-core-2.0-0.jar"/>
 	    	</classpath>
 	    	<jvmarg value="-Xmx1g" />
 	    	<jvmarg value="-Xms256m" />
@@ -146,7 +154,10 @@
         	<!-- Bake the configuration files into the jar -->
         	<fileset dir="." includes="config/*cassandra*.json"/>
             <!-- Bake class dependencies into the jar -->
+<!--
     	    <zipfileset dir="thirdparty/hector-core-1.0-1/" includes="*.jar" excludes="META-INF/*.SF"/>
+-->
+    	    <zipfileset src="thirdparty/hector-core-2.0-0.jar" includes="**" excludes="META-INF/*.SF"/>
         </jar>
     </target>
 	<!-- CloudstoneNull workload -->
