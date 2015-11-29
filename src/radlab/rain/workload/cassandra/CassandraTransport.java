@@ -215,11 +215,11 @@ public class CassandraTransport
 	
 	public List<byte[]> scan( String startKey, String columnFamilyName, int maxRows )// throws IOException
 	{
-		ArrayList<byte[]> results = new ArrayList<byte[]>();
+		List<byte[]> results = new ArrayList<byte[]>();
 
 		MultigetSliceQuery<String, String, byte[]> multigetSliceQuery = HFactory.createMultigetSliceQuery(this._keyspace, StringSerializer.get(), StringSerializer.get(), BytesArraySerializer.get());
 		multigetSliceQuery.setColumnFamily(columnFamilyName);
-		//multigetSliceQuery.setKey(startKey);
+		multigetSliceQuery.setKeys(startKey);
 		multigetSliceQuery.setRange(startKey, "", false, maxRows);
 		QueryResult<Rows<String, String, byte[]>> queryResult = multigetSliceQuery.execute();
 		Rows<String, String, byte[]> rows = queryResult.get();
