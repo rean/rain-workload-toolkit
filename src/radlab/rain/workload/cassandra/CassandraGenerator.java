@@ -2,6 +2,7 @@ package radlab.rain.workload.cassandra;
 
 //import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 import java.util.HashSet;
 import java.util.Random;
 
@@ -54,6 +55,7 @@ public class CassandraGenerator extends Generator
 	private NegativeExponential _thinkTimeRng;
 	private double _cycleTime = -1; ///< The mean cycle time; a value <= 0 means that no cycle time is used.
 	private NegativeExponential _cycleTimeRng;
+	private Logger _logger;
 	
 	
 	/**
@@ -106,6 +108,16 @@ public class CassandraGenerator extends Generator
 	public void setUsePooling( boolean value ) { this._usePooling = value; }
 	public boolean getUsePooling() { return this._usePooling; }
 		
+	/**
+	 * Returns the <code>Logger</code> associated with this generator.
+	 * 
+	 * @return A <code>Logger</code> object.
+	 */
+	public Logger getLogger()
+	{
+		return this._logger;
+	}
+
 	@Override
 	public void initialize() 
 	{
@@ -120,6 +132,7 @@ public class CassandraGenerator extends Generator
 		{
 			this._cycleTimeRng = new NegativeExponential(this._cycleTime, this._random);
 		}
+		this._logger = Logger.getLogger(this.getName());
 	}
 
 	@Override

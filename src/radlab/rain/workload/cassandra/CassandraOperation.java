@@ -1,6 +1,7 @@
 package radlab.rain.workload.cassandra;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 import radlab.rain.Generator;
 import radlab.rain.IScoreboard;
@@ -65,4 +66,14 @@ public abstract class CassandraOperation extends Operation
 	{
 		this._cassandraClient.delete( this._columnFamilyName, key );
 	}
+
+    public CassandraGenerator getGenerator()
+    {
+        return (CassandraGenerator) this._generator;
+    }
+
+    public Logger getLogger()
+    {
+        return this.getGenerator().getLogger();
+    }
 }

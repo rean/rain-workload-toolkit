@@ -18,7 +18,10 @@ public class CassandraGetOperation extends CassandraOperation
 	{
 		byte[] result = this.doGet( this._key );
 		if( result == null || result.length == 0 )
-			throw new Exception( "Empty value for key: " + this._key );
+		{
+			//throw new Exception( "Empty value for key: " + this._key );
+			this.getLogger().warning(NAME + "(" + this._key + ") returned an empty value");
+		}
 		
 		this.setFailed( false );
 	}
