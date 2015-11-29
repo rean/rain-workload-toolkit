@@ -412,7 +412,7 @@ public class CassandraGenerator extends Generator
 		if( this._usePooling )
 		{
 			ObjectPool pool = this.getTrack().getObjectPool();
-			op = (CassandraDeleteOperation) pool.rentObject( CassandraGetOperation.NAME );	
+			op = (CassandraDeleteOperation) pool.rentObject( CassandraDeleteOperation.NAME );	
 		}
 		
 		if( op == null )
