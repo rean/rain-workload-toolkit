@@ -10,7 +10,7 @@ Redis has built-in replication, Lua scripting, LRU eviction, transactions and di
 
 The benchmark implements the core functionality of a data store: setting, getting, and deleting keys.
 
-Redis is an open source (BDS licensed) software available at the [Redis](http://redis.io/) web site.
+Redis is an open source (BSD licensed) software available at the [Redis](http://redis.io/) web site.
 
 
 ## Implementation in RAIN
@@ -28,7 +28,7 @@ Currently, this implementation supports the following Redis operations:
 ### Configuration Properties
 
 The Redis workload can be customized by means of a set of properties.
-Of particular interest are properties for the *generatorParameters* and *loadProfile* keys of the *profiles.config.rubis.json*.
+Of particular interest are properties for the *generatorParameters* and *loadProfile* keys of the *profiles.config.redis.json*.
 
 For the *generatorParameters* key, the supported configuration properties are the following:
 - **usePooling**: a boolean value (i.e., either as *"true"* or *"false"* string) indicating whether object pooling must be enabled or not.
