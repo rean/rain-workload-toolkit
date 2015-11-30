@@ -31,12 +31,12 @@ The Redis workload can be customized by means of a set of properties.
 Of particular interest are properties for the *generatorParameters* and *loadProfile* keys of the *profiles.config.redis.json*.
 
 For the *generatorParameters* key, the supported configuration properties are the following:
-- **usePooling**: a boolean value (i.e., either as *"true"* or *"false"* string) indicating whether object pooling must be enabled or not.
-  Default value is: *"true"*.
-- **rngSeed**: an integer number representing the seed used to initialize the random number generator used by the Redis generator; if set to `-1`, the random number generator will be initialized with the Java's default (i.e., to a value very likely to be distinct from any other invocation of the `java.util.Random` default constructor).
-  Default value is: *-1*.
 - **debug**: a boolean value (i.e., either as *"true"* or *"false"* string) indicating whether debugging messages must be displayed or not.
   Default value is: *"false"*.
+- **rngSeed**: an integer number representing the seed used to initialize the random number generator used by the Redis generator; if set to `-1`, the random number generator will be initialized with the Java's default (i.e., to a value very likely to be distinct from any other invocation of the `java.util.Random` default constructor).
+  Default value is: *-1*.
+- **usePooling**: a boolean value (i.e., either as *"true"* or *"false"* string) indicating whether object pooling must be enabled or not.
+  Default value is: *"true"*.
 
 For the *loadProfile* key, there can be one or more *load profile* section (i.e., a piece of JSON code delimited by a pair of braces), each of which represents a specific workload to run against the Redis application.
 The configuration properties supported by each load profile section are the ones defined by the load profile class (see property *loadProfileClass*), which in this case are inherited from both the `radlab.rain.util.storage.StorageLoadProfile` and `radlab.rain.LoadProfile` classes.
@@ -53,12 +53,18 @@ Those of particular interest are the following:
   Default value is: *""*.
 - **keyGeneratorConfig**: an associative array containing properties for key generation.
   The supported properties are at least those defined by the `radlab.rain.util.storage.KeyGenerator` and possibly other ones provided by the key generator class (see property *keyGenerator*):
+  - **a**: a positive real number greater than 1 representing the shape parameter (i.e., the exponent) of the Zipf probability distribution.
+    Larger value implies taller peaks.
+    This properties is used by the `radlab.rain.util.storage.ZipfKeyGenerator` key generator class.
   - **maxKey**: a non-negative integer number representing the minimum value a key can take.
     Default value is: *0*.
   - **minKey**: a non-negative integer number representing the maximum value a key can take.
     Default value is: *0*.
+  - **r**: a positive real number greater than 0, used to shuffle keys around.
+    This properties is used by the `radlab.rain.util.storage.ZipfKeyGenerator` key generator class.
   - **rngSeed**: an integer number representing the seed used to initialize the random number generator used by the key generator; if set to `-1`, the random number generator will be initialized with the Java's default (i.e., to a value very likely to be distinct from any other invocation of the `java.util.Random` default constructor).
     Default value is: *1*.
+
 - **numHotObjects**: a non-negative integer number representing the number of hotspots to pick.
   Default value is: *0*.
 - **readPct**: a non-negative real number representing the percentage of GET operations.
