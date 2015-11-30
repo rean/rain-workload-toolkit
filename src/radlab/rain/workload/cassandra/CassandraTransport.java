@@ -13,16 +13,26 @@ import me.prettyprint.cassandra.service.ThriftKsDef;
 import me.prettyprint.hector.api.Cluster;
 import me.prettyprint.hector.api.Keyspace;
 import me.prettyprint.hector.api.beans.HColumn;
+import me.prettyprint.hector.api.beans.Row;
+import me.prettyprint.hector.api.beans.Rows;
 import me.prettyprint.hector.api.ddl.ColumnFamilyDefinition;
 import me.prettyprint.hector.api.ddl.KeyspaceDefinition;
 import me.prettyprint.hector.api.factory.HFactory;
 import me.prettyprint.hector.api.mutation.Mutator;
 import me.prettyprint.hector.api.query.ColumnQuery;
+import me.prettyprint.hector.api.query.MultigetSliceQuery;
 import me.prettyprint.hector.api.query.QueryResult;
+
+//[FIXME] Experimental: use templates instead of mutators
+//import me.prettyprint.cassandra.service.template.ColumnFamilyTemplate;
+//import me.prettyprint.cassandra.service.template.ColumnFamilyUpdater;
+//import me.prettyprint.cassandra.service.template.ThriftColumnFamilyTemplate;
+//[/FIXME]
 
 public class CassandraTransport 
 {
 	public static final int DEFAULT_PORT = 9160;
+	private static final String DEFAULT_COLUMN_NAME = "value";
 	
 	private String _clusterName = "";
 	//private String _clusterHost = "";
@@ -37,6 +47,9 @@ public class CassandraTransport
 	private int _replicationFactor = 1;
 	//private boolean _debug = true;
 	//private HashMap<String,Integer> _failMap = new HashMap<String,Integer>();
+	//[FIXME] Experimental: use of templates instead of mutators
+	//private ColumnFamilyTemplate<String, String> _template;
+	//[/FIXME]
 	
 	
 	public CassandraTransport( String clusterName, String clusterHosts, int maxUsers )
@@ -85,6 +98,13 @@ public class CassandraTransport
 		if( createColumnFamily )
 			this.createColumnFamily( columnFamilyName );
 		
+		//[FIXME] Experimental: use templates instead of mutators
+        //this._template = new ThriftColumnFamilyTemplate<String, String>(this._keyspace,
+		//																columnFamilyName,
+		//																StringSerializer.get(),
+		//																StringSerializer.get());
+		//[/FIXME]
+
 		this._initialized = true;
 	}
 	
@@ -134,13 +154,22 @@ public class CassandraTransport
 	public void put( String columnFamily, String key, byte[] value )
 	{	
 		Mutator<String> mutator = HFactory.createMutator( this._keyspace, StringSerializer.get() );
-		mutator.insert( key, columnFamily, HFactory.createColumn( "value", value, StringSerializer.get(), BytesArraySerializer.get() ) );
+		mutator.insert( key, columnFamily, HFactory.createColumn( DEFAULT_COLUMN_NAME, value, StringSerializer.get(), BytesArraySerializer.get() ) );
 	}
+	
+//[FIXME] Experimental: use templates instead of mutators
+//	public void put( String columnFamily, String key, byte[] value )
+//	{	
+//		ColumnFamilyUpdater<String, String> updater = this._template.createUpdater(key);
+//		updater.setByteArray(DEFAULT_COLUMN_NAME, value);
+ //   	this._template.update(updater);
+//	}
+//[/FIXME]
 	
 	public byte[] get( String columnFamilyName, String key )
 	{
 		ColumnQuery<String, String, byte[]> columnQuery = HFactory.createColumnQuery( this._keyspace, StringSerializer.get(), StringSerializer.get(), BytesArraySerializer.get() );
-		columnQuery.setColumnFamily( columnFamilyName ).setKey( key ).setName( "value" );
+		columnQuery.setColumnFamily( columnFamilyName ).setKey( key ).setName( DEFAULT_COLUMN_NAME );
 		QueryResult<HColumn<String, byte[]>> result = columnQuery.execute();
 		
 		HColumn<String, byte[]> res = result.get(); 
@@ -176,11 +205,140 @@ public class CassandraTransport
 		}
 	}
 	
-	public void scan( String startKey, String columnFamilyName, int maxRows )
-	{
-		
-	}
+//[FIXME] Experimental: use templates instead of mutators
+//	public byte[] get( String columnFamilyName, String key )
+//	{
+//		ColumnFamilyResult<String, String> res = this._template.queryColumns(key);
+//		return res.getByteArray(DEFAULT_COLUMN_NAME);
+//	}
+//[/FIXME]
 	
+	public List<byte[]> scan( String startKey, String columnFamilyName, int maxRows )// throws IOException
+	{
+		List<byte[]> results = new ArrayList<byte[]>();
+
+		MultigetSliceQuery<String, String, byte[]> multigetSliceQuery = HFactory.createMultigetSliceQuery(this._keyspace, StringSerializer.get(), StringSerializer.get(), BytesArraySerializer.get());
+		multigetSliceQuery.setColumnFamily(columnFamilyName);
+		multigetSliceQuery.setKeys(startKey);
+		multigetSliceQuery.setRange(startKey, "", false, maxRows);
+		QueryResult<Rows<String, String, byte[]>> queryResult = multigetSliceQuery.execute();
+		Rows<String, String, byte[]> rows = queryResult.get();
+		for (Row<String, String, byte[]> row : rows)
+		{
+			boolean fail = true;
+			HColumn<String, byte[]> column = row.getColumnSlice().getColumnByName(DEFAULT_COLUMN_NAME);
+			if (column != null)
+			{
+				byte[] value = column.getValue();
+
+				if (value != null)
+				{
+					results.add(value);
+					fail = false;
+					/*
+					if (this._debug)
+					{
+						String key = rows.getKey();
+
+						if (this._failMap.containsKey(key))
+						{
+							System.out.println("Successful scan for previously failed key: " + key);
+						}
+					}
+					*/
+				}
+			}
+			if (fail)
+			{
+				/*
+				if (this._debug)
+				{
+					String key = rows.getKey();
+
+					// Track the keys that fail and check whether we ever see a key for a value that failed before
+					if (this._failMap.containsKey(key))
+					{
+						int count = this._failMap.get(key);
+						count++;
+						this._failMap.put(key, count);
+					}
+					else
+					{
+						this._failMap.put(key, 1);
+					}
+				}
+				*/
+			}
+		}
+
+		return results;
+	}
+
+	//[FIXME] Experimental: use templates instead of mutators
+	//public List<byte[]> scan( String startKey, String columnFamilyName, int maxRows )// throws IOException
+	//{
+	//	ArrayList<byte[]> results = new ArrayList<byte[]>();
+	//
+	//	HSlicePredicate<String> predicate = new HSlicePredicate<String>(StringSerializer.get());
+	//	predicate.setStartOn(startkey);
+	//	predicate.setCount(maxRows);
+	//
+	//	ColumnFamilyResult<String, String> rows = this._template.queryColumns(startkey, predicate);
+	//
+	//	while (rows.hasNext())
+	//	{
+	//		ColumnFamilyResult<String, String> row = rows.next();
+	//		byte[] value = row.getByteArray(DEFAULT_COLUMN_NAME);
+	//		if (value != null)
+	//		{
+	//			results.add(value);
+	//
+	//			/*
+	//			if (this._debug)
+	//			{
+	//				String key = row.getKey();
+	//
+	//				if (this._failMap.containsKey(key))
+	//				{
+	//					System.out.println("Successful scan for previously failed key: " + key);
+	//				}
+	//			}
+	//			*/
+	//		}
+	//		else
+	//		{
+	//			/*
+	//			if (this._debug)
+	//			{
+	//				String key = row.getKey();
+	//
+	//				// Track the keys that fail and check whether we ever see a key for a value that failed before
+	//				if (this._failMap.containsKey(key))
+	//				{
+	//					int count = this._failMap.get(key);
+	//					count++;
+	//					this._failMap.put(key, count);
+	//				}
+	//				else
+	//				{
+	//					this._failMap.put(key, 1);
+	//				}
+	//			}
+	//			*/
+	//		}
+	//	}
+	//
+	//	return results;
+	//}
+	
+	public void delete( String columnFamily, String key )
+	{	
+		Mutator<String> mutator = HFactory.createMutator( this._keyspace, StringSerializer.get() );
+		mutator.delete(key, columnFamily, null, StringSerializer.get());
+		//mutator.addDeletion(key, columnFamily);
+		//mutator.execute();
+	}
+
 	public void dispose()
 	{
 		/*

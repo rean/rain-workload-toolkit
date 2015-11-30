@@ -1,6 +1,7 @@
 package radlab.rain.workload.cassandra;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 
 import radlab.rain.Generator;
 import radlab.rain.IScoreboard;
@@ -50,10 +51,9 @@ public abstract class CassandraOperation extends Operation
 		return this._cassandraClient.get( this._columnFamilyName, key );
 	}
 	
-	public ArrayList<byte[]> doScan( String startKey, int maxRows ) throws Exception
+	public List<byte[]> doScan( String startKey, int maxRows ) throws Exception
 	{
-		//return this._cassandraClient.scan( startKey, this._columnFamilyName, maxRows );
-		throw new Exception( "Scan not implemented" );
+		return this._cassandraClient.scan( startKey, this._columnFamilyName, maxRows );
 	}
 	
 	public void doPut( String key, byte[] value ) throws Exception
@@ -61,4 +61,19 @@ public abstract class CassandraOperation extends Operation
 		this._operationRequest = key;
 		this._cassandraClient.put( this._columnFamilyName, key, value );
 	}
+
+	public void doDelete( String key ) throws Exception
+	{
+		this._cassandraClient.delete( this._columnFamilyName, key );
+	}
+
+    public CassandraGenerator getGenerator()
+    {
+        return (CassandraGenerator) this._generator;
+    }
+
+    public Logger getLogger()
+    {
+        return this.getGenerator().getLogger();
+    }
 }

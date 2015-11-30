@@ -2,6 +2,7 @@ package radlab.rain.workload.cassandra;
 
 //import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 import java.util.HashSet;
 import java.util.Random;
 
@@ -14,6 +15,7 @@ import radlab.rain.ObjectPool;
 import radlab.rain.Operation;
 import radlab.rain.ScenarioTrack;
 import radlab.rain.util.Histogram;
+import radlab.rain.util.NegativeExponential;
 import radlab.rain.util.storage.KeyGenerator;
 
 public class CassandraGenerator extends Generator 
@@ -32,6 +34,7 @@ public class CassandraGenerator extends Generator
 	public static int READ 					= CassandraLoadProfile.READ;
 	public static int WRITE 				= CassandraLoadProfile.WRITE;
 	public static int SCAN					= CassandraLoadProfile.SCAN;
+	public static int DELETE 				= CassandraLoadProfile.DELETE;
 	public static int DEFAULT_OBJECT_SIZE	= 4096;
 	
 	@SuppressWarnings("unused")
@@ -40,7 +43,7 @@ public class CassandraGenerator extends Generator
 	private boolean _usePooling						= true;
 	private boolean _debug 							= false;
 	
-	private Random _random						= null;
+	private static Random _random				= null; ///< The Random Number Generator
 	String _clusterName							= DEFAULT_CLUSTER_NAME;
 	String _keyspaceName						= DEFAULT_KEYSPACE_NAME;
 	String _columnFamilyName					= DEFAULT_COLUMN_FAMILY_NAME;
@@ -48,8 +51,52 @@ public class CassandraGenerator extends Generator
 	Histogram<String> _keyHist					= new Histogram<String>();
 	// Debug hot object popularity
 	Histogram<String> _hotObjHist				= new Histogram<String>();
+	private double _thinkTime = -1; ///< The mean think time; a value <= 0 means that no think time is used.
+	private NegativeExponential _thinkTimeRng;
+	private double _cycleTime = -1; ///< The mean cycle time; a value <= 0 means that no cycle time is used.
+	private NegativeExponential _cycleTimeRng;
+	private Logger _logger;
 	
 	
+	/**
+	 * Returns the internally used random number generator.
+	 * 
+	 * @return A Random object.
+	 */
+	public static Random getRandomGenerator()
+	{
+		//NOTE: this method is not "synchronized" since java.util.Random is threadsafe.
+		return _random;
+	}
+
+	/**
+	 * Set the internally used random number generator.
+	 * 
+	 * @param value A Random object.
+	 */
+	protected static synchronized void setRandomGenerator(Random value)
+	{
+		_random = value;
+	}
+
+	/**
+	 * Initialize the shared random number generator.
+	 */
+	private static synchronized void initizializeRandomGenerator(long seed)
+	{
+		if (_random == null)
+		{
+			if (seed >= 0)
+			{
+				_random = new Random(seed);
+			}
+			else
+			{
+				_random = new Random();
+			}
+		}
+	}
+
 	public CassandraGenerator(ScenarioTrack track) 
 	{
 		super(track);
@@ -61,9 +108,32 @@ public class CassandraGenerator extends Generator
 	public void setUsePooling( boolean value ) { this._usePooling = value; }
 	public boolean getUsePooling() { return this._usePooling; }
 		
+	/**
+	 * Returns the <code>Logger</code> associated with this generator.
+	 * 
+	 * @return A <code>Logger</code> object.
+	 */
+	public Logger getLogger()
+	{
+		return this._logger;
+	}
+
 	@Override
 	public void initialize() 
-	{}
+	{
+		// Setup think and cycle times
+		this._thinkTime = this.getTrack().getMeanThinkTime();
+		if (this._thinkTime > 0)
+		{
+			this._thinkTimeRng = new NegativeExponential(this._thinkTime, this._random);
+		}
+		this._cycleTime = this.getTrack().getMeanCycleTime();
+		if (this._cycleTime > 0)
+		{
+			this._cycleTimeRng = new NegativeExponential(this._cycleTime, this._random);
+		}
+		this._logger = Logger.getLogger(this.getName());
+	}
 
 	@Override
 	public void configure( JSONObject config ) throws JSONException
@@ -76,8 +146,9 @@ public class CassandraGenerator extends Generator
 		
 		// Look for a random number seed
 		if( config.has( CFG_RNG_SEED_KEY ) )
-			this._random = new Random( config.getLong( CFG_RNG_SEED_KEY ) );
-		else this._random = new Random();
+			this.initizializeRandomGenerator( config.getLong( CFG_RNG_SEED_KEY ) );
+		else
+			this.initizializeRandomGenerator(-1);
 	
 		if( config.has( CFG_CLUSTER_NAME_KEY ) )
 			this._clusterName = config.getString( CFG_CLUSTER_NAME_KEY );
@@ -113,13 +184,23 @@ public class CassandraGenerator extends Generator
 	@Override
 	public long getThinkTime() 
 	{
-		return 0;
+		if (this._cycleTime <= 0)
+		{
+			return 0;
+		}
+
+		return Math.round(this._cycleTimeRng.nextDouble());
 	}
 
 	@Override
 	public long getCycleTime() 
 	{
-		return 0;
+		if (this._thinkTime <= 0)
+		{
+			return 0;
+		}
+
+		return Math.round(this._thinkTimeRng.nextDouble());
 	}
 
 	@Override
@@ -260,6 +341,8 @@ public class CassandraGenerator extends Generator
 			return this.createScanOperation( request );
 		else if( request.op == WRITE )
 			return this.createPutOperation( request );
+		else if( request.op == DELETE )
+			return this.createDeleteOperation( request );
 		else return null; // We don't support updates/deletes explicitly, if an existing key gets re-written then so be it
 	}
 	
@@ -331,6 +414,26 @@ public class CassandraGenerator extends Generator
 			this._random.nextBytes( op._value );
 		}
 		else op._value = request.value;
+		op.prepare( this );
+		return op;
+	}
+
+	public CassandraDeleteOperation createDeleteOperation( CassandraRequest<String> request )
+	{
+		CassandraDeleteOperation op = null;
+		
+		if( this._usePooling )
+		{
+			ObjectPool pool = this.getTrack().getObjectPool();
+			op = (CassandraDeleteOperation) pool.rentObject( CassandraDeleteOperation.NAME );	
+		}
+		
+		if( op == null )
+			op = new CassandraDeleteOperation( this.getTrack().getInteractive(), this.getScoreboard() );
+		
+		// Set the specific fields
+		op._key = request.key;
+		
 		op.prepare( this );
 		return op;
 	}

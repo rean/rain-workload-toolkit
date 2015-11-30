@@ -1,6 +1,6 @@
 package radlab.rain.workload.cassandra;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import radlab.rain.IScoreboard;
 
@@ -19,9 +19,12 @@ public class CassandraScanOperation extends CassandraOperation
 	@Override
 	public void execute() throws Throwable
 	{
-		ArrayList<byte[]> results = this.doScan( this._key, this._maxScanRows );
+		List<byte[]> results = this.doScan( this._key, this._maxScanRows );
 		if( results.size() == 0 )
-			throw new Exception( "Empty scan results for stsart key: " + this._key + " rows: " + this._maxScanRows );
+		{
+			//throw new Exception( "Empty scan results for stsart key: " + this._key + " rows: " + this._maxScanRows );
+			this.getLogger().warning(NAME + "(" + this._key + ", " + this._maxScanRows + ") returned an empty result");
+		}
 		
 		this.setFailed( false );
 	}	
