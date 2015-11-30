@@ -40,6 +40,17 @@ import radlab.rain.util.Histogram;
 
 public class ZipfKeyGenerator extends KeyGenerator 
 {
+	/** Configuration property for setting the sampling method. */
+	public static final String SAMPLING_METHOD_CONFIG_KEY = "zipf.method";
+	/** Value for the SAMPLING_METHOD_CONFIG_KEY used to specify the direct sampling method. */
+	public static final String DIRECT_SAMPLING_METHOD_CONFIG_VALUE = "direct";
+	/** Value for the SAMPLING_METHOD_CONFIG_KEY used to specify the rejection inversion sampling method. */
+	public static final String REJECTION_SAMPLING_METHOD_CONFIG_VALUE = "rejection";
+	/** Constant to specify the direct sampling method. */
+	public static final int DIRECT_SAMPLING_METHOD = 0;
+	/** Constant to specify the rejection inversion sampling method. */
+	public static final int REJECTION_SAMPLING_METHOD = 1;
+
 	protected String name = "Zipf";
 
 	protected Random random = null;
@@ -52,16 +63,25 @@ public class ZipfKeyGenerator extends KeyGenerator
 
 	protected double[] cdf;
 	
+	/** The sampling method (either direct or rejection sampling). */
+	protected int _method = DIRECT_SAMPLING_METHOD;
+
 	public ZipfKeyGenerator( JSONObject configObj ) throws JSONException
 	{
 		this( configObj.getDouble( A_CONFIG_KEY ),
 			  configObj.getDouble( R_CONFIG_KEY ),
 			  configObj.getInt( MIN_KEY_CONFIG_KEY ),
 			  configObj.getInt( MAX_KEY_CONFIG_KEY ),
-			  configObj.getLong( RNG_SEED_KEY ) );
+			  configObj.getLong( RNG_SEED_KEY ),
+			  parseSamplingMethod( configObj.getString( SAMPLING_METHOD_CONFIG_KEY ) ) );
 	}
 
 	public ZipfKeyGenerator( double a, double r, int minKey, int maxKey, long seed )
+	{
+		this(a, r, minKey, maxKey, seed, DIRECT_SAMPLING_METHOD);
+	}
+
+	public ZipfKeyGenerator( double a, double r, int minKey, int maxKey, long seed, int method )
 	{
 		if ( a <= 1 ) {
 			throw new RuntimeException( "Zipf distribution requires a > 1: a = " + a );
@@ -74,12 +94,26 @@ public class ZipfKeyGenerator extends KeyGenerator
 		this.upperBound = maxKey + 1;
 		this.seed = seed;
 		this.random = new Random( this.seed );
+		this._method = method;
 	}
 
 	public int generateKey()
 	{
-		// Generate zipf numbers directly
-		return this.generateKeyDirect();
+		int key = -1;
+
+		switch (this._method)
+		{
+			case DIRECT_SAMPLING_METHOD:
+				// Generate zipf numbers directly
+				key = this.generateKeyDirect();
+				break;
+			case REJECTION_SAMPLING_METHOD:
+				// Generate zipf numbers directly
+				key = this.generateKeyReject();
+				break;
+		}
+
+		return key;
 	}
 	
 	public int generateKeyReject()
@@ -151,7 +185,7 @@ public class ZipfKeyGenerator extends KeyGenerator
 	
 	// Rejection method for generating Zipfian numbers
 	// See: Non-Uniform Random Variate Generation, Chapter 10: Discrete Univariate Distributions,  
-	// Luc Devroye (http://cg.scs.carleton.ca/~luc/rnbookindex.html)
+	// Luc Devroye (http://luc.devroye.org/rnbookindex.html)
 	private int sampleZipfReject()
 	{
 		double b = Math.pow( 2, a - 1 );
@@ -165,6 +199,20 @@ public class ZipfKeyGenerator extends KeyGenerator
 		return (int) x;
 	}
 		
+	private static int parseSamplingMethod(String methodStr)
+	{
+		int method = DIRECT_SAMPLING_METHOD;
+		if (methodStr.equalsIgnoreCase(DIRECT_SAMPLING_METHOD_CONFIG_VALUE))
+		{
+			method = DIRECT_SAMPLING_METHOD;
+		}
+		else if (methodStr.equalsIgnoreCase(REJECTION_SAMPLING_METHOD_CONFIG_VALUE))
+		{
+			method = REJECTION_SAMPLING_METHOD;
+		}
+		return method;
+	}
+
 	public static void main( String[] args )
 	{
 		/*double probSum = 0.0;
