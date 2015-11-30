@@ -31,7 +31,7 @@ Currently, this implementation supports the following Cassandra operations:
 ### Configuration Properties
 
 The Cassandra workload can be customized by means of a set of properties.
-Of particular interest are properties for the *generatorParameters* and *loadProfile* keys of the *profiles.config.redis.json*.
+Of particular interest are properties for the *generatorParameters* and *loadProfile* keys of the *profiles.config.cassandra.json*.
 
 For the *generatorParameters* key, the supported configuration properties are the following:
 - **clusterName**: the name of the Cassandra cluster.
