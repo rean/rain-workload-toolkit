@@ -25,8 +25,8 @@ For this reason, this workload can only be used for versions of Cassandra less t
 Currently, this implementation supports the following Cassandra operations:
 - **DELETE**: delete a key.
 - **READ**: retrieve the value of a key.
-- **WRITE**: set the value of a key (via either insertion or update).
-- **SCAN**: retrieve the values of a slice of keys (via multiget_slice).
+- **WRITE**: set the value of a key (cab be either an insertion or an update).
+- **SCAN**: retrieve the values of a slice of keys (via multiget_slice call).
 
 ### Configuration Properties
 
@@ -34,12 +34,18 @@ The Cassandra workload can be customized by means of a set of properties.
 Of particular interest are properties for the *generatorParameters* and *loadProfile* keys of the *profiles.config.rubis.json*.
 
 For the *generatorParameters* key, the supported configuration properties are the following:
-- **usePooling**: a boolean value (i.e., either as *"true"* or *"false"* string) indicating whether object pooling must be enabled or not.
-  Default value is: *"true"*.
-- **rngSeed**: an integer number representing the seed used to initialize the random number generator used by the Cassandra generator; if set to `-1`, the random number generator will be initialized with the Java's default (i.e., to a value very likely to be distinct from any other invocation of the `java.util.Random` default constructor).
-  Default value is: *-1*.
+- **clusterName**: the name of the Cassandra cluster.
+  Default value is: *rainclstr*.
+- **columnFamilyName**: the name of the Cassandra column family.
+  Default value is: *raincf*.
 - **debug**: a boolean value (i.e., either as *"true"* or *"false"* string) indicating whether debugging messages must be displayed or not.
   Default value is: *"false"*.
+- **keyspaceName**: the name of the Cassandra keyspace.
+  Default value is: *rainks*.
+- **rngSeed**: an integer number representing the seed used to initialize the random number generator used by the Cassandra generator; if set to `-1`, the random number generator will be initialized with the Java's default (i.e., to a value very likely to be distinct from any other invocation of the `java.util.Random` default constructor).
+  Default value is: *-1*.
+- **usePooling**: a boolean value (i.e., either as *"true"* or *"false"* string) indicating whether object pooling must be enabled or not.
+  Default value is: *"true"*.
 
 For the *loadProfile* key, there can be one or more *load profile* section (i.e., a piece of JSON code delimited by a pair of braces), each of which represents a specific workload to run against the Cassandra application.
 The configuration properties supported by each load profile section are the ones defined by the load profile class (see property *loadProfileClass*), which in this case are inherited from both the `radlab.rain.util.storage.StorageLoadProfile` and `radlab.rain.LoadProfile` classes.
@@ -66,7 +72,7 @@ Those of particular interest are the following:
   Default value is: *0*.
 - **readPct**: a non-negative real number representing the percentage of READ operations.
   Default value is: *0*.
-- **readPct**: a non-negative real number representing the percentage of SCAN operations.
+- **scanPct**: a non-negative real number representing the percentage of SCAN operations.
   Default value is: *0*.
 - **size**: a non-negative integer number representing the size (in bytes) of each object.
   Default value is: *0*.
@@ -102,3 +108,6 @@ To run the Cassandra workload, simply enter the following command:
 ### Assumptions
 
 None.
+
+It is not necessary to explicitly create the cluster, keyspace and column family (specified in the configuration file) in the Cassandra data store.
+Indeed, if one of them don't exist, this implementation will create it for you.
