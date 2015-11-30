@@ -18,7 +18,7 @@ Apache Cassandra is an open source (Apache License 2.0 licensed) software availa
 The current implementation of the Cassandra workload in RAIN only supports a limited set of Cassandra operations and data structures.
 In particular, this implementation is based on the Cassandra [Thrift](http://thrift.apache.org/) API which is the legacy RPC API used by older versions of Cassandra.
 The Thrift support will probably be removed in future versions of Cassandra in favor of the [CQL](http://docs.datastax.com/en/cql/3.3) interface.
-This implementation has been tested with Cassandra 0.7.9, 2.0.17, 2.1.11, and 2.2.3.
+This implementation has been tested with Cassandra v0.7.9, v2.0.17, v2.1.11, and v2.2.3.
 
 ### Type of Operations
 
@@ -31,7 +31,7 @@ Currently, this implementation supports the following Cassandra operations:
 ### Configuration Properties
 
 The Cassandra workload can be customized by means of a set of properties.
-Of particular interest are properties for the *generatorParameters* and *loadProfile* keys of the *profiles.config.rubis.json*.
+Of particular interest are properties for the *generatorParameters* and *loadProfile* keys of the *profiles.config.redis.json*.
 
 For the *generatorParameters* key, the supported configuration properties are the following:
 - **clusterName**: the name of the Cassandra cluster.
