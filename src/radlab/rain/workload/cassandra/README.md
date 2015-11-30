@@ -16,8 +16,8 @@ Apache Cassandra is an open source (Apache License 2.0 licensed) software availa
 ## Implementation in RAIN
 
 The current implementation of the Cassandra workload in RAIN only supports a limited set of Cassandra operations and data structures.
-In particular, this implementation is based on the Cassandra [Thrift](http://thrift.apache.org/) API which is the legacy API used by older version of Cassandra.
-The Thrift support will probably be removed since version 3.0.
+In particular, this implementation is based on the Cassandra [Thrift](http://thrift.apache.org/) API which is the legacy RPC API used by older versions of Cassandra.
+The Thrift support will probably be removed in future versions of Cassandra in favor of the [CQL](http://docs.datastax.com/en/cql/3.3) interface.
 For this reason, this workload can only be used for versions of Cassandra less than 3.0.
 
 ### Type of Operations
@@ -62,12 +62,18 @@ Those of particular interest are the following:
   Default value is: *""*.
 - **keyGeneratorConfig**: an associative array containing properties for key generation.
   The supported properties are at least those defined by the `radlab.rain.util.storage.KeyGenerator` and possibly other ones provided by the key generator class (see property *keyGenerator*):
+  - **a**: a positive real number greater than 1 representing the shape parameter (i.e., the exponent) of the Zipf probability distribution.
+    Larger value implies taller peaks.
+    This properties is used by the *radlab.rain.util.storage.ZipfKeyGenerator* key generator class.
   - **maxKey**: a non-negative integer number representing the minimum value a key can take.
     Default value is: *0*.
   - **minKey**: a non-negative integer number representing the maximum value a key can take.
     Default value is: *0*.
+  - **r**: a positive real number greater than 0, used to shuffle keys around.
+    This properties is used by the *radlab.rain.util.storage.ZipfKeyGenerator* key generator class.
   - **rngSeed**: an integer number representing the seed used to initialize the random number generator used by the key generator; if set to `-1`, the random number generator will be initialized with the Java's default (i.e., to a value very likely to be distinct from any other invocation of the `java.util.Random` default constructor).
     Default value is: *1*.
+
 - **numHotObjects**: a non-negative integer number representing the number of hotspots to pick.
   Default value is: *0*.
 - **readPct**: a non-negative real number representing the percentage of READ operations.
