@@ -50,6 +50,8 @@ public class ZipfKeyGenerator extends KeyGenerator
 	public static final int DIRECT_SAMPLING_METHOD = 0;
 	/** Constant to specify the rejection inversion sampling method. */
 	public static final int REJECTION_SAMPLING_METHOD = 1;
+	/** Constant to specify the default sampling method. */
+	private static final int DEFAULT_SAMPLING_METHOD = DIRECT_SAMPLING_METHOD;
 
 	protected String name = "Zipf";
 
@@ -73,12 +75,12 @@ public class ZipfKeyGenerator extends KeyGenerator
 			  configObj.getInt( MIN_KEY_CONFIG_KEY ),
 			  configObj.getInt( MAX_KEY_CONFIG_KEY ),
 			  configObj.getLong( RNG_SEED_KEY ),
-			  parseSamplingMethod( configObj.getString( SAMPLING_METHOD_CONFIG_KEY ) ) );
+			  configObj.has( SAMPLING_METHOD_CONFIG_KEY ) ? parseSamplingMethod( configObj.getString( SAMPLING_METHOD_CONFIG_KEY ) ) : DEFAULT_SAMPLING_METHOD );
 	}
 
 	public ZipfKeyGenerator( double a, double r, int minKey, int maxKey, long seed )
 	{
-		this(a, r, minKey, maxKey, seed, DIRECT_SAMPLING_METHOD);
+		this(a, r, minKey, maxKey, seed, DEFAULT_SAMPLING_METHOD);
 	}
 
 	public ZipfKeyGenerator( double a, double r, int minKey, int maxKey, long seed, int method )
@@ -201,7 +203,7 @@ public class ZipfKeyGenerator extends KeyGenerator
 		
 	private static int parseSamplingMethod(String methodStr)
 	{
-		int method = DIRECT_SAMPLING_METHOD;
+		int method = DEFAULT_SAMPLING_METHOD;
 		if (methodStr.equalsIgnoreCase(DIRECT_SAMPLING_METHOD_CONFIG_VALUE))
 		{
 			method = DIRECT_SAMPLING_METHOD;
