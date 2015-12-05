@@ -182,7 +182,7 @@ public class CassandraGenerator extends Generator
 	
 	
 	@Override
-	public long getThinkTime() 
+	public long getCycleTime() 
 	{
 		if (this._cycleTime <= 0)
 		{
@@ -193,7 +193,7 @@ public class CassandraGenerator extends Generator
 	}
 
 	@Override
-	public long getCycleTime() 
+	public long getThinkTime() 
 	{
 		if (this._thinkTime <= 0)
 		{
