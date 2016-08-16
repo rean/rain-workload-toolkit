@@ -22,10 +22,10 @@ Modifications by: Rean Griffith
 */
 
 //package org.apache.olio.workload.util;
-package radlab.rain.workload.olio;
+package radlab.rain.workload.rubis;
 
 //import com.sun.faban.driver.util.Random;
-import radlab.rain.workload.olio.Random;
+import radlab.rain.workload.rubis.Random;
 
 import java.io.FileReader;
 import java.util.HashSet;

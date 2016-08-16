@@ -505,7 +505,7 @@
             <!-- Bake the resource files into the jar -->
             <fileset dir="." includes="resources/rubbos-dictionary.txt"/>
 	    </jar>
-	</target>	
+	</target>
 	<!-- RUBiS workload -->
     <target depends="build" name="build-rubis">
         <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}" includes="radlab/rain/workload/rubis/**">
@@ -520,7 +520,7 @@
         	<!-- Bake the configuration files into the jar -->
         	<fileset dir="." includes="config/*rubis*.json"/>
 	    </jar>
-	</target>	
+	</target>
 	<!-- S3 workload -->
     <target depends="build" name="build-s3">
         <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}" includes="radlab/rain/workload/s3/**">
@@ -623,6 +623,21 @@
             <fileset dir="bin" includes="radlab/rain/workload/scads/**"/>
         	<!-- Bake the configuration files into the jar -->
         	<fileset dir="." includes="config/*scads*.json"/>
+        </jar>
+    </target>
+    <!-- nginx web -->
+     <target depends="build" name="build-nginx">
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}" includes="radlab/rain/workload/nginx/**">
+            <src path="src"/>
+            <classpath refid="rain.classpath"/>
+        </javac>
+    </target>
+    <target depends="build-nginx" name="package-nginx">
+        <mkdir dir="workloads"/>
+        <jar destfile="workloads/nginx.jar" filesetmanifest="mergewithoutmain">
+            <fileset dir="bin" includes="radlab/rain/workload/nginx/**"/>
+        	<!-- Bake the configuration files into the jar -->
+        	<fileset dir="." includes="config/*nginx*.json"/>
         </jar>
     </target>
 	<!-- Tests -->

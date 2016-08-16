@@ -1,0 +1,8 @@
+{
+    "profiles": "config/profiles.config.nginx.json",
+    "timing": {
+        "rampUp": 10,
+        "duration": 300,
+        "rampDown": 10
+    }
+}

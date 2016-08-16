@@ -24,7 +24,7 @@
  * Modifications by: Rean Griffith 
  * 1) Changed package to include file in Rain harness
  */
-package radlab.rain.workload.olio;
+package radlab.rain.workload.rubis;
 
 import java.util.GregorianCalendar;
 import java.util.Calendar;

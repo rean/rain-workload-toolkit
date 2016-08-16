@@ -25,7 +25,7 @@
  * 2) Renamed cumuHalfLogistic to cumulativeHalfLogistic.
  * 3) Added documentation.
  */
-package radlab.rain.workload.olio;
+package radlab.rain.workload.rubis;
 
 /**
  * This static class contains all the scale factors used for loading the data
