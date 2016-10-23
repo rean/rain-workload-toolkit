@@ -640,6 +640,21 @@
         	<fileset dir="." includes="config/*nginx*.json"/>
         </jar>
     </target>
+    <!-- ukweb -->
+    <target depends="build" name="build-ukweb">
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}" includes="radlab/rain/workload/ukweb/**">
+            <src path="src"/>
+            <classpath refid="rain.classpath"/>
+        </javac>
+    </target>
+     <target depends="build-ukweb" name="package-ukweb">
+        <mkdir dir="workloads"/>
+        <jar destfile="workloads/ukweb.jar" filesetmanifest="mergewithoutmain">
+            <fileset dir="bin" includes="radlab/rain/workload/ukweb/**"/>
+            <!-- Bake the configuration files into the jar -->
+            <fileset dir="." includes="config/*ukweb*.json"/>
+        </jar>
+    </target>
 	<!-- Tests -->
     <target name="OlioOperationsTest">
         <mkdir dir="${junit.output.dir}"/>
